@@ -14,7 +14,7 @@ export default function ProductCard({ p }: { p: PublicProduct }) {
           {p.colors.slice(0, 8).map((c) => <span key={c.name} className="dot" title={c.name} style={{ background: c.hex ?? '#ddd' }} />)}
           {p.colors.length > 8 && <span className="muted" style={{ fontSize: 12 }}>+{p.colors.length - 8}</span>}
         </div>
-        <div className="price">ab {eur(p.price)} <small>netto</small></div>
+        <div className="price">{p.price != null ? <>ab {eur(p.price)} <small>netto</small></> : <small style={{ fontSize: 14, color: 'var(--brand)', fontWeight: 600 }}>Preis auf Anfrage</small>}</div>
       </div>
     </Link>
   );

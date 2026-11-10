@@ -25,7 +25,7 @@ export async function POST(req: Request) {
   const lines = (Array.isArray(body.lines) ? body.lines : []).slice(0, 200).flatMap((l: any) => {
     const p = getProduct(String(l.id));
     const qty = Math.max(1, Math.min(100000, Math.floor(Number(l.qty) || 1)));
-    return p ? [{ sku: p.sku, name: p.name, color: String(l.color ?? ''), size: String(l.size ?? ''), qty, price: p.price, sum: p.price * qty }] : [];
+    return p ? [{ sku: p.sku, name: p.name, color: String(l.color ?? ''), size: String(l.size ?? ''), qty, price: p.price, sum: (p.price ?? 0) * qty }] : [];
   });
   if (!lines.length) return NextResponse.json({ error: 'Warenkorb ist leer.' }, { status: 400 });
   const total = lines.reduce((s: number, l: any) => s + l.sum, 0);
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, `${no}.json`), JSON.stringify({ no, date: new Date().toISOString(), customer: c, lines, total }, null, 2));
 
-  const rows = lines.map((l: any) => `<tr><td>${esc(l.sku)}</td><td>${esc(l.name)}</td><td>${esc(l.color)}</td><td>${esc(l.size)}</td><td align="right">${l.qty}</td><td align="right">${eur(l.price)}</td><td align="right">${eur(l.sum)}</td></tr>`).join('');
+  const rows = lines.map((l: any) => `<tr><td>${esc(l.sku)}</td><td>${esc(l.name)}</td><td>${esc(l.color)}</td><td>${esc(l.size)}</td><td align="right">${l.qty}</td><td align="right">${eur(l.price)}</td><td align="right">${l.price == null ? "auf Anfrage" : eur(l.sum)}</td></tr>`).join('');
   const table = `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;font:13px Arial"><tr style="background:#eee"><th>Art.-Nr.</th><th>Artikel</th><th>Farbe</th><th>Größe</th><th>Menge</th><th>Einzel</th><th>Summe</th></tr>${rows}<tr><td colspan="6" align="right"><b>Summe netto</b></td><td align="right"><b>${eur(total)}</b></td></tr></table>`;
   const customer = `<p><b>${esc(c.name)}</b>${c.company ? ` – ${esc(c.company)}` : ''}<br>${esc(c.email)} · ${esc(c.phone)}<br>${esc(c.city)}</p><p><b>Nachricht:</b><br>${esc(c.message).replace(/\n/g, '<br>')}</p>`;
 

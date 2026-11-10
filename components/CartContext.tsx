@@ -1,7 +1,7 @@
 'use client';
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 
-export type CartLine = { key: string; id: string; sku: string; name: string; color?: string; size?: string; qty: number; price: number; hex?: string; category: string; image?: string };
+export type CartLine = { key: string; id: string; sku: string; name: string; color?: string; size?: string; qty: number; price: number | null; hex?: string; category: string; image?: string };
 type Ctx = { lines: CartLine[]; add: (l: Omit<CartLine, 'key'>) => void; setQty: (key: string, qty: number) => void; remove: (key: string) => void; clear: () => void; count: number };
 
 const CartCtx = createContext<Ctx | null>(null);

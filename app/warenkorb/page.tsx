@@ -9,7 +9,8 @@ export default function CartPage() {
   const { lines, setQty, remove, clear } = useCart();
   const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle');
   const [err, setErr] = useState('');
-  const net = lines.reduce((s, l) => s + l.price * l.qty, 0);
+  const net = lines.reduce((s, l) => s + (l.price ?? 0) * l.qty, 0);
+  const anyOpen = lines.some((l) => l.price == null);
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -48,16 +49,16 @@ export default function CartPage() {
               <div style={{ width: 64, height: 64 }}><ProductImage p={{ name: l.name, images: l.image ? [l.image] : [], colors: [{ name: l.color ?? '', hex: l.hex }], category: l.category }} /></div>
               <div>
                 <Link href={`/produkt/${encodeURIComponent(l.id)}`} style={{ fontWeight: 600 }}>{l.name}</Link>
-                <div className="muted" style={{ fontSize: 13 }}>{[l.color, l.size, l.sku].filter(Boolean).join(' · ')} · {eur(l.price)}/Stk.</div>
+                <div className="muted" style={{ fontSize: 13 }}>{[l.color, l.size, l.sku].filter(Boolean).join(' · ')}{l.price != null && <> · {eur(l.price)}/Stk.</>}</div>
               </div>
               <input className="qty" style={{ width: 80, height: 40 }} type="number" min={1} value={l.qty} onChange={(e) => setQty(l.key, Number(e.target.value) || 1)} aria-label="Menge" />
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <strong>{eur(l.price * l.qty)}</strong>
+                <strong>{l.price != null ? eur(l.price * l.qty) : '—'}</strong>
                 <button className="x" onClick={() => remove(l.key)} aria-label="Entfernen">×</button>
               </div>
             </div>
           ))}
-          <div className="tot big"><span>Summe netto (Richtwert)</span><span>{eur(net)}</span></div>
+          {net > 0 && <div className="tot big"><span>Summe netto (Richtwert){anyOpen ? ' *' : ''}</span><span>{eur(net)}</span></div>}
           <p className="muted" style={{ fontSize: 13, margin: '6px 0 0' }}>Endpreis inkl. Mengenstaffel, Veredelung und Versand erhalten Sie mit dem Angebot.</p>
         </div>
 

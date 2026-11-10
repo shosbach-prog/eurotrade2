@@ -13,7 +13,7 @@ cp .env.example .env      # Werte eintragen
 npm install
 npm run dev               # http://localhost:3000
 ```
-Ohne API-Key laufen Demo-Daten (`npm run demo-data` erzeugt sie neu).
+Ohne API-Key kommt der Katalog aus `seed/products.json`. Neue Artikel: gespeicherte L-Shop-Produktseiten (.html) in `import/` legen → `npm run import-html` → Preise optional in `seed/preise.csv` (`AQ010;6,85`).
 
 ## L-Shop anbinden (sobald der API-Key da ist)
 1. In `.env`: `LSHOP_API_URL`, `LSHOP_API_KEY`, ggf. `LSHOP_AUTH_MODE` (header | x-api-key | query)

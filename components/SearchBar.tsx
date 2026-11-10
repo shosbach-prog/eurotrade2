@@ -63,7 +63,7 @@ export default function SearchBar() {
             <a key={p.id} href={`/produkt/${encodeURIComponent(p.id)}`} className={i === active ? 'on' : ''} onMouseEnter={() => setActive(i)}>
               <div className="thumb"><ProductImage p={p} /></div>
               <div><div className="t">{p.name}</div><div className="s">{p.brand} · {p.category} · {p.sku}</div></div>
-              <div className="p">ab {eur(p.price)}</div>
+              <div className="p">{p.price != null ? `ab ${eur(p.price)}` : ''}</div>
             </a>
           ))}
           {total > items.length && <a className="all" href={`/suche?q=${encodeURIComponent(q.trim())}`}>Alle {total} Treffer anzeigen →</a>}

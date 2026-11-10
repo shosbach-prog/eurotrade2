@@ -11,8 +11,11 @@ export type Product = {
   description: string;
   material?: string;
   gender?: string;
-  /** Einkaufspreis netto (L-Shop) – wird NIE an den Browser gegeben */
-  basePrice: number;
+  /** Einkaufspreis netto (L-Shop) – wird NIE an den Browser gegeben; null = Preis auf Anfrage */
+  basePrice: number | null;
+  features?: string[];
+  composition?: string;
+  specs?: Record<string, string>;
   images: string[];
   colors: Color[];
   sizes: string[];
@@ -21,6 +24,6 @@ export type Product = {
 };
 
 /** Was der Browser sieht: Verkaufspreis statt Einkaufspreis */
-export type PublicProduct = Omit<Product, 'basePrice'> & { price: number; priceGross: number };
+export type PublicProduct = Omit<Product, 'basePrice'> & { price: number | null; priceGross: number | null };
 
 export type Category = { name: string; slug: string; count: number };

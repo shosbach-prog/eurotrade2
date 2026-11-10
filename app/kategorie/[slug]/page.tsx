@@ -12,8 +12,8 @@ export default function CategoryPage({ params, searchParams }: { params: { slug:
   const cat = getCategories().find((x) => x.slug === params.slug);
   if (!cat) notFound();
   let items = getByCategory(params.slug);
-  if (searchParams.sort === 'preis') items = [...items].sort((a, b) => a.price - b.price);
-  if (searchParams.sort === 'preis-ab') items = [...items].sort((a, b) => b.price - a.price);
+  if (searchParams.sort === 'preis') items = [...items].sort((a, b) => (a.price ?? 1e9) - (b.price ?? 1e9));
+  if (searchParams.sort === 'preis-ab') items = [...items].sort((a, b) => (b.price ?? -1) - (a.price ?? -1));
   return (
     <>
       <div className="crumbs"><Link href="/">Start</Link> › {cat.name}</div>

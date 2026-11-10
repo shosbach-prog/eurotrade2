@@ -7,7 +7,7 @@ import { buildIndex, buildSkuMap, runSearch, type SearchDoc } from './search';
 import { gross, sellPrice } from './pricing';
 
 const LIVE = path.join(process.cwd(), 'data', 'products.json');
-const SEED = path.join(process.cwd(), 'seed', 'products.demo.json');
+const SEED = path.join(process.cwd(), 'seed', 'products.json');
 const file = () => (fs.existsSync(LIVE) ? LIVE : SEED);
 
 type State = { mtime: number; products: Product[]; byId: Map<string, Product>; index: MiniSearch<SearchDoc>; skus: Map<string, string>; categories: Category[] };
@@ -38,8 +38,8 @@ function load(): State {
 
 export function toPublic(p: Product): PublicProduct {
   const { basePrice, ...rest } = p;
-  const price = sellPrice(basePrice, p.categorySlug);
-  return { ...rest, price, priceGross: gross(price) };
+  const price = basePrice != null && basePrice > 0 ? sellPrice(basePrice, p.categorySlug) : null;
+  return { ...rest, price, priceGross: price != null ? gross(price) : null };
 }
 
 export const getCategories = () => load().categories;

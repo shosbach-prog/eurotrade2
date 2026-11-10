@@ -1,0 +1,370 @@
+[
+ {
+  "id": "mv470064",
+  "sku": "MV470064",
+  "name": "Men´s Shirt Modern Fit Long Sleeve",
+  "brand": "Marvelis",
+  "category": "Hemden & Blusen",
+  "categorySlug": "hemden-blusen",
+  "description": "Modern fit · Bügelfrei · New Kent Kragen · Brusttasche mit Bestickung · Langärmelig · White, Navy, Black: 100% Popeline; Blue, Anthracite: 100% Chambray · White bis 60 °C waschbar",
+  "features": [
+   "Modern fit",
+   "Bügelfrei",
+   "New Kent Kragen",
+   "Brusttasche mit Bestickung",
+   "Langärmelig",
+   "White, Navy, Black: 100% Popeline; Blue, Anthracite: 100% Chambray",
+   "White bis 60 °C waschbar"
+  ],
+  "material": "Popeline, 120 g/m²",
+  "composition": "100% Baumwolle",
+  "gender": "Herren",
+  "basePrice": null,
+  "images": [
+   "https://shop.l-shop-team.de/out/pictures/generated/product/1/665_665_75/2477845.jpg",
+   "https://shop.l-shop-team.de/out/pictures/generated/product/2/665_665_75/2499194.jpg",
+   "https://shop.l-shop-team.de/out/pictures/generated/product/3/665_665_75/2499795.jpg",
+   "https://shop.l-shop-team.de/out/pictures/generated/product/4/665_665_75/2499796.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Anthracite",
+    "hex": "#41424a"
+   },
+   {
+    "name": "Black",
+    "hex": "#2d2c2f"
+   },
+   {
+    "name": "Blue",
+    "hex": "#7a9dcb"
+   },
+   {
+    "name": "Navy",
+    "hex": "#2b3042"
+   },
+   {
+    "name": "White",
+    "hex": "#f1f2f1"
+   }
+  ],
+  "sizes": [
+   "38",
+   "39",
+   "40",
+   "41",
+   "42",
+   "43",
+   "44",
+   "45",
+   "46",
+   "47",
+   "48"
+  ],
+  "specs": {
+   "Passform": "Modern",
+   "Ärmel": "Langarm",
+   "Veredelung": "Keine Angabe",
+   "Zertifizierung": "OEKO-TEX® STANDARD 100",
+   "Pflege": "40 °C waschbar, Trockner geeignet, Bügeln erlaubt, Bügelfrei",
+   "Herkunft": "Indonesien"
+  },
+  "tags": [
+   "Hemden",
+   "Brusttasche",
+   "Berufsbekleidung",
+   "Herren"
+  ]
+ },
+ {
+  "id": "my111",
+  "sku": "MY111",
+  "name": "my mate - Men´s Long Tee",
+  "brand": "Miners mate",
+  "category": "T-Shirts",
+  "categorySlug": "t-shirts",
+  "description": "Klassische, lange Passform · Ringgesponnene Baumwolle · Single Jersey · Entfernbares miners mate Etikett · Neutrales Größenetikett im Kragen, seitlich versetzt · Vorgeschrumpft · Enzym- und silikongewaschen",
+  "features": [
+   "Klassische, lange Passform",
+   "Ringgesponnene Baumwolle",
+   "Single Jersey",
+   "Entfernbares miners mate Etikett",
+   "Neutrales Größenetikett im Kragen, seitlich versetzt",
+   "Vorgeschrumpft",
+   "Enzym- und silikongewaschen"
+  ],
+  "material": "Jersey, 160 g/m²",
+  "composition": "Uni Farben: 100% Baumwolle; Heather Farben: 60% Baumwolle / 40% Polyester; Heather Grey: 85% Baumwolle / 15% Viskose",
+  "gender": "Herren",
+  "basePrice": null,
+  "images": [
+   "https://shop.l-shop-team.de/out/pictures/generated/product/1/665_665_75/2693087.jpg",
+   "https://shop.l-shop-team.de/out/pictures/generated/product/2/665_665_75/1881208.jpg",
+   "https://shop.l-shop-team.de/out/pictures/generated/product/3/665_665_75/1881209.jpg",
+   "https://shop.l-shop-team.de/out/pictures/generated/product/4/665_665_75/1881210.jpg"
+  ],
+  "colors": [
+   {
+    "name": "White/White",
+    "hex": "#f4f5f0"
+   },
+   {
+    "name": "Pantone N/A",
+    "hex": "#f4f5f0"
+   },
+   {
+    "name": "Black/Heather Black",
+    "hex": "#28282d"
+   },
+   {
+    "name": "Black/Black",
+    "hex": "#28282d"
+   },
+   {
+    "name": "Heather Grey/Grey Solid",
+    "hex": "#625d5d"
+   },
+   {
+    "name": "Grey Solid/Heather Grey",
+    "hex": "#625d5d"
+   },
+   {
+    "name": "Navy/Heather Navy",
+    "hex": "#2c313d"
+   },
+   {
+    "name": "Olive/Heather Olive",
+    "hex": "#44413c"
+   },
+   {
+    "name": "Burgundy/Heather Burgundy",
+    "hex": "#502b33"
+   }
+  ],
+  "sizes": [
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
+  "specs": {
+   "Passform": "Long (länger geschnitten), Regular (normal geschnitten)",
+   "Ärmel": "Kurzarm, Raglan",
+   "Veredelung": "Bestickung, Digitaldruck, Siebdruck, Transferdruck",
+   "Zertifizierung": "",
+   "Pflege": "40 °C waschbar, Bügeln erlaubt",
+   "Herkunft": "Bangladesch"
+  },
+  "tags": [
+   "T-Shirts",
+   "Herren"
+  ]
+ },
+ {
+  "id": "aq010",
+  "sku": "AQ010",
+  "name": "Men´s Classic Fit Polo",
+  "brand": "Asquith & Fox",
+  "category": "Poloshirts",
+  "categorySlug": "poloshirts",
+  "description": "100% ringgesponnene, gekämmte Baumwolle · Classic fit · Aus festerem Pikée-Gewebe · Weiches Finish",
+  "features": [
+   "100% ringgesponnene, gekämmte Baumwolle",
+   "Classic fit",
+   "Aus festerem Pikée-Gewebe",
+   "Weiches Finish"
+  ],
+  "material": "Piqué, 200 g/m²",
+  "composition": "100% Baumwolle (Charcoal, Heather Black, Teal Heather: 60% Baumwolle / 40% Polyester), (Heather Grey: 85% Baumwolle / 15% Viskose)",
+  "gender": "Herren",
+  "basePrice": null,
+  "images": [
+   "https://shop.l-shop-team.de/out/pictures/generated/product/1/665_665_75/2552350.jpg",
+   "https://shop.l-shop-team.de/out/pictures/generated/product/2/665_665_75/2552448.jpg",
+   "https://shop.l-shop-team.de/out/pictures/generated/product/3/665_665_75/2595041.jpg",
+   "https://shop.l-shop-team.de/out/pictures/generated/product/4/665_665_75/2595042.jpg",
+   "https://shop.l-shop-team.de/out/pictures/generated/product/5/665_665_75/2595119.jpg",
+   "https://shop.l-shop-team.de/out/pictures/generated/product/6/665_665_75/2595120.jpg",
+   "https://shop.l-shop-team.de/out/pictures/generated/product/7/665_665_75/2595121.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Burgundy",
+    "hex": "#572932"
+   },
+   {
+    "name": "Cherry Red",
+    "hex": "#ba0c2f"
+   },
+   {
+    "name": "Cornflower",
+    "hex": "#418fde"
+   },
+   {
+    "name": "Hot Pink",
+    "hex": "#ce0058"
+   },
+   {
+    "name": "Kelly",
+    "hex": "#09dc00"
+   },
+   {
+    "name": "Khaki",
+    "hex": "#a89968"
+   },
+   {
+    "name": "Lime",
+    "hex": "#6cc24a"
+   },
+   {
+    "name": "Natural",
+    "hex": "#d9c89e"
+   },
+   {
+    "name": "Orange",
+    "hex": "#fe5000"
+   },
+   {
+    "name": "Pink Carnation",
+    "hex": "#e782a9"
+   },
+   {
+    "name": "Sky",
+    "hex": "#9bb8d3"
+   },
+   {
+    "name": "Slate",
+    "hex": "#505759"
+   },
+   {
+    "name": "Sunflower",
+    "hex": "#eaaa00"
+   },
+   {
+    "name": "Turquoise",
+    "hex": "#00b5e2"
+   },
+   {
+    "name": "French Navy",
+    "hex": "#081f2c"
+   },
+   {
+    "name": "Denim",
+    "hex": "#403a60"
+   },
+   {
+    "name": "Olive",
+    "hex": "#5b6238"
+   },
+   {
+    "name": "Mint",
+    "hex": "#a0dab3"
+   },
+   {
+    "name": "Cardinal Red",
+    "hex": "#862633"
+   },
+   {
+    "name": "Orchid",
+    "hex": "#ac4fc6"
+   },
+   {
+    "name": "Peacock",
+    "hex": "#074f71"
+   },
+   {
+    "name": "Bright Royal",
+    "hex": "#003da5"
+   },
+   {
+    "name": "Heather Black",
+    "hex": "#2d2926"
+   },
+   {
+    "name": "Teal Heather",
+    "hex": "#006272"
+   },
+   {
+    "name": "Bright Ocean",
+    "hex": "#a8dfe8"
+   },
+   {
+    "name": "Jade",
+    "hex": "#007680"
+   },
+   {
+    "name": "Lavender",
+    "hex": "#a5b0e3"
+   },
+   {
+    "name": "Fern",
+    "hex": "#28724f"
+   },
+   {
+    "name": "Black",
+    "hex": "#000000"
+   },
+   {
+    "name": "Bottle",
+    "hex": "#22372b"
+   },
+   {
+    "name": "Charcoal",
+    "hex": "#53565a"
+   },
+   {
+    "name": "Heather Grey",
+    "hex": "#888b8d"
+   },
+   {
+    "name": "Navy",
+    "hex": "#0c2340"
+   },
+   {
+    "name": "Purple",
+    "hex": "#512d6d"
+   },
+   {
+    "name": "Red",
+    "hex": "#c8102e"
+   },
+   {
+    "name": "Royal",
+    "hex": "#003087"
+   },
+   {
+    "name": "Sapphire",
+    "hex": "#00629b"
+   },
+   {
+    "name": "White",
+    "hex": "#ffffff"
+   }
+  ],
+  "sizes": [
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL",
+   "4XL",
+   "5XL"
+  ],
+  "specs": {
+   "Passform": "Regular (normal geschnitten)",
+   "Ärmel": "Kurzarm, Set-In",
+   "Veredelung": "Bestickung, Siebdruck, Transferdruck",
+   "Zertifizierung": "OEKO-TEX® STANDARD 100",
+   "Pflege": "30 °C waschbar, Bügeln erlaubt",
+   "Herkunft": "Bangladesch"
+  },
+  "tags": [
+   "Poloshirts",
+   "Seitenschlitze",
+   "Herren"
+  ]
+ }
+]

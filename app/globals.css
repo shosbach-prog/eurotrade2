@@ -90,8 +90,8 @@ h2{font-size:20px;margin:28px 0 12px}
 .note{margin-top:12px;font-size:14px}
 .ok{color:var(--ok)} .err{color:var(--err)}
 .specs{margin-top:20px;border-top:1px solid var(--line);padding-top:14px;font-size:14px}
-.specs dt{color:var(--muted);float:left;width:120px}
-.specs dd{margin:0 0 6px 120px}
+.specs dt{color:var(--muted);float:left;width:150px}
+.specs dd{margin:0 0 6px 150px}
 
 /* Warenkorb */
 .cart{display:grid;grid-template-columns:1.6fr 1fr;gap:24px;align-items:start}
@@ -122,3 +122,10 @@ footer .wrap{display:flex;gap:20px;flex-wrap:wrap;justify-content:space-between}
   .hero{padding:22px}
   .form .two{grid-template-columns:1fr}
 }
+.thumbs{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.thumbs button{width:64px;height:64px;padding:0;border:2px solid transparent;border-radius:8px;overflow:hidden;background:#f0f2f5}
+.thumbs button.on{border-color:var(--brand)}
+.thumbs img{width:100%;height:100%;object-fit:cover;display:block}
+.feat{margin:20px 0 0;padding-left:20px;font-size:14px;line-height:1.7}
+.card .img{background:#fff}
+.pd .gallery{background:#fff;border:1px solid var(--line)}
