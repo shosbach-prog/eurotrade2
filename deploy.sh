@@ -18,11 +18,11 @@ fi
 
 # 3) Datenordner vorbereiten (Container läuft als root, Daten bleiben bei Updates erhalten)
 mkdir -p data/anfragen
-# Ohne L-Shop-API: Katalog aus dem Repo (seed/products.json) verwenden
-if ! grep -qE '^LSHOP_API_KEY=.+' .env; then cp seed/products.json data/products.json; fi
 
 # 4) Neuesten Stand aus Git holen
 if [ -d .git ]; then git pull --ff-only; fi
+# Ohne L-Shop-API: Katalog aus dem Repo (seed/products.json) verwenden – erst NACH dem Pull kopieren
+if ! grep -qE '^LSHOP_API_KEY=.+' .env; then cp seed/products.json data/products.json; fi
 
 # 5) Bauen & starten
 docker compose up -d --build

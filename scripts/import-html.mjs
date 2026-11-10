@@ -42,18 +42,34 @@ function parse(file) {
   }
   const sp = (k) => (specs[k] || []).join(', ');
 
-  // Farben mit HEX
+  // Farben mit HEX – aus der Farbauswahl der Seite (zuverlässiger als der Text)
   const colors = [];
-  lines.forEach((l, k) => {
+  for (const chunk of raw.split('data-toggle="variant-color" data-value="').slice(1)) {
+    const name = decode(chunk.slice(0, chunk.indexOf('"'))).trim();
+    if (!name || name.includes('<%')) continue;
+    const field = chunk.slice(0, chunk.indexOf('</a>'));
+    const hx = field.match(/background:\s*(#[0-9a-fA-F]{6})/);
+    const sw = field.match(/background-image:\s*url\((data:image\/[^)]+)\)/);
+    if (colors.some((c) => c.name === name)) continue;
+    const c = { name };
+    if (hx) c.hex = hx[1].toLowerCase();
+    if (sw) c.swatch = sw[1]; // Meliert/gemustert: Stoffmuster als Bild
+    colors.push(c);
+  }
+  if (!colors.length) lines.forEach((l, k) => {
     const m = l.match(/^HEX\s*(#[0-9a-f]{6})/i);
-    if (m && !colors.some((c) => c.name === lines[k - 1])) colors.push({ name: lines[k - 1], hex: m[1].toLowerCase() });
+    if (m && !/^(Pantone|CMYK|RGB)/.test(lines[k - 1]) && !colors.some((c) => c.name === lines[k - 1])) colors.push({ name: lines[k - 1], hex: m[1].toLowerCase() });
   });
+  // Größen je Farbgruppe (Fallback, wenn kein Größenlauf angegeben)
+  const sizeHeads = [...raw.matchAll(/class="variant-size-heading">\s*([^<]+)</g)].map((m) => decode(m[1]).replace(/^\s*Größen?:\s*/, '').trim());
 
   // Bilder (große Variante, in Reihenfolge)
   const imgs = new Map();
   for (const m of raw.matchAll(/https:\/\/shop\.l-shop-team\.de\/out\/pictures\/generated\/product\/(\d+)\/665_665_75\/([\w-]+\.jpg)/g))
     if (!imgs.has(m[1])) imgs.set(m[1], m[0]);
-  const images = [...imgs.entries()].sort((a, b) => a[0] - b[0]).map((e) => e[1]);
+  let images = [...imgs.entries()].sort((a, b) => a[0] - b[0]).map((e) => e[1]);
+  if (!images.length) // Artikel mit nur einem Bild: Originalbild verwenden
+    images = [...new Set([...raw.matchAll(/class="cloud-zoom-gallery" href="(https:\/\/shop\.l-shop-team\.de\/out\/pictures\/master\/product\/[^"]+\.jpg)"/g)].map((m) => m[1]))];
 
   const typ = (specs['Produkt'] || [])[0] || 'Sonstiges';
   const category = CAT[typ] || typ;
@@ -70,7 +86,13 @@ function parse(file) {
     basePrice: null,
     images,
     colors,
-    sizes: sp('Größenlauf').split(/,\s*/).filter(Boolean),
+    sizes: (() => {
+      const s = sp('Größenlauf').split(/,\s*/).filter(Boolean);
+      if (s.length) return s;
+      const all = [];
+      for (const h of sizeHeads) for (const z of h.split(/,\s*/)) if (z && !all.includes(z)) all.push(z);
+      return all;
+    })(),
     specs: {
       Passform: sp('Passform'), Ärmel: sp('Ärmel'), Veredelung: sp('Veredelungsangabe Hersteller'),
       Zertifizierung: (specs['Zertifizierung'] || [])[0] || '', Pflege: sp('Pflegehinweis'), Herkunft: sp('Ursprungsland Bezeichnung'),
@@ -93,7 +115,9 @@ for (const f of files) {
 // Preise aus CSV
 if (fs.existsSync(PRICES)) {
   for (const row of fs.readFileSync(PRICES, 'utf8').split(/\r?\n/)) {
-    const [sku, ek] = row.split(/[;,\t]/).map((x) => x && x.trim());
+    if (!row.trim() || row.startsWith('#')) continue;
+    const parts = /[;\t]/.test(row) ? row.split(/[;\t]/) : row.split(',');
+    const [sku, ek] = parts.map((x) => x && x.trim());
     const v = Number(String(ek ?? '').replace(',', '.'));
     if (sku && bySku.has(sku) && v > 0) bySku.get(sku).basePrice = v;
   }

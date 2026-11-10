@@ -4,6 +4,7 @@ import type { PublicProduct } from '@/lib/types';
 import { eur } from '@/lib/format';
 import ProductImage from '@/components/ProductImage';
 import { useCart } from '@/components/CartContext';
+import { swatchBg } from '@/lib/colors';
 
 export default function AddToCart({ p }: { p: PublicProduct }) {
   const { add } = useCart();
@@ -49,7 +50,7 @@ export default function AddToCart({ p }: { p: PublicProduct }) {
         {p.colors.length > 0 && <>
           <div className="opt">Farbe: <span className="muted">{color?.name}</span> <span className="muted" style={{ fontWeight: 400 }}>({p.colors.length} Farben)</span></div>
           <div className="swatches">
-            {p.colors.map((c) => <button key={c.name} title={c.name} aria-label={c.name} className={`sw ${c.name === color?.name ? 'on' : ''}`} style={{ background: c.hex ?? '#ddd' }} onClick={() => setColor(c)} />)}
+            {p.colors.map((c) => <button key={c.name} title={c.name} aria-label={c.name} className={`sw ${c.name === color?.name ? 'on' : ''}`} style={{ background: swatchBg(c) }} onClick={() => setColor(c)} />)}
           </div>
         </>}
 

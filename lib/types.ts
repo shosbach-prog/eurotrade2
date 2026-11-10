@@ -1,4 +1,4 @@
-export type Color = { name: string; hex?: string; image?: string };
+export type Color = { name: string; hex?: string; image?: string; /** Stoffmuster (data-URI) für melierte Farben */ swatch?: string };
 
 /** Einheitliches Produktformat – der L-Shop-Sync schreibt genau dieses Format nach data/products.json */
 export type Product = {

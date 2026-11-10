@@ -28,3 +28,6 @@ export function sortColors(colors: Color[]): Color[] {
     return ka[0] - kb[0] || ka[1] - kb[1] || ka[2] - kb[2];
   });
 }
+
+/** Hintergrund für Farbpunkte: Stoffmuster (meliert) oder Vollfarbe */
+export const swatchBg = (c: Color) => (c.swatch ? `url("${c.swatch}") center/cover` : c.hex ?? '#ddd');
