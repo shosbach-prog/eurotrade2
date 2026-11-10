@@ -8,8 +8,8 @@ export default function Home() {
     <>
       <section className="hero">
         <div>
-          <h1>Textilien für Druck & Stick</h1>
-          <p>{productCount().toLocaleString('de-DE')} Artikel · Warenkorb füllen · unverbindliches Angebot in 24 h</p>
+          <h1>Markentextilien ab 1 Stück</h1>
+          <p>{productCount().toLocaleString('de-DE')} Artikel · schon ab 1 Stück · auf Wunsch mit Druck oder Stick</p>
           <div className="chips">{cats.map((c) => <Link key={c.slug} className="chip" href={`/kategorie/${c.slug}`}>{c.name}</Link>)}</div>
         </div>
       </section>

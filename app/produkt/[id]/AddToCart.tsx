@@ -10,7 +10,7 @@ export default function AddToCart({ p }: { p: PublicProduct }) {
   const [color, setColor] = useState(p.colors[0]);
   const [img, setImg] = useState(0);
   const [size, setSize] = useState(p.sizes.length === 1 ? p.sizes[0] : '');
-  const [qty, setQty] = useState(10);
+  const [qty, setQty] = useState(1);
   const [msg, setMsg] = useState('');
   const needSize = p.sizes.length > 1 && !size;
   const current = color?.image ?? p.images[img];
@@ -40,10 +40,10 @@ export default function AddToCart({ p }: { p: PublicProduct }) {
         <h1 style={{ margin: '4px 0 0' }}>{p.name}</h1>
         {p.price != null ? <>
           <div className="price">ab {eur(p.price)}</div>
-          <div className="vat">netto zzgl. MwSt. ({eur(p.priceGross)} brutto) · Staffelpreise im Angebot</div>
+          <div className="vat">netto zzgl. MwSt. ({eur(p.priceGross)} brutto) · schon ab 1 Stück</div>
         </> : <>
           <div className="price" style={{ fontSize: 22, color: 'var(--brand)' }}>Preis auf Anfrage</div>
-          <div className="vat">Mengenpreis inkl. Veredelung erhalten Sie mit dem Angebot</div>
+          <div className="vat">Schon ab 1 Stück · Ihren Preis erhalten Sie umgehend per E-Mail</div>
         </>}
 
         {p.colors.length > 0 && <>

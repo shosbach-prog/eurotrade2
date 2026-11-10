@@ -59,7 +59,7 @@ export default function CartPage() {
             </div>
           ))}
           {net > 0 && <div className="tot big"><span>Summe netto (Richtwert){anyOpen ? ' *' : ''}</span><span>{eur(net)}</span></div>}
-          <p className="muted" style={{ fontSize: 13, margin: '6px 0 0' }}>Endpreis inkl. Mengenstaffel, Veredelung und Versand erhalten Sie mit dem Angebot.</p>
+          <p className="muted" style={{ fontSize: 13, margin: '6px 0 0' }}>Endpreis inkl. Versand und ggf. Veredelung erhalten Sie mit dem Angebot.</p>
         </div>
 
         <form className="box form" onSubmit={submit}>
@@ -74,7 +74,7 @@ export default function CartPage() {
           </div>
           <label>PLZ / Ort</label><input name="city" />
           <label>Veredelung / Nachricht</label>
-          <textarea name="message" placeholder="z. B. Logo einfarbig Brust links, Liefertermin …" />
+          <textarea name="message" placeholder="Optional: Druck/Stick gewünscht? Liefertermin? …" />
           <input className="hp" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
           <label style={{ display: 'flex', gap: 8, fontWeight: 400 }}>
             <input type="checkbox" name="privacy" required style={{ width: 'auto' }} />
