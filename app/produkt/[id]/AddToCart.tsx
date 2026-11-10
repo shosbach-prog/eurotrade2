@@ -5,6 +5,7 @@ import { eur } from '@/lib/format';
 import ProductImage from '@/components/ProductImage';
 import { useCart } from '@/components/CartContext';
 import { swatchBg } from '@/lib/colors';
+import { WishButton } from '@/components/Wishlist';
 
 export default function AddToCart({ p }: { p: PublicProduct }) {
   const { add } = useCart();
@@ -62,6 +63,7 @@ export default function AddToCart({ p }: { p: PublicProduct }) {
         <div className="qtyrow">
           <input className="qty" type="number" min={1} value={qty} onChange={(e) => setQty(Math.max(1, Number(e.target.value) || 1))} aria-label="Menge" />
           <button className="btn" disabled={needSize} onClick={onAdd}>{needSize ? 'Bitte Größe wählen' : 'In den Warenkorb'}</button>
+          <WishButton id={p.id} variant="full" />
         </div>
         {msg && <div className="note ok">✓ {msg} <a href="/warenkorb" style={{ textDecoration: 'underline' }}>Zum Warenkorb</a></div>}
 

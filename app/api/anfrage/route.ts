@@ -4,6 +4,8 @@ import path from 'node:path';
 import nodemailer from 'nodemailer';
 import { getProduct } from '@/lib/catalog';
 import { eur } from '@/lib/format';
+import { cookies } from 'next/headers';
+import { ACCESS_COOKIE, codeForToken } from '@/lib/access';
 
 const hits = new Map<string, number[]>();
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
@@ -29,16 +31,18 @@ export async function POST(req: Request) {
   });
   if (!lines.length) return NextResponse.json({ error: 'Warenkorb ist leer.' }, { status: 400 });
   const total = lines.reduce((s: number, l: any) => s + l.sum, 0);
+  const access = await codeForToken(cookies().get(ACCESS_COOKIE)?.value);
+  const via = access ? `${access.code}${access.label ? ` (${access.label})` : ''}` : '';
   const no = `A${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
 
   // Immer lokal sichern (auch wenn Mail ausfällt)
   const dir = path.join(process.cwd(), 'data', 'anfragen');
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, `${no}.json`), JSON.stringify({ no, date: new Date().toISOString(), customer: c, lines, total }, null, 2));
+  fs.writeFileSync(path.join(dir, `${no}.json`), JSON.stringify({ no, date: new Date().toISOString(), zugangscode: via || null, customer: c, lines, total }, null, 2));
 
   const rows = lines.map((l: any) => `<tr><td>${esc(l.sku)}</td><td>${esc(l.name)}</td><td>${esc(l.color)}</td><td>${esc(l.size)}</td><td align="right">${l.qty}</td><td align="right">${eur(l.price)}</td><td align="right">${l.price == null ? "auf Anfrage" : eur(l.sum)}</td></tr>`).join('');
   const table = `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;font:13px Arial"><tr style="background:#eee"><th>Art.-Nr.</th><th>Artikel</th><th>Farbe</th><th>Größe</th><th>Menge</th><th>Einzel</th><th>Summe</th></tr>${rows}<tr><td colspan="6" align="right"><b>Summe netto</b></td><td align="right"><b>${eur(total)}</b></td></tr></table>`;
-  const customer = `<p><b>${esc(c.name)}</b>${c.company ? ` – ${esc(c.company)}` : ''}<br>${esc(c.email)} · ${esc(c.phone)}<br>${esc(c.city)}</p><p><b>Nachricht:</b><br>${esc(c.message).replace(/\n/g, '<br>')}</p>`;
+  const customer = `<p><b>${esc(c.name)}</b>${c.company ? ` – ${esc(c.company)}` : ''}<br>${esc(c.email)} · ${esc(c.phone)}<br>${esc(c.city)}</p><p><b>Nachricht:</b><br>${esc(c.message).replace(/\n/g, '<br>')}</p>${via ? `<p><b>Zugangscode:</b> ${esc(via)}</p>` : ''}`;
 
   if (process.env.SMTP_HOST) {
     try {
