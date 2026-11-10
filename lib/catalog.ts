@@ -5,6 +5,7 @@ import type MiniSearch from 'minisearch';
 import type { Category, Product, PublicProduct } from './types';
 import { buildIndex, buildSkuMap, runSearch, type SearchDoc } from './search';
 import { gross, sellPrice } from './pricing';
+import { sortColors } from './colors';
 
 const LIVE = path.join(process.cwd(), 'data', 'products.json');
 const SEED = path.join(process.cwd(), 'seed', 'products.json');
@@ -39,7 +40,7 @@ function load(): State {
 export function toPublic(p: Product): PublicProduct {
   const { basePrice, ...rest } = p;
   const price = basePrice != null && basePrice > 0 ? sellPrice(basePrice, p.categorySlug) : null;
-  return { ...rest, price, priceGross: price != null ? gross(price) : null };
+  return { ...rest, colors: sortColors(p.colors), price, priceGross: price != null ? gross(price) : null };
 }
 
 export const getCategories = () => load().categories;

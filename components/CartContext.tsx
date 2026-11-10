@@ -5,7 +5,7 @@ export type CartLine = { key: string; id: string; sku: string; name: string; col
 type Ctx = { lines: CartLine[]; add: (l: Omit<CartLine, 'key'>) => void; setQty: (key: string, qty: number) => void; remove: (key: string) => void; clear: () => void; count: number };
 
 const CartCtx = createContext<Ctx | null>(null);
-const KEY = 'et-cart-v1';
+const KEY = 'et-cart-v2'; // v1 enthielt Demo-Artikel
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>([]);
