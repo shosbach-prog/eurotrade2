@@ -5,12 +5,16 @@ import { useCart } from '@/components/CartContext';
 import ProductImage from '@/components/ProductImage';
 import { eur } from '@/lib/format';
 import { decoLabel } from '@/lib/deco';
+import { unitFor } from '@/lib/tiers';
 
 export default function CartPage() {
   const { lines, setQty, remove, clear } = useCart();
   const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle');
   const [err, setErr] = useState('');
-  const net = lines.reduce((s, l) => s + (l.price ?? 0) * l.qty, 0);
+  // Staffelpreis gilt für die Gesamtmenge je Artikel (alle Farben/Größen)
+  const perProduct = lines.reduce<Record<string, number>>((m, l) => ({ ...m, [l.id]: (m[l.id] ?? 0) + l.qty }), {});
+  const unit = (l: (typeof lines)[number]) => unitFor(l.tiers, perProduct[l.id], l.price);
+  const net = lines.reduce((s, l) => s + (unit(l) ?? 0) * l.qty, 0);
   const anyOpen = lines.some((l) => l.price == null);
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
@@ -50,12 +54,12 @@ export default function CartPage() {
               <div style={{ width: 64, height: 64 }}><ProductImage p={{ name: l.name, images: l.image ? [l.image] : [], colors: [{ name: l.color ?? '', hex: l.hex }], category: l.category }} /></div>
               <div>
                 <Link href={`/produkt/${encodeURIComponent(l.id)}`} style={{ fontWeight: 600 }}>{l.name}</Link>
-                <div className="muted" style={{ fontSize: 13 }}>{[l.color, l.size, l.sku].filter(Boolean).join(' · ')}{l.price != null && <> · {eur(l.price)}/Stk.</>}</div>
+                <div className="muted" style={{ fontSize: 13 }}>{[l.color, l.size, l.sku].filter(Boolean).join(' · ')}{l.price != null && <> · {eur(unit(l))}/Stk.{unit(l)! < l.price && <span className="ok"> (Staffel)</span>}</>}</div>
                 {l.deco && <div className="deco-tag">✦ {decoLabel(l.deco)}</div>}
               </div>
               <input className="qty" style={{ width: 80, height: 40 }} type="number" min={1} value={l.qty} onChange={(e) => setQty(l.key, Number(e.target.value) || 1)} aria-label="Menge" />
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <strong>{l.price != null ? eur(l.price * l.qty) : '—'}</strong>
+                <strong>{l.price != null ? eur(unit(l)! * l.qty) : '—'}</strong>
                 <button className="x" onClick={() => remove(l.key)} aria-label="Entfernen">×</button>
               </div>
             </div>

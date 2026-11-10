@@ -1,17 +1,24 @@
 'use client';
 import { useState } from 'react';
-import type { Customer } from '@/lib/store';
+import type { AccessRequest, Customer } from '@/lib/store';
 
 type P = { sku: string; name: string; brand: string };
 const gen = () => Array.from(crypto.getRandomValues(new Uint8Array(6)), (b) => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[b % 32]).join('');
 
-export default function CustomerEditor({ initial, envCodes, products, defaultMarkup }: { initial: Customer[]; envCodes: { code: string; name: string }[]; products: P[]; defaultMarkup: number }) {
+export default function CustomerEditor({ initial, envCodes, products, defaultMarkup, defaultTiers, requests: req0 }: { requests: AccessRequest[]; initial: Customer[]; envCodes: { code: string; name: string }[]; products: P[]; defaultMarkup: number; defaultTiers: string }) {
   const [list, setList] = useState<Customer[]>(initial);
   const [open, setOpen] = useState<number | null>(null);
   const [dirty, setDirty] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; t: string } | null>(null);
   const [busy, setBusy] = useState(false);
   const [pick, setPick] = useState('');
+  const [requests, setRequests] = useState(req0);
+  async function doneReq(id: string) { await fetch('/api/admin/zugangsanfragen', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, done: true }) }); setRequests((r) => r.filter((x) => x.id !== id)); }
+  function createFrom(r: AccessRequest) {
+    const c: Customer = { code: gen(), name: r.company || r.name, markup: null, skus: [], exclusive: false, active: true, note: `${r.name} · ${r.email}${r.phone ? ' · ' + r.phone : ''}${r.type ? ' · ' + r.type : ''}${r.message ? '\n' + r.message : ''}` };
+    setList((l) => [c, ...l]); setOpen(0); setDirty(true); doneReq(r.id);
+    setMsg({ ok: true, t: `Kunde angelegt (Code ${c.code}) – jetzt speichern und Einladung an ${r.email} schicken.` });
+  }
 
   const upd = (k: number, patch: Partial<Customer>) => { setList((l) => l.map((c, n) => (n === k ? { ...c, ...patch } : c))); setDirty(true); };
   const add = () => { setList((l) => [{ code: gen(), name: '', markup: null, skus: [], exclusive: false, active: true }, ...l]); setOpen(0); setDirty(true); };
@@ -41,6 +48,20 @@ export default function CustomerEditor({ initial, envCodes, products, defaultMar
         {msg && <span className={msg.ok ? 'ok' : 'err'}>{msg.t}</span>}
       </div>
 
+      {requests.length > 0 && (
+        <div className="box" style={{ marginBottom: 14, borderLeft: '4px solid var(--accent)' }}>
+          <strong>Offene Zugangsanfragen ({requests.length})</strong>
+          {requests.map((r) => (
+            <div key={r.id} className="req">
+              <div><b>{r.company || r.name}</b> <span className="muted">· {r.name} · <a className="alink" href={`mailto:${r.email}`}>{r.email}</a>{r.phone && ` · ${r.phone}`}{r.type && ` · ${r.type}`} · {new Date(r.date).toLocaleDateString('de-DE')}</span>{r.message && <div className="muted" style={{ fontSize: 13 }}>{r.message}</div>}</div>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center', flex: 'none' }}>
+                <button className="btn" style={{ height: 38 }} onClick={() => createFrom(r)}>Als Kunde anlegen</button>
+                <button className="linkbtn" onClick={() => doneReq(r.id)}>ablehnen</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
       {!list.length && <div className="box muted">Noch keine Kunden angelegt. Mit „Neuer Kunde / Code“ legen Sie den ersten an.</div>}
       <div className="cust-list">
         {list.map((c, k) => (
@@ -69,6 +90,9 @@ export default function CustomerEditor({ initial, envCodes, products, defaultMar
                   </div>
                 </div>
 
+                <label>Staffelrabatt (leer = Standard {defaultTiers || 'keiner'}, „-“ = keiner)</label>
+                <input value={c.tiers ?? ''} onChange={(e) => upd(k, { tiers: e.target.value })} placeholder="z. B. 10:5,50:10,100:15  →  ab 10 Stk. −5 %, ab 50 −10 %, ab 100 −15 %" />
+
                 <label>Kollektion (Artikel, die der Kunde zuerst sieht)</label>
                 <div className="chips" style={{ marginTop: 4 }}>
                   {(c.skus ?? []).map((s) => <span key={s} className="chip">{s} – {pname(s)} <button type="button" className="x" style={{ fontSize: 15 }} onClick={() => upd(k, { skus: c.skus!.filter((x) => x !== s) })}>×</button></span>)}
@@ -96,7 +120,7 @@ export default function CustomerEditor({ initial, envCodes, products, defaultMar
                 <label>Interne Notiz</label>
                 <textarea value={c.note ?? ''} onChange={(e) => upd(k, { note: e.target.value })} placeholder="nur für Sie sichtbar" />
                 <div className="admin-actions">
-                  <button type="button" className="btn alt" onClick={() => navigator.clipboard.writeText(`Ihr Zugang zu unserem Shop: ${window.location.origin} – Code: ${c.code}`)}>Einladungstext kopieren</button>
+                  <button type="button" className="btn alt" onClick={() => navigator.clipboard.writeText(`Guten Tag,\n\nIhr persönlicher Zugang zu unserem Textil-Shop ist freigeschaltet:\n\n${window.location.origin}\nZugangscode: ${c.code}\n\nDort finden Sie Ihre Konditionen${c.skus?.length ? ' und Ihre eigene Kollektion' : ''}, können Logos hochladen und erhalten Ihr Angebot innerhalb von 24 Stunden.\n\nMit freundlichen Grüßen\nEuro-Trade`)}>Einladungstext kopieren</button>
                   <span style={{ flex: 1 }} />
                   <button type="button" className="linkbtn err" onClick={() => del(k)}>Kunde löschen</button>
                 </div>

@@ -24,6 +24,8 @@ export type Customer = {
   name: string;
   /** Aufschlag in % – leer = Standard (MARKUP_PERCENT) */
   markup?: number | null;
+  /** eigene Staffel "10:5,50:10" – leer = Standard, "-" = keine */
+  tiers?: string | null;
   /** Artikelnummern der Kundenkollektion */
   skus?: string[];
   /** true = Kunde sieht NUR seine Kollektion */
@@ -106,3 +108,15 @@ export function draftOffer(i: Inquiry): Offer {
   for (const { d, qty } of decos.values()) lines.push({ text: `Veredelung: ${d.method}`, detail: d.positions.join(', '), qty, price: 0 });
   return { lines, shipping: 0, note: '', validDays: 14, createdAt: new Date().toISOString(), vat: Number(process.env.MWST_PERCENT ?? 19) };
 }
+
+/* ---------- Referenzen (öffentlich auf der Startseite) ---------- */
+export type Reference = { id: string; title: string; text: string; imageId?: string | null; imageName?: string | null; tag?: string };
+const REFS = path.join(DATA, 'referenzen.json');
+export const listReferences = () => readJSON<Reference[]>(REFS, []);
+export const saveReferences = (r: Reference[]) => writeJSON(REFS, r);
+
+/* ---------- Zugangsanfragen (von der Startseite) ---------- */
+export type AccessRequest = { id: string; date: string; name: string; company: string; email: string; phone: string; type: string; message: string; done?: boolean };
+const AREQ = path.join(DATA, 'zugangsanfragen.json');
+export const listAccessRequests = () => readJSON<AccessRequest[]>(AREQ, []);
+export const saveAccessRequests = (r: AccessRequest[]) => writeJSON(AREQ, r.slice(-1000));

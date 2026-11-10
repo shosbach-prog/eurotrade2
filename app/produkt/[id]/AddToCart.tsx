@@ -7,6 +7,7 @@ import { useCart } from '@/components/CartContext';
 import { swatchBg } from '@/lib/colors';
 import { WishButton } from '@/components/Wishlist';
 import { METHODS, POSITIONS, PREVIEW, isImage, type Deco } from '@/lib/deco';
+import { nextTier, unitFor } from '@/lib/tiers';
 
 type Logo = { id: string; name: string };
 
@@ -57,7 +58,7 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
     const items = entries.map(([key, n]) => {
       const [c, s] = key.split('|');
       const col = p.colors.find((x) => x.name === c);
-      return { id: p.id, sku: p.sku, name: p.name, color: c || undefined, hex: col?.hex, size: s || undefined, qty: n, price: p.price, category: p.category, image: p.images[0], deco };
+      return { id: p.id, sku: p.sku, name: p.name, color: c || undefined, hex: col?.hex, size: s || undefined, qty: n, price: p.price, category: p.category, image: p.images[0], deco, tiers: p.tiers };
     });
     addMany(items);
     setMsg(`${total} Stück von ${p.name} im Warenkorb${deco ? ' (mit Veredelung)' : ''}.`);
@@ -83,6 +84,16 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
         {p.price != null ? <>
           <div className="price">{eur(p.price)} <span style={{ fontSize: 15, fontWeight: 500 }} className="muted">/ Stück</span></div>
           <div className="vat">netto zzgl. MwSt. ({eur(p.priceGross)} brutto) · schon ab 1 Stück{decoOn ? ' · Veredelung wird im Angebot kalkuliert' : ''}</div>
+          {p.tiers.length > 0 && (
+            <div className="tiers">
+              <div className={`tier ${total < p.tiers[0].min ? 'on' : ''}`}><span>1–{p.tiers[0].min - 1} Stk.</span><b>{eur(p.price)}</b></div>
+              {p.tiers.map((t, n) => {
+                const to = p.tiers[n + 1]?.min;
+                const on = total >= t.min && (!to || total < to);
+                return <div key={t.min} className={`tier ${on ? 'on' : ''}`}><span>{to ? `${t.min}–${to - 1}` : `ab ${t.min}`} Stk.</span><b>{eur(t.price)}</b><small>−{Math.round((1 - t.price / p.price!) * 100)} %</small></div>;
+              })}
+            </div>
+          )}
         </> : <>
           <div className="price" style={{ fontSize: 22, color: 'var(--brand)' }}>Preis auf Anfrage</div>
           <div className="vat">Schon ab 1 Stück · Ihren Preis erhalten Sie umgehend per E-Mail</div>
@@ -117,6 +128,7 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
         </label>
         {decoOn && (
           <div className="deco">
+            <p className="hint" style={{ margin: '0 0 10px' }}>Unsicher, welches Verfahren passt? <a href="/druck-stick" target="_blank" className="alink">Druck & Stick im Vergleich</a></p>
             <div className="deco-row">
               {METHODS.map((m) => <button key={m} type="button" className={`size ${m === method ? 'on' : ''}`} onClick={() => setMethod(m)}>{m}</button>)}
             </div>
@@ -152,7 +164,14 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
           </button>
           <WishButton id={p.id} variant="full" />
         </div>
-        {total > 0 && p.price != null && <div className="note muted">Summe Textil: {eur(total * p.price)} netto</div>}
+        {total > 0 && p.price != null && (() => {
+          const u = unitFor(p.tiers, total, p.price)!;
+          const nx = nextTier(p.tiers, total);
+          return <div className="note">
+            <strong>{total} Stück × {eur(u)} = {eur(total * u)} netto</strong>{u < p.price && <span className="ok"> · Sie sparen {eur((p.price - u) * total)}</span>}
+            {nx && <div className="muted" style={{ fontSize: 13 }}>Noch {nx.min - total} Stück bis {eur(nx.price)} pro Stück</div>}
+          </div>;
+        })()}
         {msg && <div className="note ok">✓ {msg} <a href="/warenkorb" style={{ textDecoration: 'underline' }}>Zum Warenkorb</a></div>}
 
         {p.features?.length ? <ul className="feat">{p.features.map((f) => <li key={f}>{f}</li>)}</ul> : <p style={{ marginTop: 20 }}>{p.description}</p>}

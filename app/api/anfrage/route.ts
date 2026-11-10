@@ -4,6 +4,7 @@ import { eur } from '@/lib/format';
 import { getCustomer } from '@/lib/customer';
 import { METHODS, POSITIONS, decoLabel, type Deco } from '@/lib/deco';
 import { esc, sendMail, shopUrl } from '@/lib/mail';
+import { unitFor } from '@/lib/tiers';
 import { randomId, saveInquiry, type InqLine, type Inquiry } from '@/lib/store';
 
 const hits = new Map<string, number[]>();
@@ -33,10 +34,17 @@ export async function POST(req: Request) {
 
   // Preise serverseitig neu berechnen (mit Kunden-Aufschlag) – nie dem Browser vertrauen
   const ctx = await getCustomer();
-  const lines: InqLine[] = (Array.isArray(body.lines) ? body.lines : []).slice(0, 300).flatMap((l: any) => {
+  type Raw = { p: NonNullable<ReturnType<typeof getProduct>>; l: any; qty: number };
+  const raw: Raw[] = (Array.isArray(body.lines) ? body.lines : []).slice(0, 300).flatMap((l: any) => {
     const p = getProduct(String(l.id), ctx);
     const qty = Math.max(1, Math.min(100000, Math.floor(Number(l.qty) || 1)));
-    return p ? [{ id: p.id, sku: p.sku, name: p.name, color: String(l.color ?? '').slice(0, 80), size: String(l.size ?? '').slice(0, 40), qty, price: p.price, sum: (p.price ?? 0) * qty, deco: cleanDeco(l.deco) }] : [];
+    return p ? [{ p, l, qty }] : [];
+  });
+  // Staffelpreis nach Gesamtmenge je Artikel
+  const perProduct = raw.reduce((m: Record<string, number>, x) => ({ ...m, [x.p.id]: (m[x.p.id] ?? 0) + x.qty }), {});
+  const lines: InqLine[] = raw.map(({ p, l, qty }) => {
+    const price = unitFor(p.tiers, perProduct[p.id], p.price);
+    return { id: p.id, sku: p.sku, name: p.name, color: String(l.color ?? '').slice(0, 80), size: String(l.size ?? '').slice(0, 40), qty, price, sum: Math.round((price ?? 0) * qty * 100) / 100, deco: cleanDeco(l.deco) };
   });
   if (!lines.length) return NextResponse.json({ error: 'Warenkorb ist leer.' }, { status: 400 });
   const total = lines.reduce((s, l) => s + l.sum, 0);

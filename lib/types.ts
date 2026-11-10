@@ -24,6 +24,6 @@ export type Product = {
 };
 
 /** Was der Browser sieht: Verkaufspreis statt Einkaufspreis */
-export type PublicProduct = Omit<Product, 'basePrice'> & { price: number | null; priceGross: number | null };
+export type PublicProduct = Omit<Product, 'basePrice'> & { price: number | null; priceGross: number | null; /** Staffelpreise netto (ab Menge) */ tiers: { min: number; price: number }[] };
 
 export type Category = { name: string; slug: string; count: number };

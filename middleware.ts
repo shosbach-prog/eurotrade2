@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { ACCESS_COOKIE, ADMIN_COOKIE, isAdminToken, shopClosed, verifyCodeToken } from '@/lib/access';
 
 // Immer erreichbar: Zugang, Pflichtseiten, Angebots-Links aus der E-Mail, Admin-Login
-const PUBLIC = ['/zugang', '/api/zugang', '/impressum', '/datenschutz', '/angebot', '/api/angebot', '/admin/login', '/api/admin/login', '/icon.svg', '/favicon.ico', '/robots.txt'];
+const PUBLIC = ['/start', '/druck-stick', '/api/zugang-anfrage', '/api/bild', '/sitemap.xml', '/zugang', '/api/zugang', '/impressum', '/datenschutz', '/angebot', '/api/angebot', '/admin/login', '/api/admin/login', '/icon.svg', '/favicon.ico', '/robots.txt'];
 const match = (path: string, list: string[]) => list.some((p) => path === p || path.startsWith(p + '/'));
 
 export async function middleware(req: NextRequest) {
@@ -24,6 +24,12 @@ export async function middleware(req: NextRequest) {
   if (!shopClosed() || admin) return pass();
   // Signatur prüfen – ob der Code noch aktiv ist, prüft der Server (Codes können im Admin gesperrt werden)
   if (await verifyCodeToken(req.cookies.get(ACCESS_COOKIE)?.value)) return pass();
+  // Startseite ohne Code: öffentliche Landingpage (URL bleibt euro-trade.com/)
+  if (pathname === '/') {
+    headers.set('x-path', '/start');
+    const url = req.nextUrl.clone(); url.pathname = '/start';
+    return NextResponse.rewrite(url, { request: { headers } });
+  }
   return deny('/zugang');
 }
 

@@ -4,7 +4,7 @@ import path from 'node:path';
 import type MiniSearch from 'minisearch';
 import type { Category, Product, PublicProduct } from './types';
 import { buildIndex, buildSkuMap, runSearch, type SearchDoc } from './search';
-import { gross, sellPrice } from './pricing';
+import { gross, priceTiers, sellPrice } from './pricing';
 import { sortColors } from './colors';
 
 const LIVE = path.join(process.cwd(), 'data', 'products.json');
@@ -38,12 +38,12 @@ function load(): State {
 }
 
 /** Kundenkontext: eigener Aufschlag, eigene Kollektion */
-export type Ctx = { markup?: number | null; skus?: string[]; exclusive?: boolean } | null | undefined;
+export type Ctx = { markup?: number | null; skus?: string[]; exclusive?: boolean; tiers?: string | null } | null | undefined;
 
 export function toPublic(p: Product, ctx?: Ctx): PublicProduct {
   const { basePrice, ...rest } = p;
   const price = basePrice != null && basePrice > 0 ? sellPrice(basePrice, p.categorySlug, ctx?.markup) : null;
-  return { ...rest, colors: sortColors(p.colors), price, priceGross: price != null ? gross(price) : null };
+  return { ...rest, colors: sortColors(p.colors), price, priceGross: price != null ? gross(price) : null, tiers: price != null ? priceTiers(price, ctx?.tiers) : [] };
 }
 
 const skuSet = (ctx: Ctx) => new Set((ctx?.skus ?? []).map((x) => x.toUpperCase()));

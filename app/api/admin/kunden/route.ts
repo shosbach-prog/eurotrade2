@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { isAdmin } from '@/lib/customer';
 import { saveCustomers, type Customer } from '@/lib/store';
+import { parseTiers, tiersToString } from '@/lib/tiers';
 
 export async function PUT(req: Request) {
   if (!(await isAdmin())) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
@@ -9,6 +10,7 @@ export async function PUT(req: Request) {
     code: String(c.code ?? '').trim().toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 40),
     name: String(c.name ?? '').trim().slice(0, 120),
     markup: c.markup === '' || c.markup == null || !Number.isFinite(Number(c.markup)) ? null : Math.max(0, Math.min(500, Number(c.markup))),
+    tiers: (() => { const t = String(c.tiers ?? '').trim(); return t === '-' ? '-' : t ? tiersToString(parseTiers(t)) || null : null; })(),
     skus: (Array.isArray(c.skus) ? c.skus : []).map((s: unknown) => String(s).trim().toUpperCase()).filter(Boolean).slice(0, 500),
     exclusive: !!c.exclusive,
     logoId: /^[a-f0-9]{24}$/.test(String(c.logoId ?? '')) ? String(c.logoId) : null,
