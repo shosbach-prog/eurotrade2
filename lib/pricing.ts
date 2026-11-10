@@ -4,8 +4,9 @@ const round99 = (process.env.PRICE_ROUND_99 ?? 'true') === 'true';
 let byCat: Record<string, number> = {};
 try { byCat = JSON.parse(process.env.MARKUP_BY_CATEGORY || '{}'); } catch { byCat = {}; }
 
-export function sellPrice(basePrice: number, categorySlug: string): number {
-  const pct = byCat[categorySlug] ?? markup;
+/** override = kundenspezifischer Aufschlag (Zugangscode) – hat Vorrang vor Kategorie und Standard */
+export function sellPrice(basePrice: number, categorySlug: string, override?: number | null): number {
+  const pct = override != null && Number.isFinite(override) ? override : byCat[categorySlug] ?? markup;
   let p = basePrice * (1 + pct / 100);
   if (round99 && p >= 1) p = Math.ceil(p * 10) / 10 - 0.01; // z. B. 4,23 -> 4,29
   return Math.round(p * 100) / 100;

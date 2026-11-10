@@ -1,13 +1,14 @@
 import ProductCard from '@/components/ProductCard';
 import { search } from '@/lib/catalog';
+import { getCustomer } from '@/lib/customer';
 
 export function generateMetadata({ searchParams }: { searchParams: { q?: string } }) {
   return { title: `Suche: ${searchParams.q ?? ''}`, robots: { index: false } };
 }
 
-export default function SearchPage({ searchParams }: { searchParams: { q?: string } }) {
+export default async function SearchPage({ searchParams }: { searchParams: { q?: string } }) {
   const q = (searchParams.q ?? '').trim();
-  const res = q ? search(q, 200) : [];
+  const res = q ? search(q, 200, await getCustomer()) : [];
   return (
     <>
       <h1>{q ? <>Ergebnisse für „{q}“</> : 'Suche'}</h1>

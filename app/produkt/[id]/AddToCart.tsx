@@ -1,70 +1,158 @@
 'use client';
-import { Fragment, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import type { PublicProduct } from '@/lib/types';
 import { eur } from '@/lib/format';
-import ProductImage from '@/components/ProductImage';
+import Gallery from '@/components/Gallery';
 import { useCart } from '@/components/CartContext';
 import { swatchBg } from '@/lib/colors';
 import { WishButton } from '@/components/Wishlist';
+import { METHODS, POSITIONS, PREVIEW, isImage, type Deco } from '@/lib/deco';
 
-export default function AddToCart({ p }: { p: PublicProduct }) {
-  const { add } = useCart();
+type Logo = { id: string; name: string };
+
+export default function AddToCart({ p, customerLogo }: { p: PublicProduct; customerLogo?: Logo | null }) {
+  const { addMany } = useCart();
   const [color, setColor] = useState(p.colors[0]);
-  const [img, setImg] = useState(0);
-  const [size, setSize] = useState(p.sizes.length === 1 ? p.sizes[0] : '');
-  const [qty, setQty] = useState(1);
+  // Mengen je Farbe + Größe ("Black|M" -> 5) – mehrere Farben in einem Schritt möglich
+  const [qty, setQty] = useState<Record<string, number>>({});
   const [msg, setMsg] = useState('');
-  const needSize = p.sizes.length > 1 && !size;
-  const current = color?.image ?? p.images[img];
+
+  // Veredelung
+  const [decoOn, setDecoOn] = useState(false);
+  const [method, setMethod] = useState(METHODS[0]);
+  const [positions, setPositions] = useState<string[]>(['Brust links']);
+  const [logo, setLogo] = useState<Logo | null>(customerLogo ?? null);
+  const [uploading, setUploading] = useState(false);
+  const [upErr, setUpErr] = useState('');
+  const [note, setNote] = useState('');
+
+  const sizes = p.sizes.length ? p.sizes : [''];
+  const cname = color?.name ?? '';
+  const k = (c: string, s: string) => `${c}|${s}`;
+  const setQ = (s: string, v: number) => setQty((q) => ({ ...q, [k(cname, s)]: Math.max(0, Math.min(99999, Math.floor(v) || 0)) }));
+  const entries = Object.entries(qty).filter(([, v]) => v > 0);
+  const total = entries.reduce((s, [, v]) => s + v, 0);
+  const colorTotals = useMemo(() => {
+    const m: Record<string, number> = {};
+    for (const [key, v] of entries) { const c = key.split('|')[0]; m[c] = (m[c] ?? 0) + v; }
+    return m;
+  }, [qty]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const togglePos = (x: string) => setPositions((ps) => (ps.includes(x) ? ps.filter((y) => y !== x) : [...ps, x]));
+  const decoOk = !decoOn || (positions.length > 0 && (method === 'Beratung gewünscht' || !!logo));
+
+  async function upload(file?: File | null) {
+    if (!file) return;
+    setUploading(true); setUpErr('');
+    const fd = new FormData();
+    fd.append('file', file);
+    const r = await fetch('/api/upload', { method: 'POST', body: fd });
+    const d = await r.json().catch(() => ({}));
+    setUploading(false);
+    if (r.ok) setLogo({ id: d.id, name: d.name }); else setUpErr(d.error ?? 'Upload fehlgeschlagen.');
+  }
 
   const onAdd = () => {
-    add({ id: p.id, sku: p.sku, name: p.name, color: color?.name, hex: color?.hex, size, qty, price: p.price, category: p.category, image: p.images[0] });
-    setMsg(`${qty} × ${p.name} (${[color?.name, size].filter(Boolean).join(', ')}) im Warenkorb.`);
+    const deco: Deco | null = decoOn ? { method, positions, logoId: logo?.id ?? null, logoName: logo?.name ?? null, note: note.trim() } : null;
+    const items = entries.map(([key, n]) => {
+      const [c, s] = key.split('|');
+      const col = p.colors.find((x) => x.name === c);
+      return { id: p.id, sku: p.sku, name: p.name, color: c || undefined, hex: col?.hex, size: s || undefined, qty: n, price: p.price, category: p.category, image: p.images[0], deco };
+    });
+    addMany(items);
+    setMsg(`${total} Stück von ${p.name} im Warenkorb${deco ? ' (mit Veredelung)' : ''}.`);
+    setQty({});
   };
   const specs = Object.entries(p.specs ?? {}).filter(([, v]) => v && v !== 'Keine Angabe');
+  const showPreview = decoOn && logo && isImage(logo.name);
 
   return (
     <div className="pd">
       <div>
-        <div className="gallery"><ProductImage p={p} src={current} hex={color?.hex} /></div>
-        {p.images.length > 1 && (
-          <div className="thumbs">
-            {p.images.map((src, i) => (
-              <button key={src} className={i === img ? 'on' : ''} onClick={() => setImg(i)} aria-label={`Bild ${i + 1}`}>
-                <img src={src} alt="" loading="lazy" />
-              </button>
-            ))}
-          </div>
-        )}
+        <Gallery p={p} hex={color?.hex} overlay={showPreview ? <>
+          {positions.filter((x) => PREVIEW[x]).map((x) => {
+            const [l, t, w] = PREVIEW[x];
+            return <img key={x} className="logo-prev" src={`/api/upload/${logo!.id}`} alt="" style={{ left: `${l}%`, top: `${t}%`, width: `${w}%` }} />;
+          })}
+          <div className="prev-note">Vorschau · Position und Größe unverbindlich</div>
+        </> : null} />
       </div>
       <div>
         <div className="muted" style={{ textTransform: 'uppercase', fontSize: 13, letterSpacing: '.4px' }}>{p.brand} · Art.-Nr. {p.sku}</div>
         <h1 style={{ margin: '4px 0 0' }}>{p.name}</h1>
         {p.price != null ? <>
-          <div className="price">ab {eur(p.price)}</div>
-          <div className="vat">netto zzgl. MwSt. ({eur(p.priceGross)} brutto) · schon ab 1 Stück</div>
+          <div className="price">{eur(p.price)} <span style={{ fontSize: 15, fontWeight: 500 }} className="muted">/ Stück</span></div>
+          <div className="vat">netto zzgl. MwSt. ({eur(p.priceGross)} brutto) · schon ab 1 Stück{decoOn ? ' · Veredelung wird im Angebot kalkuliert' : ''}</div>
         </> : <>
           <div className="price" style={{ fontSize: 22, color: 'var(--brand)' }}>Preis auf Anfrage</div>
           <div className="vat">Schon ab 1 Stück · Ihren Preis erhalten Sie umgehend per E-Mail</div>
         </>}
 
         {p.colors.length > 0 && <>
-          <div className="opt">Farbe: <span className="muted">{color?.name}</span> <span className="muted" style={{ fontWeight: 400 }}>({p.colors.length} Farben)</span></div>
+          <div className="opt">Farbe: <span className="muted">{cname}</span> <span className="muted" style={{ fontWeight: 400 }}>({p.colors.length} Farben)</span></div>
           <div className="swatches">
-            {p.colors.map((c) => <button key={c.name} title={c.name} aria-label={c.name} className={`sw ${c.name === color?.name ? 'on' : ''}`} style={{ background: swatchBg(c) }} onClick={() => setColor(c)} />)}
+            {p.colors.map((c) => (
+              <button key={c.name} title={c.name} aria-label={c.name} className={`sw ${c.name === cname ? 'on' : ''}`} style={{ background: swatchBg(c) }} onClick={() => setColor(c)}>
+                {colorTotals[c.name] ? <span className="sw-n">{colorTotals[c.name]}</span> : null}
+              </button>
+            ))}
           </div>
         </>}
 
-        {p.sizes.length > 1 && <>
-          <div className="opt">Größe</div>
-          <div className="sizes">{p.sizes.map((s) => <button key={s} className={`size ${s === size ? 'on' : ''}`} onClick={() => setSize(s)}>{s}</button>)}</div>
-        </>}
+        <div className="opt">{sizes.length > 1 ? <>Mengen je Größe <span className="muted" style={{ fontWeight: 400 }}>– für {cname || 'diese Farbe'}</span></> : 'Menge'}</div>
+        <div className="matrix">
+          {sizes.map((s) => (
+            <label key={s} className={`mx ${qty[k(cname, s)] ? 'on' : ''}`}>
+              {s && <span>{s}</span>}
+              <input type="number" inputMode="numeric" min={0} placeholder="0" value={qty[k(cname, s)] || ''} onChange={(e) => setQ(s, Number(e.target.value))} aria-label={`Menge ${s}`} />
+            </label>
+          ))}
+        </div>
+        {p.colors.length > 1 && <p className="hint">Tipp: Farbe wechseln und weitere Mengen eintragen – alles landet zusammen im Warenkorb.</p>}
+
+        {/* Veredelung */}
+        <label className="deco-toggle">
+          <input type="checkbox" checked={decoOn} onChange={(e) => setDecoOn(e.target.checked)} />
+          <span><strong>Mit Logo veredeln</strong> <span className="muted">– Druck oder Stick</span></span>
+        </label>
+        {decoOn && (
+          <div className="deco">
+            <div className="deco-row">
+              {METHODS.map((m) => <button key={m} type="button" className={`size ${m === method ? 'on' : ''}`} onClick={() => setMethod(m)}>{m}</button>)}
+            </div>
+            <div className="opt" style={{ marginTop: 14 }}>Position(en)</div>
+            <div className="deco-row">
+              {POSITIONS.map((x) => <button key={x} type="button" className={`size ${positions.includes(x) ? 'on' : ''}`} onClick={() => togglePos(x)}>{x}</button>)}
+            </div>
+            <div className="opt" style={{ marginTop: 14 }}>Logo</div>
+            {logo ? (
+              <div className="logo-file">
+                {isImage(logo.name) ? <img src={`/api/upload/${logo.id}`} alt="" /> : <span className="file-ico">{logo.name.split('.').pop()?.toUpperCase()}</span>}
+                <span>{logo.name}{customerLogo && logo.id === customerLogo.id && <span className="muted"> · hinterlegt</span>}</span>
+                <button type="button" className="linkbtn" onClick={() => setLogo(null)}>ändern</button>
+              </div>
+            ) : (
+              <div className="deco-row">
+                <label className="btn alt upl">
+                  {uploading ? 'Lädt hoch …' : 'Logo hochladen'}
+                  <input type="file" accept=".png,.jpg,.jpeg,.webp,.svg,.pdf,.ai,.eps" hidden onChange={(e) => upload(e.target.files?.[0])} />
+                </label>
+                {customerLogo && <button type="button" className="linkbtn" onClick={() => setLogo(customerLogo)}>Hinterlegtes Logo verwenden</button>}
+              </div>
+            )}
+            {upErr && <p className="err" style={{ margin: '6px 0 0', fontSize: 14 }}>{upErr}</p>}
+            <p className="hint">PNG, JPG, SVG, PDF, AI oder EPS bis 15 MB. Vektordateien liefern das beste Ergebnis.</p>
+            <textarea className="deco-note" placeholder="Hinweise, z. B. Logogröße ca. 8 cm, Farben, Text/Namen auf dem Rücken …" value={note} onChange={(e) => setNote(e.target.value)} />
+          </div>
+        )}
 
         <div className="qtyrow">
-          <input className="qty" type="number" min={1} value={qty} onChange={(e) => setQty(Math.max(1, Number(e.target.value) || 1))} aria-label="Menge" />
-          <button className="btn" disabled={needSize} onClick={onAdd}>{needSize ? 'Bitte Größe wählen' : 'In den Warenkorb'}</button>
+          <button className="btn" disabled={!total || !decoOk} onClick={onAdd}>
+            {!total ? 'Menge eintragen' : !decoOk ? 'Logo / Position wählen' : `${total} Stück in den Warenkorb`}
+          </button>
           <WishButton id={p.id} variant="full" />
         </div>
+        {total > 0 && p.price != null && <div className="note muted">Summe Textil: {eur(total * p.price)} netto</div>}
         {msg && <div className="note ok">✓ {msg} <a href="/warenkorb" style={{ textDecoration: 'underline' }}>Zum Warenkorb</a></div>}
 
         {p.features?.length ? <ul className="feat">{p.features.map((f) => <li key={f}>{f}</li>)}</ul> : <p style={{ marginTop: 20 }}>{p.description}</p>}
@@ -73,7 +161,7 @@ export default function AddToCart({ p }: { p: PublicProduct }) {
           {p.composition && <><dt>Zusammensetzung</dt><dd>{p.composition}</dd></>}
           {p.gender && <><dt>Schnitt</dt><dd>{p.gender}</dd></>}
           {p.sizes.length > 0 && <><dt>Größen</dt><dd>{p.sizes.join(', ')}</dd></>}
-          {specs.map(([k, v]) => <Fragment key={k}><dt>{k}</dt><dd>{v}</dd></Fragment>)}
+          {specs.map(([key, v]) => <Fragment key={key}><dt>{key}</dt><dd>{v}</dd></Fragment>)}
         </dl>
       </div>
     </div>

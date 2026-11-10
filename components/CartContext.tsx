@@ -1,8 +1,9 @@
 'use client';
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import type { Deco } from '@/lib/deco';
 
-export type CartLine = { key: string; id: string; sku: string; name: string; color?: string; size?: string; qty: number; price: number | null; hex?: string; category: string; image?: string };
-type Ctx = { lines: CartLine[]; add: (l: Omit<CartLine, 'key'>) => void; setQty: (key: string, qty: number) => void; remove: (key: string) => void; clear: () => void; count: number };
+export type CartLine = { key: string; id: string; sku: string; name: string; color?: string; size?: string; qty: number; price: number | null; hex?: string; category: string; image?: string; deco?: Deco | null };
+type Ctx = { lines: CartLine[]; add: (l: Omit<CartLine, 'key'>) => void; addMany: (ls: Omit<CartLine, 'key'>[]) => void; setQty: (key: string, qty: number) => void; remove: (key: string) => void; clear: () => void; count: number };
 
 const CartCtx = createContext<Ctx | null>(null);
 const KEY = 'et-cart-v2'; // v1 enthielt Demo-Artikel
@@ -12,16 +13,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => { try { setLines(JSON.parse(localStorage.getItem(KEY) || '[]')); } catch {} }, []);
   const save = (next: CartLine[]) => { setLines(next); try { localStorage.setItem(KEY, JSON.stringify(next)); } catch {} };
 
-  const add: Ctx['add'] = (l) => {
-    const key = `${l.id}|${l.color ?? ''}|${l.size ?? ''}`;
-    const ex = lines.find((x) => x.key === key);
-    save(ex ? lines.map((x) => (x.key === key ? { ...x, qty: x.qty + l.qty } : x)) : [...lines, { ...l, key }]);
+  const merge = (base: CartLine[], l: Omit<CartLine, 'key'>) => {
+    const key = `${l.id}|${l.color ?? ''}|${l.size ?? ''}|${l.deco ? JSON.stringify(l.deco) : ''}`;
+    const ex = base.find((x) => x.key === key);
+    return ex ? base.map((x) => (x.key === key ? { ...x, qty: x.qty + l.qty } : x)) : [...base, { ...l, key }];
   };
+  const add: Ctx['add'] = (l) => save(merge(lines, l));
+  const addMany: Ctx['addMany'] = (ls) => save(ls.reduce(merge, lines));
   const setQty = (key: string, qty: number) => save(lines.map((x) => (x.key === key ? { ...x, qty: Math.max(1, qty) } : x)));
   const remove = (key: string) => save(lines.filter((x) => x.key !== key));
   const clear = () => save([]);
   const count = lines.reduce((s, l) => s + l.qty, 0);
-  return <CartCtx.Provider value={{ lines, add, setQty, remove, clear, count }}>{children}</CartCtx.Provider>;
+  return <CartCtx.Provider value={{ lines, add, addMany, setQty, remove, clear, count }}>{children}</CartCtx.Provider>;
 }
 export const useCart = () => useContext(CartCtx)!;
 

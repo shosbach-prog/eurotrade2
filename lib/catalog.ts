@@ -37,23 +37,50 @@ function load(): State {
   return state;
 }
 
-export function toPublic(p: Product): PublicProduct {
+/** Kundenkontext: eigener Aufschlag, eigene Kollektion */
+export type Ctx = { markup?: number | null; skus?: string[]; exclusive?: boolean } | null | undefined;
+
+export function toPublic(p: Product, ctx?: Ctx): PublicProduct {
   const { basePrice, ...rest } = p;
-  const price = basePrice != null && basePrice > 0 ? sellPrice(basePrice, p.categorySlug) : null;
+  const price = basePrice != null && basePrice > 0 ? sellPrice(basePrice, p.categorySlug, ctx?.markup) : null;
   return { ...rest, colors: sortColors(p.colors), price, priceGross: price != null ? gross(price) : null };
 }
 
-export const getCategories = () => load().categories;
-export const getProduct = (id: string) => {
-  const p = load().byId.get(id);
-  return p ? toPublic(p) : null;
+const skuSet = (ctx: Ctx) => new Set((ctx?.skus ?? []).map((x) => x.toUpperCase()));
+/** Sichtbar für diesen Kunden? (exklusive Kunden sehen nur ihre Kollektion) */
+const visible = (ctx: Ctx) => {
+  const set = skuSet(ctx);
+  return ctx?.exclusive && set.size ? (p: Product) => set.has(p.sku.toUpperCase()) : () => true;
 };
-export const getByCategory = (slug: string) =>
-  load().products.filter((p) => p.categorySlug === slug).map(toPublic);
-export const getFeatured = (n = 12) => load().products.slice(0, n).map(toPublic);
-export const productCount = () => load().products.length;
+const products = (ctx: Ctx) => load().products.filter(visible(ctx));
 
-export function search(q: string, limit = 48): PublicProduct[] {
+export function getCategories(ctx?: Ctx): Category[] {
+  if (!(ctx?.exclusive && ctx.skus?.length)) return load().categories;
+  const m = new Map<string, Category>();
+  for (const p of products(ctx)) {
+    const c = m.get(p.categorySlug) ?? { name: p.category, slug: p.categorySlug, count: 0 };
+    c.count++; m.set(p.categorySlug, c);
+  }
+  return [...m.values()].sort((a, b) => b.count - a.count);
+}
+export const getProduct = (id: string, ctx?: Ctx) => {
+  const p = load().byId.get(id);
+  return p && visible(ctx)(p) ? toPublic(p, ctx) : null;
+};
+export const getByCategory = (slug: string, ctx?: Ctx) => products(ctx).filter((p) => p.categorySlug === slug).map((p) => toPublic(p, ctx));
+export const getFeatured = (n = 12, ctx?: Ctx) => products(ctx).slice(0, n).map((p) => toPublic(p, ctx));
+export const productCount = (ctx?: Ctx) => products(ctx).length;
+/** Kundenkollektion in der hinterlegten Reihenfolge */
+export function getCollection(ctx?: Ctx): PublicProduct[] {
   const s = load();
-  return runSearch(s.index, q, limit, s.skus).map((id) => toPublic(s.byId.get(id)!));
+  const bySku = new Map(s.products.map((p) => [p.sku.toUpperCase(), p]));
+  return (ctx?.skus ?? []).flatMap((k) => { const p = bySku.get(k.toUpperCase()); return p ? [toPublic(p, ctx)] : []; });
+}
+/** Alle Artikel (Admin: Auswahl für Kollektionen) */
+export const allProductsBrief = () => load().products.map((p) => ({ sku: p.sku, name: p.name, brand: p.brand }));
+
+export function search(q: string, limit = 48, ctx?: Ctx): PublicProduct[] {
+  const s = load();
+  const ok = visible(ctx);
+  return runSearch(s.index, q, limit * 2, s.skus).map((id) => s.byId.get(id)!).filter(ok).slice(0, limit).map((p) => toPublic(p, ctx));
 }

@@ -1,7 +1,7 @@
 'use client';
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 
-type Ctx = { ids: string[]; has: (id: string) => boolean; toggle: (id: string) => void; clear: () => void };
+type Ctx = { ids: string[]; has: (id: string) => boolean; toggle: (id: string) => void; clear: () => void; addAll: (ids: string[]) => void };
 const WishCtx = createContext<Ctx | null>(null);
 const KEY = 'et-merkliste-v1';
 
@@ -11,7 +11,8 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
   const save = (next: string[]) => { setIds(next); try { localStorage.setItem(KEY, JSON.stringify(next)); } catch {} };
   const has = (id: string) => ids.includes(id);
   const toggle = (id: string) => save(has(id) ? ids.filter((x) => x !== id) : [id, ...ids]);
-  return <WishCtx.Provider value={{ ids, has, toggle, clear: () => save([]) }}>{children}</WishCtx.Provider>;
+  const addAll = (more: string[]) => save([...ids, ...more.filter((x) => !ids.includes(x))]);
+  return <WishCtx.Provider value={{ ids, has, toggle, clear: () => save([]), addAll }}>{children}</WishCtx.Provider>;
 }
 export const useWishlist = () => useContext(WishCtx)!;
 

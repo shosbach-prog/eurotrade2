@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { ACCESS_COOKIE, ACCESS_DAYS, accessCodes, tokenFor } from '@/lib/access';
+import { ACCESS_COOKIE, ACCESS_DAYS, normCode, signCode } from '@/lib/access';
+import { findCustomer } from '@/lib/store';
 
 const tries = new Map<string, number[]>();
 
@@ -12,19 +13,17 @@ export async function POST(req: Request) {
   tries.set(ip, [...recent, now]);
 
   const body = await req.json().catch(() => ({}));
-  const code = String(body?.code ?? '').trim().toUpperCase();
-  const match = accessCodes().find((c) => c.code === code);
-  if (!match) return NextResponse.json({ error: 'Dieser Code ist ungültig.' }, { status: 403 });
+  const c = findCustomer(normCode(body?.code));
+  if (!c) return NextResponse.json({ error: 'Dieser Code ist ungültig.' }, { status: 403 });
 
   tries.delete(ip);
   const res = NextResponse.json({ ok: true });
-  res.cookies.set(ACCESS_COOKIE, await tokenFor(match.code), {
+  res.cookies.set(ACCESS_COOKIE, await signCode(c.code), {
     httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', path: '/', maxAge: ACCESS_DAYS * 86400,
   });
   return res;
 }
 
-/** Abmelden */
 export async function DELETE() {
   const res = NextResponse.json({ ok: true });
   res.cookies.set(ACCESS_COOKIE, '', { path: '/', maxAge: 0 });

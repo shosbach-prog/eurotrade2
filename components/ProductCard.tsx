@@ -8,7 +8,7 @@ import { WishButton } from './Wishlist';
 export default function ProductCard({ p }: { p: PublicProduct }) {
   return (
     <Link href={`/produkt/${encodeURIComponent(p.id)}`} className="card">
-      <div className="img"><ProductImage p={p} /><WishButton id={p.id} /></div>
+      <div className="img"><ProductImage p={p} />{p.images[1] && <img className="pimg img2" src={p.images[1]} alt="" loading="lazy" aria-hidden />}<WishButton id={p.id} /></div>
       <div className="b">
         <div className="brand">{p.brand}</div>
         <div className="name">{p.name}</div>

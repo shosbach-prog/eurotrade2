@@ -1,35 +1,34 @@
-// Zugangscodes – funktioniert in Middleware (Edge) und im Node-Server (Web Crypto)
-// .env:  ACCESS_CODES=FIRMA24:Firma Muster GmbH,TEAM-XY:Verein XY   (Name nach dem Doppelpunkt ist optional)
-//        ACCESS_SECRET=<langer Zufallswert>   – ändern = alle Freischaltungen ungültig
+// Signierte Cookies für Kunden-Zugang und Admin – läuft in Middleware (Edge) und Node (Web Crypto)
 export const ACCESS_COOKIE = 'et_access';
+export const ADMIN_COOKIE = 'et_admin';
 export const ACCESS_DAYS = 180;
 
-export type AccessCode = { code: string; label: string };
+const enc = new TextEncoder();
+const hex = (b: ArrayBuffer) => Array.from(new Uint8Array(b), (x) => x.toString(16).padStart(2, '0')).join('');
+const secret = () => process.env.ACCESS_SECRET || 'euro-trade';
 
-export function accessCodes(): AccessCode[] {
-  return (process.env.ACCESS_CODES ?? '')
-    .split(',')
-    .map((x) => x.trim())
-    .filter(Boolean)
-    .map((x) => {
-      const [code, ...rest] = x.split(':');
-      return { code: code.trim().toUpperCase(), label: rest.join(':').trim() };
-    })
-    .filter((c) => c.code);
+export async function hmac(msg: string, key = secret()): Promise<string> {
+  const k = await crypto.subtle.importKey('raw', enc.encode(key), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  return hex(await crypto.subtle.sign('HMAC', k, enc.encode(msg)));
 }
 
-/** Shop ist nur gesperrt, wenn mindestens ein Code hinterlegt ist */
-export const accessEnabled = () => accessCodes().length > 0;
+export const normCode = (c: string) => String(c ?? '').trim().toUpperCase();
 
-export async function tokenFor(code: string): Promise<string> {
-  const data = new TextEncoder().encode(`${process.env.ACCESS_SECRET ?? 'euro-trade'}|${code.trim().toUpperCase()}`);
-  const buf = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(buf), (b) => b.toString(16).padStart(2, '0')).join('');
-}
+/** Shop geschlossen? – SHOP_CLOSED=true oder Codes in ACCESS_CODES */
+export const shopClosed = () => process.env.SHOP_CLOSED === 'true' || !!(process.env.ACCESS_CODES ?? '').trim();
 
-/** Liefert den freigeschalteten Code zum Cookie-Wert – oder null (Code entfernt / ungültig) */
-export async function codeForToken(token?: string | null): Promise<AccessCode | null> {
+/** Cookie-Wert: CODE.signatur */
+export async function signCode(code: string) { const c = normCode(code); return `${encodeURIComponent(c)}.${await hmac('code|' + c)}`; }
+export async function verifyCodeToken(token?: string | null): Promise<string | null> {
   if (!token) return null;
-  for (const c of accessCodes()) if ((await tokenFor(c.code)) === token) return c;
-  return null;
+  const i = token.lastIndexOf('.');
+  if (i < 1) return null;
+  const code = decodeURIComponent(token.slice(0, i));
+  return (await hmac('code|' + code)) === token.slice(i + 1) ? code : null;
+}
+
+/** Admin-Cookie: hängt am Passwort – Passwort ändern = alle Admin-Sitzungen ungültig */
+export async function adminToken() { return hmac('admin|' + (process.env.ADMIN_PASSWORD ?? '')); }
+export async function isAdminToken(token?: string | null) {
+  return !!process.env.ADMIN_PASSWORD && !!token && token === (await adminToken());
 }

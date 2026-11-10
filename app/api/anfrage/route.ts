@@ -1,14 +1,21 @@
 import { NextResponse } from 'next/server';
-import fs from 'node:fs';
-import path from 'node:path';
-import nodemailer from 'nodemailer';
 import { getProduct } from '@/lib/catalog';
 import { eur } from '@/lib/format';
-import { cookies } from 'next/headers';
-import { ACCESS_COOKIE, codeForToken } from '@/lib/access';
+import { getCustomer } from '@/lib/customer';
+import { METHODS, POSITIONS, decoLabel, type Deco } from '@/lib/deco';
+import { esc, sendMail, shopUrl } from '@/lib/mail';
+import { randomId, saveInquiry, type InqLine, type Inquiry } from '@/lib/store';
 
 const hits = new Map<string, number[]>();
-const esc = (s: unknown) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+
+function cleanDeco(d: any): Deco | null {
+  if (!d || typeof d !== 'object') return null;
+  const positions = (Array.isArray(d.positions) ? d.positions : []).filter((x: string) => POSITIONS.includes(x));
+  const method = METHODS.includes(d.method) ? d.method : METHODS[0];
+  if (!positions.length) return null;
+  const logoId = /^[a-f0-9]{24}$/.test(String(d.logoId ?? '')) ? String(d.logoId) : null;
+  return { method, positions, logoId, logoName: logoId ? String(d.logoName ?? '').slice(0, 120) : null, note: String(d.note ?? '').slice(0, 1000) };
+}
 
 export async function POST(req: Request) {
   // einfacher Spam-Schutz: max. 5 Anfragen / 10 Min. pro IP
@@ -22,42 +29,36 @@ export async function POST(req: Request) {
   const c = body?.customer ?? {};
   if (c.website) return NextResponse.json({ ok: true }); // Honeypot
   if (!c.name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(c.email ?? '')) return NextResponse.json({ error: 'Bitte Name und gültige E-Mail angeben.' }, { status: 400 });
+  const customer = Object.fromEntries(['name', 'company', 'email', 'phone', 'city', 'message'].map((k) => [k, String(c[k] ?? '').slice(0, 2000)]));
 
-  // Preise serverseitig neu berechnen – nie dem Browser vertrauen
-  const lines = (Array.isArray(body.lines) ? body.lines : []).slice(0, 200).flatMap((l: any) => {
-    const p = getProduct(String(l.id));
+  // Preise serverseitig neu berechnen (mit Kunden-Aufschlag) – nie dem Browser vertrauen
+  const ctx = await getCustomer();
+  const lines: InqLine[] = (Array.isArray(body.lines) ? body.lines : []).slice(0, 300).flatMap((l: any) => {
+    const p = getProduct(String(l.id), ctx);
     const qty = Math.max(1, Math.min(100000, Math.floor(Number(l.qty) || 1)));
-    return p ? [{ sku: p.sku, name: p.name, color: String(l.color ?? ''), size: String(l.size ?? ''), qty, price: p.price, sum: (p.price ?? 0) * qty }] : [];
+    return p ? [{ id: p.id, sku: p.sku, name: p.name, color: String(l.color ?? '').slice(0, 80), size: String(l.size ?? '').slice(0, 40), qty, price: p.price, sum: (p.price ?? 0) * qty, deco: cleanDeco(l.deco) }] : [];
   });
   if (!lines.length) return NextResponse.json({ error: 'Warenkorb ist leer.' }, { status: 400 });
-  const total = lines.reduce((s: number, l: any) => s + l.sum, 0);
-  const access = await codeForToken(cookies().get(ACCESS_COOKIE)?.value);
-  const via = access ? `${access.code}${access.label ? ` (${access.label})` : ''}` : '';
-  const no = `A${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+  const total = lines.reduce((s, l) => s + l.sum, 0);
+  const no = `A${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${randomId(3).toUpperCase()}`;
+  const via = ctx ? `${ctx.code}${ctx.name && ctx.name !== ctx.code ? ` (${ctx.name})` : ''}` : null;
 
-  // Immer lokal sichern (auch wenn Mail ausfällt)
-  const dir = path.join(process.cwd(), 'data', 'anfragen');
-  fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, `${no}.json`), JSON.stringify({ no, date: new Date().toISOString(), zugangscode: via || null, customer: c, lines, total }, null, 2));
+  const inq: Inquiry = { no, date: new Date().toISOString(), zugangscode: via, customer, lines, total, status: 'neu', token: randomId(16), offer: null, history: [{ date: new Date().toISOString(), text: 'Anfrage eingegangen' }] };
+  saveInquiry(inq); // immer lokal sichern (auch wenn Mail ausfällt)
 
-  const rows = lines.map((l: any) => `<tr><td>${esc(l.sku)}</td><td>${esc(l.name)}</td><td>${esc(l.color)}</td><td>${esc(l.size)}</td><td align="right">${l.qty}</td><td align="right">${eur(l.price)}</td><td align="right">${l.price == null ? "auf Anfrage" : eur(l.sum)}</td></tr>`).join('');
-  const table = `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;font:13px Arial"><tr style="background:#eee"><th>Art.-Nr.</th><th>Artikel</th><th>Farbe</th><th>Größe</th><th>Menge</th><th>Einzel</th><th>Summe</th></tr>${rows}<tr><td colspan="6" align="right"><b>Summe netto</b></td><td align="right"><b>${eur(total)}</b></td></tr></table>`;
-  const customer = `<p><b>${esc(c.name)}</b>${c.company ? ` – ${esc(c.company)}` : ''}<br>${esc(c.email)} · ${esc(c.phone)}<br>${esc(c.city)}</p><p><b>Nachricht:</b><br>${esc(c.message).replace(/\n/g, '<br>')}</p>${via ? `<p><b>Zugangscode:</b> ${esc(via)}</p>` : ''}`;
+  const base = shopUrl();
+  const rows = lines.map((l) => `<tr><td>${esc(l.sku)}</td><td>${esc(l.name)}${l.deco ? `<br><small>✦ ${esc(decoLabel(l.deco))}${l.deco.note ? ` – ${esc(l.deco.note)}` : ''}</small>` : ''}</td><td>${esc(l.color)}</td><td>${esc(l.size)}</td><td align="right">${l.qty}</td><td align="right">${eur(l.price)}</td><td align="right">${l.price == null ? 'auf Anfrage' : eur(l.sum)}</td></tr>`).join('');
+  const table = `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;font:13px Arial"><tr style="background:#eee"><th>Art.-Nr.</th><th>Artikel</th><th>Farbe</th><th>Größe</th><th>Menge</th><th>Einzel</th><th>Summe</th></tr>${rows}<tr><td colspan="6" align="right"><b>Summe netto (Textil)</b></td><td align="right"><b>${eur(total)}</b></td></tr></table>`;
+  const logos = [...new Map(lines.filter((l) => l.deco?.logoId).map((l) => [l.deco!.logoId!, l.deco!.logoName])).entries()];
+  const who = `<p><b>${esc(customer.name)}</b>${customer.company ? ` – ${esc(customer.company)}` : ''}<br>${esc(customer.email)} · ${esc(customer.phone)}<br>${esc(customer.city)}</p>${customer.message ? `<p><b>Nachricht:</b><br>${esc(customer.message).replace(/\n/g, '<br>')}</p>` : ''}${via ? `<p><b>Zugangscode:</b> ${esc(via)}</p>` : ''}`;
 
-  if (process.env.SMTP_HOST) {
-    try {
-      const tx = nodemailer.createTransport({
-        host: process.env.SMTP_HOST, port: Number(process.env.SMTP_PORT ?? 587), secure: Number(process.env.SMTP_PORT) === 465,
-        auth: process.env.SMTP_USER ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS } : undefined,
-      });
-      const from = process.env.SMTP_FROM ?? process.env.SMTP_USER;
-      await tx.sendMail({ from, to: process.env.INQUIRY_TO, replyTo: c.email, subject: `Neue Anfrage ${no} – ${c.company || c.name} – ${eur(total)}`, html: `<h2>Anfrage ${no}</h2>${customer}${table}` });
-      await tx.sendMail({ from, to: c.email, subject: `Ihre Anfrage ${no} bei ${process.env.SHOP_NAME ?? 'Euro-Trade'}`, html: `<p>Guten Tag ${esc(c.name)},</p><p>vielen Dank für Ihre Anfrage. Wir melden uns innerhalb von 24 Stunden mit Ihrem Angebot.</p>${table}<p>Mit freundlichen Grüßen<br>${esc(process.env.SHOP_NAME ?? 'Euro-Trade')}</p>` });
-    } catch (e) {
-      console.error('Mailversand fehlgeschlagen', e); // Anfrage ist trotzdem gespeichert
-    }
-  } else {
-    console.log(`[Anfrage ${no}] SMTP nicht konfiguriert – gespeichert in data/anfragen/${no}.json`);
+  try {
+    await sendMail({ to: process.env.INQUIRY_TO ?? '', replyTo: customer.email, subject: `Neue Anfrage ${no} – ${customer.company || customer.name} – ${eur(total)}`,
+      html: `<h2>Anfrage ${no}</h2>${who}${table}${logos.length ? `<p><b>Logos:</b> ${logos.map(([id, n]) => `<a href="${base}/api/upload/${id}?download">${esc(n)}</a>`).join(', ')}</p>` : ''}<p><a href="${base}/admin/anfrage/${no}">→ Im Admin öffnen und Angebot erstellen</a></p>` });
+    await sendMail({ to: customer.email, subject: `Ihre Anfrage ${no} bei ${process.env.SHOP_NAME ?? 'Euro-Trade'}`,
+      html: `<p>Guten Tag ${esc(customer.name)},</p><p>vielen Dank für Ihre Anfrage. Wir melden uns innerhalb von 24 Stunden mit Ihrem Angebot.</p>${table}<p>Mit freundlichen Grüßen<br>${esc(process.env.SHOP_NAME ?? 'Euro-Trade')}</p>` });
+  } catch (e) {
+    console.error('Mailversand fehlgeschlagen', e); // Anfrage ist trotzdem gespeichert
   }
   return NextResponse.json({ ok: true, no });
 }

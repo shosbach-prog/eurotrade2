@@ -1,7 +1,8 @@
 import './globals.css';
 import { Suspense } from 'react';
 import Link from 'next/link';
-import { cookies } from 'next/headers';
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
 import SearchBar from '@/components/SearchBar';
 import Logo from '@/components/Logo';
@@ -9,7 +10,8 @@ import LogoutLink from '@/components/LogoutLink';
 import { CartButton, CartProvider } from '@/components/CartContext';
 import { WishlistButton, WishlistProvider } from '@/components/Wishlist';
 import { getCategories } from '@/lib/catalog';
-import { ACCESS_COOKIE, accessEnabled, codeForToken } from '@/lib/access';
+import { shopClosed } from '@/lib/access';
+import { shopAccess } from '@/lib/customer';
 
 const SHOP = process.env.SHOP_NAME ?? 'Euro-Trade';
 export async function generateMetadata(): Promise<Metadata> {
@@ -18,15 +20,20 @@ export async function generateMetadata(): Promise<Metadata> {
     description: 'T-Shirts, Polos, Hoodies, Jacken, Caps und Taschen für Druck und Stick – schnell finden, Anfrage in einer Minute.',
     metadataBase: new URL(process.env.SHOP_URL ?? 'https://euro-trade.com'),
     // Geschlossener Shop: nicht in Suchmaschinen
-    robots: accessEnabled() ? { index: false, follow: false } : undefined,
+    robots: shopClosed() ? { index: false, follow: false } : undefined,
   };
 }
 export const dynamic = 'force-dynamic';
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const gated = accessEnabled();
-  const open = !gated || !!(await codeForToken(cookies().get(ACCESS_COOKIE)?.value));
-  const cats = open ? getCategories() : [];
+  const gated = shopClosed();
+  const path = headers().get('x-path') ?? '/';
+  const isPublic = ['/zugang', '/impressum', '/datenschutz', '/angebot', '/admin'].some((p) => path === p || path.startsWith(p + '/'));
+  const { ok, customer } = await shopAccess();
+  // Code im Admin gesperrt/gelöscht -> zurück zur Anmeldung
+  if (!ok && !isPublic) redirect('/zugang');
+  const open = ok && !path.startsWith('/zugang') && !path.startsWith('/admin');
+  const cats = open ? getCategories(customer) : [];
   return (
     <html lang="de">
       <body>
@@ -46,7 +53,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <main className="wrap">{children}</main>
           <footer><div className="wrap">
             <span>© {new Date().getFullYear()} {SHOP} · Alle Preise netto zzgl. MwSt. und Versand</span>
-            <span><Link href="/impressum">Impressum</Link> · <Link href="/datenschutz">Datenschutz</Link>{gated && open && <> · <LogoutLink /></>}</span>
+            <span><Link href="/impressum">Impressum</Link> · <Link href="/datenschutz">Datenschutz</Link>{gated && customer && <> · {customer.name} · <LogoutLink /></>}</span>
           </div></footer>
         </WishlistProvider></CartProvider>
       </body>

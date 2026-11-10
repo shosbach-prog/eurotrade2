@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useCart } from '@/components/CartContext';
 import ProductImage from '@/components/ProductImage';
 import { eur } from '@/lib/format';
+import { decoLabel } from '@/lib/deco';
 
 export default function CartPage() {
   const { lines, setQty, remove, clear } = useCart();
@@ -18,7 +19,7 @@ export default function CartPage() {
     const f = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
     const r = await fetch('/api/anfrage', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ customer: f, lines: lines.map(({ id, color, size, qty }) => ({ id, color, size, qty })) }),
+      body: JSON.stringify({ customer: f, lines: lines.map(({ id, color, size, qty, deco }) => ({ id, color, size, qty, deco })) }),
     });
     const d = await r.json().catch(() => ({}));
     if (r.ok) { setState('done'); clear(); } else { setState('error'); setErr(d.error ?? 'Senden fehlgeschlagen.'); }
@@ -50,6 +51,7 @@ export default function CartPage() {
               <div>
                 <Link href={`/produkt/${encodeURIComponent(l.id)}`} style={{ fontWeight: 600 }}>{l.name}</Link>
                 <div className="muted" style={{ fontSize: 13 }}>{[l.color, l.size, l.sku].filter(Boolean).join(' · ')}{l.price != null && <> · {eur(l.price)}/Stk.</>}</div>
+                {l.deco && <div className="deco-tag">✦ {decoLabel(l.deco)}</div>}
               </div>
               <input className="qty" style={{ width: 80, height: 40 }} type="number" min={1} value={l.qty} onChange={(e) => setQty(l.key, Number(e.target.value) || 1)} aria-label="Menge" />
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -73,8 +75,8 @@ export default function CartPage() {
             <div><label>Telefon</label><input name="phone" type="tel" /></div>
           </div>
           <label>PLZ / Ort</label><input name="city" />
-          <label>Veredelung / Nachricht</label>
-          <textarea name="message" placeholder="Optional: Druck/Stick gewünscht? Liefertermin? …" />
+          <label>Nachricht</label>
+          <textarea name="message" placeholder="Optional: Liefertermin, Lieferadresse, Fragen …" />
           <input className="hp" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
           <label style={{ display: 'flex', gap: 8, fontWeight: 400 }}>
             <input type="checkbox" name="privacy" required style={{ width: 'auto' }} />
