@@ -1,0 +1,37 @@
+'use client';
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+
+export type CartLine = { key: string; id: string; sku: string; name: string; color?: string; size?: string; qty: number; price: number; hex?: string; category: string; image?: string };
+type Ctx = { lines: CartLine[]; add: (l: Omit<CartLine, 'key'>) => void; setQty: (key: string, qty: number) => void; remove: (key: string) => void; clear: () => void; count: number };
+
+const CartCtx = createContext<Ctx | null>(null);
+const KEY = 'et-cart-v1';
+
+export function CartProvider({ children }: { children: ReactNode }) {
+  const [lines, setLines] = useState<CartLine[]>([]);
+  useEffect(() => { try { setLines(JSON.parse(localStorage.getItem(KEY) || '[]')); } catch {} }, []);
+  const save = (next: CartLine[]) => { setLines(next); try { localStorage.setItem(KEY, JSON.stringify(next)); } catch {} };
+
+  const add: Ctx['add'] = (l) => {
+    const key = `${l.id}|${l.color ?? ''}|${l.size ?? ''}`;
+    const ex = lines.find((x) => x.key === key);
+    save(ex ? lines.map((x) => (x.key === key ? { ...x, qty: x.qty + l.qty } : x)) : [...lines, { ...l, key }]);
+  };
+  const setQty = (key: string, qty: number) => save(lines.map((x) => (x.key === key ? { ...x, qty: Math.max(1, qty) } : x)));
+  const remove = (key: string) => save(lines.filter((x) => x.key !== key));
+  const clear = () => save([]);
+  const count = lines.reduce((s, l) => s + l.qty, 0);
+  return <CartCtx.Provider value={{ lines, add, setQty, remove, clear, count }}>{children}</CartCtx.Provider>;
+}
+export const useCart = () => useContext(CartCtx)!;
+
+export function CartButton() {
+  const { count } = useCart();
+  return (
+    <a href="/warenkorb" className="cart-btn" aria-label="Warenkorb">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 3h2l2.4 12.2a2 2 0 0 0 2 1.8h8.7a2 2 0 0 0 2-1.6L21 7H6" /><circle cx="9" cy="21" r="1" /><circle cx="18" cy="21" r="1" /></svg>
+      <span className="hide-sm">Warenkorb</span>
+      {count > 0 && <span className="badge">{count}</span>}
+    </a>
+  );
+}

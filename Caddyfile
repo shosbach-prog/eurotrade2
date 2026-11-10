@@ -1,0 +1,4 @@
+euro-trade.com, www.euro-trade.com {
+  encode zstd gzip
+  reverse_proxy shop:3000
+}

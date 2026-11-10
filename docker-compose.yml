@@ -1,0 +1,31 @@
+services:
+  shop:
+    build: .
+    image: euro-trade-shop:latest
+    container_name: euro-trade-shop
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./data:/app/data
+    ports:
+      - "127.0.0.1:3000:3000"   # nur lokal; öffentlich geht's über Caddy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/search?q=test"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  caddy:
+    image: caddy:2.8.4-alpine
+    container_name: euro-trade-caddy
+    restart: unless-stopped
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on: [shop]
+
+volumes:
+  caddy_data:
+  caddy_config:
