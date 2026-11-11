@@ -7,6 +7,8 @@ export async function sendMail(opts: { to: string; subject: string; html: string
   const tx = nodemailer.createTransport({
     host: process.env.SMTP_HOST, port: Number(process.env.SMTP_PORT ?? 587), secure: Number(process.env.SMTP_PORT) === 465,
     auth: process.env.SMTP_USER ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS } : undefined,
+    // nie minutenlang hängen, wenn der Mailserver nicht antwortet
+    connectionTimeout: 15_000, greetingTimeout: 10_000, socketTimeout: 30_000,
   });
   const { toText } = await import('./mail-templates');
   await tx.sendMail({ from: process.env.SMTP_FROM ?? process.env.SMTP_USER, text: opts.text ?? toText(opts.html), ...opts });

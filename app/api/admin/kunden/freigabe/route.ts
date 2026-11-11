@@ -15,16 +15,14 @@ export async function POST(req: Request) {
   if (b?.action === 'reject') { saveCustomers(list.filter((_, n) => n !== i)); return NextResponse.json({ ok: true }); }
   list[i] = { ...c, active: true, pending: false };
   saveCustomers(list);
-  let mailed = false;
-  if (mailEnabled() && c.email) {
-    try {
-      await sendMail({ to: c.email, subject: `Ihr Konto bei ${process.env.SHOP_NAME ?? 'Euro-Trade'} ist freigeschaltet`,
-        html: layout({ preheader: 'Sie können sich jetzt anmelden und bestellen.', title: 'Konto freigeschaltet',
-          body: h1('Ihr Konto ist freigeschaltet') + p(`Guten Tag ${esc(c.name)},`)
-            + p('Ihr Kundenkonto ist jetzt aktiv. Melden Sie sich mit Ihrer E-Mail-Adresse und Ihrem Passwort an – dann sehen Sie Ihre Preise, können Logos hochladen und direkt anfragen.')
-            + button(`${shopUrl()}/zugang`, 'Jetzt anmelden') + signature() }) });
-      mailed = true;
-    } catch (e) { console.error('Freischalt-Mail fehlgeschlagen', e); }
+  // Mail im Hintergrund – die Freischaltung ist sofort gespeichert, auch wenn der Mailserver hakt
+  const mailed = mailEnabled() && !!c.email;
+  if (mailed) {
+    sendMail({ to: c.email!, subject: `Ihr Konto bei ${process.env.SHOP_NAME ?? 'Euro-Trade'} ist freigeschaltet`,
+      html: layout({ preheader: 'Sie können sich jetzt anmelden und bestellen.', title: 'Konto freigeschaltet',
+        body: h1('Ihr Konto ist freigeschaltet') + p(`Guten Tag ${esc(c.name)},`)
+          + p('Ihr Kundenkonto ist jetzt aktiv. Melden Sie sich mit Ihrer E-Mail-Adresse und Ihrem Passwort an – dann sehen Sie Ihre Preise, können Logos hochladen und direkt anfragen.')
+          + button(`${shopUrl()}/zugang`, 'Jetzt anmelden') + signature() }) }).catch((e) => console.error('Freischalt-Mail fehlgeschlagen', e));
   }
   return NextResponse.json({ ok: true, mailed });
 }

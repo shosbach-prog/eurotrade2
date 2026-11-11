@@ -38,7 +38,7 @@ export async function POST(req: Request) {
   };
   saveCustomers([c, ...list]);
 
-  try {
+  (async () => {
     await sendMail({ to: process.env.INQUIRY_TO ?? '', replyTo: email, subject: `Neue Registrierung: ${company || name}`,
       html: layout({ preheader: `${company || name} hat sich registriert und wartet auf Freigabe`, title: 'Neue Registrierung',
         body: h1('Neue Registrierung') + infoBox([['Wer', esc(company || name)], ['Art', esc(type || '–')]], '#ffc21a')
@@ -50,6 +50,6 @@ export async function POST(req: Request) {
         body: h1('Vielen Dank für Ihre Registrierung!') + p(`Guten Tag ${esc(name)},`)
           + p('Ihr Konto ist angelegt. Wir prüfen Ihre Angaben und schalten es in der Regel <strong>innerhalb von 24 Stunden</strong> frei. Sie erhalten dann eine E-Mail und können sich mit Ihrer E-Mail-Adresse und Ihrem Passwort anmelden.')
           + p('Fragen? Antworten Sie einfach auf diese E-Mail.') + signature() }) });
-  } catch (e) { console.error('Mail Registrierung fehlgeschlagen', e); }
+  })().catch((e) => console.error('Mail Registrierung fehlgeschlagen', e));
   return NextResponse.json({ ok: true });
 }

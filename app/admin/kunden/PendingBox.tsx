@@ -15,7 +15,8 @@ export default function PendingBox({ items }: { items: P[] }) {
     const r = await fetch('/api/admin/kunden/freigabe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: c.code, action }) });
     const d = await r.json().catch(() => ({}));
     if (!r.ok) { setBusy(null); setMsg({ ok: false, t: d.error ?? 'Fehler' }); return; }
-    window.location.reload();
+    setMsg({ ok: true, t: action === 'approve' ? `✓ ${c.name} ist freigeschaltet${d.mailed ? ' – E-Mail an den Kunden ist unterwegs.' : ' – bitte Kunde selbst informieren (kein Mailversand).'}` : `${c.name} wurde abgelehnt.` });
+    setTimeout(() => window.location.reload(), 1800);
   }
 
   return (
