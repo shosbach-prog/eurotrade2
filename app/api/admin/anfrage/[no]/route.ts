@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { isAdmin } from '@/lib/customer';
 import { esc, sendMail, shopUrl } from '@/lib/mail';
+import { button, h1, infoBox, layout, offerTable, p, quote, signature } from '@/lib/mail-templates';
 import { offerPdf } from '@/lib/pdf';
 import { STATUS, addHistory, getInquiry, offerTotals, randomId, saveInquiry, type Offer, type Status } from '@/lib/store';
 
@@ -57,9 +58,19 @@ export async function POST(req: Request, { params }: { params: { no: string } })
         to: i.customer.email, replyTo: process.env.INQUIRY_TO,
         subject: `Ihr Angebot ${i.no} von ${shop}`,
         attachments: [{ filename: `Angebot-${i.no}.pdf`, content: pdf }],
-        html: `<p>Guten Tag ${esc(i.customer.name)},</p><p>vielen Dank für Ihre Anfrage. Anbei erhalten Sie unser Angebot <b>${i.no}</b> über <b>${eur(t.gross)}</b> (${eur(t.net)} netto).</p>`
-          + `<p style="margin:24px 0"><a href="${link}" style="background:#0b4ea2;color:#fff;padding:12px 22px;border-radius:8px;text-decoration:none;font-weight:bold">Angebot ansehen & annehmen</a></p>`
-          + `<p>Bei Fragen antworten Sie einfach auf diese E-Mail.</p><p>Mit freundlichen Grüßen<br>${esc(shop)}</p>`,
+        html: layout({
+          preheader: `Ihr Angebot über ${eur(t.gross)} – mit einem Klick online annehmen.`, title: `Angebot ${i.no}`,
+          body: h1(`Ihr Angebot ${i.no}`)
+            + p(`Guten Tag ${esc(i.customer.name)},`)
+            + p(`vielen Dank für Ihre Anfrage. Gerne bieten wir Ihnen Folgendes an – das Angebot finden Sie zusätzlich als PDF im Anhang.`)
+            + infoBox([['Angebot-Nr.', i.no], ['Gesamtbetrag', `${eur(t.gross)}`], ['davon netto', eur(t.net)], ['Gültig bis', new Date(new Date(i.offer.createdAt).getTime() + i.offer.validDays * 86400000).toLocaleDateString('de-DE')]])
+            + offerTable(i.offer, t)
+            + (i.offer.note ? quote(i.offer.note) : '')
+            + button(link, 'Angebot ansehen & annehmen', '#1d7a3e')
+            + p('Nach Ihrer Annahme erhalten Sie von uns eine Vorschau zur Druck- bzw. Stickfreigabe. Erst danach geht Ihr Auftrag in Produktion.', true)
+            + p('Fragen oder Änderungswünsche? Antworten Sie einfach auf diese E-Mail.')
+            + signature(),
+        }),
       });
     } catch (e) {
       console.error('Angebot senden fehlgeschlagen', e);

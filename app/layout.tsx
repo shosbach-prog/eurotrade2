@@ -42,7 +42,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           {previewMode() && ok && !path.startsWith('/start') && <div className="preview-bar">Vorschau-Modus – nur für Sie sichtbar. Preise sind Platzhalter. Kunden-Codes sind gesperrt, bis Sie <code>SHOP_PREVIEW=false</code> setzen.</div>}
           <header className="hdr">
             <div className="wrap hdr-row">
-              <Link href="/" className="logo" aria-label={`${SHOP} – Startseite`}><Logo name={SHOP} /></Link>
+              <Link href="/" className="logo" aria-label={`${SHOP} – Startseite`}><Logo domain={process.env.SHOP_DOMAIN ?? 'euro-trade.com'} /></Link>
               {open ? <>
                 <Suspense fallback={<div className="search" />}><SearchBar /></Suspense>
                 <div className="hdr-actions"><AccountButton /><WishlistButton /><CartButton /></div>

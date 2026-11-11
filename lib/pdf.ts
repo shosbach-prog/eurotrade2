@@ -4,7 +4,7 @@ import { offerTotals, type Inquiry } from './store';
 
 const eur = (n: number) => n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' EUR';
 const date = (d: Date) => d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
-const BRAND = rgb(0.043, 0.306, 0.635);
+const BRAND = rgb(0.039, 0.361, 0.941);
 const INK = rgb(0.08, 0.09, 0.12);
 const MUTED = rgb(0.36, 0.4, 0.46);
 const LINE = rgb(0.86, 0.88, 0.91);
@@ -52,10 +52,11 @@ export async function offerPdf(i: Inquiry): Promise<Buffer> {
   };
 
   // Kopf
-  page.drawRectangle({ x: L, y: y - 22, width: 26, height: 26, color: rgb(0.949, 0.718, 0.02) });
-  text('E', L + 7.5, y - 15, { f: bold, size: 15, color: rgb(0.04, 0.18, 0.39) });
-  text(process.env.SHOP_NAME ?? 'Euro-Trade', L + 36, y - 10, { f: bold, size: 18, color: BRAND });
-  text('Textil · Werbemittel', L + 36, y - 22, { size: 8, color: MUTED });
+  page.drawRectangle({ x: L, y: y - 22, width: 26, height: 26, color: rgb(1, 0.76, 0.1) });
+  text('E', L + 7.5, y - 15, { f: bold, size: 15, color: rgb(0.024, 0.22, 0.72) });
+  text('euro-trade', L + 36, y - 10, { f: bold, size: 18, color: BRAND });
+  text('.com', L + 36 + bold.widthOfTextAtSize('euro-trade', 18), y - 10, { f: bold, size: 11, color: MUTED });
+  text('Textil · Werbemittel · Veredelung', L + 36, y - 22, { size: 8, color: MUTED });
   sender().forEach((s, k) => text(s, R, y - 2 - k * 11, { size: 8.5, color: MUTED, right: true }));
   y -= 70;
 

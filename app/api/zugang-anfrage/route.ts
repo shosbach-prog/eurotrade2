@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { esc, sendMail, shopUrl } from '@/lib/mail';
+import { button, contactBlock, h1, infoBox, layout, p, quote, signature } from '@/lib/mail-templates';
 import { listAccessRequests, randomId, saveAccessRequests } from '@/lib/store';
 
 const hits = new Map<string, number[]>();
@@ -19,9 +20,18 @@ export async function POST(req: Request) {
   saveAccessRequests([...listAccessRequests(), r]);
   try {
     await sendMail({ to: process.env.INQUIRY_TO ?? '', replyTo: r.email, subject: `Zugangsanfrage: ${r.company || r.name}`,
-      html: `<h2>Neue Zugangsanfrage</h2><p><b>${esc(r.name)}</b>${r.company ? ` – ${esc(r.company)}` : ''}<br>${esc(r.email)} · ${esc(r.phone)}<br>Art: ${esc(r.type)}</p><p>${esc(r.message).replace(/\n/g, '<br>')}</p><p><a href="${shopUrl()}/admin/kunden">→ Im Admin als Kunde anlegen</a></p>` });
+      html: layout({ preheader: `${r.company || r.name} möchte Zugang zum Shop`, title: 'Neue Zugangsanfrage',
+        body: h1('Neue Zugangsanfrage') + infoBox([['Wer', esc(r.company || r.name)], ['Art', esc(r.type || '–')]], '#ffc21a')
+          + contactBlock({ name: r.name, company: r.company, email: r.email, phone: r.phone })
+          + (r.message ? `<div style="font-size:13px;font-weight:700;margin:0 0 6px">Vorhaben</div>${quote(r.message)}` : '')
+          + button(`${shopUrl()}/admin/kunden`, 'Als Kunde anlegen →') }) });
     await sendMail({ to: r.email, subject: `Ihre Zugangsanfrage bei ${process.env.SHOP_NAME ?? 'Euro-Trade'}`,
-      html: `<p>Guten Tag ${esc(r.name)},</p><p>vielen Dank für Ihr Interesse! Wir melden uns innerhalb von 24 Stunden mit Ihrem persönlichen Zugangscode.</p><p>Mit freundlichen Grüßen<br>${esc(process.env.SHOP_NAME ?? 'Euro-Trade')}</p>` });
+      html: layout({ preheader: 'Ihr persönlicher Zugangscode folgt innerhalb von 24 Stunden.', title: 'Ihre Zugangsanfrage',
+        body: h1('Vielen Dank für Ihr Interesse!') + p(`Guten Tag ${esc(r.name)},`)
+          + p(`wir haben Ihre Anfrage erhalten. Innerhalb von <strong>24 Stunden</strong> melden wir uns mit Ihrem persönlichen Zugangscode – damit sehen Sie Ihre Konditionen, können Logos hochladen und erhalten Angebote mit einem Klick.`)
+          + p('Bis dahin finden Sie auf unserer Website alles rund um Druck und Stick:', true)
+          + button(`${shopUrl()}/druck-stick`, 'Druck & Stick im Vergleich')
+          + p('Fragen? Antworten Sie einfach auf diese E-Mail.') + signature() }) });
   } catch (e) { console.error('Mail Zugangsanfrage fehlgeschlagen', e); }
   return NextResponse.json({ ok: true });
 }
