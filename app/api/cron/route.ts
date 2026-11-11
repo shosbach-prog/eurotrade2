@@ -3,6 +3,7 @@ import { isAdmin } from '@/lib/customer';
 import { cronKey, runFollowUps } from '@/lib/followup';
 import { runPaymentReminders } from '@/lib/invoice-actions';
 import { runShippingChecks } from '@/lib/shipping';
+import { runCartReminders } from '@/lib/cart-remind';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,5 +14,6 @@ export async function GET(req: Request) {
   const delivered = await runShippingChecks().catch(() => 0);
   const r = await runFollowUps();
   const pay = await runPaymentReminders().catch(() => ({ sent: 0 }));
-  return NextResponse.json({ ok: true, ...r, result: `${r.result}${pay.sent ? `, ${pay.sent} Zahlungserinnerung(en)` : ''}${delivered ? `, ${delivered} Sendung(en) zugestellt` : ''}`, payReminders: pay.sent });
+  const carts = await runCartReminders().catch(() => 0);
+  return NextResponse.json({ ok: true, ...r, result: `${r.result}${pay.sent ? `, ${pay.sent} Zahlungserinnerung(en)` : ''}${delivered ? `, ${delivered} Sendung(en) zugestellt` : ''}${carts ? `, ${carts} Warenkorb-Erinnerung(en)` : ''}`, payReminders: pay.sent });
 }

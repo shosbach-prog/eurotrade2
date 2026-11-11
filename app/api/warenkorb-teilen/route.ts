@@ -1,26 +1,19 @@
-import fs from 'node:fs';
 import path from 'node:path';
 import { NextResponse } from 'next/server';
-import { DATA, randomId, readJSON, writeJSON } from '@/lib/store';
+import { readJSON } from '@/lib/store';
+import { SHARED_DIR as DIR, cleanSharedLines, saveSharedCart, type SharedLine } from '@/lib/shared-cart';
 import { getProduct } from '@/lib/catalog';
 import { viewCtx } from '@/lib/customer';
 
 /** Warenkorb per Link teilen: gespeichert werden nur Artikel, Farbe, Größe, Menge und Veredelung – Preise kommen beim Öffnen frisch aus dem Katalog */
-const DIR = path.join(DATA, 'shared-carts');
-type Shared = { date: string; lines: { id: string; color?: string; size?: string; qty: number; deco?: unknown; sample?: boolean; team?: string }[] };
+type Shared = { date: string; lines: SharedLine[] };
 
 export async function POST(req: Request) {
   const b = await req.json().catch(() => null);
-  const raw = Array.isArray(b?.lines) ? b.lines.slice(0, 200) : [];
-  const lines = raw.filter((l: any) => typeof l?.id === 'string' && l.id.length < 80).map((l: any) => ({
-    id: l.id, color: typeof l.color === 'string' ? l.color.slice(0, 80) : undefined, size: typeof l.size === 'string' ? l.size.slice(0, 20) : undefined,
-    qty: Math.max(1, Math.min(99999, Math.floor(Number(l.qty)) || 1)), deco: l.deco && typeof l.deco === 'object' ? l.deco : null, sample: !!l.sample, team: typeof l.team === 'string' ? l.team.slice(0, 60) : undefined,
-  }));
+  const lines = cleanSharedLines(b?.lines);
   if (!lines.length) return NextResponse.json({ error: 'Warenkorb ist leer.' }, { status: 400 });
-  if (JSON.stringify(lines).length > 200_000) return NextResponse.json({ error: 'Warenkorb zu groß zum Teilen.' }, { status: 400 });
-  fs.mkdirSync(DIR, { recursive: true });
-  const id = randomId(8);
-  writeJSON(path.join(DIR, `${id}.json`), { date: new Date().toISOString(), lines } satisfies Shared);
+  const id = saveSharedCart(lines);
+  if (!id) return NextResponse.json({ error: 'Warenkorb zu groß zum Teilen.' }, { status: 400 });
   return NextResponse.json({ ok: true, id });
 }
 

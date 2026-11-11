@@ -25,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
     twitter: { card: 'summary_large_image', images: ['/og.png'] },
     // Geschlossener Shop: nur Landingpage und Info-Seite in Suchmaschinen
     // Geschlossener Shop: Landingpage, Infoseiten und Schaufenster (Kategorien/Artikel ohne Preise) indexierbar
-    robots: previewMode() || (shopClosed() && !(['/start', '/druck-stick', '/widerruf', '/garantie', '/impressum', '/ueber-uns'].includes(headers().get('x-path') ?? '') || (headers().get('x-path') ?? '').startsWith('/fuer/') || headers().get('x-showcase') === '1')) ? { index: false, follow: false } : undefined,
+    robots: previewMode() || (shopClosed() && !(['/start', '/druck-stick', '/widerruf', '/garantie', '/impressum', '/ueber-uns'].includes(headers().get('x-path') ?? '') || ((headers().get('x-path') ?? '').startsWith('/fuer/') || (headers().get('x-path') ?? '').startsWith('/aktion/')) || headers().get('x-showcase') === '1')) ? { index: false, follow: false } : undefined,
   };
 }
 export const dynamic = 'force-dynamic';
@@ -46,7 +46,7 @@ function orgSchema() {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const gated = shopClosed();
   const path = headers().get('x-path') ?? '/';
-  const isPublic = ['/fuer', '/ueber-uns', '/garantie', '/bewerten', '/widerruf', '/newsletter', '/start', '/druck-stick', '/zugang', '/passwort', '/registrieren', '/kontakt', '/agb', '/ratgeber', '/impressum', '/datenschutz', '/angebot', '/admin', '/marken', '/team', '/rechnung'].some((p) => path === p || path.startsWith(p + '/')) || headers().get('x-public') === '1';
+  const isPublic = ['/fuer', '/aktion', '/ueber-uns', '/garantie', '/bewerten', '/widerruf', '/newsletter', '/start', '/druck-stick', '/zugang', '/passwort', '/registrieren', '/kontakt', '/agb', '/ratgeber', '/impressum', '/datenschutz', '/angebot', '/admin', '/marken', '/team', '/rechnung'].some((p) => path === p || path.startsWith(p + '/')) || headers().get('x-public') === '1';
   const { ok, customer } = await shopAccess();
   const admin = !customer && (await isAdmin());
   // Code im Admin gesperrt/gelöscht -> zurück zur Anmeldung
@@ -87,6 +87,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <Link href="/fuer/unternehmen">Unternehmen</Link>
                 <Link href="/fuer/handwerk">Handwerk</Link>
                 <Link href="/fuer/gastronomie">Gastronomie</Link>
+                <Link href="/aktion/workwear">Workwear</Link>
+                <Link href="/aktion/weihnachtsgeschenke-mitarbeiter">Weihnachtsgeschenke</Link>
+                <Link href="/aktion/vereinsausstattung">Vereinsausstattung</Link>
               </nav>
               <nav className="ft-col" aria-label="Service">
                 <h4>Service</h4>

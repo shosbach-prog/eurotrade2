@@ -6,6 +6,7 @@ import { esc, mailEnabled, sendMail, shopUrl } from './mail';
 import { button, h1, layout, p, signature } from './mail-templates';
 import { DATA, addHistory, listInquiries, listReviews, offerTotals, readJSON, saveInquiry, writeJSON } from './store';
 import { reviewDays, sendReviewRequest } from './review-mail';
+import { getPricing } from './deco-pricing-store';
 
 const STATE = path.join(DATA, 'cron.json');
 export const followDays = () => Math.max(1, Number(process.env.NACHFASS_TAGE ?? 3));
@@ -52,6 +53,42 @@ export async function runFollowUps() {
       sent++;
     } catch (e) { console.error('Nachfass-Mail fehlgeschlagen', i.no, e); failed++; }
   }
+  // Ablauf-Erinnerung X Tage vor Ende der Gültigkeit – optional mit Rabatt bei Annahme bis zum Ablauf
+  const rm = getPricing().remind ?? { expiryDays: 3, expiryPct: 0, cart: true };
+  let exp = 0;
+  if (mailEnabled() && rm.expiryDays > 0) for (const i of listInquiries()) {
+    const o = i.offer;
+    if (i.status !== 'angebot' || !o?.sentAt || i.expiryRemindedAt || !i.token || !i.customer?.email) continue;
+    const end = Date.parse(o.createdAt) + (o.validDays ?? 14) * 864e5, left = end - now;
+    if (left <= 12 * 36e5 || left > rm.expiryDays * 864e5) continue;
+    if (i.remindedAt && now - Date.parse(i.remindedAt) < 2 * 864e5) continue; // nicht direkt nach der Nachfass-Mail
+    const until = new Date(end).toLocaleDateString('de-DE');
+    let bonus = '';
+    if (rm.expiryPct > 0 && !o.lines.some((l) => l.text.startsWith('Rabatt bei Annahme'))) {
+      const goods = o.lines.filter((l) => l.price > 0).reduce((x, l) => x + l.qty * l.price, 0);
+      const off = Math.round(goods * rm.expiryPct) / 100;
+      if (off > 0) { o.lines.push({ text: `Rabatt bei Annahme bis ${until}`, detail: `${rm.expiryPct} % auf den Warenwert`, qty: 1, price: -off }); bonus = `Als kleines Dankeschön haben wir Ihnen <strong>${rm.expiryPct} % Rabatt</strong> (${off.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}) direkt ins Angebot eingerechnet – gültig bei Annahme bis ${until}.`; }
+    }
+    try {
+      await sendMail({
+        to: i.customer.email, replyTo: process.env.INQUIRY_TO, subject: `Ihr Angebot ${i.no} läuft am ${until} ab`,
+        html: layout({
+          preheader: `Nur noch bis ${until} gültig – mit einem Klick annehmen.`, title: 'Ihr Angebot',
+          body: h1('Ihr Angebot läuft bald ab')
+            + p(`Guten Tag ${esc(i.customer.name)},`)
+            + p(`unser Angebot <strong>${i.no}</strong> über <strong>${offerTotals(o).gross.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</strong> ist noch bis <strong>${until}</strong> gültig. Danach können sich Preise und Liefertermine ändern.`)
+            + (bonus ? p(bonus) : '')
+            + button(`${shopUrl()}/angebot/${i.token}`, 'Angebot ansehen & annehmen')
+            + p('Sie brauchen mehr Zeit oder möchten etwas ändern? Antworten Sie einfach auf diese E-Mail – wir verlängern gern.', true)
+            + signature(),
+        }),
+      });
+      i.expiryRemindedAt = new Date().toISOString();
+      addHistory(i, `Ablauf-Erinnerung gesendet${bonus ? ` (mit ${rm.expiryPct} % Rabatt im Angebot)` : ''}`);
+      saveInquiry(i);
+      exp++;
+    } catch (e) { console.error('Ablauf-Erinnerung fehlgeschlagen', i.no, e); failed++; }
+  }
   // Bewertungseinladung X Tage nach Lieferung, eine Erinnerung 7 Tage später (nur ohne Bewertung)
   const rd = reviewDays(), reviewed = new Set(listReviews().map((r) => r.inquiryNo));
   let rev = 0, revRem = 0;
@@ -67,7 +104,7 @@ export async function runFollowUps() {
       saveInquiry(i);
     } catch (e) { console.error('Bewertungsmail fehlgeschlagen', i.no, e); failed++; }
   }
-  const result = !mailEnabled() ? `${due.length} fällig – kein Mailversand eingerichtet` : `${sent} Angebots-Erinnerung(en), ${rev} Bewertungseinladung(en), ${revRem} Bewertungs-Erinnerung(en)${failed ? `, ${failed} fehlgeschlagen` : ''}`;
+  const result = !mailEnabled() ? `${due.length} fällig – kein Mailversand eingerichtet` : `${sent} Angebots-Erinnerung(en), ${exp} Ablauf-Erinnerung(en), ${rev} Bewertungseinladung(en), ${revRem} Bewertungs-Erinnerung(en)${failed ? `, ${failed} fehlgeschlagen` : ''}`;
   writeJSON(STATE, { lastRun: new Date().toISOString(), lastResult: result });
   return { due: due.length, sent, failed, result };
 }

@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next';
 import { previewMode } from '@/lib/access';
 import { getCategories, allProductsBrief } from '@/lib/catalog';
 import { ZIELGRUPPEN } from '@/lib/zielgruppen';
+import { AKTIONEN } from '@/lib/aktionen';
 import { GUIDES } from '@/lib/ratgeber';
 import { productPath } from '@/lib/format';
 
@@ -13,6 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/`, priority: 1, changeFrequency: 'weekly', lastModified: now },
     { url: `${base}/druck-stick`, priority: 0.8, changeFrequency: 'monthly', lastModified: now },
     ...ZIELGRUPPEN.map((z) => ({ url: `${base}/fuer/${z.slug}`, priority: 0.8, changeFrequency: 'monthly' as const, lastModified: now })),
+    ...AKTIONEN.map((a) => ({ url: `${base}/aktion/${a.slug}`, priority: 0.8, changeFrequency: 'weekly' as const, lastModified: now })),
     { url: `${base}/ratgeber`, priority: 0.7, changeFrequency: 'monthly', lastModified: now },
     ...GUIDES.map((g) => ({ url: `${base}/ratgeber/${g.slug}`, priority: 0.7, changeFrequency: 'monthly' as const, lastModified: now })),
     { url: `${base}/kontakt`, priority: 0.6, changeFrequency: 'yearly', lastModified: now },

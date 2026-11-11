@@ -7,6 +7,7 @@ import ProofSender from './ProofSender';
 import CreateInvoice from './CreateInvoice';
 import ShippingBox from './ShippingBox';
 import MarginBox from './MarginBox';
+import QuickOffer from './QuickOffer';
 import { dhlLabelEnabled, trackingUrl } from '@/lib/shipping';
 import { inquiryMargin } from '@/lib/margin';
 import { INV_STATUS, invoiceTotals, kindShort, listInvoices } from '@/lib/invoice';
@@ -14,7 +15,7 @@ import { getTeamShop } from '@/lib/teamshop';
 import { eur } from '@/lib/format';
 import { decoLabel, teamLabel } from '@/lib/deco';
 import { mailEnabled, shopUrl } from '@/lib/mail';
-import { STATUS, draftOffer, getInquiry } from '@/lib/store';
+import { STATUS, draftOffer, getInquiry, offerTotals } from '@/lib/store';
 
 export const metadata: Metadata = { title: 'Anfrage', robots: { index: false, follow: false } };
 const fmt = (d: string) => new Date(d).toLocaleString('de-DE', { dateStyle: 'medium', timeStyle: 'short' });
@@ -32,6 +33,19 @@ export default function InquiryPage({ params }: { params: { no: string } }) {
         <h1 style={{ marginBottom: 0 }}>Anfrage {i.no}</h1>
         <span className={`st st-${i.status}`}>{STATUS[i.status!]}</span>
       </div>
+      {!i.offer?.sentAt && (() => {
+        const o = i.offer ?? draftOffer(i);
+        const t = offerTotals(o);
+        const w: string[] = [];
+        const zero = o.lines.filter((l) => l.price === 0);
+        if (zero.length) w.push(`${zero.length} Position(en) ohne Preis: ${zero.map((l) => l.text).slice(0, 3).join(', ')}`);
+        if (i.lines.some((l) => l.deco?.method === 'Beratung gewünscht')) w.push('Kunde wünscht Beratung zur Veredelung');
+        if (i.lines.some((l) => l.deco?.note)) w.push('Kunde hat Hinweise zur Veredelung notiert');
+        if (i.customer.message) w.push('Kunde hat eine Nachricht geschrieben – bitte lesen');
+        if (!o.shipping) w.push('Versand 0 € – Pauschale unter Admin → Veredelung einstellen');
+        const m = inquiryMargin({ ...i, offer: o });
+        return <QuickOffer no={i.no} offer={o} gross={t.gross} net={t.net} margin={m} warnings={w} mail={mailEnabled()} email={i.customer.email} />;
+      })()}
       <div className="admin-grid">
         <div className="box">
           <strong>Kunde</strong>
@@ -87,7 +101,7 @@ export default function InquiryPage({ params }: { params: { no: string } }) {
           </div>}
         </div></>;
       })()}
-      <h2>Angebot</h2>
+      <h2 id="angebot">Angebot</h2>
       <OfferEditor no={i.no} initial={i.offer ?? draftOffer(i)} saved={!!i.offer} status={i.status!} statuses={STATUS} mail={mailEnabled()} acceptUrl={i.token ? `${shopUrl()}/angebot/${i.token}` : ''} sentAt={i.offer?.sentAt ?? null} />
     </>
   );

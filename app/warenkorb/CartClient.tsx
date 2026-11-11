@@ -14,10 +14,25 @@ import { productPath } from '@/lib/format';
 const FORM_KEY = 'et-form-v1';
 const FIELDS = ['name', 'company', 'email', 'phone', 'street', 'city'] as const;
 
-export default function CartClient({ share, contact }: { share: string | null; contact?: ReactNode }) {
+export default function CartClient({ share, contact, remind }: { share: string | null; contact?: ReactNode; remind?: boolean }) {
   const { lines, setQty, update, remove, clear, decoToAll, addMany } = useCart();
   const router = useRouter();
   const [more, setMore] = useState(false);
+  // Warenkorb-Erinnerung (Opt-in): beim Anhaken, beim Verlassen der E-Mail und beim Schließen der Seite speichern
+  const [keep, setKeep] = useState(false);
+  const saveKeep = (beacon = false) => {
+    const email = (document.getElementById('f-email') as HTMLInputElement | null)?.value.trim() ?? '';
+    const name = (document.getElementById('f-name') as HTMLInputElement | null)?.value.trim() ?? '';
+    if (!keep || !/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(email) || !lines.length) return;
+    const body = JSON.stringify({ consent: true, email, name, lines: lines.map(({ id, color, size, qty, deco, sample, team }) => ({ id, color, size, qty, deco, sample, team })) });
+    if (beacon && navigator.sendBeacon) navigator.sendBeacon('/api/warenkorb-erinnerung', new Blob([body], { type: 'application/json' }));
+    else fetch('/api/warenkorb-erinnerung', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body }).catch(() => {});
+  };
+  useEffect(() => { if (keep) saveKeep(); }, [keep, lines]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const h = () => { if (document.visibilityState === 'hidden' && state !== 'sending') saveKeep(true); };
+    document.addEventListener('visibilitychange', h); return () => document.removeEventListener('visibilitychange', h);
+  }); // eslint-disable-line react-hooks/exhaustive-deps
   // Warenkorb teilen
   const [shareUrl, setShareUrl] = useState('');
   const [shareMsg, setShareMsg] = useState('');
@@ -177,8 +192,9 @@ export default function CartClient({ share, contact }: { share: string | null; c
           <p className="muted" style={{ margin: '2px 0 0', fontSize: 13.5 }}>Nur Name und E-Mail nötig – alles Weitere klären wir mit dem Angebot.</p>
           <div className="two">
             <div><label htmlFor="f-name">Name *</label><input id="f-name" name="name" required defaultValue={form.name} key={`n${form.name}`} autoComplete="name" /></div>
-            <div><label htmlFor="f-email">E-Mail *</label><input id="f-email" name="email" type="email" required defaultValue={form.email} key={`e${form.email}`} autoComplete="email" /></div>
+            <div><label htmlFor="f-email">E-Mail *</label><input id="f-email" name="email" type="email" required defaultValue={form.email} key={`e${form.email}`} autoComplete="email" onBlur={() => saveKeep()} /></div>
           </div>
+          {remind && <label className="ds-check keep"><input type="checkbox" checked={keep} onChange={(e) => setKeep(e.target.checked)} /> <span>Warenkorb merken und mich einmalig per E-Mail erinnern, falls ich heute nicht absende <span className="muted">(jederzeit abbestellbar)</span></span></label>}
           <label htmlFor="f-msg">Nachricht <span className="muted" style={{ fontWeight: 400 }}>(optional)</span></label>
           <textarea id="f-msg" name="message" placeholder="Fragen, Namen/Nummern, Wünsche …" />
           <button type="button" className="linkbtn more-toggle" aria-expanded={more} onClick={() => setMore(!more)}>{more ? '− Weniger Angaben' : '+ Firma, Telefon, Adresse, Wunschtermin (optional)'}</button>

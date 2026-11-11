@@ -7,6 +7,7 @@ import { esc, sendMail, shopUrl } from '@/lib/mail';
 import { button, contactBlock, eur, h1, infoBox, itemsTable, layout, p, quote, signature, type MailLine } from '@/lib/mail-templates';
 import { unitFor } from '@/lib/tiers';
 import { discountFor, randomId, saveInquiry, validCode, type InqLine, type Inquiry } from '@/lib/store';
+import { cartDone } from '@/lib/cart-remind';
 
 const hits = new Map<string, number[]>();
 
@@ -83,6 +84,7 @@ export async function POST(req: Request) {
   const team = body.team ? getTeamShop(String(body.team)) : null;
   const inq: Inquiry = { no, date: new Date().toISOString(), zugangscode: via, customer, lines, total, discount, status: 'neu', token: randomId(16), offer: null, team: team?.slug ?? null, history: [{ date: new Date().toISOString(), text: team ? `Anfrage über Team-Shop „${team.name}“ eingegangen` : 'Anfrage eingegangen' }] };
   saveInquiry(inq); // immer lokal sichern (auch wenn Mail ausfällt)
+  try { cartDone(customer.email); } catch {}
 
   const base = shopUrl();
   const abs = (u?: string) => (u && u.startsWith('/') ? `${base}${u}` : u ?? '');

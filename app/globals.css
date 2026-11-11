@@ -1470,3 +1470,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .sz-link{background:none;border:0;padding:0;font-size:13px;font-weight:500;color:var(--brand);text-decoration:underline;text-underline-offset:2px;cursor:pointer}
 .opt-row .sz-link{margin-left:0}
 .sz-tools{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:center;margin-top:8px;font-size:13px}
+/* Schnellangebot */
+.quick{border-color:var(--brand);margin:14px 0}
+.quick-head{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start;margin-bottom:10px}
+.quick-sum{display:grid;justify-items:end;gap:2px;font-size:14px}.quick-sum b{font-size:20px}
+.quick-warn{margin:0 0 10px;padding-left:4px;list-style:none;font-size:13.5px;color:#92400e}
+.akt-dl{background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:8px 12px;display:inline-block;font-size:15px}
+.ds-check.keep{font-weight:400;font-size:13.5px;align-items:flex-start;margin-top:8px}

@@ -158,6 +158,8 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
     </div>
   );
   const studioProps = { product: p, colorHex: color?.hex, photo: color?.image ?? null, fit: color?.image ? fits?.[color.image] ?? null : null, positions, active: activePos, setActive: setActivePos, place, setPlace, logoSrc: useLogo && logo && isImage(logo.name) ? `/api/upload/${logo.id}` : null, text: useText ? text : '', font, textColor: tColor, method };
+  // Galerie: Fotos der gewählten Farbe, danach Detailfotos des Artikels
+  const galP = color?.images?.length ? { ...p, images: [...color.images, ...p.images.filter((x) => !color.images!.includes(x) && /detail/i.test(x))] } : p;
   const textStyle = { fontFamily: fontCss(font), color: colorHex(tColor) };
 
   return (
@@ -168,9 +170,9 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
             <DecoStudio {...studioProps} />
             <button type="button" className="linkbtn ds-photos" onClick={() => setShowPhotos(true)}>Produktfotos ansehen</button>
           </div>
-          <div className="pd-gal-m"><Gallery key={cname} p={color?.images?.length ? { ...p, images: color.images } : p} hex={color?.hex} /></div>
+          <div className="pd-gal-m"><Gallery key={cname} p={galP} hex={color?.hex} /></div>
         </> : <>
-          <Gallery key={cname} p={color?.images?.length ? { ...p, images: color.images } : p} hex={color?.hex} />
+          <Gallery key={cname} p={galP} hex={color?.hex} />
           {decoOn && <button type="button" className="linkbtn ds-photos" onClick={() => setShowPhotos(false)}>← Zurück zur Live-Vorschau</button>}
         </>}
       </div>

@@ -7,7 +7,10 @@ export type MethodPrices = {
   setup: number[];             // je Größe: einmalige Einrichtung (z. B. Stickprogramm) je Position
   setupLabel: string;          // z. B. „Stickprogramm“
 };
-export type DecoPricing = { stick: MethodPrices; druck: MethodPrices; minOrder: number; showEstimate: boolean; /** Personalisierung je Teil (netto) */ team: { name: number; nummer: number }; /** eigene Kosten der Veredelung in % vom Verkaufspreis (für die Margenrechnung) */ costPct: number; updatedAt?: string };
+export type DecoPricing = { stick: MethodPrices; druck: MethodPrices; minOrder: number; showEstimate: boolean; /** Personalisierung je Teil (netto) */ team: { name: number; nummer: number }; /** eigene Kosten der Veredelung in % vom Verkaufspreis (für die Margenrechnung) */ costPct: number;
+  /** Versand im Angebotsentwurf: Pauschale netto, frei ab Warenwert netto (0 = nie) */ shipping: { flat: number; freeFrom: number };
+  /** Erinnerungen: Ablauf-Erinnerung X Tage vor Angebotsende (0 = aus), Rabatt bei Annahme in %, Warenkorb-Erinnerung an/aus */ remind: { expiryDays: number; expiryPct: number; cart: boolean };
+  updatedAt?: string };
 
 export const DEFAULT_PRICING: DecoPricing = {
   stick: {
@@ -25,6 +28,8 @@ export const DEFAULT_PRICING: DecoPricing = {
   minOrder: 0,
   team: { name: 4.5, nummer: 3.5 },
   costPct: 50,
+  shipping: { flat: 0, freeFrom: 0 },
+  remind: { expiryDays: 3, expiryPct: 0, cart: true },
   showEstimate: true,
 };
 
@@ -66,7 +71,9 @@ export function cleanPricing(d: any): DecoPricing {
     const setup = order.map(([, k]) => num(m?.setup?.[k]));
     return { sizes: order.map(([s]) => s), tiers, prices, setup, setupLabel: String(m?.setupLabel ?? def.setupLabel).slice(0, 40) || def.setupLabel };
   };
-  return { stick: meth(d?.stick, DEFAULT_PRICING.stick), druck: meth(d?.druck, DEFAULT_PRICING.druck), minOrder: num(d?.minOrder), showEstimate: d?.showEstimate !== false, team: { name: d?.team ? num(d.team.name) : DEFAULT_PRICING.team.name, nummer: d?.team ? num(d.team.nummer) : DEFAULT_PRICING.team.nummer }, costPct: d?.costPct != null ? Math.min(100, num(d.costPct)) : DEFAULT_PRICING.costPct };
+  return { stick: meth(d?.stick, DEFAULT_PRICING.stick), druck: meth(d?.druck, DEFAULT_PRICING.druck), minOrder: num(d?.minOrder), showEstimate: d?.showEstimate !== false, team: { name: d?.team ? num(d.team.name) : DEFAULT_PRICING.team.name, nummer: d?.team ? num(d.team.nummer) : DEFAULT_PRICING.team.nummer }, costPct: d?.costPct != null ? Math.min(100, num(d.costPct)) : DEFAULT_PRICING.costPct,
+    shipping: { flat: num(d?.shipping?.flat), freeFrom: num(d?.shipping?.freeFrom) },
+    remind: { expiryDays: d?.remind?.expiryDays != null ? Math.min(14, Math.floor(num(d.remind.expiryDays))) : 3, expiryPct: Math.min(20, num(d?.remind?.expiryPct)), cart: d?.remind?.cart !== false } };
 }
 
 /** Preis der Personalisierung je Teil */

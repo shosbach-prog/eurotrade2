@@ -6,14 +6,14 @@ import type { Color, Product } from '@/lib/types';
 const prev = (src: string) => src.replace(/^\/api\/bild\//, '/api/upload/'); // Admin-Vorschau auch vor dem Speichern
 const money = (n: number) => n.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
 
-type F = Omit<Product, 'id' | 'categorySlug' | 'basePrice'> & { basePrice: string; tiersText: string; sizesText: string; featuresText: string; tagsText: string; specsText: string };
+type F = Omit<Product, 'id' | 'categorySlug' | 'basePrice'> & { basePrice: string; tiersText: string; sizesText: string; featuresText: string; tagsText: string; specsText: string; pairsText: string };
 export default function ArticleEditor({ p, custom, changed, categories, markup }: { p: Product; custom: boolean; changed: boolean; categories: string[]; markup: number }) {
   const router = useRouter();
   const [f, setF] = useState<F>({
     ...p, hidden: !!p.hidden, top: !!p.top,
     basePrice: p.basePrice != null ? String(p.basePrice).replace('.', ',') : '',
     tiersText: (p.baseTiers ?? []).map((t) => `${t.min}: ${String(t.price).replace('.', ',')}`).join('\n'),
-    sizesText: p.sizes.join(', '), featuresText: (p.features ?? []).join('\n'), tagsText: (p.tags ?? []).join(', '),
+    sizesText: p.sizes.join(', '), featuresText: (p.features ?? []).join('\n'), tagsText: (p.tags ?? []).join(', '), pairsText: (p.pairs ?? []).join(', '),
     specsText: Object.entries(p.specs ?? {}).map(([k, v]) => `${k}: ${v}`).join('\n'),
   });
   const [msg, setMsg] = useState<{ ok: boolean; m: string } | null>(null);
@@ -46,6 +46,7 @@ export default function ArticleEditor({ p, custom, changed, categories, markup }
       sizes: f.sizesText.split(',').map((s) => s.trim()).filter(Boolean),
       features: f.featuresText.split('\n').map((s) => s.trim()).filter(Boolean),
       tags: f.tagsText.split(',').map((s) => s.trim()).filter(Boolean),
+      pairs: f.pairsText.split(/[,;\s]+/).map((s) => s.trim().toUpperCase()).filter(Boolean),
       specs: Object.fromEntries(f.specsText.split('\n').map((l) => [l.slice(0, l.indexOf(':')).trim(), l.slice(l.indexOf(':') + 1).trim()]).filter(([k, v]) => k && v)),
     };
     const r = await fetch('/api/admin/artikel', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: p.id, data }) });
@@ -123,6 +124,7 @@ export default function ArticleEditor({ p, custom, changed, categories, markup }
         <div><label>Merkmale <span className="muted" style={{ fontWeight: 400 }}>(eine Zeile je Merkmal)</span></label><textarea value={f.featuresText} onChange={(e) => set({ featuresText: e.target.value })} style={{ minHeight: 110 }} /></div>
         <div><label>Technische Daten <span className="muted" style={{ fontWeight: 400 }}>(Bezeichnung: Wert)</span></label><textarea value={f.specsText} onChange={(e) => set({ specsText: e.target.value })} style={{ minHeight: 110 }} /></div>
         <div><label>Suchbegriffe / Tags <span className="muted" style={{ fontWeight: 400 }}>(mit Komma)</span></label><input value={f.tagsText} onChange={(e) => set({ tagsText: e.target.value })} /></div>
+        <div><label>Passende Artikel <span className="muted" style={{ fontWeight: 400 }}>(Art.-Nr. mit Komma, z. B. Damenmodell)</span></label><input value={f.pairsText} onChange={(e) => set({ pairsText: e.target.value })} placeholder="JN841, JN1000" /></div>
         <div><label>Zielgruppe</label><input value={f.gender ?? ''} onChange={(e) => set({ gender: e.target.value })} placeholder="Unisex, Herren, Damen, Kinder" /></div>
       </div>
       <label>Herstellerbeschreibung</label>

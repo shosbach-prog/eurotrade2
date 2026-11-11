@@ -27,7 +27,7 @@ function clean(d: Record<string, unknown>): Partial<Product> {
     sku: str(d.sku, 40), name: str(d.name, 120), brand: str(d.brand, 60), category: str(d.category, 60) || 'Sonstiges',
     basePrice: num(d.basePrice), baseTiers: tiers,
     description: str(d.description, 20000), material: str(d.material, 200), composition: str(d.composition, 200), gender: str(d.gender, 40),
-    features: list(d.features, 20), tags: list(d.tags, 20), sizes: list(d.sizes, 30).map((s) => s.slice(0, 40)),
+    features: list(d.features, 20), tags: list(d.tags, 20), pairs: list(d.pairs, 12).map((s) => s.toUpperCase().slice(0, 40)), sizes: list(d.sizes, 30).map((s) => s.slice(0, 40)),
     images: list(d.images, 30).filter(img), colors, specs, sizeChart: str(d.sizeChart, 400) || undefined,
   };
 }

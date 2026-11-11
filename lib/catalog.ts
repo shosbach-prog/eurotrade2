@@ -190,7 +190,11 @@ export function matchingFor(id: string, ctx?: Ctx): { variants: PublicProduct[];
   const p = all.find((x) => x.id === id);
   if (!p) return { variants: [], combos: [] };
   const b = baseName(p.name);
-  const variants = b.length >= 3 ? all.filter((x) => x.id !== p.id && x.brand === p.brand && baseName(x.name) === b && (x.gender ?? '') !== (p.gender ?? '')).slice(0, 4) : [];
+  // 1. im Admin verknüpfte Artikel (in beide Richtungen), 2. gleicher Name mit anderem Schnitt
+  const mine = new Set((p.pairs ?? []).map((x) => x.toUpperCase()));
+  const linked = all.filter((x) => x.id !== p.id && (mine.has(x.sku.toUpperCase()) || (x.pairs ?? []).some((y) => y.toUpperCase() === p.sku.toUpperCase())));
+  const auto = b.length >= 3 ? all.filter((x) => x.id !== p.id && !linked.includes(x) && x.brand === p.brand && baseName(x.name) === b && (x.gender ?? '') !== (p.gender ?? '')) : [];
+  const variants = [...linked, ...auto].slice(0, 4);
   const used = new Set([p.id, ...variants.map((x) => x.id)]);
   const combos: Product[] = [];
   for (const cat of PAIRS[p.category] ?? ['T-Shirts', 'Sweatshirts', 'Caps & Mützen']) {
@@ -200,3 +204,6 @@ export function matchingFor(id: string, ctx?: Ctx): { variants: PublicProduct[];
   }
   return { variants: variants.map((x) => toPublic(x, ctx)), combos: combos.slice(0, 4).map((x) => toPublic(x, ctx)) };
 }
+
+/** Alle sichtbaren Artikel (für Aktionsseiten) */
+export const allPublic = (ctx?: Ctx) => products(ctx).map((p) => toPublic(p, ctx));

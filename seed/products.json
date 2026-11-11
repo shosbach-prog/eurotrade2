@@ -2,7 +2,7 @@
  {
   "id": "aq010",
   "sku": "AQ010",
-  "name": "Men´s Classic Fit Polo",
+  "name": "Herren Poloshirt Classic Fit",
   "brand": "Asquith & Fox",
   "category": "Poloshirts",
   "categorySlug": "poloshirts",
@@ -202,13 +202,14 @@
   "tags": [
    "Poloshirts",
    "Seitenschlitze",
-   "Herren"
+   "Herren",
+   "Men´s Classic Fit Polo"
   ]
  },
  {
   "id": "arb931",
   "sku": "ARB931",
-  "name": "Babiezz® Soft Knitted Blanket",
+  "name": "Babiezz® Strickdecke Soft",
   "brand": "ARTG",
   "category": "Decken",
   "categorySlug": "decken",
@@ -255,13 +256,14 @@
   },
   "tags": [
    "Decken",
-   "Unisex"
+   "Unisex",
+   "Babiezz® Soft Knitted Blanket"
   ]
  },
  {
   "id": "ars1745",
   "sku": "ARS1745",
-  "name": "Originalzz® Sherpa Fleece Blanket DeLuxe",
+  "name": "Originalzz® Sherpa-Fleecedecke DeLuxe",
   "brand": "ARTG",
   "category": "Decken",
   "categorySlug": "decken",
@@ -309,13 +311,14 @@
   },
   "tags": [
    "Decken",
-   "Unisex"
+   "Unisex",
+   "Originalzz® Sherpa Fleece Blanket DeLuxe"
   ]
  },
  {
   "id": "bcwu620",
   "sku": "BCWU620",
-  "name": "Hooded Sweat",
+  "name": "Kapuzen-Sweatshirt Unisex",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
@@ -410,13 +413,14 @@
   },
   "tags": [
    "Sweatshirts & -jacken",
-   "Unisex"
+   "Unisex",
+   "Hooded Sweat"
   ]
  },
  {
   "id": "cb336b",
   "sku": "CB336B",
-  "name": "Kids Deep Cuffed Tonal Patch Beanie",
+  "name": "Kinder-Beanie mit Umschlag und Patch",
   "brand": "Beechfield",
   "category": "Caps & Mützen",
   "categorySlug": "caps-muetzen",
@@ -482,13 +486,14 @@
   "tags": [
    "Mützen",
    "Patch",
-   "Kinder"
+   "Kinder",
+   "Kids Deep Cuffed Tonal Patch Beanie"
   ]
  },
  {
   "id": "hrm801",
   "sku": "HRM801",
-  "name": "Women´s Hooded Jacket",
+  "name": "Damen Kapuzen-Sweatjacke",
   "brand": "HRM",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
@@ -598,13 +603,14 @@
   "tags": [
    "Sweatshirts & -jacken",
    "Reißverschluss Metall",
-   "Damen"
+   "Damen",
+   "Women´s Hooded Jacket"
   ]
  },
  {
   "id": "jn8046",
   "sku": "JN8046",
-  "name": "Men´s Hoodie Interlock",
+  "name": "Herren Kapuzen-Sweatshirt Interlock",
   "brand": "Daiber",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
@@ -682,13 +688,14 @@
   "tags": [
    "Sweatshirts & -jacken",
    "Ärmeltasche",
-   "Herren"
+   "Herren",
+   "Men´s Hoodie Interlock"
   ]
  },
  {
   "id": "mv470064",
   "sku": "MV470064",
-  "name": "Men´s Shirt Modern Fit Long Sleeve",
+  "name": "Herren Hemd Modern Fit Langarm",
   "brand": "Marvelis",
   "category": "Hemden & Blusen",
   "categorySlug": "hemden-blusen",
@@ -760,13 +767,14 @@
    "Hemden",
    "Brusttasche",
    "Berufsbekleidung",
-   "Herren"
+   "Herren",
+   "Men´s Shirt Modern Fit Long Sleeve"
   ]
  },
  {
   "id": "my111",
   "sku": "MY111",
-  "name": "my mate - Men´s Long Tee",
+  "name": "my mate – Herren Long-T-Shirt",
   "brand": "Miners mate",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
@@ -849,13 +857,14 @@
   },
   "tags": [
    "T-Shirts",
-   "Herren"
+   "Herren",
+   "my mate - Men´s Long Tee"
   ]
  },
  {
   "id": "nn310",
   "sku": "NN310",
-  "name": "Invincible Women´s Onna-Stretch Tunic",
+  "name": "Invincible Damen Stretch-Kasack Onna",
   "brand": "Onna by Premier",
   "category": "Arbeitskleidung",
   "categorySlug": "arbeitskleidung",
@@ -933,13 +942,14 @@
    "Kittel & Kasacks",
    "Seitenschlitze",
    "Berufsbekleidung",
-   "Damen"
+   "Damen",
+   "Invincible Women´s Onna-Stretch Tunic"
   ]
  },
  {
   "id": "p04",
   "sku": "P04",
-  "name": "Essential Hoodie",
+  "name": "Essential Kapuzen-Sweatshirt Unisex",
   "brand": "Mantis",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
@@ -1021,7 +1031,8 @@
   },
   "tags": [
    "Sweatshirts & -jacken",
-   "Unisex"
+   "Unisex",
+   "Essential Hoodie"
   ]
  },
  {
@@ -1100,7 +1111,7 @@
  {
   "id": "tj9120",
   "sku": "TJ9120",
-  "name": "Mountain Fleece",
+  "name": "Fleecejacke Mountain",
   "brand": "Tee Jays",
   "category": "Jacken",
   "categorySlug": "jacken",
@@ -1165,13 +1176,14 @@
    "Brusttasche",
    "Seitentaschen mit Reißverschluss",
    "Rückennaht",
-   "Unisex"
+   "Unisex",
+   "Mountain Fleece"
   ]
  },
  {
   "id": "tr510",
   "sku": "TR510",
-  "name": "Women´s Recycled Seamless ´3D Fit´ Multi-Sport Flex Bra",
+  "name": "Damen Sport-BH Seamless 3D Fit (recycelt)",
   "brand": "TriDri®",
   "category": "Unterwäsche",
   "categorySlug": "unterwaesche",
@@ -1241,7 +1253,8 @@
   "tags": [
    "Unterwäsche",
    "Sport",
-   "Damen"
+   "Damen",
+   "Women´s Recycled Seamless ´3D Fit´ Multi-Sport Flex Bra"
   ]
  },
  {
@@ -1320,7 +1333,7 @@
  {
   "id": "sd-01-852485",
   "sku": "01.852485-0033",
-  "name": "Oversized Suit Pants Flanell",
+  "name": "Herren Oversized Anzughose Flanell",
   "brand": "Studio Seidensticker",
   "category": "Hosen",
   "categorySlug": "hosen",
@@ -1366,7 +1379,8 @@
    "Hosen",
    "Business",
    "Anzug",
-   "Herren"
+   "Herren",
+   "Oversized Suit Pants Flanell"
   ]
  },
  {
@@ -33140,7 +33154,7 @@
  {
   "id": "jn842",
   "sku": "JN842",
-  "name": "Men´s Workwear Fleece Jacket – STRONG –",
+  "name": "Herren Workwear-Fleecejacke STRONG",
   "brand": "Daiber",
   "category": "Jacken",
   "categorySlug": "jacken",
@@ -33257,14 +33271,18 @@
    "Jacken",
    "Workwear",
    "Fleece",
-   "James & Nicholson"
+   "James & Nicholson",
+   "Men´s Workwear Fleece Jacket – STRONG –"
   ],
-  "hidden": false
+  "hidden": false,
+  "pairs": [
+   "JN841"
+  ]
  },
  {
   "id": "jn1000",
   "sku": "JN1000",
-  "name": "Men´s Winter Softshell Jacket",
+  "name": "Herren Winter-Softshelljacke",
   "brand": "Daiber",
   "category": "Jacken",
   "categorySlug": "jacken",
@@ -33362,14 +33380,15 @@
    "Jacken",
    "Softshell",
    "Winterjacke",
-   "James & Nicholson"
+   "James & Nicholson",
+   "Men´s Winter Softshell Jacket"
   ],
   "hidden": false
  },
  {
   "id": "jn963",
   "sku": "JN963",
-  "name": "Men´s Lifestyle Zip-Hoody",
+  "name": "Herren Kapuzen-Sweatjacke Lifestyle",
   "brand": "Daiber",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
@@ -33480,14 +33499,15 @@
   "tags": [
    "Sweatshirts & -jacken",
    "Zip-Hoody",
-   "James & Nicholson"
+   "James & Nicholson",
+   "Men´s Lifestyle Zip-Hoody"
   ],
   "hidden": false
  },
  {
   "id": "jn1808",
   "sku": "JN1808",
-  "name": "Men´s Bio Workwear T-Shirt",
+  "name": "Herren Bio-Workwear-T-Shirt",
   "brand": "Daiber",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
@@ -33663,14 +33683,15 @@
    "T-Shirts",
    "Workwear",
    "Bio",
-   "James & Nicholson"
+   "James & Nicholson",
+   "Men´s Bio Workwear T-Shirt"
   ],
   "hidden": false
  },
  {
   "id": "jn1813",
   "sku": "JN1813",
-  "name": "Workwear Pants Slim-Line – STRONG –",
+  "name": "Workwear-Stretchhose Slim-Line STRONG",
   "brand": "Daiber",
   "category": "Hosen",
   "categorySlug": "hosen",
@@ -33760,14 +33781,15 @@
    "Workwear",
    "Arbeitshose",
    "Stretch",
-   "James & Nicholson"
+   "James & Nicholson",
+   "Workwear Pants Slim-Line – STRONG –"
   ],
   "hidden": false
  },
  {
   "id": "jn8022",
   "sku": "JN8022",
-  "name": "Men´s Sweat",
+  "name": "Herren Sweatshirt Raglan",
   "brand": "Daiber",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
@@ -33924,7 +33946,8 @@
   "tags": [
    "Sweatshirts & -jacken",
    "Sweatshirt",
-   "James & Nicholson"
+   "James & Nicholson",
+   "Men´s Sweat"
   ],
   "hidden": false
  }

@@ -107,6 +107,17 @@ export default function PricingEditor({ initial, defaults }: { initial: DecoPric
           <p className="muted" style={{ fontSize: 13, margin: '4px 0 0' }}>Personalisierung aus der Teamliste (Namen/Nummern je Teil) – erscheint als eigene Position im Angebot.</p>
           <label className="ds-check" style={{ marginTop: 14 }}><input type="checkbox" checked={p.showEstimate} onChange={(e) => { setP({ ...p, showEstimate: e.target.checked }); setDirty(true); }} /> Kunden sehen im Shop einen „ca.“-Preis für die Veredelung</label>
           <p className="muted" style={{ fontSize: 13 }}>Alle Preise netto. Im Angebot können Sie jede Position weiterhin von Hand anpassen.</p>
+          <h2 style={{ marginTop: 22 }}>Angebot & Erinnerungen</h2>
+          <div className="pe-team">
+            <label className="pe-lbl">Versandpauschale<span className="pe-cell"><N v={p.shipping?.flat ?? 0} set={(n) => { setP((x) => ({ ...x, shipping: { ...x.shipping, flat: n } })); setDirty(true); }} /><span>€</span></span></label>
+            <label className="pe-lbl">Versandfrei ab Warenwert<span className="pe-cell"><N v={p.shipping?.freeFrom ?? 0} set={(n) => { setP((x) => ({ ...x, shipping: { ...x.shipping, freeFrom: n } })); setDirty(true); }} /><span>€</span></span></label>
+          </div>
+          <div className="pe-team">
+            <label className="pe-lbl">Ablauf-Erinnerung (Tage vorher, 0 = aus)<span className="pe-cell"><N v={p.remind?.expiryDays ?? 3} set={(n) => { setP((x) => ({ ...x, remind: { ...x.remind, expiryDays: n } })); setDirty(true); }} /><span>Tage</span></span></label>
+            <label className="pe-lbl">Rabatt bei Annahme bis Ablauf<span className="pe-cell"><N v={p.remind?.expiryPct ?? 0} set={(n) => { setP((x) => ({ ...x, remind: { ...x.remind, expiryPct: n } })); setDirty(true); }} /><span>%</span></span></label>
+          </div>
+          <label className="ds-check" style={{ marginTop: 10 }}><input type="checkbox" checked={p.remind?.cart !== false} onChange={(e) => { setP((x) => ({ ...x, remind: { ...x.remind, cart: e.target.checked } })); setDirty(true); }} /> Warenkorb-Erinnerung nach 24 Stunden (nur mit Einwilligung des Kunden)</label>
+          <p className="muted" style={{ fontSize: 13 }}>Versand landet automatisch im Angebotsentwurf. Der Rabatt wird bei der Ablauf-Erinnerung als eigene Position ins Angebot übernommen (0 % = nur Erinnerung).</p>
         </div>
         <div className="box pe-box">
           <h2>Testrechner</h2>

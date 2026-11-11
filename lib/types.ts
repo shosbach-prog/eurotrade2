@@ -27,6 +27,8 @@ export type Product = {
   /** Staffel-Einkaufspreise von L-Shop: ab Menge -> EK netto */
   baseTiers?: { min: number; price: number }[];
   tags?: string[];
+  /** Passende Artikel (Art.-Nr.), z. B. Damen-/Herrenmodell */
+  pairs?: string[];
   /** Admin: im Shop ausgeblendet */
   hidden?: boolean;
   /** Admin: oben anzeigen */

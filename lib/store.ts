@@ -95,6 +95,8 @@ export type Inquiry = {
   reviewRequestedAt?: string | null;
   /** Erinnerung zum Angebot gesendet */
   remindedAt?: string | null;
+  /** Erinnerung kurz vor Ablauf des Angebots */
+  expiryRemindedAt?: string | null;
   /** Status „geliefert“ gesetzt – Bewertungseinladung folgt automatisch nach ein paar Tagen */
   deliveredAt?: string | null;
   reviewRemindedAt?: string | null;
@@ -164,7 +166,11 @@ export function draftOffer(i: Inquiry): Offer {
     const textil = i.lines.reduce((s, l) => s + l.sum, 0);
     lines.push({ text: `Willkommensrabatt ${i.discount.pct} %`, detail: `Code ${i.discount.code} · auf Textilien`, qty: 1, price: -Math.round(textil * i.discount.pct) / 100 });
   }
-  return { lines, shipping: 0, note: '', validDays: 14, createdAt: new Date().toISOString(), vat: Number(process.env.MWST_PERCENT ?? 19) };
+  // Versand nach Kalkulation (Admin → Veredelung): Pauschale, frei ab Warenwert
+  const goods = lines.reduce((x, l) => x + l.qty * l.price, 0);
+  const sh = pricing.shipping ?? { flat: 0, freeFrom: 0 };
+  const shipping = sh.flat > 0 && !(sh.freeFrom > 0 && goods >= sh.freeFrom) ? sh.flat : 0;
+  return { lines, shipping, note: '', validDays: 14, createdAt: new Date().toISOString(), vat: Number(process.env.MWST_PERCENT ?? 19) };
 }
 
 /* ---------- Referenzen (öffentlich auf der Startseite) ---------- */
