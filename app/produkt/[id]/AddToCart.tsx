@@ -80,7 +80,7 @@ export default function AddToCart({ p, customerLogo, delivery }: { p: PublicProd
   return (
     <div className="pd">
       <div>
-        <Gallery p={p} hex={color?.hex} overlay={showPreview ? <>
+        <Gallery key={cname} p={color?.images?.length ? { ...p, images: color.images } : p} hex={color?.hex} overlay={showPreview ? <>
           {prevPos.map((x) => {
             const [l, t, w] = PREVIEW[x];
             return (
@@ -131,14 +131,18 @@ export default function AddToCart({ p, customerLogo, delivery }: { p: PublicProd
         <div className={`szgrid ${sizes.length === 1 ? 'single' : ''}`}>
           {sizes.map((s) => {
             const v = qty[k(cname, s)] || 0;
+            const st = p.stockBy ? p.stockBy[`${cname}|${s}`] : undefined;
+            const out = st === 0;
             return (
-              <div key={s} className={`sz ${v ? 'on' : ''}`}>
+              <div key={s} className={`sz ${v ? 'on' : ''} ${out ? 'out' : ''}`}>
                 {s && <span className="sz-l">{s}</span>}
                 <div className="step">
                   <button type="button" onClick={() => setQ(s, v - 1)} disabled={!v} aria-label={`${s} weniger`}>−</button>
                   <input type="number" inputMode="numeric" min={0} placeholder="0" value={v || ''} onChange={(e) => setQ(s, Number(e.target.value))} onFocus={(e) => e.target.select()} aria-label={`Menge ${s}`} />
                   <button type="button" onClick={() => setQ(s, v + 1)} aria-label={`${s} mehr`}>+</button>
                 </div>
+                {st != null && <span className={`stock ${out ? 'no' : st < 10 ? 'low' : 'ok'}`}>{out ? 'nicht vorrätig' : st < 10 ? `nur ${st} Stk.` : 'auf Lager'}</span>}
+                {st != null && v > st && <span className="stock low">{out ? 'längere Lieferzeit' : `nur ${st} sofort`}</span>}
               </div>
             );
           })}

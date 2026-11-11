@@ -481,3 +481,10 @@ footer .wrap{display:flex;gap:20px;flex-wrap:wrap;justify-content:space-between}
 .drawer-wrap.open .drawer{box-shadow:-12px 0 40px rgba(0,0,0,.2);visibility:visible;transition:transform .25s ease}
 footer .wrap{padding-right:84px}
 .pd>div,.gal,.gal-main{min-width:0}.gal-thumbs{max-width:100%}
+/* Bestand */
+.stock{font-size:11px;font-weight:600;line-height:1.2;text-align:center}
+.stock.ok{color:var(--ok)}
+.stock.low{color:#b45309}
+.stock.no{color:var(--err)}
+.sz.out{background:#fafafa}
+.sz.out .sz-l{color:#9aa1ab;text-decoration:line-through}

@@ -15,6 +15,16 @@ npm run dev               # http://localhost:3000
 ```
 Ohne API-Key kommt der Katalog aus `seed/products.json`. Neue Artikel: gespeicherte L-Shop-Produktseiten (.html) in `import/` legen → `npm run import-html` → Preise optional in `seed/preise.csv` (`AQ010;6,85`).
 
+## Händler-Feed von L-Shop (CSV / XML / JSON)
+```bash
+npm run import-feed -- /pfad/lshop-feed.csv          # -> data/products.json (live, ohne Neustart)
+npm run import-feed -- /pfad/lshop-feed.csv --seed   # -> seed/products.json (ins Repo)
+```
+Auf dem Server: Datei nach `/opt/euro-trade-shop/data/` kopieren und
+`docker compose exec shop node scripts/import-feed.mjs data/lshop-feed.csv` ausführen.
+Erkannt werden u. a. Artikelnummer, Bezeichnung, Marke, Warengruppe, Farbe, Farbcode, Größe, EK, Preis_10/Preis_50 (Staffel-EK),
+Bestand, Bild, Farbbild. Abweichende Spaltennamen in `scripts/feed-lib.mjs` → `mapItem()` ergänzen.
+
 ## L-Shop anbinden (sobald der API-Key da ist)
 1. In `.env`: `LSHOP_API_URL`, `LSHOP_API_KEY`, ggf. `LSHOP_AUTH_MODE` (header | x-api-key | query)
 2. `npm run sync` – schreibt `data/products.json`. Der laufende Shop lädt die neuen Daten automatisch (kein Neustart).

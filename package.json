@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start -p ${PORT:-3000}",
     "sync": "node scripts/sync-lshop.mjs",
-    "import-html": "node scripts/import-html.mjs"
+    "import-html": "node scripts/import-html.mjs",
+    "import-feed": "node scripts/import-feed.mjs"
   },
   "dependencies": {
     "minisearch": "7.2.0",
