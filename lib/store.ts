@@ -55,7 +55,7 @@ export function allCustomers(): (Customer & { source: 'admin' | 'env' })[] {
 export const findCustomer = (code: string) => allCustomers().find((c) => c.code === code.toUpperCase() && c.active !== false) ?? null;
 
 /* ---------- Anfragen / Angebote ---------- */
-import type { Deco } from './deco';
+import { decoText, type Deco } from './deco';
 export type { Deco };
 export type InqLine = { id?: string; sku: string; name: string; color: string; size: string; qty: number; price: number | null; sum: number; deco?: Deco | null };
 export type OfferLine = { text: string; detail?: string; qty: number; price: number };
@@ -105,7 +105,7 @@ export function draftOffer(i: Inquiry): Offer {
     const e = decos.get(k) ?? { d: l.deco, qty: 0 };
     e.qty += l.qty; decos.set(k, e);
   }
-  for (const { d, qty } of decos.values()) lines.push({ text: `Veredelung: ${d.method}`, detail: d.positions.join(', '), qty, price: 0 });
+  for (const { d, qty } of decos.values()) lines.push({ text: `Veredelung: ${d.method}`, detail: [d.positions.join(', '), d.logoName ? `Logo: ${d.logoName}` : '', decoText(d)].filter(Boolean).join(' · '), qty, price: 0 });
   return { lines, shipping: 0, note: '', validDays: 14, createdAt: new Date().toISOString(), vat: Number(process.env.MWST_PERCENT ?? 19) };
 }
 

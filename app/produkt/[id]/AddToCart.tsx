@@ -6,7 +6,7 @@ import Gallery from '@/components/Gallery';
 import { useCart } from '@/components/CartContext';
 import { swatchBg } from '@/lib/colors';
 import { WishButton } from '@/components/Wishlist';
-import { METHODS, POSITIONS, PREVIEW, isImage, type Deco } from '@/lib/deco';
+import { FONTS, METHODS, MOTIFS, POSITIONS, PREVIEW, TEXT_COLORS, colorHex, fontCss, isImage, type Deco, type Motif } from '@/lib/deco';
 import { nextTier, unitFor } from '@/lib/tiers';
 
 type Logo = { id: string; name: string };
@@ -26,6 +26,11 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
   const [uploading, setUploading] = useState(false);
   const [upErr, setUpErr] = useState('');
   const [note, setNote] = useState('');
+  const [motif, setMotif] = useState<Motif>('logo');
+  const [text, setText] = useState('');
+  const [font, setFont] = useState(FONTS[0].id);
+  const [tColor, setTColor] = useState('Weiß');
+  const useLogo = motif !== 'text', useText = motif !== 'logo';
 
   const sizes = p.sizes.length ? p.sizes : [''];
   const cname = color?.name ?? '';
@@ -40,7 +45,7 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
   }, [qty]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const togglePos = (x: string) => setPositions((ps) => (ps.includes(x) ? ps.filter((y) => y !== x) : [...ps, x]));
-  const decoOk = !decoOn || (positions.length > 0 && (method === 'Beratung gewünscht' || !!logo));
+  const decoOk = !decoOn || (positions.length > 0 && (!useText || !!text.trim()) && (!useLogo || method === 'Beratung gewünscht' || !!logo));
 
   async function upload(file?: File | null) {
     if (!file) return;
@@ -54,7 +59,7 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
   }
 
   const onAdd = () => {
-    const deco: Deco | null = decoOn ? { method, positions, logoId: logo?.id ?? null, logoName: logo?.name ?? null, note: note.trim() } : null;
+    const deco: Deco | null = decoOn ? { method, positions, motif, logoId: useLogo ? logo?.id ?? null : null, logoName: useLogo ? logo?.name ?? null : null, text: useText ? text.trim() : null, font: useText ? font : null, textColor: useText ? tColor : null, note: note.trim() } : null;
     const items = entries.map(([key, n]) => {
       const [c, s] = key.split('|');
       const col = p.colors.find((x) => x.name === c);
@@ -65,15 +70,24 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
     setQty({});
   };
   const specs = Object.entries(p.specs ?? {}).filter(([, v]) => v && v !== 'Keine Angabe');
-  const showPreview = decoOn && logo && isImage(logo.name);
+  const showLogo = decoOn && useLogo && logo && isImage(logo.name);
+  const showText = decoOn && useText && !!text.trim();
+  const showPreview = showLogo || showText;
+  const prevPos = positions.filter((x) => PREVIEW[x]);
+  const textStyle = { fontFamily: fontCss(font), color: colorHex(tColor) };
 
   return (
     <div className="pd">
       <div>
         <Gallery p={p} hex={color?.hex} overlay={showPreview ? <>
-          {positions.filter((x) => PREVIEW[x]).map((x) => {
+          {prevPos.map((x) => {
             const [l, t, w] = PREVIEW[x];
-            return <img key={x} className="logo-prev" src={`/api/upload/${logo!.id}`} alt="" style={{ left: `${l}%`, top: `${t}%`, width: `${w}%` }} />;
+            return (
+              <div key={x} className="deco-prev" style={{ left: `${l}%`, top: `${t}%`, width: `${w}%` }}>
+                {showLogo && <img src={`/api/upload/${logo!.id}`} alt="" />}
+                {showText && <span className="text-prev" style={{ ...textStyle, fontSize: `${w * 0.16}cqw` }}>{text}</span>}
+              </div>
+            );
           })}
           <div className="prev-note">Vorschau · Position und Größe unverbindlich</div>
         </> : null} />
@@ -124,7 +138,7 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
         {/* Veredelung */}
         <label className="deco-toggle">
           <input type="checkbox" checked={decoOn} onChange={(e) => setDecoOn(e.target.checked)} />
-          <span><strong>Mit Logo veredeln</strong> <span className="muted">– Druck oder Stick</span></span>
+          <span><strong>Veredeln mit Logo oder Text</strong> <span className="muted">– Druck oder Stick</span></span>
         </label>
         {decoOn && (
           <div className="deco">
@@ -136,7 +150,24 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
             <div className="deco-row">
               {POSITIONS.map((x) => <button key={x} type="button" className={`size ${positions.includes(x) ? 'on' : ''}`} onClick={() => togglePos(x)}>{x}</button>)}
             </div>
-            <div className="opt" style={{ marginTop: 14 }}>Logo</div>
+            <div className="opt" style={{ marginTop: 14 }}>Motiv</div>
+            <div className="deco-row">
+              {MOTIFS.map((m) => <button key={m.id} type="button" className={`size ${m.id === motif ? 'on' : ''}`} onClick={() => setMotif(m.id)}>{m.label}</button>)}
+            </div>
+            {useText && <>
+              <div className="opt" style={{ marginTop: 14 }}>Text</div>
+              <textarea className="deco-text" rows={2} maxLength={120} value={text} onChange={(e) => setText(e.target.value)} placeholder={'z. B. Vereinsname, Slogan oder Webadresse\n(zweite Zeile möglich)'} />
+              <div className="deco-row" style={{ marginTop: 8 }}>
+                {FONTS.map((f) => <button key={f.id} type="button" className={`size ${f.id === font ? 'on' : ''}`} style={{ fontFamily: f.css }} onClick={() => setFont(f.id)}>{f.id}</button>)}
+              </div>
+              <div className="deco-row" style={{ marginTop: 8 }}>
+                {TEXT_COLORS.map((c) => <button key={c.id} type="button" title={c.id} aria-label={`Textfarbe ${c.id}`} className={`sw tc ${c.id === tColor ? 'on' : ''}`} style={{ background: c.hex }} onClick={() => setTColor(c.id)} />)}
+                <span className="muted" style={{ fontSize: 13 }}>{tColor}</span>
+              </div>
+              {text.trim() && <div className="text-sample" style={{ background: color?.hex ?? '#e5e7eb' }}><span style={textStyle}>{text}</span></div>}
+              <p className="hint">Unterschiedliche Namen oder Nummern je Teil? Einfach unten im Hinweisfeld auflisten, z. B. „M: Lisa 7, L: Tom 10“.</p>
+            </>}
+            {useLogo && <><div className="opt" style={{ marginTop: 14 }}>Logo</div>
             {logo ? (
               <div className="logo-file">
                 {isImage(logo.name) ? <img src={`/api/upload/${logo.id}`} alt="" /> : <span className="file-ico">{logo.name.split('.').pop()?.toUpperCase()}</span>}
@@ -154,13 +185,14 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
             )}
             {upErr && <p className="err" style={{ margin: '6px 0 0', fontSize: 14 }}>{upErr}</p>}
             <p className="hint">PNG, JPG, SVG, PDF, AI oder EPS bis 15 MB. Vektordateien liefern das beste Ergebnis.</p>
-            <textarea className="deco-note" placeholder="Hinweise, z. B. Logogröße ca. 8 cm, Farben, Text/Namen auf dem Rücken …" value={note} onChange={(e) => setNote(e.target.value)} />
+            </>}
+            <textarea className="deco-note" placeholder="Hinweise, z. B. Größe ca. 8 cm, Pantone-Farben, Namen/Nummern je Größe …" value={note} onChange={(e) => setNote(e.target.value)} />
           </div>
         )}
 
         <div className="qtyrow">
           <button className="btn" disabled={!total || !decoOk} onClick={onAdd}>
-            {!total ? 'Menge eintragen' : !decoOk ? 'Logo / Position wählen' : `${total} Stück in den Warenkorb`}
+            {!total ? 'Menge eintragen' : !decoOk ? (useText && !text.trim() ? 'Text eingeben' : 'Logo / Position wählen') : `${total} Stück in den Warenkorb`}
           </button>
           <WishButton id={p.id} variant="full" />
         </div>

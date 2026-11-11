@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getProduct } from '@/lib/catalog';
 import { eur } from '@/lib/format';
 import { getCustomer } from '@/lib/customer';
-import { METHODS, POSITIONS, decoLabel, type Deco } from '@/lib/deco';
+import { FONTS, METHODS, POSITIONS, TEXT_COLORS, decoLabel, type Deco } from '@/lib/deco';
 import { esc, sendMail, shopUrl } from '@/lib/mail';
 import { unitFor } from '@/lib/tiers';
 import { randomId, saveInquiry, type InqLine, type Inquiry } from '@/lib/store';
@@ -15,7 +15,14 @@ function cleanDeco(d: any): Deco | null {
   const method = METHODS.includes(d.method) ? d.method : METHODS[0];
   if (!positions.length) return null;
   const logoId = /^[a-f0-9]{24}$/.test(String(d.logoId ?? '')) ? String(d.logoId) : null;
-  return { method, positions, logoId, logoName: logoId ? String(d.logoName ?? '').slice(0, 120) : null, note: String(d.note ?? '').slice(0, 1000) };
+  const text = String(d.text ?? '').replace(/\r/g, '').trim().slice(0, 120) || null;
+  return {
+    method, positions, motif: ['logo', 'text', 'beides'].includes(d.motif) ? d.motif : 'logo',
+    logoId, logoName: logoId ? String(d.logoName ?? '').slice(0, 120) : null,
+    text, font: text ? (FONTS.some((f) => f.id === d.font) ? d.font : FONTS[0].id) : null,
+    textColor: text ? (TEXT_COLORS.some((c) => c.id === d.textColor) ? d.textColor : 'Schwarz') : null,
+    note: String(d.note ?? '').slice(0, 1000),
+  };
 }
 
 export async function POST(req: Request) {
