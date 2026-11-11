@@ -9,6 +9,8 @@ import { discountTiers, listReferences } from '@/lib/store';
 import { getCategories, getFeatured } from '@/lib/catalog';
 import ProductCard from '@/components/ProductCard';
 import { previewMode } from '@/lib/access';
+import HeroProducts from '@/components/HeroProducts';
+import { heroItems } from '@/lib/hero';
 
 export const metadata: Metadata = {
   title: 'Teamwear & Firmenbekleidung mit Logo – ab 1 Stück',
@@ -22,7 +24,7 @@ export default function Start() {
   const refs = listReferences();
   const cats = getCategories().slice(0, 8);
   const showcase = getFeatured(8, { locked: true });
-  const collage = showcase.flatMap((p) => p.images.slice(0, 1)).slice(0, 4);
+  const hero = heroItems(showcase, { link: !previewMode() });
   return (
     <div className="landing">
       <section className="l-hero">
@@ -40,16 +42,13 @@ export default function Start() {
             <li>Logo-Vorschau direkt am Artikel</li>
           </ul>
         </div>
-        <div className="l-login box">
-          <strong>Schon Kunde?</strong>
-          <p className="muted" style={{ margin: '4px 0 0', fontSize: 14 }}>Mit Ihrem Zugangscode direkt in Ihren Shop.</p>
-          <AccessForm next="/" />
-        </div>
+        {hero.length > 0 ? <HeroProducts items={hero} /> : <div />}
       </section>
 
-      {collage.length >= 3 && (
-        <div className="l-collage" aria-hidden>{collage.map((src) => <img key={src} src={src} alt="" loading="lazy" />)}</div>
-      )}
+      <div className="l-loginbar box">
+        <div><strong>Schon Kunde?</strong><span className="muted"> Mit Ihrem Zugangscode direkt in Ihren Shop.</span></div>
+        <AccessForm next="/" />
+      </div>
 
       <section className="l-feats">
         {[
