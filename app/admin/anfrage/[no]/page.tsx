@@ -13,6 +13,7 @@ import { inquiryMargin } from '@/lib/margin';
 import { INV_STATUS, invoiceTotals, kindShort, listInvoices } from '@/lib/invoice';
 import { getTeamShop } from '@/lib/teamshop';
 import { eur } from '@/lib/format';
+import { adminProduct } from '@/lib/catalog';
 import { decoLabel, teamLabel } from '@/lib/deco';
 import { mailEnabled, shopUrl } from '@/lib/mail';
 import { STATUS, draftOffer, getInquiry, offerTotals } from '@/lib/store';
@@ -25,6 +26,14 @@ export default function InquiryPage({ params }: { params: { no: string } }) {
   if (!i) notFound();
   const c = i.customer;
   const logos = [...new Map(i.lines.filter((l) => l.deco?.logoId).map((l) => [l.deco!.logoId!, l.deco!.logoName ?? 'Logo'])).entries()];
+  // Einkaufskonditionen (nur Admin): Staffel-EK nach Gesamtmenge je Artikel, sonst EK zum Anfragezeitpunkt / aktueller EK
+  const qtyBy = i.lines.reduce<Record<string, number>>((m, l) => ({ ...m, [l.id ?? l.sku]: (m[l.id ?? l.sku] ?? 0) + l.qty }), {});
+  const ek = i.lines.map((l) => {
+    const p = l.id ? adminProduct(l.id).p : null, total = qtyBy[l.id ?? l.sku];
+    const t = [...(p?.baseTiers ?? [])].filter((x) => x.price > 0).sort((a, b) => a.min - b.min).reverse().find((x) => total >= x.min);
+    return { unit: t?.price ?? l.ek ?? p?.basePrice ?? null, tier: t?.min ?? null, total };
+  });
+  const ekSum = ek.reduce((x, e, k) => x + (e.unit ?? 0) * i.lines[k].qty, 0);
   return (
     <>
       <AdminNav active="anfragen" />
@@ -72,16 +81,23 @@ export default function InquiryPage({ params }: { params: { no: string } }) {
       <h2>Angefragte Positionen</h2>
       <div className="box" style={{ padding: 0, overflowX: 'auto' }}>
         <table className="atable">
-          <thead><tr><th>Art.-Nr.</th><th>Artikel</th><th>Farbe</th><th>Größe</th><th>Menge</th><th>Shoppreis</th><th>Summe</th></tr></thead>
+          <thead><tr><th>Art.-Nr.</th><th>Artikel</th><th>Farbe</th><th>Größe</th><th>Menge</th><th className="ek" title="nur im Admin sichtbar">EK / Stk.</th><th>Shoppreis</th><th>Summe</th><th className="ek">EK Summe</th><th className="ek">Aufschlag</th></tr></thead>
           <tbody>{i.lines.map((l, k) => (
             <tr key={k}>
               <td>{l.sku}</td>
               <td>{l.sample && <span className="sample-tag">Muster</span>}{l.id ? <Link href={`/produkt/${l.id}`} className="alink" target="_blank">{l.name}</Link> : l.name}{l.deco && <div className="deco-tag">✦ {decoLabel(l.deco)}{l.deco.note && <> – <i>{l.deco.note}</i></>}</div>}
                 {l.deco?.team?.rows.length ? <div className="muted" style={{ fontSize: 12.5 }}>{l.deco.team.pos}: {teamLabel(l.deco.team.rows)}</div> : null}
                 {l.deco?.previews?.length ? <div className="cl-prev">{l.deco.previews.map((id) => <a key={id} href={`/api/upload/${id}`} target="_blank"><img src={`/api/upload/${id}`} alt="Vorschau" /></a>)}</div> : null}</td>
-              <td>{l.color}</td><td>{l.size}</td><td>{l.qty}</td><td>{eur(l.price)}</td><td>{l.price == null ? '–' : eur(l.sum)}</td>
+              <td>{l.color}</td><td>{l.size}</td><td>{l.qty}</td>
+              {(() => { const e = ek[k]; return <><td className="ek" title={e.tier ? `Staffel-EK ab ${e.tier} Stk. (Gesamtmenge ${e.total})` : 'EK netto'}>{e.unit == null ? <span className="err">fehlt</span> : <>{eur(e.unit)}{e.tier ? <small> ab {e.tier}</small> : null}</>}</td>
+              <td>{eur(l.price)}</td><td>{l.price == null ? '–' : eur(l.sum)}</td>
+              <td className="ek">{e.unit == null ? '–' : eur(e.unit * l.qty)}</td>
+              <td className="ek">{e.unit && l.price != null ? `${Math.round((l.price / e.unit - 1) * 100)} %` : '–'}</td></>; })()}
             </tr>))}
           </tbody>
+          <tfoot><tr><td colSpan={4}><b>Summe</b></td><td><b>{i.lines.reduce((x, l) => x + l.qty, 0)}</b></td><td className="ek" /><td /><td><b>{eur(i.lines.reduce((x, l) => x + (l.price == null ? 0 : l.sum), 0))}</b></td>
+            <td className="ek"><b>{eur(ekSum)}</b>{ek.some((e) => e.unit == null) && <small className="err"> unvollständig</small>}</td>
+            <td className="ek">{(() => { const vk = i.lines.reduce((x, l) => x + (l.price == null ? 0 : l.sum), 0); return vk && ekSum ? <b title="Rohertrag Textil (ohne Veredelung und Versand)">{eur(vk - ekSum)}</b> : '–'; })()}</td></tr></tfoot>
         </table>
       </div>
 
