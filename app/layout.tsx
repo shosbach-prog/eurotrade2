@@ -10,6 +10,7 @@ import TrustBadge from '@/components/TrustBadge';
 import { CartProvider } from '@/components/CartContext';
 import { WishlistProvider } from '@/components/Wishlist';
 import SiteHeader from '@/components/SiteHeader';
+import Consent, { ConsentLink } from '@/components/Consent';
 import { getCategories } from '@/lib/catalog';
 import { previewMode, shopClosed } from '@/lib/access';
 import { isAdmin, shopAccess } from '@/lib/customer';
@@ -91,6 +92,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <Link href="/widerruf">Rückgabe & Widerruf</Link>
                 <Link href="/impressum">Impressum</Link>
                 <Link href="/datenschutz">Datenschutz</Link>
+                <ConsentLink />
               </nav>
             </div>
             <div className="ft-bottom">
@@ -100,6 +102,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               </div>
             </div>
           </footer>
+          {!path.startsWith('/admin') && <Consent tools={{ ga: process.env.GA_ID || undefined, gads: process.env.GOOGLE_ADS_ID || undefined, meta: process.env.META_PIXEL_ID || undefined }} />}
           {!path.startsWith('/admin') && <TrustBadge />}
           {!path.startsWith('/admin') && <Contact whatsapp={process.env.CONTACT_WHATSAPP ?? '491732648097'} phone={process.env.CONTACT_PHONE ?? '0173 2648097'} email={process.env.CONTACT_EMAIL ?? 'info@euro-trade.com'} />}
         </WishlistProvider></CartProvider>

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = { title: 'Datenschutz', description: 'Datenschutzerklärung von euro-trade.com: welche Daten wir bei Anfragen, Newsletter, Bewertungen und Uploads verarbeiten und welche Rechte Sie haben.', robots: { index: false, follow: true } };
 
-const S = ({ t, children }: { t: string; children: React.ReactNode }) => (<section><h2>{t}</h2>{children}</section>);
+const S = ({ t, id, children }: { t: string; id?: string; children: React.ReactNode }) => (<section id={id}><h2>{t}</h2>{children}</section>);
 
 export default function Datenschutz() {
   return (
@@ -28,7 +28,7 @@ export default function Datenschutz() {
         <p>Produktbilder und Größentabellen werden direkt von den Servern unseres Lieferanten L-SHOP-TEAM GmbH, Otto-Hahn-Straße 27, 59423 Unna, geladen. Dabei wird Ihre IP-Adresse technisch bedingt an L-SHOP-TEAM übermittelt. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer aktuellen und vollständigen Produktdarstellung).</p>
       </S>
 
-      <S t="5. Cookies und lokaler Speicher">
+      <S t="5. Cookies und lokaler Speicher" id="cookies">
         <p>Wir verwenden ausschließlich technisch notwendige Cookies:</p>
         <ul>
           <li><strong>et_access</strong> – speichert, dass Sie sich mit Ihrem Zugangscode angemeldet haben (Laufzeit 180 Tage).</li>
@@ -36,6 +36,7 @@ export default function Datenschutz() {
         </ul>
         <p>Zusätzlich werden Warenkorb, Merkliste, zuletzt angesehene Artikel, Ihre zuletzt verwendeten Formulardaten und die Nummern Ihrer Anfragen <strong>nur lokal in Ihrem Browser</strong> (Local Storage) gespeichert. Diese Daten werden nicht an uns übertragen, bis Sie eine Anfrage absenden. Sie können sie jederzeit über die Browser-Einstellungen löschen.</p>
         <p>Rechtsgrundlage ist § 25 Abs. 2 Nr. 2 TDDDG, da die Speicherung für den von Ihnen gewünschten Dienst unbedingt erforderlich ist, sowie Art. 6 Abs. 1 lit. b und f DSGVO.</p>
+        <p><strong>Cookie-Einwilligung:</strong> Beim ersten Besuch fragen wir Sie, welche Kategorien Sie zulassen (Notwendig, Statistik, Marketing). Ihre Auswahl speichern wir für 12 Monate lokal in Ihrem Browser (<strong>et_consent</strong>). Statistik- und Marketing-Dienste werden – falls wir sie einsetzen – erst nach Ihrer Einwilligung geladen (§ 25 Abs. 1 TDDDG, Art. 6 Abs. 1 lit. a DSGVO). Sie können Ihre Einwilligung jederzeit über „Cookie-Einstellungen“ im Fußbereich mit Wirkung für die Zukunft widerrufen.</p>
       </S>
 
       <S t="6. Zugangsanfrage">
