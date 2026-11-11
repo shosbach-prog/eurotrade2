@@ -46,12 +46,12 @@ function orgSchema() {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const gated = shopClosed();
   const path = headers().get('x-path') ?? '/';
-  const isPublic = ['/fuer', '/ueber-uns', '/garantie', '/bewerten', '/widerruf', '/newsletter', '/start', '/druck-stick', '/zugang', '/impressum', '/datenschutz', '/angebot', '/admin'].some((p) => path === p || path.startsWith(p + '/'));
+  const isPublic = ['/fuer', '/ueber-uns', '/garantie', '/bewerten', '/widerruf', '/newsletter', '/start', '/druck-stick', '/zugang', '/passwort', '/impressum', '/datenschutz', '/angebot', '/admin'].some((p) => path === p || path.startsWith(p + '/'));
   const { ok, customer } = await shopAccess();
   // Code im Admin gesperrt/gelöscht -> zurück zur Anmeldung
   const showcase = !ok && headers().get('x-showcase') === '1';
   if (!ok && !isPublic && !showcase) redirect('/zugang');
-  const open = ok && !path.startsWith('/zugang') && !path.startsWith('/admin');
+  const open = ok && !path.startsWith('/zugang') && !path.startsWith('/passwort') && !path.startsWith('/admin');
   const cats = open ? getCategories(customer) : showcase ? getCategories() : [];
   return (
     <html lang="de">
