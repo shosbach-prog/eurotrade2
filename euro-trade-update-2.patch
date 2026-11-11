@@ -1,0 +1,1119 @@
+From d55e6f7eb92592a9577049d6faf28f7ed2c27788 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Wed, 11 Nov 2026 00:42:21 +0100
+Subject: [PATCH] =?UTF-8?q?Staffelpreise,=20=C3=B6ffentliche=20Startseite,?=
+ =?UTF-8?q?=20Info-Seite=20Druck=20&=20Stick,=20Referenzen,=20Zugangsanfra?=
+ =?UTF-8?q?gen?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+- Staffelrabatt (PRICE_TIERS, je Kunde überschreibbar), berechnet auf Gesamtmenge je Artikel
+  in Produktseite, Warenkorb und Anfrage
+- Öffentliche Landingpage auf / für Besucher ohne Code (SEO), mit Code-Login und Zugangsanfrage
+- /druck-stick: Verfahren im Vergleich, Größen, Logo-Anforderungen, Ablauf, FAQ
+- Admin: Referenzen pflegen, offene Zugangsanfragen als Kunde anlegen
+- robots.txt und sitemap.xml
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01AW9Go5bwJWAYsfGemt2b6Z
+---
+ .env.example                           |   2 +
+ app/admin/kunden/CustomerEditor.tsx    |  30 ++++++-
+ app/admin/kunden/page.tsx              |   6 +-
+ app/admin/referenzen/RefEditor.tsx     |  57 +++++++++++++
+ app/admin/referenzen/page.tsx          |  16 ++++
+ app/api/admin/kunden/route.ts          |   2 +
+ app/api/admin/referenzen/route.ts      |  15 ++++
+ app/api/admin/zugangsanfragen/route.ts |  11 +++
+ app/api/anfrage/route.ts               |  12 ++-
+ app/api/bild/[id]/route.ts             |  14 ++++
+ app/api/zugang-anfrage/route.ts        |  27 ++++++
+ app/druck-stick/page.tsx               | 110 +++++++++++++++++++++++++
+ app/globals.css                        |  77 +++++++++++++++++
+ app/layout.tsx                         |  17 ++--
+ app/produkt/[id]/AddToCart.tsx         |  23 +++++-
+ app/robots.ts                          |   5 ++
+ app/sitemap.ts                         |   5 ++
+ app/start/RequestForm.tsx              |  41 +++++++++
+ app/start/page.tsx                     |  94 +++++++++++++++++++++
+ app/warenkorb/page.tsx                 |  10 ++-
+ components/AdminNav.tsx                |   3 +-
+ components/CartContext.tsx             |   2 +-
+ components/ProductCard.tsx             |   2 +-
+ lib/catalog.ts                         |   6 +-
+ lib/pricing.ts                         |  13 ++-
+ lib/store.ts                           |  14 ++++
+ lib/tiers.ts                           |  21 +++++
+ lib/types.ts                           |   2 +-
+ middleware.ts                          |   8 +-
+ 29 files changed, 618 insertions(+), 27 deletions(-)
+ create mode 100644 app/admin/referenzen/RefEditor.tsx
+ create mode 100644 app/admin/referenzen/page.tsx
+ create mode 100644 app/api/admin/referenzen/route.ts
+ create mode 100644 app/api/admin/zugangsanfragen/route.ts
+ create mode 100644 app/api/bild/[id]/route.ts
+ create mode 100644 app/api/zugang-anfrage/route.ts
+ create mode 100644 app/druck-stick/page.tsx
+ create mode 100644 app/robots.ts
+ create mode 100644 app/sitemap.ts
+ create mode 100644 app/start/RequestForm.tsx
+ create mode 100644 app/start/page.tsx
+ create mode 100644 lib/tiers.ts
+
+diff --git a/.env.example b/.env.example
+index 7f8ece1..eaec351 100644
+--- a/.env.example
++++ b/.env.example
+@@ -5,6 +5,8 @@ SHOP_URL=https://euro-trade.com
+ MARKUP_PERCENT=35
+ # Optional: Aufschlag pro Kategorie (JSON, Kategorie-Slug -> Prozent)
+ # MARKUP_BY_CATEGORY={"t-shirts":40,"taschen":25}
++# Staffelrabatt auf den Verkaufspreis: Menge:Prozent (leer = keine Staffel)
++PRICE_TIERS=10:5,50:10,100:15
+ # Preise auf ,x9 runden (true/false)
+ PRICE_ROUND_99=true
+ MWST_PERCENT=19
+diff --git a/app/admin/kunden/CustomerEditor.tsx b/app/admin/kunden/CustomerEditor.tsx
+index 0922054..b4251a7 100644
+--- a/app/admin/kunden/CustomerEditor.tsx
++++ b/app/admin/kunden/CustomerEditor.tsx
+@@ -1,17 +1,24 @@
+ 'use client';
+ import { useState } from 'react';
+-import type { Customer } from '@/lib/store';
++import type { AccessRequest, Customer } from '@/lib/store';
+ 
+ type P = { sku: string; name: string; brand: string };
+ const gen = () => Array.from(crypto.getRandomValues(new Uint8Array(6)), (b) => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[b % 32]).join('');
+ 
+-export default function CustomerEditor({ initial, envCodes, products, defaultMarkup }: { initial: Customer[]; envCodes: { code: string; name: string }[]; products: P[]; defaultMarkup: number }) {
++export default function CustomerEditor({ initial, envCodes, products, defaultMarkup, defaultTiers, requests: req0 }: { requests: AccessRequest[]; initial: Customer[]; envCodes: { code: string; name: string }[]; products: P[]; defaultMarkup: number; defaultTiers: string }) {
+   const [list, setList] = useState<Customer[]>(initial);
+   const [open, setOpen] = useState<number | null>(null);
+   const [dirty, setDirty] = useState(false);
+   const [msg, setMsg] = useState<{ ok: boolean; t: string } | null>(null);
+   const [busy, setBusy] = useState(false);
+   const [pick, setPick] = useState('');
++  const [requests, setRequests] = useState(req0);
++  async function doneReq(id: string) { await fetch('/api/admin/zugangsanfragen', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, done: true }) }); setRequests((r) => r.filter((x) => x.id !== id)); }
++  function createFrom(r: AccessRequest) {
++    const c: Customer = { code: gen(), name: r.company || r.name, markup: null, skus: [], exclusive: false, active: true, note: `${r.name} · ${r.email}${r.phone ? ' · ' + r.phone : ''}${r.type ? ' · ' + r.type : ''}${r.message ? '\n' + r.message : ''}` };
++    setList((l) => [c, ...l]); setOpen(0); setDirty(true); doneReq(r.id);
++    setMsg({ ok: true, t: `Kunde angelegt (Code ${c.code}) – jetzt speichern und Einladung an ${r.email} schicken.` });
++  }
+ 
+   const upd = (k: number, patch: Partial<Customer>) => { setList((l) => l.map((c, n) => (n === k ? { ...c, ...patch } : c))); setDirty(true); };
+   const add = () => { setList((l) => [{ code: gen(), name: '', markup: null, skus: [], exclusive: false, active: true }, ...l]); setOpen(0); setDirty(true); };
+@@ -41,6 +48,20 @@ export default function CustomerEditor({ initial, envCodes, products, defaultMar
+         {msg && <span className={msg.ok ? 'ok' : 'err'}>{msg.t}</span>}
+       </div>
+ 
++      {requests.length > 0 && (
++        <div className="box" style={{ marginBottom: 14, borderLeft: '4px solid var(--accent)' }}>
++          <strong>Offene Zugangsanfragen ({requests.length})</strong>
++          {requests.map((r) => (
++            <div key={r.id} className="req">
++              <div><b>{r.company || r.name}</b> <span className="muted">· {r.name} · <a className="alink" href={`mailto:${r.email}`}>{r.email}</a>{r.phone && ` · ${r.phone}`}{r.type && ` · ${r.type}`} · {new Date(r.date).toLocaleDateString('de-DE')}</span>{r.message && <div className="muted" style={{ fontSize: 13 }}>{r.message}</div>}</div>
++              <div style={{ display: 'flex', gap: 10, alignItems: 'center', flex: 'none' }}>
++                <button className="btn" style={{ height: 38 }} onClick={() => createFrom(r)}>Als Kunde anlegen</button>
++                <button className="linkbtn" onClick={() => doneReq(r.id)}>ablehnen</button>
++              </div>
++            </div>
++          ))}
++        </div>
++      )}
+       {!list.length && <div className="box muted">Noch keine Kunden angelegt. Mit „Neuer Kunde / Code“ legen Sie den ersten an.</div>}
+       <div className="cust-list">
+         {list.map((c, k) => (
+@@ -69,6 +90,9 @@ export default function CustomerEditor({ initial, envCodes, products, defaultMar
+                   </div>
+                 </div>
+ 
++                <label>Staffelrabatt (leer = Standard {defaultTiers || 'keiner'}, „-“ = keiner)</label>
++                <input value={c.tiers ?? ''} onChange={(e) => upd(k, { tiers: e.target.value })} placeholder="z. B. 10:5,50:10,100:15  →  ab 10 Stk. −5 %, ab 50 −10 %, ab 100 −15 %" />
++
+                 <label>Kollektion (Artikel, die der Kunde zuerst sieht)</label>
+                 <div className="chips" style={{ marginTop: 4 }}>
+                   {(c.skus ?? []).map((s) => <span key={s} className="chip">{s} – {pname(s)} <button type="button" className="x" style={{ fontSize: 15 }} onClick={() => upd(k, { skus: c.skus!.filter((x) => x !== s) })}>×</button></span>)}
+@@ -96,7 +120,7 @@ export default function CustomerEditor({ initial, envCodes, products, defaultMar
+                 <label>Interne Notiz</label>
+                 <textarea value={c.note ?? ''} onChange={(e) => upd(k, { note: e.target.value })} placeholder="nur für Sie sichtbar" />
+                 <div className="admin-actions">
+-                  <button type="button" className="btn alt" onClick={() => navigator.clipboard.writeText(`Ihr Zugang zu unserem Shop: ${window.location.origin} – Code: ${c.code}`)}>Einladungstext kopieren</button>
++                  <button type="button" className="btn alt" onClick={() => navigator.clipboard.writeText(`Guten Tag,\n\nIhr persönlicher Zugang zu unserem Textil-Shop ist freigeschaltet:\n\n${window.location.origin}\nZugangscode: ${c.code}\n\nDort finden Sie Ihre Konditionen${c.skus?.length ? ' und Ihre eigene Kollektion' : ''}, können Logos hochladen und erhalten Ihr Angebot innerhalb von 24 Stunden.\n\nMit freundlichen Grüßen\nEuro-Trade`)}>Einladungstext kopieren</button>
+                   <span style={{ flex: 1 }} />
+                   <button type="button" className="linkbtn err" onClick={() => del(k)}>Kunde löschen</button>
+                 </div>
+diff --git a/app/admin/kunden/page.tsx b/app/admin/kunden/page.tsx
+index 30178d7..d94e53e 100644
+--- a/app/admin/kunden/page.tsx
++++ b/app/admin/kunden/page.tsx
+@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
+ import AdminNav from '@/components/AdminNav';
+ import CustomerEditor from './CustomerEditor';
+ import { allProductsBrief } from '@/lib/catalog';
+-import { allCustomers } from '@/lib/store';
++import { allCustomers, listAccessRequests } from '@/lib/store';
++import { defaultTiers } from '@/lib/pricing';
++import { tiersToString } from '@/lib/tiers';
+ 
+ export const metadata: Metadata = { title: 'Kunden & Codes', robots: { index: false, follow: false } };
+ 
+@@ -13,7 +15,7 @@ export default function Kunden() {
+       <AdminNav active="kunden" />
+       <h1>Kunden & Zugangscodes</h1>
+       <p className="muted" style={{ marginTop: -8 }}>Jeder Code öffnet den Shop. Pro Kunde: eigener Aufschlag, eigene Kollektion und hinterlegtes Logo. Standard-Aufschlag: {process.env.MARKUP_PERCENT ?? 35} %.</p>
+-      <CustomerEditor initial={list.filter((c) => c.source === 'admin')} envCodes={list.filter((c) => c.source === 'env').map((c) => ({ code: c.code, name: c.name }))} products={allProductsBrief()} defaultMarkup={Number(process.env.MARKUP_PERCENT ?? 35)} />
++      <CustomerEditor initial={list.filter((c) => c.source === 'admin')} envCodes={list.filter((c) => c.source === 'env').map((c) => ({ code: c.code, name: c.name }))} products={allProductsBrief()} defaultMarkup={Number(process.env.MARKUP_PERCENT ?? 35)} defaultTiers={tiersToString(defaultTiers())} requests={listAccessRequests().filter((r) => !r.done).reverse()} />
+     </>
+   );
+ }
+diff --git a/app/admin/referenzen/RefEditor.tsx b/app/admin/referenzen/RefEditor.tsx
+new file mode 100644
+index 0000000..d29811f
+--- /dev/null
++++ b/app/admin/referenzen/RefEditor.tsx
+@@ -0,0 +1,57 @@
++'use client';
++import { useState } from 'react';
++import type { Reference } from '@/lib/store';
++
++export default function RefEditor({ initial }: { initial: Reference[] }) {
++  const [refs, setRefs] = useState<Reference[]>(initial);
++  const [dirty, setDirty] = useState(false);
++  const [msg, setMsg] = useState<{ ok: boolean; t: string } | null>(null);
++  const upd = (k: number, p: Partial<Reference>) => { setRefs((r) => r.map((x, n) => (n === k ? { ...x, ...p } : x))); setDirty(true); };
++  async function upload(k: number, f?: File | null) {
++    if (!f) return;
++    if (!/\.(png|jpe?g|webp)$/i.test(f.name)) { alert('Bitte ein Foto (JPG, PNG oder WebP) wählen.'); return; }
++    const fd = new FormData(); fd.append('file', f);
++    const r = await fetch('/api/upload', { method: 'POST', body: fd }); const d = await r.json().catch(() => ({}));
++    if (r.ok) upd(k, { imageId: d.id, imageName: d.name }); else alert(d.error ?? 'Upload fehlgeschlagen');
++  }
++  async function save() {
++    const r = await fetch('/api/admin/referenzen', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ refs }) });
++    const d = await r.json().catch(() => ({}));
++    if (r.ok) { setDirty(false); setMsg({ ok: true, t: 'Gespeichert – auf der Startseite sichtbar.' }); } else setMsg({ ok: false, t: d.error ?? 'Fehler' });
++  }
++  const move = (k: number, d: number) => { setRefs((r) => { const a = [...r]; const [x] = a.splice(k, 1); a.splice(Math.max(0, Math.min(a.length, k + d)), 0, x); return a; }); setDirty(true); };
++  return (
++    <>
++      <div className="admin-actions" style={{ marginTop: 0 }}>
++        <button className="btn" onClick={() => { setRefs((r) => [{ id: '', title: '', text: '', tag: '' }, ...r]); setDirty(true); }}>+ Neue Referenz</button>
++        <button className="btn alt" disabled={!dirty} onClick={save}>{dirty ? 'Änderungen speichern' : 'Gespeichert'}</button>
++        {msg && <span className={msg.ok ? 'ok' : 'err'}>{msg.t}</span>}
++      </div>
++      {!refs.length && <div className="box muted">Noch keine Referenzen. Ohne Einträge wird der Bereich auf der Startseite ausgeblendet.</div>}
++      <div className="ref-admin">
++        {refs.map((r, k) => (
++          <div key={k} className="box form ref-item">
++            <div className="ref-img">
++              {r.imageId ? <img src={`/api/upload/${r.imageId}`} alt="" /> : <span className="muted">Kein Foto</span>}
++              <label className="btn alt upl">Foto wählen<input type="file" hidden accept=".jpg,.jpeg,.png,.webp" onChange={(e) => upload(k, e.target.files?.[0])} /></label>
++            </div>
++            <div style={{ flex: 1 }}>
++              <div className="two">
++                <div><label>Kunde / Titel *</label><input value={r.title} onChange={(e) => upd(k, { title: e.target.value })} placeholder="z. B. SV Musterstadt – Trikots Saison 26/27" /></div>
++                <div><label>Kategorie</label><input value={r.tag ?? ''} onChange={(e) => upd(k, { tag: e.target.value })} placeholder="Verein, Handwerk, Gastro …" /></div>
++              </div>
++              <label>Kurzbeschreibung</label>
++              <textarea value={r.text} onChange={(e) => upd(k, { text: e.target.value })} placeholder="z. B. 120 Hoodies mit Stick auf der Brust, Namen auf dem Rücken, Lieferung in 8 Werktagen" />
++              <div className="admin-actions" style={{ margin: '10px 0 0' }}>
++                <button type="button" className="linkbtn" onClick={() => move(k, -1)}>↑ nach oben</button>
++                <button type="button" className="linkbtn" onClick={() => move(k, 1)}>↓ nach unten</button>
++                <span style={{ flex: 1 }} />
++                <button type="button" className="linkbtn err" onClick={() => { setRefs((x) => x.filter((_, n) => n !== k)); setDirty(true); }}>Löschen</button>
++              </div>
++            </div>
++          </div>
++        ))}
++      </div>
++    </>
++  );
++}
+diff --git a/app/admin/referenzen/page.tsx b/app/admin/referenzen/page.tsx
+new file mode 100644
+index 0000000..d5fa1f4
+--- /dev/null
++++ b/app/admin/referenzen/page.tsx
+@@ -0,0 +1,16 @@
++import type { Metadata } from 'next';
++import AdminNav from '@/components/AdminNav';
++import RefEditor from './RefEditor';
++import { listReferences } from '@/lib/store';
++
++export const metadata: Metadata = { title: 'Referenzen', robots: { index: false, follow: false } };
++export default function Referenzen() {
++  return (
++    <>
++      <AdminNav active="referenzen" />
++      <h1>Referenzen</h1>
++      <p className="muted" style={{ marginTop: -8 }}>Erscheinen öffentlich auf der Startseite. Bitte nur mit Einverständnis der Kunden veröffentlichen – auch für Fotos mit erkennbaren Personen.</p>
++      <RefEditor initial={listReferences()} />
++    </>
++  );
++}
+diff --git a/app/api/admin/kunden/route.ts b/app/api/admin/kunden/route.ts
+index 78aefb2..beb71bb 100644
+--- a/app/api/admin/kunden/route.ts
++++ b/app/api/admin/kunden/route.ts
+@@ -1,6 +1,7 @@
+ import { NextResponse } from 'next/server';
+ import { isAdmin } from '@/lib/customer';
+ import { saveCustomers, type Customer } from '@/lib/store';
++import { parseTiers, tiersToString } from '@/lib/tiers';
+ 
+ export async function PUT(req: Request) {
+   if (!(await isAdmin())) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
+@@ -9,6 +10,7 @@ export async function PUT(req: Request) {
+     code: String(c.code ?? '').trim().toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 40),
+     name: String(c.name ?? '').trim().slice(0, 120),
+     markup: c.markup === '' || c.markup == null || !Number.isFinite(Number(c.markup)) ? null : Math.max(0, Math.min(500, Number(c.markup))),
++    tiers: (() => { const t = String(c.tiers ?? '').trim(); return t === '-' ? '-' : t ? tiersToString(parseTiers(t)) || null : null; })(),
+     skus: (Array.isArray(c.skus) ? c.skus : []).map((s: unknown) => String(s).trim().toUpperCase()).filter(Boolean).slice(0, 500),
+     exclusive: !!c.exclusive,
+     logoId: /^[a-f0-9]{24}$/.test(String(c.logoId ?? '')) ? String(c.logoId) : null,
+diff --git a/app/api/admin/referenzen/route.ts b/app/api/admin/referenzen/route.ts
+new file mode 100644
+index 0000000..08eb870
+--- /dev/null
++++ b/app/api/admin/referenzen/route.ts
+@@ -0,0 +1,15 @@
++import { NextResponse } from 'next/server';
++import { isAdmin } from '@/lib/customer';
++import { randomId, saveReferences, type Reference } from '@/lib/store';
++
++export async function PUT(req: Request) {
++  if (!(await isAdmin())) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
++  const b = await req.json().catch(() => null);
++  const list: Reference[] = (Array.isArray(b?.refs) ? b.refs : []).slice(0, 60).map((r: any) => ({
++    id: /^[a-f0-9]{8,24}$/.test(String(r.id ?? '')) ? String(r.id) : randomId(6),
++    title: String(r.title ?? '').trim().slice(0, 120), text: String(r.text ?? '').trim().slice(0, 600), tag: String(r.tag ?? '').trim().slice(0, 40),
++    imageId: /^[a-f0-9]{24}$/.test(String(r.imageId ?? '')) ? String(r.imageId) : null, imageName: String(r.imageName ?? '').slice(0, 120) || null,
++  })).filter((r: Reference) => r.title);
++  saveReferences(list);
++  return NextResponse.json({ ok: true });
++}
+diff --git a/app/api/admin/zugangsanfragen/route.ts b/app/api/admin/zugangsanfragen/route.ts
+new file mode 100644
+index 0000000..7ad2c96
+--- /dev/null
++++ b/app/api/admin/zugangsanfragen/route.ts
+@@ -0,0 +1,11 @@
++import { NextResponse } from 'next/server';
++import { isAdmin } from '@/lib/customer';
++import { listAccessRequests, saveAccessRequests } from '@/lib/store';
++
++/** Zugangsanfrage als erledigt markieren */
++export async function PATCH(req: Request) {
++  if (!(await isAdmin())) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
++  const { id, done } = await req.json().catch(() => ({}));
++  saveAccessRequests(listAccessRequests().map((r) => (r.id === id ? { ...r, done: !!done } : r)));
++  return NextResponse.json({ ok: true });
++}
+diff --git a/app/api/anfrage/route.ts b/app/api/anfrage/route.ts
+index ffaffa2..c706c8a 100644
+--- a/app/api/anfrage/route.ts
++++ b/app/api/anfrage/route.ts
+@@ -4,6 +4,7 @@ import { eur } from '@/lib/format';
+ import { getCustomer } from '@/lib/customer';
+ import { METHODS, POSITIONS, decoLabel, type Deco } from '@/lib/deco';
+ import { esc, sendMail, shopUrl } from '@/lib/mail';
++import { unitFor } from '@/lib/tiers';
+ import { randomId, saveInquiry, type InqLine, type Inquiry } from '@/lib/store';
+ 
+ const hits = new Map<string, number[]>();
+@@ -33,10 +34,17 @@ export async function POST(req: Request) {
+ 
+   // Preise serverseitig neu berechnen (mit Kunden-Aufschlag) – nie dem Browser vertrauen
+   const ctx = await getCustomer();
+-  const lines: InqLine[] = (Array.isArray(body.lines) ? body.lines : []).slice(0, 300).flatMap((l: any) => {
++  type Raw = { p: NonNullable<ReturnType<typeof getProduct>>; l: any; qty: number };
++  const raw: Raw[] = (Array.isArray(body.lines) ? body.lines : []).slice(0, 300).flatMap((l: any) => {
+     const p = getProduct(String(l.id), ctx);
+     const qty = Math.max(1, Math.min(100000, Math.floor(Number(l.qty) || 1)));
+-    return p ? [{ id: p.id, sku: p.sku, name: p.name, color: String(l.color ?? '').slice(0, 80), size: String(l.size ?? '').slice(0, 40), qty, price: p.price, sum: (p.price ?? 0) * qty, deco: cleanDeco(l.deco) }] : [];
++    return p ? [{ p, l, qty }] : [];
++  });
++  // Staffelpreis nach Gesamtmenge je Artikel
++  const perProduct = raw.reduce((m: Record<string, number>, x) => ({ ...m, [x.p.id]: (m[x.p.id] ?? 0) + x.qty }), {});
++  const lines: InqLine[] = raw.map(({ p, l, qty }) => {
++    const price = unitFor(p.tiers, perProduct[p.id], p.price);
++    return { id: p.id, sku: p.sku, name: p.name, color: String(l.color ?? '').slice(0, 80), size: String(l.size ?? '').slice(0, 40), qty, price, sum: Math.round((price ?? 0) * qty * 100) / 100, deco: cleanDeco(l.deco) };
+   });
+   if (!lines.length) return NextResponse.json({ error: 'Warenkorb ist leer.' }, { status: 400 });
+   const total = lines.reduce((s, l) => s + l.sum, 0);
+diff --git a/app/api/bild/[id]/route.ts b/app/api/bild/[id]/route.ts
+new file mode 100644
+index 0000000..3c4cf24
+--- /dev/null
++++ b/app/api/bild/[id]/route.ts
+@@ -0,0 +1,14 @@
++import fs from 'node:fs';
++import path from 'node:path';
++import { UPLOADS, listReferences, readJSON } from '@/lib/store';
++
++const TYPES: Record<string, string> = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp' };
++
++/** Öffentliche Bilder – nur solche, die als Referenz freigegeben sind */
++export function GET(_: Request, { params }: { params: { id: string } }) {
++  if (!/^[a-f0-9]{24}$/.test(params.id) || !listReferences().some((r) => r.imageId === params.id)) return new Response('Nicht gefunden', { status: 404 });
++  const meta = readJSON<{ ext: string } | null>(path.join(UPLOADS, `${params.id}.json`), null);
++  const file = meta && path.join(UPLOADS, `${params.id}.${meta.ext}`);
++  if (!meta || !TYPES[meta.ext] || !fs.existsSync(file!)) return new Response('Nicht gefunden', { status: 404 });
++  return new Response(fs.readFileSync(file!), { headers: { 'Content-Type': TYPES[meta.ext], 'Cache-Control': 'public, max-age=86400', 'X-Content-Type-Options': 'nosniff' } });
++}
+diff --git a/app/api/zugang-anfrage/route.ts b/app/api/zugang-anfrage/route.ts
+new file mode 100644
+index 0000000..91ab9ea
+--- /dev/null
++++ b/app/api/zugang-anfrage/route.ts
+@@ -0,0 +1,27 @@
++import { NextResponse } from 'next/server';
++import { esc, sendMail, shopUrl } from '@/lib/mail';
++import { listAccessRequests, randomId, saveAccessRequests } from '@/lib/store';
++
++const hits = new Map<string, number[]>();
++
++export async function POST(req: Request) {
++  const ip = req.headers.get('x-forwarded-for')?.split(',')[0] ?? 'local';
++  const now = Date.now();
++  const recent = (hits.get(ip) ?? []).filter((t) => now - t < 3_600_000);
++  if (recent.length >= 3) return NextResponse.json({ error: 'Zu viele Anfragen – bitte später erneut.' }, { status: 429 });
++  hits.set(ip, [...recent, now]);
++  const b = await req.json().catch(() => ({}));
++  if (b.website) return NextResponse.json({ ok: true }); // Honeypot
++  const f = (k: string, n = 200) => String(b[k] ?? '').trim().slice(0, n);
++  const r = { id: randomId(6), date: new Date().toISOString(), name: f('name'), company: f('company'), email: f('email'), phone: f('phone', 60), type: f('type', 60), message: f('message', 2000) };
++  if (!r.name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(r.email)) return NextResponse.json({ error: 'Bitte Name und gültige E-Mail angeben.' }, { status: 400 });
++  if (!b.privacy) return NextResponse.json({ error: 'Bitte der Datenschutzerklärung zustimmen.' }, { status: 400 });
++  saveAccessRequests([...listAccessRequests(), r]);
++  try {
++    await sendMail({ to: process.env.INQUIRY_TO ?? '', replyTo: r.email, subject: `Zugangsanfrage: ${r.company || r.name}`,
++      html: `<h2>Neue Zugangsanfrage</h2><p><b>${esc(r.name)}</b>${r.company ? ` – ${esc(r.company)}` : ''}<br>${esc(r.email)} · ${esc(r.phone)}<br>Art: ${esc(r.type)}</p><p>${esc(r.message).replace(/\n/g, '<br>')}</p><p><a href="${shopUrl()}/admin/kunden">→ Im Admin als Kunde anlegen</a></p>` });
++    await sendMail({ to: r.email, subject: `Ihre Zugangsanfrage bei ${process.env.SHOP_NAME ?? 'Euro-Trade'}`,
++      html: `<p>Guten Tag ${esc(r.name)},</p><p>vielen Dank für Ihr Interesse! Wir melden uns innerhalb von 24 Stunden mit Ihrem persönlichen Zugangscode.</p><p>Mit freundlichen Grüßen<br>${esc(process.env.SHOP_NAME ?? 'Euro-Trade')}</p>` });
++  } catch (e) { console.error('Mail Zugangsanfrage fehlgeschlagen', e); }
++  return NextResponse.json({ ok: true });
++}
+diff --git a/app/druck-stick/page.tsx b/app/druck-stick/page.tsx
+new file mode 100644
+index 0000000..2dd500f
+--- /dev/null
++++ b/app/druck-stick/page.tsx
+@@ -0,0 +1,110 @@
++import Link from 'next/link';
++import type { Metadata } from 'next';
++
++export const metadata: Metadata = {
++  title: 'Druck & Stick – welches Verfahren passt zu Ihrem Logo?',
++  description: 'Siebdruck, Transferdruck, Digitaldruck (DTF) und Stick im Vergleich: Mindestmengen, Vorteile, Grenzen, Logo-Anforderungen und typische Größen für Teamwear und Firmenbekleidung.',
++  alternates: { canonical: '/druck-stick' },
++};
++
++const METHODS = [
++  {
++    name: 'Stick', tag: 'edel & langlebig', min: 'ab ca. 10 Stück sinnvoll',
++    good: ['Hochwertige Optik, sehr langlebig', 'Ideal für Polos, Hemden, Jacken, Caps', 'Übersteht Industriewäsche'],
++    limits: ['Sehr feine Details und Schrift unter ca. 4 mm schwierig', 'Einmalige Kosten für das Stickprogramm', 'Keine Farbverläufe'],
++    for: 'Firmenbekleidung, Vereinslogo auf der Brust, Caps',
++  },
++  {
++    name: 'Siebdruck', tag: 'günstig bei Menge', min: 'ab ca. 25–50 Stück wirtschaftlich',
++    good: ['Sehr günstiger Stückpreis bei großen Mengen', 'Kräftige, deckende Farben', 'Sehr waschbeständig'],
++    limits: ['Einrichtungskosten je Farbe', 'Wenige Farben pro Motiv', 'Nicht für Einzelstücke'],
++    for: 'Event-Shirts, Promotion, große Teamauflagen',
++  },
++  {
++    name: 'Digitaltransfer (DTF)', tag: 'vollfarbig ab 1 Stück', min: 'ab 1 Stück',
++    good: ['Beliebig viele Farben, Verläufe und Fotos', 'Auf Baumwolle, Polyester und Mischgewebe', 'Keine Einrichtungskosten'],
++    limits: ['Leicht spürbare Oberfläche', 'Bei sehr großen Flächen weniger atmungsaktiv'],
++    for: 'Bunte Logos, Kleinserien, Nachbestellungen',
++  },
++  {
++    name: 'Flex- / Flocktransfer', tag: 'Namen & Nummern', min: 'ab 1 Stück',
++    good: ['Perfekt für Namen und Rückennummern', 'Leuchtende Effekte (Neon, Reflex, Metallic)', 'Sehr robust'],
++    limits: ['Nur einfarbige Flächen je Folie', 'Keine feinen Details'],
++    for: 'Trikots, Personalisierung, Warnwesten-Schriftzüge',
++  },
++];
++
++const SIZES = [
++  ['Brust links / rechts', 'ca. 8–10 cm breit', 'Klassisch für Logos auf Polos, Hemden, Jacken'],
++  ['Brust mittig', 'bis ca. 25 cm breit', 'Großes Front-Motiv auf T-Shirts und Hoodies'],
++  ['Rücken', 'bis ca. 30 × 40 cm', 'Großer Schriftzug, Namen und Nummern'],
++  ['Nacken', 'ca. 6–8 cm breit', 'Dezentes Zweitlogo oder Webadresse'],
++  ['Ärmel', 'ca. 6–8 cm breit', 'Sponsor, Flagge oder Zusatzlogo'],
++];
++
++export default function DruckStick() {
++  return (
++    <div className="info">
++      <div className="crumbs"><Link href="/">Start</Link> › Druck & Stick</div>
++      <h1>Druck & Stick: welches Verfahren passt zu Ihrem Logo?</h1>
++      <p className="lead">Ob Vereinslogo auf der Brust, Namen auf dem Rücken oder ein buntes Motiv auf dem Event-Shirt: Für jedes Projekt gibt es das passende Verfahren. Hier finden Sie die wichtigsten Unterschiede auf einen Blick. Wenn Sie unsicher sind, wählen Sie bei Ihrer Anfrage einfach „Beratung gewünscht“.</p>
++
++      <div className="m-grid">
++        {METHODS.map((m) => (
++          <div key={m.name} className="box m-card">
++            <div className="m-head"><h2>{m.name}</h2><span className="l-tag">{m.tag}</span></div>
++            <p className="m-min">{m.min}</p>
++            <div className="m-cols">
++              <div><b>Stärken</b><ul className="pro">{m.good.map((x) => <li key={x}>{x}</li>)}</ul></div>
++              <div><b>Grenzen</b><ul className="con">{m.limits.map((x) => <li key={x}>{x}</li>)}</ul></div>
++            </div>
++            <p className="m-for"><b>Ideal für:</b> {m.for}</p>
++          </div>
++        ))}
++      </div>
++      <p className="muted" style={{ fontSize: 13 }}>Mindestmengen sind Richtwerte. Den genauen Preis für Ihr Motiv erhalten Sie mit dem Angebot.</p>
++
++      <h2>Positionen & typische Größen</h2>
++      <div className="box" style={{ padding: 0, overflowX: 'auto' }}>
++        <table className="atable">
++          <thead><tr><th>Position</th><th>Typische Größe</th><th>Verwendung</th></tr></thead>
++          <tbody>{SIZES.map(([a, b, c]) => <tr key={a}><td><b>{a}</b></td><td>{b}</td><td>{c}</td></tr>)}</tbody>
++        </table>
++      </div>
++
++      <h2>So liefern Sie Ihr Logo richtig an</h2>
++      <div className="box">
++        <ul className="feat" style={{ marginTop: 0 }}>
++          <li><b>Am besten:</b> Vektordatei als AI, EPS, SVG oder PDF (mit Schriften in Pfade umgewandelt).</li>
++          <li><b>Auch möglich:</b> PNG oder JPG in hoher Auflösung, mindestens 300 dpi in Druckgröße und möglichst mit transparentem Hintergrund.</li>
++          <li><b>Farben:</b> Wenn vorhanden, nennen Sie uns die Pantone- oder HKS-Farben. Dann treffen wir Ihr Firmen- oder Vereinsdesign genau.</li>
++          <li><b>Kein passendes Format?</b> Kein Problem, wir prüfen jede Datei und melden uns, falls etwas nachbearbeitet werden muss.</li>
++        </ul>
++      </div>
++
++      <h2>Ablauf</h2>
++      <ol className="l-steps">
++        <li><b>Anfrage</b><span>Artikel, Mengen und Logo im Shop auswählen und Anfrage senden.</span></li>
++        <li><b>Angebot</b><span>Sie erhalten innerhalb von 24 Stunden ein Angebot inklusive Veredelung als PDF.</span></li>
++        <li><b>Freigabe</b><span>Nach Ihrer Annahme schicken wir Ihnen eine Druck- oder Stickvorschau zur Freigabe.</span></li>
++        <li><b>Lieferung</b><span>Produktion und Versand meist in 7–14 Werktagen nach Freigabe.</span></li>
++      </ol>
++
++      <h2>Häufige Fragen</h2>
++      <div className="faq">
++        <details className="box"><summary>Kann ich auch nur ein einzelnes Teil veredeln lassen?</summary><p>Ja. Mit Digitaltransfer oder Flex ist das ab 1 Stück möglich. Für Stick fallen einmalige Kosten für das Stickprogramm an, deshalb lohnt er sich meist ab etwa 10 Teilen. Bei Nachbestellungen nutzen wir dasselbe Programm erneut.</p></details>
++        <details className="box"><summary>Was kostet die Veredelung?</summary><p>Das hängt von Verfahren, Größe, Farbanzahl und Menge ab. Sie erhalten die Kosten transparent als eigene Position im Angebot.</p></details>
++        <details className="box"><summary>Können Namen und Nummern individuell sein?</summary><p>Ja. Tragen Sie die Namen und Nummern einfach im Hinweisfeld der Veredelung ein oder schicken Sie uns eine Liste. Das ist ideal für Trikots und Teamwear.</p></details>
++        <details className="box"><summary>Wie wasche ich veredelte Textilien?</summary><p>Auf links gedreht bei der angegebenen Temperatur waschen und nicht direkt auf dem Motiv bügeln. So bleiben Druck und Stick lange schön.</p></details>
++      </div>
++
++      <div className="box l-cta-box">
++        <div><h2 style={{ margin: 0 }}>Bereit für Ihr Projekt?</h2><p className="muted" style={{ margin: '4px 0 0' }}>Fragen Sie Ihren persönlichen Zugang an, oder melden Sie sich mit Ihrem Code an.</p></div>
++        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
++          <Link href="/#anfragen" className="btn" style={{ display: 'inline-grid', placeItems: 'center' }}>Zugang anfragen</Link>
++          <Link href="/zugang" className="btn alt" style={{ display: 'inline-grid', placeItems: 'center' }}>Anmelden</Link>
++        </div>
++      </div>
++    </div>
++  );
++}
+diff --git a/app/globals.css b/app/globals.css
+index e3c4af8..611acbf 100644
+--- a/app/globals.css
++++ b/app/globals.css
+@@ -261,3 +261,80 @@ footer .wrap{display:flex;gap:20px;flex-wrap:wrap;justify-content:space-between}
+ .card .img .img2{position:absolute;inset:0;opacity:0;transition:opacity .25s;background:#fff}
+ .card:hover .img .img2{opacity:1}
+ @media (hover:none){.card .img .img2{display:none}}
++/* Staffelpreise */
++.tiers{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
++.tier{border:1px solid var(--line);border-radius:8px;padding:6px 10px;display:flex;flex-direction:column;min-width:92px;background:#fff;font-size:12px;color:var(--muted)}
++.tier b{font-size:15px;color:var(--ink)}
++.tier small{color:var(--ok);font-weight:700}
++.tier.on{border-color:var(--brand);background:#eef4fc;box-shadow:0 0 0 1px var(--brand)}
++.req{display:flex;justify-content:space-between;gap:14px;align-items:center;padding:10px 0;border-top:1px solid var(--line);flex-wrap:wrap}
++.req:first-of-type{margin-top:8px}
++.ref-admin{display:flex;flex-direction:column;gap:12px}
++.ref-item{display:flex;gap:18px;flex-wrap:wrap}
++.ref-img{width:180px;display:flex;flex-direction:column;gap:8px;align-items:stretch}
++.ref-img img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px}
++.ref-img .muted{display:grid;place-items:center;aspect-ratio:4/3;background:#f0f2f5;border-radius:8px;font-size:13px}
++
++/* Öffentliche Startseite */
++.pub-nav{display:flex;gap:6px;align-items:center;margin-left:auto;font-size:15px}
++.pub-nav a{padding:8px 12px;border-radius:8px;color:#dbe6f6}
++.pub-nav a:hover{background:rgba(255,255,255,.12);color:#fff}
++.pub-nav .pub-login{background:var(--accent);color:#111;font-weight:700}
++.pub-nav .pub-login:hover{background:#ffc928;color:#111}
++.landing h2{font-size:26px;margin:0 0 16px;letter-spacing:-.3px}
++.l-hero{display:grid;grid-template-columns:1.5fr 1fr;gap:28px;align-items:center;background:linear-gradient(125deg,#0b4ea2 0%,#0a3a78 60%,#082d5e 100%);color:#fff;border-radius:18px;padding:44px;position:relative;overflow:hidden}
++.l-hero::after{content:"";position:absolute;right:-120px;top:-120px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(242,183,5,.28),transparent 65%);pointer-events:none}
++.l-kicker{display:inline-block;font-size:12px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
++.l-hero h1{font-size:40px;line-height:1.12;margin:0 0 14px;color:#fff;letter-spacing:-.8px}
++.l-hero p{font-size:17px;opacity:.92;margin:0;max-width:560px}
++.l-cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
++.l-btn{background:var(--accent);color:#111;display:inline-grid;place-items:center}
++.l-btn2{background:transparent!important;color:#fff!important;border-color:rgba(255,255,255,.5)!important;display:inline-grid;place-items:center}
++.l-checks{list-style:none;padding:0;margin:20px 0 0;display:flex;gap:18px;flex-wrap:wrap;font-size:14px;opacity:.9}
++.l-checks li::before{content:"✓ ";color:var(--accent);font-weight:800}
++.l-login{color:var(--ink);position:relative;z-index:1}
++.l-login .gate-form input{font-size:17px;height:48px}
++.l-feats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:22px}
++.l-feat h3{margin:0 0 6px;font-size:17px;color:var(--brand)}
++.l-feat p{margin:0;font-size:14px;color:var(--muted)}
++.l-section{margin-top:48px}
++.l-steps{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(4,1fr);gap:14px;counter-reset:s}
++.l-steps li{background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:20px;counter-increment:s;display:flex;flex-direction:column;gap:6px}
++.l-steps li::before{content:counter(s);width:34px;height:34px;border-radius:50%;background:var(--accent);color:#111;font-weight:800;display:grid;place-items:center;margin-bottom:4px}
++.l-steps span{font-size:14px;color:var(--muted)}
++.l-refs{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
++.l-ref{margin:0;padding:0;overflow:hidden}
++.l-ref img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
++.l-ref figcaption{padding:14px 16px;display:flex;flex-direction:column;gap:4px;font-size:14px}
++.l-ref figcaption span:not(.l-tag){color:var(--muted)}
++.l-tag{align-self:flex-start;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;background:#eef4fc;color:var(--brand);padding:2px 8px;border-radius:999px}
++.l-request{display:grid;grid-template-columns:1fr 1.2fr;gap:28px;align-items:start}
++.sel{width:100%;border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:#fff}
++
++/* Info-Seite */
++.info{max-width:1000px;margin:0 auto}
++.info h1{font-size:32px;letter-spacing:-.5px}
++.info h2{margin-top:36px}
++.lead{font-size:17px;color:#3b4250;max-width:820px}
++.m-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
++.m-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
++.m-head h2{margin:0;font-size:20px}
++.m-min{font-weight:700;color:var(--brand);margin:6px 0 10px;font-size:14px}
++.m-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:14px}
++.m-cols ul{padding-left:0;list-style:none;margin:6px 0 0}
++.m-cols li{padding:2px 0 2px 20px;position:relative}
++.pro li::before{content:"✓";position:absolute;left:0;color:var(--ok);font-weight:800}
++.con li::before{content:"–";position:absolute;left:2px;color:var(--err);font-weight:800}
++.m-for{font-size:14px;margin:12px 0 0;padding-top:10px;border-top:1px solid var(--line)}
++.faq{display:flex;flex-direction:column;gap:8px}
++.faq summary{font-weight:600;cursor:pointer}
++.faq p{margin:10px 0 0;color:#3b4250}
++.l-cta-box{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-top:36px;border-left:4px solid var(--accent)}
++@media (max-width:900px){
++  .l-hero{grid-template-columns:1fr;padding:26px}
++  .l-hero h1{font-size:30px}
++  .l-feats,.l-steps{grid-template-columns:1fr 1fr}
++  .l-request,.m-grid{grid-template-columns:1fr}
++}
++@media (max-width:520px){.l-feats,.l-steps,.m-cols{grid-template-columns:1fr}}
++.landing{padding-top:6px}
+diff --git a/app/layout.tsx b/app/layout.tsx
+index 9e80cd6..11680e6 100644
+--- a/app/layout.tsx
++++ b/app/layout.tsx
+@@ -19,8 +19,8 @@ export async function generateMetadata(): Promise<Metadata> {
+     title: { default: `${SHOP} – Textilien & Werbeartikel`, template: `%s | ${SHOP}` },
+     description: 'T-Shirts, Polos, Hoodies, Jacken, Caps und Taschen für Druck und Stick – schnell finden, Anfrage in einer Minute.',
+     metadataBase: new URL(process.env.SHOP_URL ?? 'https://euro-trade.com'),
+-    // Geschlossener Shop: nicht in Suchmaschinen
+-    robots: shopClosed() ? { index: false, follow: false } : undefined,
++    // Geschlossener Shop: nur Landingpage und Info-Seite in Suchmaschinen
++    robots: shopClosed() && !['/start', '/druck-stick', '/impressum'].includes(headers().get('x-path') ?? '') ? { index: false, follow: false } : undefined,
+   };
+ }
+ export const dynamic = 'force-dynamic';
+@@ -28,7 +28,7 @@ export const dynamic = 'force-dynamic';
+ export default async function RootLayout({ children }: { children: React.ReactNode }) {
+   const gated = shopClosed();
+   const path = headers().get('x-path') ?? '/';
+-  const isPublic = ['/zugang', '/impressum', '/datenschutz', '/angebot', '/admin'].some((p) => path === p || path.startsWith(p + '/'));
++  const isPublic = ['/start', '/druck-stick', '/zugang', '/impressum', '/datenschutz', '/angebot', '/admin'].some((p) => path === p || path.startsWith(p + '/'));
+   const { ok, customer } = await shopAccess();
+   // Code im Admin gesperrt/gelöscht -> zurück zur Anmeldung
+   if (!ok && !isPublic) redirect('/zugang');
+@@ -41,10 +41,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
+           <header className="hdr">
+             <div className="wrap hdr-row">
+               <Link href="/" className="logo" aria-label={`${SHOP} – Startseite`}><Logo name={SHOP} /></Link>
+-              {open && <>
++              {open ? <>
+                 <Suspense fallback={<div className="search" />}><SearchBar /></Suspense>
+                 <div className="hdr-actions"><WishlistButton /><CartButton /></div>
+-              </>}
++              </> : !path.startsWith('/admin') && <nav className="pub-nav">
++                <Link href="/druck-stick" className="hide-sm">Druck & Stick</Link>
++                <Link href="/#ablauf" className="hide-sm">So funktioniert’s</Link>
++                <Link href="/#anfragen" className="hide-sm">Zugang anfragen</Link>
++                <Link href="/zugang" className="pub-login">Anmelden</Link>
++              </nav>}
+             </div>
+           </header>
+           {open && <nav className="catnav"><div className="wrap">
+@@ -53,7 +58,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
+           <main className="wrap">{children}</main>
+           <footer><div className="wrap">
+             <span>© {new Date().getFullYear()} {SHOP} · Alle Preise netto zzgl. MwSt. und Versand</span>
+-            <span><Link href="/impressum">Impressum</Link> · <Link href="/datenschutz">Datenschutz</Link>{gated && customer && <> · {customer.name} · <LogoutLink /></>}</span>
++            <span><Link href="/druck-stick">Druck & Stick</Link> · <Link href="/impressum">Impressum</Link> · <Link href="/datenschutz">Datenschutz</Link>{gated && customer && <> · {customer.name} · <LogoutLink /></>}</span>
+           </div></footer>
+         </WishlistProvider></CartProvider>
+       </body>
+diff --git a/app/produkt/[id]/AddToCart.tsx b/app/produkt/[id]/AddToCart.tsx
+index 16578cd..31cf12c 100644
+--- a/app/produkt/[id]/AddToCart.tsx
++++ b/app/produkt/[id]/AddToCart.tsx
+@@ -7,6 +7,7 @@ import { useCart } from '@/components/CartContext';
+ import { swatchBg } from '@/lib/colors';
+ import { WishButton } from '@/components/Wishlist';
+ import { METHODS, POSITIONS, PREVIEW, isImage, type Deco } from '@/lib/deco';
++import { nextTier, unitFor } from '@/lib/tiers';
+ 
+ type Logo = { id: string; name: string };
+ 
+@@ -57,7 +58,7 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
+     const items = entries.map(([key, n]) => {
+       const [c, s] = key.split('|');
+       const col = p.colors.find((x) => x.name === c);
+-      return { id: p.id, sku: p.sku, name: p.name, color: c || undefined, hex: col?.hex, size: s || undefined, qty: n, price: p.price, category: p.category, image: p.images[0], deco };
++      return { id: p.id, sku: p.sku, name: p.name, color: c || undefined, hex: col?.hex, size: s || undefined, qty: n, price: p.price, category: p.category, image: p.images[0], deco, tiers: p.tiers };
+     });
+     addMany(items);
+     setMsg(`${total} Stück von ${p.name} im Warenkorb${deco ? ' (mit Veredelung)' : ''}.`);
+@@ -83,6 +84,16 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
+         {p.price != null ? <>
+           <div className="price">{eur(p.price)} <span style={{ fontSize: 15, fontWeight: 500 }} className="muted">/ Stück</span></div>
+           <div className="vat">netto zzgl. MwSt. ({eur(p.priceGross)} brutto) · schon ab 1 Stück{decoOn ? ' · Veredelung wird im Angebot kalkuliert' : ''}</div>
++          {p.tiers.length > 0 && (
++            <div className="tiers">
++              <div className={`tier ${total < p.tiers[0].min ? 'on' : ''}`}><span>1–{p.tiers[0].min - 1} Stk.</span><b>{eur(p.price)}</b></div>
++              {p.tiers.map((t, n) => {
++                const to = p.tiers[n + 1]?.min;
++                const on = total >= t.min && (!to || total < to);
++                return <div key={t.min} className={`tier ${on ? 'on' : ''}`}><span>{to ? `${t.min}–${to - 1}` : `ab ${t.min}`} Stk.</span><b>{eur(t.price)}</b><small>−{Math.round((1 - t.price / p.price!) * 100)} %</small></div>;
++              })}
++            </div>
++          )}
+         </> : <>
+           <div className="price" style={{ fontSize: 22, color: 'var(--brand)' }}>Preis auf Anfrage</div>
+           <div className="vat">Schon ab 1 Stück · Ihren Preis erhalten Sie umgehend per E-Mail</div>
+@@ -117,6 +128,7 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
+         </label>
+         {decoOn && (
+           <div className="deco">
++            <p className="hint" style={{ margin: '0 0 10px' }}>Unsicher, welches Verfahren passt? <a href="/druck-stick" target="_blank" className="alink">Druck & Stick im Vergleich</a></p>
+             <div className="deco-row">
+               {METHODS.map((m) => <button key={m} type="button" className={`size ${m === method ? 'on' : ''}`} onClick={() => setMethod(m)}>{m}</button>)}
+             </div>
+@@ -152,7 +164,14 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
+           </button>
+           <WishButton id={p.id} variant="full" />
+         </div>
+-        {total > 0 && p.price != null && <div className="note muted">Summe Textil: {eur(total * p.price)} netto</div>}
++        {total > 0 && p.price != null && (() => {
++          const u = unitFor(p.tiers, total, p.price)!;
++          const nx = nextTier(p.tiers, total);
++          return <div className="note">
++            <strong>{total} Stück × {eur(u)} = {eur(total * u)} netto</strong>{u < p.price && <span className="ok"> · Sie sparen {eur((p.price - u) * total)}</span>}
++            {nx && <div className="muted" style={{ fontSize: 13 }}>Noch {nx.min - total} Stück bis {eur(nx.price)} pro Stück</div>}
++          </div>;
++        })()}
+         {msg && <div className="note ok">✓ {msg} <a href="/warenkorb" style={{ textDecoration: 'underline' }}>Zum Warenkorb</a></div>}
+ 
+         {p.features?.length ? <ul className="feat">{p.features.map((f) => <li key={f}>{f}</li>)}</ul> : <p style={{ marginTop: 20 }}>{p.description}</p>}
+diff --git a/app/robots.ts b/app/robots.ts
+new file mode 100644
+index 0000000..762c6e7
+--- /dev/null
++++ b/app/robots.ts
+@@ -0,0 +1,5 @@
++import type { MetadataRoute } from 'next';
++export default function robots(): MetadataRoute.Robots {
++  const base = (process.env.SHOP_URL ?? 'https://euro-trade.com').replace(/\/$/, '');
++  return { rules: { userAgent: '*', allow: ['/', '/druck-stick'], disallow: ['/admin', '/api', '/angebot', '/warenkorb', '/merkliste', '/zugang'] }, sitemap: `${base}/sitemap.xml` };
++}
+diff --git a/app/sitemap.ts b/app/sitemap.ts
+new file mode 100644
+index 0000000..e7b290a
+--- /dev/null
++++ b/app/sitemap.ts
+@@ -0,0 +1,5 @@
++import type { MetadataRoute } from 'next';
++export default function sitemap(): MetadataRoute.Sitemap {
++  const base = (process.env.SHOP_URL ?? 'https://euro-trade.com').replace(/\/$/, '');
++  return [{ url: `${base}/`, priority: 1 }, { url: `${base}/druck-stick`, priority: 0.8 }, { url: `${base}/impressum`, priority: 0.1 }];
++}
+diff --git a/app/start/RequestForm.tsx b/app/start/RequestForm.tsx
+new file mode 100644
+index 0000000..66e8f5e
+--- /dev/null
++++ b/app/start/RequestForm.tsx
+@@ -0,0 +1,41 @@
++'use client';
++import { useState } from 'react';
++import Link from 'next/link';
++
++export default function RequestForm() {
++  const [state, setState] = useState<'idle' | 'busy' | 'done'>('idle');
++  const [err, setErr] = useState('');
++  async function submit(e: React.FormEvent<HTMLFormElement>) {
++    e.preventDefault(); setState('busy'); setErr('');
++    const f = Object.fromEntries(new FormData(e.currentTarget));
++    const r = await fetch('/api/zugang-anfrage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(f) });
++    const d = await r.json().catch(() => ({}));
++    if (r.ok) setState('done'); else { setErr(d.error ?? 'Senden fehlgeschlagen.'); setState('idle'); }
++  }
++  if (state === 'done') return <div className="box"><h3 style={{ marginTop: 0 }}>Vielen Dank!</h3><p style={{ margin: 0 }}>Wir melden uns innerhalb von 24 Stunden mit Ihrem Zugangscode.</p></div>;
++  return (
++    <form className="box form" onSubmit={submit}>
++      <div className="two">
++        <div><label>Name *</label><input name="name" required /></div>
++        <div><label>Verein / Firma</label><input name="company" /></div>
++      </div>
++      <div className="two">
++        <div><label>E-Mail *</label><input name="email" type="email" required /></div>
++        <div><label>Telefon</label><input name="phone" type="tel" /></div>
++      </div>
++      <label>Wir sind …</label>
++      <select name="type" className="sel">
++        {['Verein', 'Unternehmen', 'Handwerk', 'Gastronomie / Hotel', 'Schule / Kita', 'Event / Agentur', 'Sonstiges'].map((x) => <option key={x}>{x}</option>)}
++      </select>
++      <label>Was planen Sie?</label>
++      <textarea name="message" placeholder="z. B. 40 Hoodies mit Vereinslogo, Polos für das Team …" />
++      <input className="hp" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
++      <label style={{ display: 'flex', gap: 8, fontWeight: 400 }}>
++        <input type="checkbox" name="privacy" required style={{ width: 'auto' }} />
++        <span>Ich stimme der Verarbeitung meiner Daten gemäß <Link href="/datenschutz" style={{ textDecoration: 'underline' }}>Datenschutzerklärung</Link> zu. *</span>
++      </label>
++      <button className="btn" disabled={state === 'busy'}>{state === 'busy' ? 'Wird gesendet …' : 'Zugang anfragen'}</button>
++      {err && <div className="note err">{err}</div>}
++    </form>
++  );
++}
+diff --git a/app/start/page.tsx b/app/start/page.tsx
+new file mode 100644
+index 0000000..6323f61
+--- /dev/null
++++ b/app/start/page.tsx
+@@ -0,0 +1,94 @@
++import Link from 'next/link';
++import type { Metadata } from 'next';
++import AccessForm from '../zugang/AccessForm';
++import RequestForm from './RequestForm';
++import { listReferences } from '@/lib/store';
++import { getCategories } from '@/lib/catalog';
++
++export const metadata: Metadata = {
++  title: 'Teamwear & Firmenbekleidung mit Logo – ab 1 Stück',
++  description: 'Markentextilien für Vereine, Unternehmen und Handwerk – bedruckt oder bestickt, schon ab 1 Stück. Persönlicher Shop mit Ihren Konditionen, Angebot in 24 Stunden.',
++  alternates: { canonical: '/' },
++};
++
++const BRANDS = ['Asquith & Fox', 'B&C', 'Beechfield', 'Daiber', 'HRM', 'Mantis', 'Marvelis', 'Result', 'Tee Jays', 'TriDri®', 'Onna by Premier', 'ARTG'];
++
++export default function Start() {
++  const refs = listReferences();
++  const cats = getCategories().slice(0, 8);
++  return (
++    <div className="landing">
++      <section className="l-hero">
++        <div className="l-hero-text">
++          <span className="l-kicker">Für Vereine · Unternehmen · Handwerk</span>
++          <h1>Teamwear & Firmenbekleidung mit Ihrem Logo</h1>
++          <p>Markentextilien schon ab 1 Stück – bedruckt oder bestickt, aus einer Hand. In Ihrem persönlichen Shop mit eigenen Konditionen und Ihrer Kollektion.</p>
++          <div className="l-cta">
++            <a href="#anfragen" className="btn l-btn">Zugang anfragen</a>
++            <Link href="/druck-stick" className="btn alt l-btn2">Druck & Stick erklärt</Link>
++          </div>
++          <ul className="l-checks">
++            <li>Angebot innerhalb von 24 Stunden</li>
++            <li>Ab 1 Stück, Mengenrabatt ab 10</li>
++            <li>Logo-Vorschau direkt am Artikel</li>
++          </ul>
++        </div>
++        <div className="l-login box">
++          <strong>Schon Kunde?</strong>
++          <p className="muted" style={{ margin: '4px 0 0', fontSize: 14 }}>Mit Ihrem Zugangscode direkt in Ihren Shop.</p>
++          <AccessForm next="/" />
++        </div>
++      </section>
++
++      <section className="l-feats">
++        {[
++          ['Ab 1 Stück', 'Einzelteile, Nachbestellungen oder ganze Teams – ohne Mindestmenge, mit Staffelpreisen ab 10 Stück.'],
++          ['Druck & Stick', 'Siebdruck, Transfer, Digitaldruck oder edler Stick – wir beraten, welches Verfahren zu Ihrem Logo passt.'],
++          ['Ihr eigener Shop', 'Persönliche Konditionen, Ihre Kollektion, Ihr Logo hinterlegt. Mitglieder bestellen aus einer geteilten Auswahl.'],
++          ['Angebot in 24 h', 'Anfrage abschicken, Angebot als PDF erhalten und mit einem Klick annehmen – fertig.'],
++        ].map(([t, x]) => <div key={t} className="l-feat box"><h3>{t}</h3><p>{x}</p></div>)}
++      </section>
++
++      <section id="ablauf" className="l-section">
++        <h2>So funktioniert’s</h2>
++        <ol className="l-steps">
++          <li><b>Artikel wählen</b><span>Farben und Größen in einer Übersicht eintragen – auch für das ganze Team auf einmal.</span></li>
++          <li><b>Logo hochladen</b><span>Position und Verfahren wählen, Vorschau direkt am Artikel ansehen.</span></li>
++          <li><b>Angebot annehmen</b><span>Sie erhalten Ihr Angebot als PDF und nehmen es online mit einem Klick an.</span></li>
++          <li><b>Freigabe & Lieferung</b><span>Nach Ihrer Druckfreigabe produzieren wir – Lieferung meist in 7–14 Werktagen.</span></li>
++        </ol>
++      </section>
++
++      {cats.length > 0 && (
++        <section className="l-section">
++          <h2>Sortiment</h2>
++          <div className="chips">{cats.map((c) => <span key={c.slug} className="chip">{c.name}</span>)}<span className="chip">und vieles mehr</span></div>
++          <p className="muted" style={{ marginTop: 14 }}>Marken u. a.: {BRANDS.join(' · ')}</p>
++        </section>
++      )}
++
++      {refs.length > 0 && (
++        <section className="l-section" id="referenzen">
++          <h2>Referenzen</h2>
++          <div className="l-refs">
++            {refs.map((r) => (
++              <figure key={r.id} className="box l-ref">
++                {r.imageId && <img src={`/api/bild/${r.imageId}`} alt={r.title} loading="lazy" />}
++                <figcaption>{r.tag && <span className="l-tag">{r.tag}</span>}<b>{r.title}</b>{r.text && <span>{r.text}</span>}</figcaption>
++              </figure>
++            ))}
++          </div>
++        </section>
++      )}
++
++      <section id="anfragen" className="l-section l-request">
++        <div>
++          <h2>Zugang anfragen</h2>
++          <p>Unser Shop ist exklusiv für Vereine, Unternehmen und Partner. Schreiben Sie uns kurz, wer Sie sind – Sie erhalten Ihren persönlichen Zugangscode innerhalb von 24 Stunden.</p>
++          <p className="muted">Lieber direkt sprechen? <a className="alink" href="tel:+491732648097">0173 2648097</a> · <a className="alink" href="mailto:info@euro-trade.com">info@euro-trade.com</a></p>
++        </div>
++        <RequestForm />
++      </section>
++    </div>
++  );
++}
+diff --git a/app/warenkorb/page.tsx b/app/warenkorb/page.tsx
+index 1fa15cd..0ae4130 100644
+--- a/app/warenkorb/page.tsx
++++ b/app/warenkorb/page.tsx
+@@ -5,12 +5,16 @@ import { useCart } from '@/components/CartContext';
+ import ProductImage from '@/components/ProductImage';
+ import { eur } from '@/lib/format';
+ import { decoLabel } from '@/lib/deco';
++import { unitFor } from '@/lib/tiers';
+ 
+ export default function CartPage() {
+   const { lines, setQty, remove, clear } = useCart();
+   const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle');
+   const [err, setErr] = useState('');
+-  const net = lines.reduce((s, l) => s + (l.price ?? 0) * l.qty, 0);
++  // Staffelpreis gilt für die Gesamtmenge je Artikel (alle Farben/Größen)
++  const perProduct = lines.reduce<Record<string, number>>((m, l) => ({ ...m, [l.id]: (m[l.id] ?? 0) + l.qty }), {});
++  const unit = (l: (typeof lines)[number]) => unitFor(l.tiers, perProduct[l.id], l.price);
++  const net = lines.reduce((s, l) => s + (unit(l) ?? 0) * l.qty, 0);
+   const anyOpen = lines.some((l) => l.price == null);
+ 
+   async function submit(e: React.FormEvent<HTMLFormElement>) {
+@@ -50,12 +54,12 @@ export default function CartPage() {
+               <div style={{ width: 64, height: 64 }}><ProductImage p={{ name: l.name, images: l.image ? [l.image] : [], colors: [{ name: l.color ?? '', hex: l.hex }], category: l.category }} /></div>
+               <div>
+                 <Link href={`/produkt/${encodeURIComponent(l.id)}`} style={{ fontWeight: 600 }}>{l.name}</Link>
+-                <div className="muted" style={{ fontSize: 13 }}>{[l.color, l.size, l.sku].filter(Boolean).join(' · ')}{l.price != null && <> · {eur(l.price)}/Stk.</>}</div>
++                <div className="muted" style={{ fontSize: 13 }}>{[l.color, l.size, l.sku].filter(Boolean).join(' · ')}{l.price != null && <> · {eur(unit(l))}/Stk.{unit(l)! < l.price && <span className="ok"> (Staffel)</span>}</>}</div>
+                 {l.deco && <div className="deco-tag">✦ {decoLabel(l.deco)}</div>}
+               </div>
+               <input className="qty" style={{ width: 80, height: 40 }} type="number" min={1} value={l.qty} onChange={(e) => setQty(l.key, Number(e.target.value) || 1)} aria-label="Menge" />
+               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+-                <strong>{l.price != null ? eur(l.price * l.qty) : '—'}</strong>
++                <strong>{l.price != null ? eur(unit(l)! * l.qty) : '—'}</strong>
+                 <button className="x" onClick={() => remove(l.key)} aria-label="Entfernen">×</button>
+               </div>
+             </div>
+diff --git a/components/AdminNav.tsx b/components/AdminNav.tsx
+index e90bf63..14f8721 100644
+--- a/components/AdminNav.tsx
++++ b/components/AdminNav.tsx
+@@ -1,10 +1,11 @@
+ import Link from 'next/link';
+ import AdminLogout from './AdminLogout';
+-export default function AdminNav({ active }: { active: 'anfragen' | 'kunden' }) {
++export default function AdminNav({ active }: { active: 'anfragen' | 'kunden' | 'referenzen' }) {
+   return (
+     <div className="admin-nav">
+       <Link href="/admin" className={active === 'anfragen' ? 'on' : ''}>Anfragen & Angebote</Link>
+       <Link href="/admin/kunden" className={active === 'kunden' ? 'on' : ''}>Kunden & Codes</Link>
++      <Link href="/admin/referenzen" className={active === 'referenzen' ? 'on' : ''}>Referenzen</Link>
+       <span style={{ flex: 1 }} />
+       <Link href="/">Zum Shop</Link>
+       <AdminLogout />
+diff --git a/components/CartContext.tsx b/components/CartContext.tsx
+index aee3ae5..6789405 100644
+--- a/components/CartContext.tsx
++++ b/components/CartContext.tsx
+@@ -2,7 +2,7 @@
+ import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+ import type { Deco } from '@/lib/deco';
+ 
+-export type CartLine = { key: string; id: string; sku: string; name: string; color?: string; size?: string; qty: number; price: number | null; hex?: string; category: string; image?: string; deco?: Deco | null };
++export type CartLine = { key: string; id: string; sku: string; name: string; color?: string; size?: string; qty: number; price: number | null; hex?: string; category: string; image?: string; deco?: Deco | null; tiers?: { min: number; price: number }[] };
+ type Ctx = { lines: CartLine[]; add: (l: Omit<CartLine, 'key'>) => void; addMany: (ls: Omit<CartLine, 'key'>[]) => void; setQty: (key: string, qty: number) => void; remove: (key: string) => void; clear: () => void; count: number };
+ 
+ const CartCtx = createContext<Ctx | null>(null);
+diff --git a/components/ProductCard.tsx b/components/ProductCard.tsx
+index 1bce961..29d7d07 100644
+--- a/components/ProductCard.tsx
++++ b/components/ProductCard.tsx
+@@ -16,7 +16,7 @@ export default function ProductCard({ p }: { p: PublicProduct }) {
+           {p.colors.slice(0, 8).map((c) => <span key={c.name} className="dot" title={c.name} style={{ background: swatchBg(c) }} />)}
+           {p.colors.length > 8 && <span className="muted" style={{ fontSize: 12 }}>+{p.colors.length - 8}</span>}
+         </div>
+-        <div className="price">{p.price != null ? <>ab {eur(p.price)} <small>netto</small></> : <small style={{ fontSize: 14, color: 'var(--brand)', fontWeight: 600 }}>Preis auf Anfrage</small>}</div>
++        <div className="price">{p.price != null ? <>ab {eur(p.tiers.length ? p.tiers[p.tiers.length - 1].price : p.price)} <small>netto</small></> : <small style={{ fontSize: 14, color: 'var(--brand)', fontWeight: 600 }}>Preis auf Anfrage</small>}</div>
+       </div>
+     </Link>
+   );
+diff --git a/lib/catalog.ts b/lib/catalog.ts
+index ab64d64..acb3d4b 100644
+--- a/lib/catalog.ts
++++ b/lib/catalog.ts
+@@ -4,7 +4,7 @@ import path from 'node:path';
+ import type MiniSearch from 'minisearch';
+ import type { Category, Product, PublicProduct } from './types';
+ import { buildIndex, buildSkuMap, runSearch, type SearchDoc } from './search';
+-import { gross, sellPrice } from './pricing';
++import { gross, priceTiers, sellPrice } from './pricing';
+ import { sortColors } from './colors';
+ 
+ const LIVE = path.join(process.cwd(), 'data', 'products.json');
+@@ -38,12 +38,12 @@ function load(): State {
+ }
+ 
+ /** Kundenkontext: eigener Aufschlag, eigene Kollektion */
+-export type Ctx = { markup?: number | null; skus?: string[]; exclusive?: boolean } | null | undefined;
++export type Ctx = { markup?: number | null; skus?: string[]; exclusive?: boolean; tiers?: string | null } | null | undefined;
+ 
+ export function toPublic(p: Product, ctx?: Ctx): PublicProduct {
+   const { basePrice, ...rest } = p;
+   const price = basePrice != null && basePrice > 0 ? sellPrice(basePrice, p.categorySlug, ctx?.markup) : null;
+-  return { ...rest, colors: sortColors(p.colors), price, priceGross: price != null ? gross(price) : null };
++  return { ...rest, colors: sortColors(p.colors), price, priceGross: price != null ? gross(price) : null, tiers: price != null ? priceTiers(price, ctx?.tiers) : [] };
+ }
+ 
+ const skuSet = (ctx: Ctx) => new Set((ctx?.skus ?? []).map((x) => x.toUpperCase()));
+diff --git a/lib/pricing.ts b/lib/pricing.ts
+index c2203b3..122b7b5 100644
+--- a/lib/pricing.ts
++++ b/lib/pricing.ts
+@@ -1,15 +1,26 @@
+ const markup = Number(process.env.MARKUP_PERCENT ?? 35);
+ const vat = Number(process.env.MWST_PERCENT ?? 19);
+ const round99 = (process.env.PRICE_ROUND_99 ?? 'true') === 'true';
++import { parseTiers, type PriceTier, type Tier } from './tiers';
++
+ let byCat: Record<string, number> = {};
+ try { byCat = JSON.parse(process.env.MARKUP_BY_CATEGORY || '{}'); } catch { byCat = {}; }
+ 
+ /** override = kundenspezifischer Aufschlag (Zugangscode) – hat Vorrang vor Kategorie und Standard */
+ export function sellPrice(basePrice: number, categorySlug: string, override?: number | null): number {
+   const pct = override != null && Number.isFinite(override) ? override : byCat[categorySlug] ?? markup;
+-  let p = basePrice * (1 + pct / 100);
++  return roundPrice(basePrice * (1 + pct / 100));
++}
++function roundPrice(p: number) {
+   if (round99 && p >= 1) p = Math.ceil(p * 10) / 10 - 0.01; // z. B. 4,23 -> 4,29
+   return Math.round(p * 100) / 100;
+ }
++/** Standard-Staffel aus .env (PRICE_TIERS="10:5,50:10,100:15"; leer = keine Staffel) */
++export const defaultTiers = (): Tier[] => parseTiers(process.env.PRICE_TIERS ?? '10:5,50:10,100:15');
++/** Staffelpreise zum Stückpreis – eigene Kunden-Staffel ("-" = keine) hat Vorrang */
++export function priceTiers(unit: number, custom?: string | null): PriceTier[] {
++  const t = custom?.trim() === '-' ? [] : custom?.trim() ? parseTiers(custom) : defaultTiers();
++  return t.map((x) => ({ min: x.min, price: roundPrice(unit * (1 - x.pct / 100)) })).filter((x) => x.price < unit);
++}
+ export const gross = (net: number) => Math.round(net * (1 + vat / 100) * 100) / 100;
+ export const VAT = vat;
+diff --git a/lib/store.ts b/lib/store.ts
+index 4bc1dbb..c0f7057 100644
+--- a/lib/store.ts
++++ b/lib/store.ts
+@@ -24,6 +24,8 @@ export type Customer = {
+   name: string;
+   /** Aufschlag in % – leer = Standard (MARKUP_PERCENT) */
+   markup?: number | null;
++  /** eigene Staffel "10:5,50:10" – leer = Standard, "-" = keine */
++  tiers?: string | null;
+   /** Artikelnummern der Kundenkollektion */
+   skus?: string[];
+   /** true = Kunde sieht NUR seine Kollektion */
+@@ -106,3 +108,15 @@ export function draftOffer(i: Inquiry): Offer {
+   for (const { d, qty } of decos.values()) lines.push({ text: `Veredelung: ${d.method}`, detail: d.positions.join(', '), qty, price: 0 });
+   return { lines, shipping: 0, note: '', validDays: 14, createdAt: new Date().toISOString(), vat: Number(process.env.MWST_PERCENT ?? 19) };
+ }
++
++/* ---------- Referenzen (öffentlich auf der Startseite) ---------- */
++export type Reference = { id: string; title: string; text: string; imageId?: string | null; imageName?: string | null; tag?: string };
++const REFS = path.join(DATA, 'referenzen.json');
++export const listReferences = () => readJSON<Reference[]>(REFS, []);
++export const saveReferences = (r: Reference[]) => writeJSON(REFS, r);
++
++/* ---------- Zugangsanfragen (von der Startseite) ---------- */
++export type AccessRequest = { id: string; date: string; name: string; company: string; email: string; phone: string; type: string; message: string; done?: boolean };
++const AREQ = path.join(DATA, 'zugangsanfragen.json');
++export const listAccessRequests = () => readJSON<AccessRequest[]>(AREQ, []);
++export const saveAccessRequests = (r: AccessRequest[]) => writeJSON(AREQ, r.slice(-1000));
+diff --git a/lib/tiers.ts b/lib/tiers.ts
+new file mode 100644
+index 0000000..1109e17
+--- /dev/null
++++ b/lib/tiers.ts
+@@ -0,0 +1,21 @@
++// Staffelpreise – client- und serverseitig nutzbar (kein process.env hier)
++export type Tier = { min: number; pct: number };
++export type PriceTier = { min: number; price: number };
++
++/** "10:5,50:10,100:15" -> ab 10 Stk. 5 %, ab 50 Stk. 10 %, ab 100 Stk. 15 % Rabatt */
++export function parseTiers(s?: string | null): Tier[] {
++  return String(s ?? '').split(',').map((x) => x.split(':').map((y) => Number(y.trim().replace(',', '.'))))
++    .filter(([m, p]) => m > 1 && p > 0 && p < 90).map(([min, pct]) => ({ min: Math.floor(min), pct }))
++    .sort((a, b) => a.min - b.min);
++}
++export const tiersToString = (t: Tier[]) => t.map((x) => `${x.min}:${x.pct}`).join(',');
++
++/** Stückpreis für eine Gesamtmenge (alle Farben/Größen eines Artikels zusammen) */
++export function unitFor(tiers: PriceTier[] | undefined, qty: number, fallback: number | null): number | null {
++  if (fallback == null) return null;
++  let p = fallback;
++  for (const t of tiers ?? []) if (qty >= t.min) p = t.price;
++  return p;
++}
++/** nächste Staffel, die noch nicht erreicht ist */
++export const nextTier = (tiers: PriceTier[] | undefined, qty: number) => (tiers ?? []).find((t) => t.min > qty) ?? null;
+diff --git a/lib/types.ts b/lib/types.ts
+index dbeb16b..0d21569 100644
+--- a/lib/types.ts
++++ b/lib/types.ts
+@@ -24,6 +24,6 @@ export type Product = {
+ };
+ 
+ /** Was der Browser sieht: Verkaufspreis statt Einkaufspreis */
+-export type PublicProduct = Omit<Product, 'basePrice'> & { price: number | null; priceGross: number | null };
++export type PublicProduct = Omit<Product, 'basePrice'> & { price: number | null; priceGross: number | null; /** Staffelpreise netto (ab Menge) */ tiers: { min: number; price: number }[] };
+ 
+ export type Category = { name: string; slug: string; count: number };
+diff --git a/middleware.ts b/middleware.ts
+index 588024a..35e6150 100644
+--- a/middleware.ts
++++ b/middleware.ts
+@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
+ import { ACCESS_COOKIE, ADMIN_COOKIE, isAdminToken, shopClosed, verifyCodeToken } from '@/lib/access';
+ 
+ // Immer erreichbar: Zugang, Pflichtseiten, Angebots-Links aus der E-Mail, Admin-Login
+-const PUBLIC = ['/zugang', '/api/zugang', '/impressum', '/datenschutz', '/angebot', '/api/angebot', '/admin/login', '/api/admin/login', '/icon.svg', '/favicon.ico', '/robots.txt'];
++const PUBLIC = ['/start', '/druck-stick', '/api/zugang-anfrage', '/api/bild', '/sitemap.xml', '/zugang', '/api/zugang', '/impressum', '/datenschutz', '/angebot', '/api/angebot', '/admin/login', '/api/admin/login', '/icon.svg', '/favicon.ico', '/robots.txt'];
+ const match = (path: string, list: string[]) => list.some((p) => path === p || path.startsWith(p + '/'));
+ 
+ export async function middleware(req: NextRequest) {
+@@ -24,6 +24,12 @@ export async function middleware(req: NextRequest) {
+   if (!shopClosed() || admin) return pass();
+   // Signatur prüfen – ob der Code noch aktiv ist, prüft der Server (Codes können im Admin gesperrt werden)
+   if (await verifyCodeToken(req.cookies.get(ACCESS_COOKIE)?.value)) return pass();
++  // Startseite ohne Code: öffentliche Landingpage (URL bleibt euro-trade.com/)
++  if (pathname === '/') {
++    headers.set('x-path', '/start');
++    const url = req.nextUrl.clone(); url.pathname = '/start';
++    return NextResponse.rewrite(url, { request: { headers } });
++  }
+   return deny('/zugang');
+ }
+ 
+-- 
+2.43.0
+

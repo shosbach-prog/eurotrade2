@@ -1,0 +1,711 @@
+From f0a06afb2c0346c509311a27fccf85adb7ded9f2 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Wed, 11 Nov 2026 05:49:41 +0100
+Subject: [PATCH] =?UTF-8?q?Preisanfrage=20ohne=20Code=20(Logo,=20Muster),?=
+ =?UTF-8?q?=20Kategorie-Kacheln,=20Branchenseiten,=20Filter-Dropdown=20ble?=
+ =?UTF-8?q?ibt=20offen,=20t=C3=A4gliches=20Backup,=20Caddy-Neustart=20im?=
+ =?UTF-8?q?=20Deploy?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01AW9Go5bwJWAYsfGemt2b6Z
+---
+ app/admin/kunden/CustomerEditor.tsx |  6 +--
+ app/api/preisanfrage/route.ts       | 60 +++++++++++++++++++++
+ app/fuer/[slug]/page.tsx            | 65 +++++++++++++++++++++++
+ app/globals.css                     | 43 +++++++++++++++
+ app/layout.tsx                      |  8 +--
+ app/robots.ts                       |  2 +-
+ app/sitemap.ts                      |  2 +
+ app/start/QuoteForm.tsx             | 47 +++++++++++++++++
+ app/start/page.tsx                  | 29 ++++++++--
+ components/CategoryTiles.tsx        | 16 ++++++
+ components/FilterGrid.tsx           | 14 ++++-
+ deploy.sh                           | 10 +++-
+ lib/catalog.ts                      |  5 ++
+ lib/hero.ts                         |  2 +-
+ lib/store.ts                        |  3 +-
+ lib/zielgruppen.ts                  | 82 +++++++++++++++++++++++++++++
+ middleware.ts                       |  2 +-
+ scripts/backup.sh                   | 11 ++++
+ 18 files changed, 387 insertions(+), 20 deletions(-)
+ create mode 100644 app/api/preisanfrage/route.ts
+ create mode 100644 app/fuer/[slug]/page.tsx
+ create mode 100644 app/start/QuoteForm.tsx
+ create mode 100644 components/CategoryTiles.tsx
+ create mode 100644 lib/zielgruppen.ts
+ create mode 100755 scripts/backup.sh
+
+diff --git a/app/admin/kunden/CustomerEditor.tsx b/app/admin/kunden/CustomerEditor.tsx
+index b4251a7..9c53168 100644
+--- a/app/admin/kunden/CustomerEditor.tsx
++++ b/app/admin/kunden/CustomerEditor.tsx
+@@ -15,7 +15,7 @@ export default function CustomerEditor({ initial, envCodes, products, defaultMar
+   const [requests, setRequests] = useState(req0);
+   async function doneReq(id: string) { await fetch('/api/admin/zugangsanfragen', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, done: true }) }); setRequests((r) => r.filter((x) => x.id !== id)); }
+   function createFrom(r: AccessRequest) {
+-    const c: Customer = { code: gen(), name: r.company || r.name, markup: null, skus: [], exclusive: false, active: true, note: `${r.name} · ${r.email}${r.phone ? ' · ' + r.phone : ''}${r.type ? ' · ' + r.type : ''}${r.message ? '\n' + r.message : ''}` };
++    const c: Customer = { code: gen(), name: r.company || r.name, markup: null, skus: [], exclusive: false, active: true, note: `${r.name} · ${r.email}${r.phone ? ' · ' + r.phone : ''}${r.type ? ' · ' + r.type : ''}${r.kind === 'preis' ? `\nPreisanfrage: ${[r.category, r.qty && r.qty + ' Stk.', r.deco, r.sample && 'Muster'].filter(Boolean).join(' · ')}` : ''}${r.message ? '\n' + r.message : ''}` };
+     setList((l) => [c, ...l]); setOpen(0); setDirty(true); doneReq(r.id);
+     setMsg({ ok: true, t: `Kunde angelegt (Code ${c.code}) – jetzt speichern und Einladung an ${r.email} schicken.` });
+   }
+@@ -50,10 +50,10 @@ export default function CustomerEditor({ initial, envCodes, products, defaultMar
+ 
+       {requests.length > 0 && (
+         <div className="box" style={{ marginBottom: 14, borderLeft: '4px solid var(--accent)' }}>
+-          <strong>Offene Zugangsanfragen ({requests.length})</strong>
++          <strong>Offene Anfragen ({requests.length})</strong>
+           {requests.map((r) => (
+             <div key={r.id} className="req">
+-              <div><b>{r.company || r.name}</b> <span className="muted">· {r.name} · <a className="alink" href={`mailto:${r.email}`}>{r.email}</a>{r.phone && ` · ${r.phone}`}{r.type && ` · ${r.type}`} · {new Date(r.date).toLocaleDateString('de-DE')}</span>{r.message && <div className="muted" style={{ fontSize: 13 }}>{r.message}</div>}</div>
++              <div><b>{r.company || r.name}</b> <span className="muted">· {r.name} · <a className="alink" href={`mailto:${r.email}`}>{r.email}</a>{r.phone && ` · ${r.phone}`}{r.type && ` · ${r.type}`} · {new Date(r.date).toLocaleDateString('de-DE')}</span>{r.kind === 'preis' && <div style={{ fontSize: 13, marginTop: 3 }}><span className="st st-angebot">Preisanfrage</span> {[r.category, r.qty && `${r.qty} Stk.`, r.deco, r.sample && 'Muster gewünscht'].filter(Boolean).join(' · ')}{r.logoId && <> · <a className="alink" href={`/api/upload/${r.logoId}?download`}>Logo ↓</a></>}</div>}{r.message && <div className="muted" style={{ fontSize: 13 }}>{r.message}</div>}</div>
+               <div style={{ display: 'flex', gap: 10, alignItems: 'center', flex: 'none' }}>
+                 <button className="btn" style={{ height: 38 }} onClick={() => createFrom(r)}>Als Kunde anlegen</button>
+                 <button className="linkbtn" onClick={() => doneReq(r.id)}>ablehnen</button>
+diff --git a/app/api/preisanfrage/route.ts b/app/api/preisanfrage/route.ts
+new file mode 100644
+index 0000000..dabb134
+--- /dev/null
++++ b/app/api/preisanfrage/route.ts
+@@ -0,0 +1,60 @@
++import { NextResponse } from 'next/server';
++import fs from 'node:fs';
++import path from 'node:path';
++import { esc, sendMail, shopUrl } from '@/lib/mail';
++import { button, contactBlock, h1, infoBox, layout, p, quote, signature } from '@/lib/mail-templates';
++import { UPLOADS, listAccessRequests, randomId, saveAccessRequests, writeJSON } from '@/lib/store';
++
++const hits = new Map<string, number[]>();
++const LOGO = ['png', 'jpg', 'jpeg', 'svg', 'pdf', 'ai', 'eps'];
++
++/** Schnelle Preisanfrage ohne Zugangscode – mit optionalem Logo und Musterwunsch */
++export async function POST(req: Request) {
++  const ip = req.headers.get('x-forwarded-for')?.split(',')[0] ?? 'local';
++  const now = Date.now();
++  const recent = (hits.get(ip) ?? []).filter((t) => now - t < 3_600_000);
++  if (recent.length >= 4) return NextResponse.json({ error: 'Zu viele Anfragen – bitte später erneut oder rufen Sie uns an.' }, { status: 429 });
++  hits.set(ip, [...recent, now]);
++
++  const form = await req.formData().catch(() => null);
++  if (!form) return NextResponse.json({ error: 'Ungültige Anfrage.' }, { status: 400 });
++  if (form.get('website')) return NextResponse.json({ ok: true }); // Honeypot
++  const f = (k: string, n = 200) => String(form.get(k) ?? '').trim().slice(0, n);
++  const r = { id: randomId(6), date: new Date().toISOString(), kind: 'preis' as const, name: f('name'), company: f('company'), email: f('email'), phone: f('phone', 60), type: f('type', 60),
++    category: f('category', 80), qty: f('qty', 40), deco: f('deco', 60), sample: form.get('sample') === 'on', message: f('message', 2000), logoId: undefined as string | undefined, logoName: undefined as string | undefined };
++  if (!r.name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(r.email)) return NextResponse.json({ error: 'Bitte Name und gültige E-Mail angeben.' }, { status: 400 });
++  if (!form.get('privacy')) return NextResponse.json({ error: 'Bitte der Datenschutzerklärung zustimmen.' }, { status: 400 });
++
++  const file = form.get('logo');
++  if (file instanceof File && file.size > 0) {
++    const ext = (file.name.split('.').pop() ?? '').toLowerCase();
++    if (!LOGO.includes(ext)) return NextResponse.json({ error: 'Logo bitte als PNG, JPG, SVG, PDF, AI oder EPS.' }, { status: 400 });
++    if (file.size > 15 * 1024 * 1024) return NextResponse.json({ error: 'Logo ist größer als 15 MB.' }, { status: 400 });
++    const id = randomId();
++    fs.mkdirSync(UPLOADS, { recursive: true });
++    fs.writeFileSync(path.join(UPLOADS, `${id}.${ext}`), Buffer.from(await file.arrayBuffer()));
++    r.logoName = file.name.replace(/[^\w.\- äöüÄÖÜß()]/g, '_').slice(0, 120);
++    writeJSON(path.join(UPLOADS, `${id}.json`), { name: r.logoName, ext, size: file.size, date: r.date });
++    r.logoId = id;
++  }
++  saveAccessRequests([...listAccessRequests(), r]);
++
++  const rows: [string, string][] = [['Artikel', esc(r.category || 'offen')], ['Menge', esc(r.qty || '–')], ['Veredelung', esc(r.deco || '–')], ['Muster', r.sample ? 'ja, gewünscht' : 'nein'], ['Logo', r.logoId ? esc(r.logoName ?? 'ja') : 'nicht hochgeladen']];
++  try {
++    await sendMail({ to: process.env.INQUIRY_TO ?? '', replyTo: r.email, subject: `Preisanfrage: ${r.company || r.name}${r.qty ? ` · ${r.qty} Stk.` : ''}`,
++      html: layout({ preheader: `${r.company || r.name}: ${r.category || 'Textilien'} ${r.qty ? `· ${r.qty} Stück` : ''}`, title: 'Neue Preisanfrage',
++        body: h1('Neue Preisanfrage (ohne Zugang)') + infoBox(rows, '#ffc21a')
++          + contactBlock({ name: r.name, company: r.company, email: r.email, phone: r.phone }, r.type ? [['Art', esc(r.type)]] : [])
++          + (r.message ? `<div style="font-size:13px;font-weight:700;margin:0 0 6px">Nachricht</div>${quote(r.message)}` : '')
++          + (r.logoId ? button(`${shopUrl()}/api/upload/${r.logoId}?download`, 'Logo herunterladen') : '')
++          + button(`${shopUrl()}/admin/kunden`, 'Im Admin ansehen →', '#1d7a3e') }) });
++    await sendMail({ to: r.email, subject: `Ihre Preisanfrage bei ${process.env.SHOP_NAME ?? 'Euro-Trade'}`,
++      html: layout({ preheader: 'Wir melden uns innerhalb von 24 Stunden mit Ihrem Angebot.', title: 'Ihre Preisanfrage',
++        body: h1('Vielen Dank für Ihre Anfrage!') + p(`Guten Tag ${esc(r.name)},`)
++          + p('wir haben Ihre Preisanfrage erhalten und melden uns innerhalb von <strong>24 Stunden</strong> mit einem Angebot oder Rückfragen zu Ihrem Motiv.')
++          + infoBox(rows)
++          + p('Mit dem Angebot erhalten Sie auf Wunsch auch Ihren persönlichen Zugangscode für unseren Shop.', true)
++          + p('Fragen? Antworten Sie einfach auf diese E-Mail.') + signature() }) });
++  } catch (e) { console.error('Mail Preisanfrage fehlgeschlagen', e); }
++  return NextResponse.json({ ok: true });
++}
+diff --git a/app/fuer/[slug]/page.tsx b/app/fuer/[slug]/page.tsx
+new file mode 100644
+index 0000000..3486cb0
+--- /dev/null
++++ b/app/fuer/[slug]/page.tsx
+@@ -0,0 +1,65 @@
++import Link from 'next/link';
++import { notFound } from 'next/navigation';
++import type { Metadata } from 'next';
++import JsonLd, { crumbSchema, faqSchema } from '@/components/JsonLd';
++import CategoryTiles from '@/components/CategoryTiles';
++import QuoteForm from '../../start/QuoteForm';
++import { ZIELGRUPPEN, zielgruppe } from '@/lib/zielgruppen';
++import { categoryTiles, getCategories } from '@/lib/catalog';
++import { previewMode } from '@/lib/access';
++
++export const dynamic = 'force-dynamic';
++export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
++  const z = zielgruppe(params.slug);
++  return z ? { title: z.title, description: z.desc, alternates: { canonical: `/fuer/${z.slug}` } } : {};
++}
++
++export default function Branche({ params }: { params: { slug: string } }) {
++  const z = zielgruppe(params.slug);
++  if (!z) notFound();
++  const tiles = categoryTiles(undefined, z.cats).sort((a, b) => z.cats.indexOf(a.slug) - z.cats.indexOf(b.slug));
++  return (
++    <div className="landing">
++      <JsonLd data={crumbSchema([['Start', '/'], [z.nav, `/fuer/${z.slug}`]])} />
++      <JsonLd data={faqSchema(z.faq)} />
++      <section className="l-hero z-hero">
++        <div className="l-hero-text">
++          <span className="l-kicker">Für {z.nav}</span>
++          <h1>{z.h1}</h1>
++          <p>{z.lead}</p>
++          <div className="l-cta">
++            <a href="#anfragen" className="btn l-btn">Preis anfragen</a>
++            <Link href="/druck-stick" className="btn alt l-btn2">Druck & Stick erklärt</Link>
++          </div>
++          <ul className="l-checks"><li>Ab 1 Stück</li><li>Angebot in 24 Stunden</li><li>Muster auf Wunsch</li></ul>
++        </div>
++        {tiles[0]?.image && <div className="z-hero-img">{tiles.slice(0, 3).filter((t) => t.image).map((t) => <img key={t.slug} src={t.image} alt="" />)}</div>}
++      </section>
++
++      <section className="l-feats">{z.points.map(([t, x]) => <div key={t} className="l-feat box"><h3>{t}</h3><p>{x}</p></div>)}</section>
++
++      {tiles.length > 0 && (
++        <section className="l-section">
++          <h2>Beliebt bei {z.dativ}</h2>
++          <CategoryTiles tiles={tiles} link={!previewMode()} />
++        </section>
++      )}
++
++      <section className="l-section">
++        <h2>Häufige Fragen</h2>
++        <div className="faq">{z.faq.map(([q, a], k) => <details key={q} className="box" open={k === 0}><summary>{q}</summary><p>{a}</p></details>)}</div>
++      </section>
++
++      <section id="anfragen" className="l-section l-quote">
++        <div>
++          <h2>Unverbindlich Preis anfragen</h2>
++          <p>Beschreiben Sie kurz Ihr Vorhaben – {z.example}. Sie erhalten innerhalb von 24 Stunden ein Angebot.</p>
++          <ul><li>Kein Zugangscode nötig</li><li>Logo gleich mitschicken</li><li>Auf Wunsch vorab ein Muster</li></ul>
++          <p className="muted" style={{ marginTop: 16 }}>Lieber sprechen? <a className="alink" href="tel:+491732648097">0173 2648097</a></p>
++          <p className="muted" style={{ marginTop: 18, fontSize: 14 }}>Auch für: {ZIELGRUPPEN.filter((x) => x.slug !== z.slug).map((x, k) => <span key={x.slug}>{k > 0 && ' · '}<Link className="alink" href={`/fuer/${x.slug}`}>{x.nav}</Link></span>)}</p>
++        </div>
++        <QuoteForm categories={getCategories().map((c) => c.name)} />
++      </section>
++    </div>
++  );
++}
+diff --git a/app/globals.css b/app/globals.css
+index 0b577df..6c0267b 100644
+--- a/app/globals.css
++++ b/app/globals.css
+@@ -716,3 +716,46 @@ footer .wrap{padding-left:112px}
+ }
+ @media (max-width:520px){.l-loginbar .gate-form{flex-direction:column;flex-basis:100%}.hs-stage,.hero-shop .hs-stage{height:260px}}
+ @media (max-width:520px){.hs-info{flex-wrap:wrap}.hs-price{text-align:left;white-space:normal;display:flex;gap:10px;align-items:baseline;width:100%}.hs-price span{margin:0}}
++/* Kategorie-Kacheln */
++.ct-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
++.ct{position:relative;display:block;aspect-ratio:4/5;border-radius:16px;overflow:hidden;background:#fff;box-shadow:var(--shadow);text-decoration:none;color:#fff}
++.ct img,.ct-ph{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
++.ct-ph{background:linear-gradient(135deg,#dfe8f7,#c5d6f2)}
++.ct:hover img{transform:scale(1.05)}
++.ct::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(6,20,60,.78))}
++.ct-label{position:absolute;left:14px;right:14px;bottom:12px;z-index:1;display:flex;flex-direction:column;gap:2px}
++.ct-label b{font-size:18px;line-height:1.2}
++.ct-label span{font-size:13px;opacity:.9}
++@media (max-width:520px){.ct-grid{grid-template-columns:1fr 1fr;gap:10px}.ct-label b{font-size:15px}}
++/* Preisanfrage */
++.qf .two{gap:12px}
++.qf-file{display:flex;align-items:center;height:42px;border:1px dashed var(--line);border-radius:8px;padding:0 12px;font-size:14px;font-weight:500;color:var(--muted);cursor:pointer;background:#fafbfc;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;margin:0}
++.qf-file:hover{border-color:var(--brand);color:var(--brand)}
++.qf-check{display:flex;gap:8px;font-weight:400;align-items:flex-start;font-size:14px}
++.qf-check input{width:auto;margin-top:3px}
++.qf-done{text-align:center;padding:36px 24px}
++.qf-done h3{margin:8px 0 6px;font-size:22px}
++.qf-done p{margin:0;color:var(--muted)}
++.qf-ok{display:inline-grid;place-items:center;width:54px;height:54px;border-radius:50%;background:#e6f4ea;color:#1d7a3e;font-size:28px;font-weight:800}
++.l-quote{display:grid;grid-template-columns:1fr 1.3fr;gap:28px;align-items:start}
++.l-quote ul{list-style:none;padding:0;margin:14px 0 0;display:flex;flex-direction:column;gap:8px}
++.l-quote li::before{content:"✓ ";color:var(--ok,#1d7a3e);font-weight:800}
++@media (max-width:900px){.l-quote{grid-template-columns:1fr}}
++.z-hero-img{position:relative;z-index:1;height:340px}
++.z-hero-img img{position:absolute;width:56%;aspect-ratio:4/5;object-fit:cover;border-radius:18px;box-shadow:0 20px 44px rgba(3,25,80,.35);background:#fff}
++.z-hero-img img:nth-child(1){left:22%;top:0;z-index:2}
++.z-hero-img img:nth-child(2){left:0;top:40px;transform:rotate(-6deg);width:44%}
++.z-hero-img img:nth-child(3){right:0;top:40px;transform:rotate(6deg);width:44%}
++@media (min-width:901px){.z-hero{grid-template-columns:1.2fr 1fr}}
++@media (max-width:900px){.z-hero-img{height:260px;max-width:420px;width:100%;margin:0 auto}}
++.zg-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
++.zg{display:flex;flex-direction:column;gap:6px;text-decoration:none;color:inherit;border-top:4px solid var(--accent)}
++.zg b{font-size:18px;color:var(--brand)}
++.zg span{font-size:14px;color:var(--muted)}
++.zg em{font-style:normal;font-weight:700;font-size:14px;margin-top:auto;padding-top:6px}
++.zg:hover{transform:translateY(-2px);transition:transform .2s}
++@media (max-width:900px){.zg-grid{grid-template-columns:1fr 1fr}}
++@media (max-width:520px){.zg-grid{grid-template-columns:1fr}}
++/* Filter-Dropdown: Lücke zwischen Button und Liste überbrücken, Schieberegler gut greifbar */
++@media (min-width:821px){.f-group.open .f-pop::before{content:"";position:absolute;left:0;right:0;top:-8px;height:8px}}
++.f-pop input[type=range]{height:28px;cursor:pointer;accent-color:var(--brand)}
+diff --git a/app/layout.tsx b/app/layout.tsx
+index 2f254b5..225e1cd 100644
+--- a/app/layout.tsx
++++ b/app/layout.tsx
+@@ -25,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
+     twitter: { card: 'summary_large_image', images: ['/og.png'] },
+     // Geschlossener Shop: nur Landingpage und Info-Seite in Suchmaschinen
+     // Geschlossener Shop: Landingpage, Infoseiten und Schaufenster (Kategorien/Artikel ohne Preise) indexierbar
+-    robots: previewMode() || (shopClosed() && !(['/start', '/druck-stick', '/widerruf', '/garantie', '/impressum', '/ueber-uns'].includes(headers().get('x-path') ?? '') || headers().get('x-showcase') === '1')) ? { index: false, follow: false } : undefined,
++    robots: previewMode() || (shopClosed() && !(['/start', '/druck-stick', '/widerruf', '/garantie', '/impressum', '/ueber-uns'].includes(headers().get('x-path') ?? '') || (headers().get('x-path') ?? '').startsWith('/fuer/') || headers().get('x-showcase') === '1')) ? { index: false, follow: false } : undefined,
+   };
+ }
+ export const dynamic = 'force-dynamic';
+@@ -46,7 +46,7 @@ function orgSchema() {
+ export default async function RootLayout({ children }: { children: React.ReactNode }) {
+   const gated = shopClosed();
+   const path = headers().get('x-path') ?? '/';
+-  const isPublic = ['/ueber-uns', '/garantie', '/bewerten', '/widerruf', '/newsletter', '/start', '/druck-stick', '/zugang', '/impressum', '/datenschutz', '/angebot', '/admin'].some((p) => path === p || path.startsWith(p + '/'));
++  const isPublic = ['/fuer', '/ueber-uns', '/garantie', '/bewerten', '/widerruf', '/newsletter', '/start', '/druck-stick', '/zugang', '/impressum', '/datenschutz', '/angebot', '/admin'].some((p) => path === p || path.startsWith(p + '/'));
+   const { ok, customer } = await shopAccess();
+   // Code im Admin gesperrt/gelöscht -> zurück zur Anmeldung
+   const showcase = !ok && headers().get('x-showcase') === '1';
+@@ -68,7 +68,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
+               </> : !path.startsWith('/admin') && <nav className="pub-nav">
+                 <Link href="/druck-stick" className="hide-sm">Druck & Stick</Link>
+                 <Link href="/#ablauf" className="hide-sm">So funktioniert’s</Link>
+-                <Link href="/#anfragen" className="hide-sm">Zugang anfragen</Link>
++                <Link href="/#preis" className="hide-sm">Preis anfragen</Link>
+                 <Link href="/zugang" className="pub-login">Anmelden</Link>
+               </nav>}
+             </div>
+@@ -79,7 +79,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
+           <main className="wrap">{children}</main>
+           <footer><div className="wrap">
+             <span>© {new Date().getFullYear()} {SHOP} · Alle Preise netto zzgl. MwSt. und Versand</span>
+-            <span>{open && <><Link href="/konto">Meine Anfragen</Link> · </>}<Link href="/ueber-uns">Über uns</Link> · <Link href="/druck-stick">Druck & Stick</Link> · <Link href="/widerruf">Rückgabe & Widerruf</Link> · <Link href="/garantie">Zufriedenheitsgarantie</Link> · <Link href="/impressum">Impressum</Link> · <Link href="/datenschutz">Datenschutz</Link>{gated && customer && <> · {customer.name} · <LogoutLink /></>}</span>
++            <span>{open && <><Link href="/konto">Meine Anfragen</Link> · </>}<Link href="/ueber-uns">Über uns</Link> · <Link href="/fuer/vereine">Vereine</Link> · <Link href="/fuer/unternehmen">Unternehmen</Link> · <Link href="/fuer/handwerk">Handwerk</Link> · <Link href="/fuer/gastronomie">Gastronomie</Link> · <Link href="/druck-stick">Druck & Stick</Link> · <Link href="/widerruf">Rückgabe & Widerruf</Link> · <Link href="/garantie">Zufriedenheitsgarantie</Link> · <Link href="/impressum">Impressum</Link> · <Link href="/datenschutz">Datenschutz</Link>{gated && customer && <> · {customer.name} · <LogoutLink /></>}</span>
+           </div></footer>
+           {!path.startsWith('/admin') && <TrustBadge />}
+           {!path.startsWith('/admin') && <Contact whatsapp={process.env.CONTACT_WHATSAPP ?? '491732648097'} phone={process.env.CONTACT_PHONE ?? '0173 2648097'} email={process.env.CONTACT_EMAIL ?? 'info@euro-trade.com'} />}
+diff --git a/app/robots.ts b/app/robots.ts
+index 7f09072..7445a10 100644
+--- a/app/robots.ts
++++ b/app/robots.ts
+@@ -3,7 +3,7 @@ import { previewMode } from '@/lib/access';
+ export default function robots(): MetadataRoute.Robots {
+   const base = (process.env.SHOP_URL ?? 'https://euro-trade.com').replace(/\/$/, '');
+   if (previewMode()) return { rules: { userAgent: '*', disallow: '/' } };
+-  return { rules: { userAgent: '*', allow: ['/', '/druck-stick', '/widerruf', '/garantie', '/ueber-uns', '/kategorie/', '/produkt/', '/p/'], disallow: ['/admin', '/api', '/angebot', '/warenkorb', '/merkliste', '/zugang'] }, sitemap: `${base}/sitemap.xml` };
++  return { rules: { userAgent: '*', allow: ['/', '/fuer/', '/api/bild/', '/druck-stick', '/widerruf', '/garantie', '/ueber-uns', '/kategorie/', '/produkt/', '/p/'], disallow: ['/admin', '/api', '/angebot', '/warenkorb', '/merkliste', '/zugang'] }, sitemap: `${base}/sitemap.xml` };
+ }
+ 
+ export const dynamic = 'force-dynamic';
+diff --git a/app/sitemap.ts b/app/sitemap.ts
+index 071c7ad..4a1d310 100644
+--- a/app/sitemap.ts
++++ b/app/sitemap.ts
+@@ -1,6 +1,7 @@
+ import type { MetadataRoute } from 'next';
+ import { previewMode } from '@/lib/access';
+ import { getCategories, allProductsBrief } from '@/lib/catalog';
++import { ZIELGRUPPEN } from '@/lib/zielgruppen';
+ 
+ export const dynamic = 'force-dynamic';
+ export default function sitemap(): MetadataRoute.Sitemap {
+@@ -9,6 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
+   const pages: MetadataRoute.Sitemap = [
+     { url: `${base}/`, priority: 1, changeFrequency: 'weekly', lastModified: now },
+     { url: `${base}/druck-stick`, priority: 0.8, changeFrequency: 'monthly', lastModified: now },
++    ...ZIELGRUPPEN.map((z) => ({ url: `${base}/fuer/${z.slug}`, priority: 0.8, changeFrequency: 'monthly' as const, lastModified: now })),
+     { url: `${base}/ueber-uns`, priority: 0.5, changeFrequency: 'yearly', lastModified: now },
+     { url: `${base}/garantie`, priority: 0.4, changeFrequency: 'yearly', lastModified: now },
+     { url: `${base}/widerruf`, priority: 0.3, changeFrequency: 'yearly', lastModified: now },
+diff --git a/app/start/QuoteForm.tsx b/app/start/QuoteForm.tsx
+new file mode 100644
+index 0000000..1b7c318
+--- /dev/null
++++ b/app/start/QuoteForm.tsx
+@@ -0,0 +1,47 @@
++'use client';
++import { useState } from 'react';
++import Link from 'next/link';
++
++/** Preisanfrage ohne Zugangscode: Artikelart, Menge, Logo, Muster */
++export default function QuoteForm({ categories }: { categories: string[] }) {
++  const [state, setState] = useState<'idle' | 'busy' | 'done'>('idle');
++  const [err, setErr] = useState('');
++  const [file, setFile] = useState('');
++  async function submit(e: React.FormEvent<HTMLFormElement>) {
++    e.preventDefault(); setState('busy'); setErr('');
++    const r = await fetch('/api/preisanfrage', { method: 'POST', body: new FormData(e.currentTarget) });
++    const d = await r.json().catch(() => ({}));
++    if (r.ok) setState('done'); else { setErr(d.error ?? 'Senden fehlgeschlagen.'); setState('idle'); }
++  }
++  if (state === 'done') return <div className="box qf-done"><span className="qf-ok">✓</span><h3>Vielen Dank!</h3><p>Ihre Anfrage ist da. Wir melden uns innerhalb von 24 Stunden mit Ihrem Angebot – eine Bestätigung haben wir Ihnen per E-Mail geschickt.</p></div>;
++  return (
++    <form className="box form qf" onSubmit={submit}>
++      <div className="two">
++        <div><label>Was brauchen Sie?</label>
++          <select name="category" className="sel">{['Weiß ich noch nicht – bitte beraten', ...categories].map((c) => <option key={c}>{c}</option>)}</select></div>
++        <div><label>Menge ca.</label><input name="qty" inputMode="numeric" placeholder="z. B. 25" /></div>
++      </div>
++      <div className="two">
++        <div><label>Veredelung</label>
++          <select name="deco" className="sel">{['Beratung gewünscht', 'Druck', 'Stick', 'Ohne Veredelung'].map((c) => <option key={c}>{c}</option>)}</select></div>
++        <div><label>Ihr Logo <span className="muted" style={{ fontWeight: 400 }}>(optional)</span></label>
++          <label className="qf-file"><input type="file" name="logo" hidden accept=".png,.jpg,.jpeg,.svg,.pdf,.ai,.eps" onChange={(e) => setFile(e.target.files?.[0]?.name ?? '')} />{file ? `📎 ${file}` : 'Datei wählen (PNG, JPG, PDF, AI, EPS)'}</label></div>
++      </div>
++      <div className="two">
++        <div><label>Name *</label><input name="name" required autoComplete="name" /></div>
++        <div><label>Verein / Firma</label><input name="company" autoComplete="organization" /></div>
++      </div>
++      <div className="two">
++        <div><label>E-Mail *</label><input name="email" type="email" required autoComplete="email" /></div>
++        <div><label>Telefon</label><input name="phone" type="tel" autoComplete="tel" /></div>
++      </div>
++      <label>Nachricht</label>
++      <textarea name="message" placeholder="Farben, Größen, Termin, Namen und Nummern …" style={{ minHeight: 80 }} />
++      <label className="qf-check"><input type="checkbox" name="sample" /> <span><b>Muster gewünscht</b> – wir schicken Ihnen vorab ein Musterteil zur Ansicht.</span></label>
++      <input className="hp" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
++      <label className="qf-check"><input type="checkbox" name="privacy" required /> <span>Ich stimme der Verarbeitung meiner Daten gemäß <Link href="/datenschutz" style={{ textDecoration: 'underline' }}>Datenschutzerklärung</Link> zu. *</span></label>
++      <button className="btn" disabled={state === 'busy'}>{state === 'busy' ? 'Wird gesendet …' : 'Unverbindliches Angebot anfordern'}</button>
++      {err && <div className="note err">{err}</div>}
++    </form>
++  );
++}
+diff --git a/app/start/page.tsx b/app/start/page.tsx
+index 3192686..9ef164c 100644
+--- a/app/start/page.tsx
++++ b/app/start/page.tsx
+@@ -6,7 +6,10 @@ import NewsletterBox from './NewsletterBox';
+ import { ReviewStrip } from '@/components/ProductReviews';
+ import { latestReviews, overall } from '@/lib/reviews';
+ import { discountTiers, listReferences } from '@/lib/store';
+-import { getCategories, getFeatured } from '@/lib/catalog';
++import { categoryTiles, getCategories, getFeatured } from '@/lib/catalog';
++import CategoryTiles from '@/components/CategoryTiles';
++import QuoteForm from './QuoteForm';
++import { ZIELGRUPPEN } from '@/lib/zielgruppen';
+ import ProductCard from '@/components/ProductCard';
+ import { previewMode } from '@/lib/access';
+ import HeroProducts from '@/components/HeroProducts';
+@@ -22,7 +25,8 @@ const BRANDS = ['Asquith & Fox', 'B&C', 'Beechfield', 'Daiber', 'HRM', 'Mantis',
+ 
+ export default function Start() {
+   const refs = listReferences();
+-  const cats = getCategories().slice(0, 8);
++  const cats = getCategories();
++  const tiles = categoryTiles().slice(0, 8);
+   const showcase = getFeatured(8, { locked: true });
+   const hero = heroItems(showcase, { link: !previewMode() });
+   return (
+@@ -33,7 +37,7 @@ export default function Start() {
+           <h1>Teamwear & Firmenbekleidung mit Ihrem Logo</h1>
+           <p>Markentextilien schon ab 1 Stück – bedruckt oder bestickt, aus einer Hand. In Ihrem persönlichen Shop mit eigenen Konditionen und Ihrer Kollektion.</p>
+           <div className="l-cta">
+-            <a href="#anfragen" className="btn l-btn">Zugang anfragen</a>
++            <a href="#preis" className="btn l-btn">Preis anfragen</a>
+             <Link href="/druck-stick" className="btn alt l-btn2">Druck & Stick erklärt</Link>
+           </div>
+           <ul className="l-checks">
+@@ -69,14 +73,19 @@ export default function Start() {
+         </ol>
+       </section>
+ 
+-      {cats.length > 0 && (
++      {tiles.length > 0 && (
+         <section className="l-section">
+           <h2>Sortiment</h2>
+-          <div className="chips">{cats.map((c) => (previewMode() ? <span key={c.slug} className="chip">{c.name}</span> : <Link key={c.slug} href={`/kategorie/${c.slug}`} className="chip">{c.name}</Link>))}<span className="chip">und vieles mehr</span></div>
++          <CategoryTiles tiles={tiles} link={!previewMode()} />
+           <p className="muted" style={{ marginTop: 14 }}>Marken u. a.: {BRANDS.join(' · ')}</p>
+         </section>
+       )}
+ 
++      <section className="l-section">
++        <h2>Für wen wir arbeiten</h2>
++        <div className="zg-grid">{ZIELGRUPPEN.map((z) => <Link key={z.slug} href={`/fuer/${z.slug}`} className="box zg"><b>{z.nav}</b><span>{z.teaser}</span><em>Mehr erfahren →</em></Link>)}</div>
++      </section>
++
+       {!previewMode() && showcase.length > 0 && (
+         <section className="l-section">
+           <h2>Beliebte Artikel</h2>
+@@ -103,6 +112,16 @@ export default function Start() {
+ 
+       <NewsletterBox tiers={discountTiers()} />
+ 
++      <section id="preis" className="l-section l-quote">
++        <div>
++          <h2>Unverbindlich Preis anfragen</h2>
++          <p>Sie haben noch keinen Zugangscode? Kein Problem: Beschreiben Sie kurz Ihr Vorhaben und schicken Sie Ihr Logo gleich mit. Sie erhalten innerhalb von 24 Stunden ein Angebot.</p>
++          <ul><li>Kein Zugangscode nötig</li><li>Logo gleich mitschicken</li><li>Auf Wunsch vorab ein Muster</li><li>Unverbindlich und kostenlos</li></ul>
++          <p className="muted" style={{ marginTop: 16 }}>Lieber sprechen? <a className="alink" href="tel:+491732648097">0173 2648097</a></p>
++        </div>
++        <QuoteForm categories={cats.map((c) => c.name)} />
++      </section>
++
+       <section id="anfragen" className="l-section l-request">
+         <div>
+           <h2>Zugang anfragen</h2>
+diff --git a/components/CategoryTiles.tsx b/components/CategoryTiles.tsx
+new file mode 100644
+index 0000000..db53293
+--- /dev/null
++++ b/components/CategoryTiles.tsx
+@@ -0,0 +1,16 @@
++import Link from 'next/link';
++
++export type Tile = { slug: string; name: string; count: number; image?: string };
++/** Kategorien als Bildkacheln – link=false: führt zur Anfrage statt zur Kategorie (Vorschau-Modus) */
++export default function CategoryTiles({ tiles, link }: { tiles: Tile[]; link: boolean }) {
++  return (
++    <div className="ct-grid">
++      {tiles.map((t) => (
++        <Link key={t.slug} href={link ? `/kategorie/${t.slug}` : '#preis'} className="ct">
++          {t.image ? <img src={t.image} alt="" loading="lazy" /> : <span className="ct-ph" />}
++          <span className="ct-label"><b>{t.name}</b><span>{t.count} {t.count === 1 ? 'Artikel' : 'Artikel'} →</span></span>
++        </Link>
++      ))}
++    </div>
++  );
++}
+diff --git a/components/FilterGrid.tsx b/components/FilterGrid.tsx
+index 8bacd97..68b4e49 100644
+--- a/components/FilterGrid.tsx
++++ b/components/FilterGrid.tsx
+@@ -1,5 +1,5 @@
+ 'use client';
+-import { useMemo, useState } from 'react';
++import { useEffect, useMemo, useRef, useState } from 'react';
+ import ProductCard from './ProductCard';
+ import type { PublicProduct } from '@/lib/types';
+ import { FAMILY_HEX, colorFamily } from '@/lib/colors';
+@@ -22,6 +22,16 @@ export default function FilterGrid({ items }: { items: PublicProduct[] }) {
+   const [open, setOpen] = useState(false);
+   const [dd, setDd] = useState<string | null>(null);
+   const [limit, setLimit] = useState(24);
++  const barRef = useRef<HTMLElement>(null);
++  // Dropdown bleibt offen, bis man daneben klickt oder Esc drückt (nicht mehr beim Verlassen mit der Maus)
++  useEffect(() => {
++    if (!dd) return;
++    const down = (e: PointerEvent) => { if (!barRef.current?.contains(e.target as Node)) setDd(null); };
++    const key = (e: KeyboardEvent) => { if (e.key === 'Escape') setDd(null); };
++    document.addEventListener('pointerdown', down);
++    document.addEventListener('keydown', key);
++    return () => { document.removeEventListener('pointerdown', down); document.removeEventListener('keydown', key); };
++  }, [dd]);
+ 
+   const facets = useMemo(() => {
+     const count = (vals: string[][]) => { const m = new Map<string, number>(); vals.forEach((v) => new Set(v).forEach((x) => m.set(x, (m.get(x) ?? 0) + 1))); return m; };
+@@ -59,7 +69,7 @@ export default function FilterGrid({ items }: { items: PublicProduct[] }) {
+     </div>
+   );
+   const panel = (
+-    <aside className={`filters ${open ? 'open' : ''}`} onMouseLeave={() => setDd(null)}>
++    <aside ref={barRef} className={`filters ${open ? 'open' : ''}`}>
+       <div className="f-head"><strong>Filter</strong>{active > 0 && <button className="linkbtn" onClick={reset}>zurücksetzen</button>}<button className="x f-close" onClick={() => setOpen(false)} aria-label="Filter schließen">×</button></div>
+       {facets.fam.length > 1 && grp('fam', 'Farbe', fams.length, <div className="f-fams">{facets.fam.map(([f, n]) => (
+         <button key={f} className={`f-fam ${fams.includes(f) ? 'on' : ''}`} onClick={() => tog(setFams, f)} title={`${f} (${n})`}><span style={{ background: FAMILY_HEX[f] }} />{f}</button>))}</div>)}
+diff --git a/deploy.sh b/deploy.sh
+index 2c1b2c5..2ff3a60 100755
+--- a/deploy.sh
++++ b/deploy.sh
+@@ -19,21 +19,27 @@ fi
+ # 3) Datenordner vorbereiten (Container läuft als root, Daten bleiben bei Updates erhalten)
+ mkdir -p data/anfragen
+ 
+-# 4) Neuesten Stand aus Git holen
++# 4) Sicherung vor dem Update, dann neuesten Stand aus Git holen
++[ -d data ] && bash scripts/backup.sh 2>/dev/null || true
++CADDY_BEFORE=$(md5sum Caddyfile 2>/dev/null | cut -d' ' -f1)
+ if [ -d .git ]; then git pull --ff-only; fi
+ # Ohne L-Shop-API: Katalog aus dem Repo (seed/products.json) verwenden – erst NACH dem Pull kopieren
+ if ! grep -qE '^LSHOP_API_KEY=.+' .env; then cp seed/products.json data/products.json; fi
+ 
+ # 5) Bauen & starten
+ docker compose up -d --build
++# Caddyfile geändert? Dann Caddy neu erstellen (Datei ist einzeln eingebunden – ein Reload sieht die neue Datei nicht)
++if [ "$CADDY_BEFORE" != "$(md5sum Caddyfile | cut -d' ' -f1)" ]; then docker compose up -d --force-recreate caddy; fi
+ docker image prune -f >/dev/null
+ 
+ # 6) Nächtlicher L-Shop-Sync (03:00) – wird nur einmal eingetragen
+ CRON="0 3 * * * cd $(pwd) && docker compose exec -T shop node scripts/sync-lshop.mjs >> $(pwd)/data/sync.log 2>&1"
+-( crontab -l 2>/dev/null | grep -v 'scripts/sync-lshop.mjs' ; echo "$CRON" ) | crontab -
++BACKUP="30 2 * * * cd $(pwd) && bash scripts/backup.sh >> $(pwd)/data/backup.log 2>&1"
++( crontab -l 2>/dev/null | grep -v 'scripts/sync-lshop.mjs' | grep -v 'scripts/backup.sh' ; echo "$CRON" ; echo "$BACKUP" ) | crontab -
+ 
+ echo
+ echo ">> Fertig. Status:"
+ docker compose ps
+ echo ">> Logs ansehen:   docker compose logs -f shop"
+ echo ">> L-Shop-Sync:    docker compose exec shop node scripts/sync-lshop.mjs"
++echo ">> Sicherungen:    ls -lh /opt/euro-trade-backups  (täglich 02:30, letzte 30)"
+diff --git a/lib/catalog.ts b/lib/catalog.ts
+index 2abafac..d9422c7 100644
+--- a/lib/catalog.ts
++++ b/lib/catalog.ts
+@@ -93,6 +93,11 @@ export function getCollection(ctx?: Ctx): PublicProduct[] {
+   const bySku = new Map(s.products.map((p) => [p.sku.toUpperCase(), p]));
+   return (ctx?.skus ?? []).flatMap((k) => { const p = bySku.get(k.toUpperCase()); return p ? [toPublic(p, ctx)] : []; });
+ }
++/** Kategorien mit Vorschaubild (erstes Artikelbild) */
++export function categoryTiles(ctx?: Ctx, slugs?: string[]) {
++  const ps = products(ctx);
++  return getCategories(ctx).filter((c) => !slugs || slugs.includes(c.slug)).map((c) => ({ ...c, image: ps.find((p) => p.categorySlug === c.slug && p.images[0])?.images[0] }));
++}
+ /** Admin: alle Artikel inkl. ausgeblendeter, mit EK */
+ export const adminProducts = () => load().all;
+ export const adminProduct = (id: string) => { const s = load(); return { p: s.all.find((x) => x.id === id) ?? null, original: s.base.get(id) ?? null }; };
+diff --git a/lib/hero.ts b/lib/hero.ts
+index c525100..70c302b 100644
+--- a/lib/hero.ts
++++ b/lib/hero.ts
+@@ -11,7 +11,7 @@ export function heroItems(list: PublicProduct[], opts: { link: boolean; n?: numb
+       id: p.id, name: p.name, brand: p.brand, image: p.images[0],
+       colors: p.colors.map((c) => c.hex).filter((h): h is string => !!h).slice(0, 6), colorCount: p.colors.length,
+       label: p.locked ? '🔒 Preis nach Anmeldung' : from != null && Number.isFinite(from) ? `ab ${eur(from)}` : 'Preis auf Anfrage',
+-      href: opts.link ? `/produkt/${p.id}` : '#anfragen',
++      href: opts.link ? `/produkt/${p.id}` : '#preis',
+     };
+   });
+ }
+diff --git a/lib/store.ts b/lib/store.ts
+index bba170d..22f9b87 100644
+--- a/lib/store.ts
++++ b/lib/store.ts
+@@ -123,7 +123,8 @@ export const listReferences = () => readJSON<Reference[]>(REFS, []);
+ export const saveReferences = (r: Reference[]) => writeJSON(REFS, r);
+ 
+ /* ---------- Zugangsanfragen (von der Startseite) ---------- */
+-export type AccessRequest = { id: string; date: string; name: string; company: string; email: string; phone: string; type: string; message: string; done?: boolean };
++export type AccessRequest = { id: string; date: string; name: string; company: string; email: string; phone: string; type: string; message: string; done?: boolean;
++  /** Preisanfrage ohne Zugang */ kind?: 'zugang' | 'preis'; category?: string; qty?: string; deco?: string; sample?: boolean; logoId?: string; logoName?: string };
+ const AREQ = path.join(DATA, 'zugangsanfragen.json');
+ export const listAccessRequests = () => readJSON<AccessRequest[]>(AREQ, []);
+ export const saveAccessRequests = (r: AccessRequest[]) => writeJSON(AREQ, r.slice(-1000));
+diff --git a/lib/zielgruppen.ts b/lib/zielgruppen.ts
+new file mode 100644
+index 0000000..2bfe1a7
+--- /dev/null
++++ b/lib/zielgruppen.ts
+@@ -0,0 +1,82 @@
++/** Branchen-Seiten: nur Leistungen, die es im Shop tatsächlich gibt */
++export type Zielgruppe = { slug: string; nav: string; teaser: string; dativ: string; title: string; h1: string; lead: string; desc: string; cats: string[]; points: [string, string][]; faq: [string, string][]; example: string };
++
++export const ZIELGRUPPEN: Zielgruppe[] = [
++  {
++    slug: 'vereine', dativ: 'Vereinen', teaser: 'Teamwear mit Vereinslogo, Namen und Nummern – ab 1 Stück nachbestellbar.', nav: 'Vereine', title: 'Vereinskleidung mit Logo bedrucken & besticken',
++    h1: 'Vereinskleidung mit Ihrem Vereinslogo',
++    lead: 'T-Shirt, Hoodie, Polo oder Cap: Wir bringen Ihr Vereinslogo auf Markentextilien – schon ab einem Stück und mit Namen und Nummern auf Wunsch.',
++    desc: 'Vereinskleidung und Teamwear mit Vereinslogo: Hoodies, T-Shirts, Polos, Jacken und Caps – bedruckt oder bestickt ab 1 Stück, mit Namen und Nummern. Angebot in 24 Stunden.',
++    cats: ['sweatshirts', 't-shirts', 'poloshirts', 'jacken', 'caps-muetzen'],
++    points: [
++      ['Namen & Nummern', 'Individuelle Rückennamen und Nummern per Flex-Transfer – einfach als Liste mitschicken.'],
++      ['Nachbestellen ab 1 Stück', 'Neue Mitglieder? Einzelteile lassen sich jederzeit nachbestellen, mit demselben Motiv.'],
++      ['Eigener Vereinsshop', 'Ihre Kollektion und Ihr Logo hinterlegt – Mitglieder bestellen aus einer gemeinsamen Auswahl.'],
++      ['Staffelpreise', 'Je mehr Teile, desto günstiger der Stückpreis – Rabattstaffel ab 10 Stück.'],
++    ],
++    faq: [
++      ['Können Mitglieder selbst bestellen?', 'Ja. Mit einem Vereinscode sehen Mitglieder Ihre Kollektion mit Ihrem Logo und können selbst Anfragen stellen.'],
++      ['Gibt es eine Mindestmenge?', 'Nein. Mit Digitaltransfer oder Flex veredeln wir schon ab einem Stück. Für Stick lohnt sich meist eine Menge ab etwa 10 Teilen.'],
++      ['Wie lange dauert die Lieferung?', 'Nach Ihrer Freigabe des Motivs meist 7–14 Werktage.'],
++    ],
++    example: 'z. B. 30 Hoodies mit Vereinslogo vorne und Namen hinten',
++  },
++  {
++    slug: 'unternehmen', dativ: 'Unternehmen', teaser: 'Polos, Hemden und Jacken mit gesticktem Logo – mit eigenem Firmenshop.', nav: 'Unternehmen', title: 'Firmenbekleidung mit Logo – Corporate Fashion',
++    h1: 'Firmenbekleidung mit Ihrem Logo',
++    lead: 'Einheitlicher Auftritt für Ihr Team: Polos, Hemden, Blusen, Sweatshirts und Jacken – edel bestickt oder bedruckt, mit persönlichem Firmenshop.',
++    desc: 'Firmenbekleidung und Corporate Fashion mit Logo: Polos, Hemden, Blusen, Sweatshirts und Jacken bestickt oder bedruckt – ab 1 Stück, eigener Firmenshop, Angebot in 24 Stunden.',
++    cats: ['poloshirts', 'hemden-blusen', 'sweatshirts', 'jacken', 't-shirts'],
++    points: [
++      ['Stick für den edlen Auftritt', 'Langlebig und hochwertig – ideal für Polos, Hemden und Jacken im Kundenkontakt.'],
++      ['Ihr Firmenshop', 'Logo, Kollektion und Ihre Konditionen hinterlegt. Neue Mitarbeitende einfach nachbestellen.'],
++      ['Angebot als PDF', 'Alle Positionen transparent: Textil, Veredelung, Versand – online mit einem Klick annehmen.'],
++      ['Ein Ansprechpartner', 'Persönliche Betreuung von der Anfrage bis zur Lieferung.'],
++    ],
++    faq: [
++      ['Können wir die Kollektion festlegen?', 'Ja. Wir hinterlegen Ihre Auswahl im Firmenshop – auf Wunsch sehen Ihre Mitarbeitenden nur diese Artikel.'],
++      ['Gibt es Rechnungskauf?', 'Die Zahlungsbedingungen stehen in Ihrem Angebot. Sprechen Sie uns an, wenn Sie besondere Wünsche haben.'],
++      ['Treffen Sie unsere Firmenfarben?', 'Nennen Sie uns Ihre Pantone- oder HKS-Farben, dann stimmen wir Druck und Stick darauf ab.'],
++    ],
++    example: 'z. B. 15 Polos mit gesticktem Logo auf der Brust',
++  },
++  {
++    slug: 'handwerk', dativ: 'Handwerksbetrieben', teaser: 'Arbeitskleidung mit Firmenlogo, robust bestickt oder bedruckt.', nav: 'Handwerk', title: 'Arbeitskleidung mit Logo für Handwerksbetriebe',
++    h1: 'Arbeitskleidung mit Ihrem Firmenlogo',
++    lead: 'Robuste Kleidung für Baustelle und Werkstatt, mit Ihrem Logo – damit Ihre Kunden sehen, wer bei ihnen arbeitet.',
++    desc: 'Arbeitskleidung mit Logo für Handwerksbetriebe: Arbeitskleidung, T-Shirts, Sweatshirts, Jacken und Hosen – bestickt oder bedruckt ab 1 Stück. Angebot in 24 Stunden.',
++    cats: ['arbeitskleidung', 't-shirts', 'sweatshirts', 'jacken', 'hosen'],
++    points: [
++      ['Stick übersteht viel', 'Gestickte Logos sind sehr langlebig und überstehen auch häufiges Waschen.'],
++      ['Werbung, die mitfährt', 'Großes Logo auf dem Rücken, Webadresse oder Telefonnummer im Nacken.'],
++      ['Ab 1 Stück', 'Für den Ein-Mann-Betrieb genauso wie für das ganze Team.'],
++      ['Nachbestellung leicht gemacht', 'Ihr Motiv bleibt gespeichert – neue Teile mit demselben Logo jederzeit.'],
++    ],
++    faq: [
++      ['Welche Veredelung hält am längsten?', 'Für Arbeitskleidung empfehlen wir meist Stick. Für große Rückenmotive ist Druck oft die günstigere Wahl – wir beraten Sie.'],
++      ['Kann die Telefonnummer mit drauf?', 'Ja. Jeder Schriftzug ist möglich, z. B. im Nacken oder unter dem Logo auf dem Rücken.'],
++      ['Haben Sie auch Hosen?', 'Ja, im Sortiment finden Sie auch Hosen. Sagen Sie uns, was Sie brauchen, dann stellen wir Ihnen eine Auswahl zusammen.'],
++    ],
++    example: 'z. B. 8 Sweatjacken mit Logo auf Brust und Rücken',
++  },
++  {
++    slug: 'gastronomie', dativ: 'Gastronomie & Hotels', teaser: 'Hemden, Blusen und Polos mit Logo für Service, Küche und Rezeption.', nav: 'Gastronomie', title: 'Gastro- & Hotelbekleidung mit Logo',
++    h1: 'Bekleidung mit Logo für Gastronomie & Hotel',
++    lead: 'Gepflegter Auftritt für Service, Küche und Rezeption: Hemden, Blusen, Polos und T-Shirts mit Ihrem Logo.',
++    desc: 'Gastronomie- und Hotelbekleidung mit Logo: Hemden, Blusen, Polos und T-Shirts – bestickt oder bedruckt ab 1 Stück. Angebot in 24 Stunden.',
++    cats: ['hemden-blusen', 'poloshirts', 't-shirts', 'caps-muetzen'],
++    points: [
++      ['Dezent oder auffällig', 'Kleines Stick-Logo auf der Brust oder großes Motiv für Events – passend zu Ihrem Konzept.'],
++      ['Saisonkräfte? Kein Problem', 'Nachbestellung ab 1 Stück, mit demselben Motiv.'],
++      ['Einheitliches Team', 'Farben und Schnitte für Damen und Herren, aufeinander abgestimmt.'],
++      ['Angebot in 24 Stunden', 'Anfrage schicken, Angebot als PDF erhalten, online annehmen.'],
++    ],
++    faq: [
++      ['Gibt es Damen- und Herrenschnitte?', 'Bei vielen Artikeln ja. Wir zeigen Ihnen passende Kombinationen.'],
++      ['Wie wasche ich bestickte Hemden?', 'Auf links gedreht bei der angegebenen Temperatur waschen und nicht direkt auf dem Stick bügeln.'],
++      ['Können wir vorab ein Muster sehen?', 'Ja. Kreuzen Sie bei der Preisanfrage einfach „Muster gewünscht“ an.'],
++    ],
++    example: 'z. B. 12 Blusen und Hemden mit gesticktem Logo',
++  },
++];
++export const zielgruppe = (slug: string) => ZIELGRUPPEN.find((z) => z.slug === slug);
+diff --git a/middleware.ts b/middleware.ts
+index 446526d..57b6c9d 100644
+--- a/middleware.ts
++++ b/middleware.ts
+@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
+ import { ACCESS_COOKIE, ADMIN_COOKIE, isAdminToken, previewMode, shopClosed, verifyCodeToken } from '@/lib/access';
+ 
+ // Immer erreichbar: Zugang, Pflichtseiten, Angebots-Links aus der E-Mail, Admin-Login
+-const PUBLIC = ['/ueber-uns', '/og.png', '/garantie', '/p', '/bewerten', '/api/bewerten', '/widerruf', '/newsletter', '/api/newsletter', '/start', '/druck-stick', '/api/zugang-anfrage', '/api/bild', '/sitemap.xml', '/zugang', '/api/zugang', '/impressum', '/datenschutz', '/angebot', '/api/angebot', '/admin/login', '/api/admin/login', '/icon.svg', '/favicon.ico', '/robots.txt'];
++const PUBLIC = ['/fuer', '/api/preisanfrage', '/ueber-uns', '/og.png', '/garantie', '/p', '/bewerten', '/api/bewerten', '/widerruf', '/newsletter', '/api/newsletter', '/start', '/druck-stick', '/api/zugang-anfrage', '/api/bild', '/sitemap.xml', '/zugang', '/api/zugang', '/impressum', '/datenschutz', '/angebot', '/api/angebot', '/admin/login', '/api/admin/login', '/icon.svg', '/favicon.ico', '/robots.txt'];
+ const match = (path: string, list: string[]) => list.some((p) => path === p || path.startsWith(p + '/'));
+ 
+ export async function middleware(req: NextRequest) {
+diff --git a/scripts/backup.sh b/scripts/backup.sh
+new file mode 100755
+index 0000000..019d8a9
+--- /dev/null
++++ b/scripts/backup.sh
+@@ -0,0 +1,11 @@
++#!/usr/bin/env bash
++# Tägliche Sicherung von data/ (Anfragen, Kunden, Artikel-Änderungen, Uploads, Bewertungen …)
++# Aufruf: bash scripts/backup.sh   – behält die letzten 30 Sicherungen
++set -euo pipefail
++cd "$(dirname "$0")/.."
++DEST="${BACKUP_DIR:-/opt/euro-trade-backups}"
++mkdir -p "$DEST"
++FILE="$DEST/data-$(date +%F-%H%M).tar.gz"
++tar -czf "$FILE" data
++ls -1t "$DEST"/data-*.tar.gz | tail -n +31 | xargs -r rm -f
++echo "$(date '+%F %T') Sicherung: $FILE ($(du -h "$FILE" | cut -f1))"
+-- 
+2.43.0
+

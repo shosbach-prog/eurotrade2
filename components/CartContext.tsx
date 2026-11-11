@@ -1,6 +1,6 @@
 'use client';
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import type { Deco } from '@/lib/deco';
+import { adaptDeco, type Deco } from '@/lib/deco';
 import CartDrawer from './CartDrawer';
 
 export type CartLine = {
@@ -44,7 +44,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const { key: _k, ...rest } = cur;
     save(merge(lines.filter((x) => x.key !== key), { ...rest, ...patch }));
   };
-  const decoToAll = (deco: Deco | null) => save(lines.reduce<CartLine[]>((acc, { key: _k, ...l }) => merge(acc, { ...l, deco }), []));
+  const decoToAll = (deco: Deco | null) => save(lines.reduce<CartLine[]>((acc, { key: _k, ...l }) => merge(acc, { ...l, deco: adaptDeco(deco, l) }), []));
   const remove = (key: string) => save(lines.filter((x) => x.key !== key));
   const clear = () => save([]);
   const count = lines.reduce((s, l) => s + l.qty, 0);

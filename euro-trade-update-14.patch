@@ -1,0 +1,613 @@
+From 0bfdd032e8ff94cfcba9a4dee53308c2e6f94790 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Wed, 11 Nov 2026 05:23:53 +0100
+Subject: [PATCH] =?UTF-8?q?Admin:=20Artikel=20vollst=C3=A4ndig=20bearbeite?=
+ =?UTF-8?q?n=20(Stammdaten,=20EK/Staffel,=20Bilder,=20Farben,=20Gr=C3=B6?=
+ =?UTF-8?q?=C3=9Fen,=20Sichtbarkeit,=20Top)=20und=20neue=20Artikel=20anleg?=
+ =?UTF-8?q?en?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01AW9Go5bwJWAYsfGemt2b6Z
+---
+ app/admin/artikel/NewArticle.tsx         |  30 +++++
+ app/admin/artikel/[id]/ArticleEditor.tsx | 138 +++++++++++++++++++++++
+ app/admin/artikel/[id]/page.tsx          |  21 +++-
+ app/admin/artikel/page.tsx               |  48 +++++---
+ app/api/admin/artikel/route.ts           |  71 ++++++++++++
+ app/api/admin/texte/route.ts             |   4 +-
+ app/api/bild/[id]/route.ts               |   5 +-
+ app/globals.css                          |  24 ++++
+ components/AdminNav.tsx                  |   2 +-
+ lib/artikel.ts                           |  16 +++
+ lib/catalog.ts                           |  25 +++-
+ lib/pricing.ts                           |   2 +
+ lib/types.ts                             |   6 +
+ 13 files changed, 361 insertions(+), 31 deletions(-)
+ create mode 100644 app/admin/artikel/NewArticle.tsx
+ create mode 100644 app/admin/artikel/[id]/ArticleEditor.tsx
+ create mode 100644 app/api/admin/artikel/route.ts
+ create mode 100644 lib/artikel.ts
+
+diff --git a/app/admin/artikel/NewArticle.tsx b/app/admin/artikel/NewArticle.tsx
+new file mode 100644
+index 0000000..9c0d0a3
+--- /dev/null
++++ b/app/admin/artikel/NewArticle.tsx
+@@ -0,0 +1,30 @@
++'use client';
++import { useState } from 'react';
++import { useRouter } from 'next/navigation';
++
++export default function NewArticle({ categories }: { categories: string[] }) {
++  const router = useRouter();
++  const [open, setOpen] = useState(false);
++  const [f, setF] = useState({ name: '', sku: '', brand: '', category: '' });
++  const [err, setErr] = useState('');
++  async function create(e: React.FormEvent) {
++    e.preventDefault();
++    const r = await fetch('/api/admin/artikel', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(f) });
++    const d = await r.json().catch(() => ({}));
++    if (r.ok) router.push(`/admin/artikel/${d.id}`); else setErr(d.error ?? 'Fehler');
++  }
++  if (!open) return <button className="btn" onClick={() => setOpen(true)}>+ Neuer Artikel</button>;
++  return (
++    <form className="box form ae-new" onSubmit={create}>
++      <input required placeholder="Artikelname" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} />
++      <input required placeholder="Artikelnummer" value={f.sku} onChange={(e) => setF({ ...f, sku: e.target.value })} />
++      <input placeholder="Marke" value={f.brand} onChange={(e) => setF({ ...f, brand: e.target.value })} />
++      <input list="na-cats" placeholder="Kategorie" value={f.category} onChange={(e) => setF({ ...f, category: e.target.value })} />
++      <datalist id="na-cats">{categories.map((c) => <option key={c} value={c} />)}</datalist>
++      <button className="btn">Anlegen</button>
++      <button type="button" className="linkbtn" onClick={() => setOpen(false)}>Abbrechen</button>
++      {err && <div className="note err" style={{ width: '100%' }}>{err}</div>}
++      <div className="muted" style={{ fontSize: 12, width: '100%' }}>Neue Artikel sind zunächst ausgeblendet – erst Bilder, Preis und Größen ergänzen, dann sichtbar schalten.</div>
++    </form>
++  );
++}
+diff --git a/app/admin/artikel/[id]/ArticleEditor.tsx b/app/admin/artikel/[id]/ArticleEditor.tsx
+new file mode 100644
+index 0000000..a46407a
+--- /dev/null
++++ b/app/admin/artikel/[id]/ArticleEditor.tsx
+@@ -0,0 +1,138 @@
++'use client';
++import { useState } from 'react';
++import { useRouter } from 'next/navigation';
++import type { Color, Product } from '@/lib/types';
++
++const prev = (src: string) => src.replace(/^\/api\/bild\//, '/api/upload/'); // Admin-Vorschau auch vor dem Speichern
++const money = (n: number) => n.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
++
++type F = Omit<Product, 'id' | 'categorySlug' | 'basePrice'> & { basePrice: string; tiersText: string; sizesText: string; featuresText: string; tagsText: string; specsText: string };
++export default function ArticleEditor({ p, custom, changed, categories, markup }: { p: Product; custom: boolean; changed: boolean; categories: string[]; markup: number }) {
++  const router = useRouter();
++  const [f, setF] = useState<F>({
++    ...p, hidden: !!p.hidden, top: !!p.top,
++    basePrice: p.basePrice != null ? String(p.basePrice).replace('.', ',') : '',
++    tiersText: (p.baseTiers ?? []).map((t) => `${t.min}: ${String(t.price).replace('.', ',')}`).join('\n'),
++    sizesText: p.sizes.join(', '), featuresText: (p.features ?? []).join('\n'), tagsText: (p.tags ?? []).join(', '),
++    specsText: Object.entries(p.specs ?? {}).map(([k, v]) => `${k}: ${v}`).join('\n'),
++  });
++  const [msg, setMsg] = useState<{ ok: boolean; m: string } | null>(null);
++  const [dirty, setDirty] = useState(false);
++  const [busy, setBusy] = useState(false);
++  const set = (x: Partial<F>) => { setF((o) => ({ ...o, ...x })); setDirty(true); setMsg(null); };
++  const ek = Number(f.basePrice.replace(',', '.'));
++  const vk = ek > 0 ? Math.round(ek * (1 + markup / 100) * 100) / 100 : null;
++
++  async function upload(files: FileList | null) {
++    if (!files?.length) return;
++    setBusy(true);
++    const add: string[] = [];
++    for (const file of Array.from(files)) {
++      const fd = new FormData(); fd.append('file', file);
++      const r = await fetch('/api/upload', { method: 'POST', body: fd }); const d = await r.json().catch(() => ({}));
++      if (r.ok) add.push(`/api/bild/${d.id}`); else setMsg({ ok: false, m: d.error ?? 'Upload fehlgeschlagen' });
++    }
++    set({ images: [...f.images, ...add] });
++    setBusy(false);
++  }
++  const move = (k: number, d: number) => { const a = [...f.images]; const [x] = a.splice(k, 1); a.splice(Math.max(0, Math.min(a.length, k + d)), 0, x); set({ images: a }); };
++  const setColor = (k: number, c: Partial<Color>) => set({ colors: f.colors.map((x, i) => (i === k ? { ...x, ...c } : x)) });
++
++  async function save() {
++    setBusy(true);
++    const data = {
++      ...f,
++      baseTiers: f.tiersText.split('\n').map((l) => l.split(/[:;=]/)).filter((x) => x.length === 2).map(([min, price]) => ({ min: Number(min.trim()), price: price.trim() })),
++      sizes: f.sizesText.split(',').map((s) => s.trim()).filter(Boolean),
++      features: f.featuresText.split('\n').map((s) => s.trim()).filter(Boolean),
++      tags: f.tagsText.split(',').map((s) => s.trim()).filter(Boolean),
++      specs: Object.fromEntries(f.specsText.split('\n').map((l) => [l.slice(0, l.indexOf(':')).trim(), l.slice(l.indexOf(':') + 1).trim()]).filter(([k, v]) => k && v)),
++    };
++    const r = await fetch('/api/admin/artikel', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: p.id, data }) });
++    const d = await r.json().catch(() => ({}));
++    setBusy(false);
++    if (r.ok) { setDirty(false); setMsg({ ok: true, m: 'Gespeichert – sofort im Shop sichtbar.' }); router.refresh(); } else setMsg({ ok: false, m: d.error ?? 'Fehler' });
++  }
++  async function reset() {
++    if (!confirm(custom ? 'Diesen Artikel endgültig löschen?' : 'Alle eigenen Änderungen verwerfen? Es gelten wieder die Katalogdaten.')) return;
++    const r = await fetch(`/api/admin/artikel?id=${encodeURIComponent(p.id)}`, { method: 'DELETE' });
++    if (r.ok) { if (custom) router.push('/admin/artikel'); else location.reload(); }
++  }
++
++  return (
++    <div className="box form ae">
++      <div className="ae-top">
++        <label className="switch"><input type="checkbox" checked={!f.hidden} onChange={(e) => set({ hidden: !e.target.checked })} /> <b>{f.hidden ? 'Ausgeblendet' : 'Im Shop sichtbar'}</b></label>
++        <label className="switch"><input type="checkbox" checked={!!f.top} onChange={(e) => set({ top: e.target.checked })} /> Oben anzeigen (Top-Artikel)</label>
++        {changed && !custom && <span className="st st-angebot">Eigene Änderungen aktiv</span>}
++      </div>
++
++      <h3>Stammdaten</h3>
++      <div className="ae-2">
++        <div><label>Artikelname</label><input value={f.name} onChange={(e) => set({ name: e.target.value })} /></div>
++        <div><label>Artikelnummer</label><input value={f.sku} onChange={(e) => set({ sku: e.target.value })} /></div>
++        <div><label>Marke</label><input value={f.brand} onChange={(e) => set({ brand: e.target.value })} /></div>
++        <div><label>Kategorie</label><input list="ae-cats" value={f.category} onChange={(e) => set({ category: e.target.value })} /><datalist id="ae-cats">{categories.map((c) => <option key={c} value={c} />)}</datalist></div>
++        <div><label>Material</label><input value={f.material ?? ''} onChange={(e) => set({ material: e.target.value })} /></div>
++        <div><label>Zusammensetzung</label><input value={f.composition ?? ''} onChange={(e) => set({ composition: e.target.value })} /></div>
++      </div>
++
++      <h3>Preise</h3>
++      <div className="ae-2">
++        <div><label>Einkaufspreis netto (EK)</label><input inputMode="decimal" placeholder="leer = Preis auf Anfrage" value={f.basePrice} onChange={(e) => set({ basePrice: e.target.value })} />
++          <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>{vk ? <>Verkaufspreis ca. <b>{money(vk)}</b> netto ({markup} % Aufschlag, wird gerundet). Kunden mit eigenem Aufschlag sehen ihren Preis.</> : 'Ohne EK erscheint „Preis auf Anfrage“.'}</div></div>
++        <div><label>Staffel-EK <span className="muted" style={{ fontWeight: 400 }}>(eine Zeile je Staffel: Menge: EK)</span></label><textarea placeholder={'50: 5,90\n100: 5,40'} value={f.tiersText} onChange={(e) => set({ tiersText: e.target.value })} style={{ minHeight: 76 }} /></div>
++      </div>
++
++      <h3>Bilder <span className="muted" style={{ fontWeight: 400, fontSize: 13 }}>– das erste Bild ist das Hauptbild</span></h3>
++      <div className="ae-imgs">
++        {f.images.map((src, k) => (
++          <div key={src + k} className="ae-img">
++            <img src={prev(src)} alt="" />
++            <div className="ae-img-act">
++              <button type="button" disabled={k === 0} onClick={() => move(k, -1)} title="nach vorne">←</button>
++              <button type="button" disabled={k === f.images.length - 1} onClick={() => move(k, 1)} title="nach hinten">→</button>
++              <button type="button" onClick={() => set({ images: f.images.filter((_, i) => i !== k), colors: f.colors.map((c) => (c.image === src ? { ...c, image: undefined } : c)) })} title="entfernen">✕</button>
++            </div>
++            {k === 0 && <span className="ae-main">Hauptbild</span>}
++          </div>
++        ))}
++        <label className="ae-add">{busy ? 'Lädt …' : '+ Bilder hochladen'}<input type="file" hidden multiple accept=".jpg,.jpeg,.png,.webp" onChange={(e) => upload(e.target.files)} /></label>
++      </div>
++
++      <h3>Farben</h3>
++      <div className="ae-colors">
++        {f.colors.map((c, k) => (
++          <div key={k} className="ae-color">
++            <input type="color" value={c.hex ?? '#cccccc'} onChange={(e) => setColor(k, { hex: e.target.value })} />
++            <input value={c.name} onChange={(e) => setColor(k, { name: e.target.value })} />
++            <select value={c.image ?? ''} onChange={(e) => setColor(k, { image: e.target.value || undefined })}>
++              <option value="">Bild: automatisch</option>
++              {f.images.map((s, i) => <option key={s} value={s}>Bild {i + 1}</option>)}
++            </select>
++            <button type="button" className="linkbtn" onClick={() => set({ colors: f.colors.filter((_, i) => i !== k) })}>entfernen</button>
++          </div>
++        ))}
++        <button type="button" className="btn alt" style={{ height: 34 }} onClick={() => set({ colors: [...f.colors, { name: '', hex: '#cccccc' }] })}>+ Farbe</button>
++      </div>
++
++      <h3>Größen & Details</h3>
++      <div className="ae-2">
++        <div><label>Größen <span className="muted" style={{ fontWeight: 400 }}>(mit Komma, in Reihenfolge)</span></label><input value={f.sizesText} onChange={(e) => set({ sizesText: e.target.value })} placeholder="XS, S, M, L, XL, XXL" /></div>
++        <div><label>Größentabelle (Link)</label><input value={f.sizeChart ?? ''} onChange={(e) => set({ sizeChart: e.target.value })} placeholder="https://…" /></div>
++        <div><label>Merkmale <span className="muted" style={{ fontWeight: 400 }}>(eine Zeile je Merkmal)</span></label><textarea value={f.featuresText} onChange={(e) => set({ featuresText: e.target.value })} style={{ minHeight: 110 }} /></div>
++        <div><label>Technische Daten <span className="muted" style={{ fontWeight: 400 }}>(Bezeichnung: Wert)</span></label><textarea value={f.specsText} onChange={(e) => set({ specsText: e.target.value })} style={{ minHeight: 110 }} /></div>
++        <div><label>Suchbegriffe / Tags <span className="muted" style={{ fontWeight: 400 }}>(mit Komma)</span></label><input value={f.tagsText} onChange={(e) => set({ tagsText: e.target.value })} /></div>
++        <div><label>Zielgruppe</label><input value={f.gender ?? ''} onChange={(e) => set({ gender: e.target.value })} placeholder="Unisex, Herren, Damen, Kinder" /></div>
++      </div>
++      <label>Herstellerbeschreibung</label>
++      <textarea value={f.description} onChange={(e) => set({ description: e.target.value })} style={{ minHeight: 110 }} />
++
++      <div className="admin-actions ae-save">
++        <button className="btn" disabled={!dirty || busy} onClick={save}>Speichern</button>
++        {(changed || custom) && <button className="linkbtn" onClick={reset}>{custom ? 'Artikel löschen' : 'Eigene Änderungen verwerfen'}</button>}
++        {msg && <span className={`note ${msg.ok ? 'ok' : 'err'}`} style={{ margin: 0 }}>{msg.m}</span>}
++      </div>
++    </div>
++  );
++}
+diff --git a/app/admin/artikel/[id]/page.tsx b/app/admin/artikel/[id]/page.tsx
+index a786f22..878478f 100644
+--- a/app/admin/artikel/[id]/page.tsx
++++ b/app/admin/artikel/[id]/page.tsx
+@@ -3,21 +3,30 @@ import { notFound } from 'next/navigation';
+ import type { Metadata } from 'next';
+ import AdminNav from '@/components/AdminNav';
+ import TextEditor from './TextEditor';
+-import { getProduct } from '@/lib/catalog';
++import ArticleEditor from './ArticleEditor';
++import { adminProduct, adminProducts } from '@/lib/catalog';
++import { readOverrides } from '@/lib/artikel';
++import { markupFor } from '@/lib/pricing';
+ import { generateText, getText, seedText } from '@/lib/content';
+ 
+-export const metadata: Metadata = { title: 'Artikeltext', robots: { index: false, follow: false } };
+-export default function EditText({ params }: { params: { id: string } }) {
+-  const p = getProduct(params.id);
++export const dynamic = 'force-dynamic';
++export const metadata: Metadata = { title: 'Artikel bearbeiten', robots: { index: false, follow: false } };
++export default function EditArticle({ params }: { params: { id: string } }) {
++  const { p, original } = adminProduct(decodeURIComponent(params.id));
+   if (!p) notFound();
+   const { text, source } = getText(p);
++  const categories = [...new Set(adminProducts().map((x) => x.category))].sort();
+   const specs = Object.entries(p.specs ?? {}).filter(([, v]) => v && v !== 'Keine Angabe');
+   return (
+     <>
+       <AdminNav active="artikel" />
+-      <div className="crumbs"><Link href="/admin/artikel">Artikeltexte</Link> › {p.name}</div>
++      <div className="crumbs"><Link href="/admin/artikel">Artikel</Link> › {p.name}</div>
+       <h1 style={{ marginBottom: 4 }}>{p.name}</h1>
+-      <p className="muted" style={{ marginTop: 0 }}>{p.sku} · {p.brand} · <Link className="alink" href={`/produkt/${p.id}`} target="_blank">Im Shop ansehen ↗</Link></p>
++      <p className="muted" style={{ marginTop: 0 }}>{p.sku} · {p.brand} · {p.hidden ? 'ausgeblendet' : <Link className="alink" href={`/produkt/${p.id}`} target="_blank">Im Shop ansehen ↗</Link>}</p>
++
++      <ArticleEditor key={JSON.stringify(readOverrides()[p.id]?.updatedAt ?? '')} p={p} custom={!original} changed={!!readOverrides()[p.id]} categories={categories} markup={markupFor(p.categorySlug)} />
++
++      <h2 style={{ marginTop: 34 }}>Verkaufstext</h2>
+       <div className="te-grid">
+         <TextEditor id={p.id} initial={text} source={source} auto={generateText(p)} seed={seedText(p.id)} />
+         <aside className="box te-facts">
+diff --git a/app/admin/artikel/page.tsx b/app/admin/artikel/page.tsx
+index 8f08085..05c6b24 100644
+--- a/app/admin/artikel/page.tsx
++++ b/app/admin/artikel/page.tsx
+@@ -1,30 +1,48 @@
+ import Link from 'next/link';
+ import type { Metadata } from 'next';
+ import AdminNav from '@/components/AdminNav';
+-import { allProductsBrief, getProduct } from '@/lib/catalog';
++import NewArticle from './NewArticle';
++import { adminProducts } from '@/lib/catalog';
++import { readOverrides } from '@/lib/artikel';
++import { sellPrice } from '@/lib/pricing';
+ import { getText } from '@/lib/content';
++import { eur } from '@/lib/format';
+ 
+-export const metadata: Metadata = { title: 'Artikeltexte', robots: { index: false, follow: false } };
+-const LBL = { eigen: ['Bearbeitet', 'st-angenommen'], vorlage: ['Redaktionelle Vorlage', 'st-angebot'], automatisch: ['Automatisch aus Daten', 'st-neu'] } as const;
++export const dynamic = 'force-dynamic';
++export const metadata: Metadata = { title: 'Artikel', robots: { index: false, follow: false } };
++const LBL = { eigen: ['Bearbeitet', 'st-angenommen'], vorlage: ['Vorlage', 'st-angebot'], automatisch: ['Automatisch', 'st-neu'] } as const;
+ 
+ export default function Artikel() {
+-  const rows = allProductsBrief().map((b) => { const p = getProduct(b.id); return p ? { p, ...getText(p) } : null; }).filter(Boolean) as { p: NonNullable<ReturnType<typeof getProduct>>; source: keyof typeof LBL; text: { headline: string } }[];
++  const ov = readOverrides();
++  const rows = adminProducts();
++  const cats = [...new Set(rows.map((p) => p.category))].sort();
+   return (
+     <>
+       <AdminNav active="artikel" />
+-      <h1>Artikeltexte</h1>
+-      <p className="muted" style={{ marginTop: -8 }}>Verkaufstexte je Artikel: Überschrift, Einleitung, Highlights und Einsatzbereiche. Neue Artikel erhalten automatisch einen Text aus den Produktdaten, den Sie hier verfeinern können. Bitte nur belegbare Eigenschaften nennen.</p>
++      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
++        <h1 style={{ marginRight: 'auto' }}>Artikel <span className="muted" style={{ fontSize: 16, fontWeight: 500 }}>({rows.length})</span></h1>
++        <NewArticle categories={cats} />
++      </div>
++      <p className="muted" style={{ marginTop: -4 }}>Name, Preise, Bilder, Farben, Größen, Sichtbarkeit und Verkaufstext je Artikel bearbeiten. Ihre Änderungen bleiben auch bei Katalog-Updates erhalten.</p>
+       <div className="box" style={{ padding: 0, overflowX: 'auto' }}>
+         <table className="atable">
+-          <thead><tr><th></th><th>Artikel</th><th>Überschrift</th><th>Text</th><th></th></tr></thead>
+-          <tbody>{rows.map(({ p, source, text }) => (
+-            <tr key={p.id}>
+-              <td style={{ width: 52 }}>{p.images[0] && <img src={p.images[0]} alt="" style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 6 }} />}</td>
+-              <td><b>{p.name}</b><div className="muted" style={{ fontSize: 12 }}>{p.sku} · {p.brand}</div></td>
+-              <td>{text.headline}</td>
+-              <td><span className={`st ${LBL[source][1]}`}>{LBL[source][0]}</span></td>
+-              <td><Link className="btn alt" style={{ height: 34, display: 'inline-grid', placeItems: 'center' }} href={`/admin/artikel/${p.id}`}>Bearbeiten</Link></td>
+-            </tr>))}</tbody>
++          <thead><tr><th></th><th>Artikel</th><th>Kategorie</th><th style={{ textAlign: 'right' }}>EK</th><th style={{ textAlign: 'right' }}>VK</th><th>Status</th><th>Text</th><th></th></tr></thead>
++          <tbody>{rows.map((p) => {
++            const src = getText(p).source;
++            const img = p.images[0]?.replace(/^\/api\/bild\//, '/api/upload/');
++            return (
++              <tr key={p.id} style={p.hidden ? { opacity: 0.55 } : undefined}>
++                <td style={{ width: 52 }}>{img ? <img src={img} alt="" style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 6 }} /> : <span className="ae-noimg" />}</td>
++                <td><b>{p.name}</b><div className="muted" style={{ fontSize: 12 }}>{p.sku} · {p.brand}{p.top ? ' · ★ Top' : ''}</div></td>
++                <td>{p.category}</td>
++                <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>{p.basePrice ? eur(p.basePrice) : <span className="muted">–</span>}</td>
++                <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>{p.basePrice ? eur(sellPrice(p.basePrice, p.categorySlug)) : <span className="muted">auf Anfrage</span>}</td>
++                <td>{p.hidden ? <span className="st st-abgelehnt">Ausgeblendet</span> : <span className="st st-angenommen">Sichtbar</span>}{ov[p.id] && !p.custom && <div className="muted" style={{ fontSize: 11, marginTop: 3 }}>geändert</div>}{p.custom && <div className="muted" style={{ fontSize: 11, marginTop: 3 }}>eigener Artikel</div>}</td>
++                <td><span className={`st ${LBL[src][1]}`}>{LBL[src][0]}</span></td>
++                <td><Link className="btn alt" style={{ height: 34, display: 'inline-grid', placeItems: 'center' }} href={`/admin/artikel/${p.id}`}>Bearbeiten</Link></td>
++              </tr>
++            );
++          })}</tbody>
+         </table>
+       </div>
+     </>
+diff --git a/app/api/admin/artikel/route.ts b/app/api/admin/artikel/route.ts
+new file mode 100644
+index 0000000..853a632
+--- /dev/null
++++ b/app/api/admin/artikel/route.ts
+@@ -0,0 +1,71 @@
++import { NextResponse } from 'next/server';
++import { isAdmin } from '@/lib/customer';
++import { adminProduct } from '@/lib/catalog';
++import { randomId } from '@/lib/store';
++import { readOverrides, saveOverride, type Override } from '@/lib/artikel';
++import type { Color, Product } from '@/lib/types';
++
++const str = (v: unknown, max = 200) => String(v ?? '').replace(/\r/g, '').trim().slice(0, max);
++const list = (v: unknown, max = 60) => (Array.isArray(v) ? v : []).map((x) => str(x, 300)).filter(Boolean).slice(0, max);
++const num = (v: unknown) => { const n = typeof v === 'number' ? v : Number(String(v ?? '').replace(',', '.')); return Number.isFinite(n) && n > 0 ? Math.round(n * 100) / 100 : null; };
++const img = (s: string) => /^(\/p\/|\/api\/bild\/[a-f0-9]{24}$|https:\/\/)/.test(s);
++
++/** Formulardaten prüfen und in Produktfelder übersetzen */
++function clean(d: Record<string, unknown>): Partial<Product> {
++  const colors: Color[] = (Array.isArray(d.colors) ? d.colors : []).slice(0, 80).map((c: Record<string, unknown>) => ({
++    ...(c as Color),
++    name: str(c?.name, 60),
++    hex: /^#[0-9a-f]{6}$/i.test(String(c?.hex)) ? String(c.hex) : undefined,
++    image: c?.image && img(String(c.image)) ? String(c.image) : undefined,
++  })).filter((c) => c.name);
++  const tiers = (Array.isArray(d.baseTiers) ? d.baseTiers : []).map((t: { min?: unknown; price?: unknown }) => ({ min: Math.floor(Number(t?.min)), price: num(t?.price) }))
++    .filter((t): t is { min: number; price: number } => t.min > 1 && t.price != null).sort((a, b) => a.min - b.min).slice(0, 10);
++  const specs: Record<string, string> = {};
++  for (const [k, v] of Object.entries((d.specs as Record<string, unknown>) ?? {}).slice(0, 30)) if (str(k, 60) && str(v, 300)) specs[str(k, 60)] = str(v, 300);
++  return {
++    hidden: !!d.hidden, top: !!d.top,
++    sku: str(d.sku, 40), name: str(d.name, 120), brand: str(d.brand, 60), category: str(d.category, 60) || 'Sonstiges',
++    basePrice: num(d.basePrice), baseTiers: tiers,
++    description: str(d.description, 20000), material: str(d.material, 200), composition: str(d.composition, 200), gender: str(d.gender, 40),
++    features: list(d.features, 20), tags: list(d.tags, 20), sizes: list(d.sizes, 30).map((s) => s.slice(0, 40)),
++    images: list(d.images, 30).filter(img), colors, specs, sizeChart: str(d.sizeChart, 400) || undefined,
++  };
++}
++const norm = (v: unknown) => (v && typeof v === 'object' && !Array.isArray(v) ? Object.fromEntries(Object.entries(v).filter(([, x]) => x !== '' && x != null)) : v);
++const same = (a: unknown, b: unknown) => JSON.stringify(norm(a) ?? null) === JSON.stringify(norm(b) ?? null) || ((a === '' || (Array.isArray(a) && !a.length) || a === false) && (b == null || b === '' || (Array.isArray(b) && !b.length) || b === false));
++
++export async function PUT(req: Request) {
++  if (!(await isAdmin())) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
++  const { id, data } = await req.json().catch(() => ({}));
++  const { p, original } = adminProduct(String(id));
++  if (!p) return NextResponse.json({ error: 'Artikel nicht gefunden.' }, { status: 404 });
++  const c = clean(data ?? {});
++  if (!c.name || !c.sku) return NextResponse.json({ error: 'Name und Artikelnummer sind Pflicht.' }, { status: 400 });
++  if (original) {
++    // Nur Abweichungen vom Katalog speichern – so kommen spätere Feed-Updates (z. B. neue Farben) weiter durch
++    const o: Override = {};
++    for (const [k, v] of Object.entries(c)) if (!same(v, (original as Record<string, unknown>)[k])) (o as Record<string, unknown>)[k] = v;
++    saveOverride(p.id, o);
++  } else saveOverride(p.id, { ...c, custom: true } as Override);
++  return NextResponse.json({ ok: true });
++}
++
++/** Neuen Artikel anlegen */
++export async function POST(req: Request) {
++  if (!(await isAdmin())) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
++  const d = await req.json().catch(() => ({}));
++  const name = str(d.name, 120), sku = str(d.sku, 40), category = str(d.category, 60) || 'Sonstiges';
++  if (!name || !sku) return NextResponse.json({ error: 'Name und Artikelnummer sind Pflicht.' }, { status: 400 });
++  const id = `a-${randomId(4)}`;
++  saveOverride(id, { custom: true, hidden: true, name, sku, category, brand: str(d.brand, 60), basePrice: null, images: [], colors: [], sizes: [], description: '' });
++  return NextResponse.json({ ok: true, id });
++}
++
++/** Eigene Änderungen verwerfen bzw. selbst angelegten Artikel löschen */
++export async function DELETE(req: Request) {
++  if (!(await isAdmin())) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
++  const id = new URL(req.url).searchParams.get('id') ?? '';
++  if (!readOverrides()[id]) return NextResponse.json({ error: 'Keine Änderungen vorhanden.' }, { status: 404 });
++  saveOverride(id, null);
++  return NextResponse.json({ ok: true });
++}
+diff --git a/app/api/admin/texte/route.ts b/app/api/admin/texte/route.ts
+index b70ec66..bd63015 100644
+--- a/app/api/admin/texte/route.ts
++++ b/app/api/admin/texte/route.ts
+@@ -1,12 +1,12 @@
+ import { NextResponse } from 'next/server';
+ import { isAdmin } from '@/lib/customer';
+ import { saveText } from '@/lib/content';
+-import { getProduct } from '@/lib/catalog';
++import { adminProduct } from '@/lib/catalog';
+ 
+ export async function PUT(req: Request) {
+   if (!(await isAdmin())) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
+   const { id, text } = await req.json().catch(() => ({}));
+-  if (!getProduct(String(id))) return NextResponse.json({ error: 'Artikel nicht gefunden.' }, { status: 404 });
++  if (!adminProduct(String(id)).p) return NextResponse.json({ error: 'Artikel nicht gefunden.' }, { status: 404 });
+   if (text === null) { saveText(id, null); return NextResponse.json({ ok: true }); }
+   const t = {
+     headline: String(text?.headline ?? '').trim().slice(0, 80),
+diff --git a/app/api/bild/[id]/route.ts b/app/api/bild/[id]/route.ts
+index 3c4cf24..12569d1 100644
+--- a/app/api/bild/[id]/route.ts
++++ b/app/api/bild/[id]/route.ts
+@@ -1,12 +1,13 @@
+ import fs from 'node:fs';
+ import path from 'node:path';
+ import { UPLOADS, listReferences, readJSON } from '@/lib/store';
++import { imageInUse } from '@/lib/catalog';
+ 
+ const TYPES: Record<string, string> = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp' };
+ 
+-/** Öffentliche Bilder – nur solche, die als Referenz freigegeben sind */
++/** Öffentliche Bilder – nur Referenzfotos und Artikelbilder */
+ export function GET(_: Request, { params }: { params: { id: string } }) {
+-  if (!/^[a-f0-9]{24}$/.test(params.id) || !listReferences().some((r) => r.imageId === params.id)) return new Response('Nicht gefunden', { status: 404 });
++  if (!/^[a-f0-9]{24}$/.test(params.id) || (!listReferences().some((r) => r.imageId === params.id) && !imageInUse(`/api/bild/${params.id}`))) return new Response('Nicht gefunden', { status: 404 });
+   const meta = readJSON<{ ext: string } | null>(path.join(UPLOADS, `${params.id}.json`), null);
+   const file = meta && path.join(UPLOADS, `${params.id}.${meta.ext}`);
+   if (!meta || !TYPES[meta.ext] || !fs.existsSync(file!)) return new Response('Nicht gefunden', { status: 404 });
+diff --git a/app/globals.css b/app/globals.css
+index db11c15..1008093 100644
+--- a/app/globals.css
++++ b/app/globals.css
+@@ -652,3 +652,27 @@ footer .wrap{padding-left:112px}
+ .l-collage{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
+ .l-collage img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:14px;background:#fff;box-shadow:var(--shadow)}
+ @media (max-width:820px){.l-collage{grid-template-columns:repeat(2,1fr)}}
++/* Admin: Artikel bearbeiten */
++.ae h3{margin:22px 0 8px;font-size:16px}
++.ae-top{display:flex;gap:22px;flex-wrap:wrap;align-items:center;padding-bottom:6px;border-bottom:1px solid var(--line)}
++.ae .switch{display:flex;gap:8px;align-items:center;font-weight:500;margin:0;cursor:pointer}
++.ae .switch input{width:18px;height:18px;margin:0}
++.ae-2{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px}
++.ae-imgs{display:flex;flex-wrap:wrap;gap:10px}
++.ae-img{position:relative;width:118px}
++.ae-img img{width:118px;height:118px;object-fit:cover;border-radius:10px;border:1px solid var(--line);background:#fff;display:block}
++.ae-img-act{display:flex;gap:4px;margin-top:4px}
++.ae-img-act button{flex:1;height:26px;border:1px solid var(--line);background:#fff;border-radius:6px;cursor:pointer}
++.ae-img-act button:disabled{opacity:.35;cursor:default}
++.ae-main{position:absolute;top:6px;left:6px;background:var(--brand,#0a5cf0);color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:5px}
++.ae-add{width:118px;height:118px;border:2px dashed var(--line);border-radius:10px;display:grid;place-items:center;text-align:center;font-size:13px;font-weight:600;color:var(--muted,#5d6675);cursor:pointer;margin:0}
++.ae-add:hover{border-color:var(--brand,#0a5cf0);color:var(--brand,#0a5cf0)}
++.ae-colors{display:grid;gap:8px;justify-items:start}
++.ae-color{display:grid;grid-template-columns:42px minmax(140px,1fr) 160px auto;gap:8px;align-items:center;width:100%}
++.ae-color input[type=color]{width:42px;height:38px;padding:2px;margin:0}
++.ae-color input,.ae-color select{margin:0}
++.ae-save{position:sticky;bottom:0;background:#fff;padding:12px 0 2px;border-top:1px solid var(--line);margin-top:18px;align-items:center}
++.ae-new{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px}
++.ae-new input{width:auto;flex:1 1 150px;margin:0}
++.ae-noimg{display:block;width:44px;height:44px;border-radius:6px;background:#eef0f3}
++@media (max-width:700px){.ae-2{grid-template-columns:1fr}.ae-color{grid-template-columns:42px 1fr;}.ae-color select{grid-column:1/-1}}
+diff --git a/components/AdminNav.tsx b/components/AdminNav.tsx
+index dfef9cb..4c90338 100644
+--- a/components/AdminNav.tsx
++++ b/components/AdminNav.tsx
+@@ -5,7 +5,7 @@ export default function AdminNav({ active }: { active: 'anfragen' | 'kunden' | '
+     <div className="admin-nav">
+       <Link href="/admin" className={active === 'anfragen' ? 'on' : ''}>Anfragen & Angebote</Link>
+       <Link href="/admin/kunden" className={active === 'kunden' ? 'on' : ''}>Kunden & Codes</Link>
+-      <Link href="/admin/artikel" className={active === 'artikel' ? 'on' : ''}>Artikeltexte</Link>
++      <Link href="/admin/artikel" className={active === 'artikel' ? 'on' : ''}>Artikel</Link>
+       <Link href="/admin/bewertungen" className={active === 'bewertungen' ? 'on' : ''}>Bewertungen</Link>
+       <Link href="/admin/referenzen" className={active === 'referenzen' ? 'on' : ''}>Referenzen</Link>
+       <Link href="/admin/newsletter" className={active === 'newsletter' ? 'on' : ''}>Newsletter</Link>
+diff --git a/lib/artikel.ts b/lib/artikel.ts
+new file mode 100644
+index 0000000..28f9786
+--- /dev/null
++++ b/lib/artikel.ts
+@@ -0,0 +1,16 @@
++import 'server-only';
++import fs from 'node:fs';
++import path from 'node:path';
++import type { Product } from './types';
++import { DATA, readJSON, writeJSON } from './store';
++
++/** Änderungen aus dem Admin – liegen getrennt vom Katalog, damit Feed-Updates und Deploys sie nicht überschreiben */
++export type Override = Partial<Omit<Product, 'id'>> & { hidden?: boolean; top?: boolean; custom?: boolean; updatedAt?: string };
++export const ARTIKEL = path.join(DATA, 'artikel.json');
++export const overridesMtime = () => (fs.existsSync(ARTIKEL) ? fs.statSync(ARTIKEL).mtimeMs : 0);
++export const readOverrides = () => readJSON<Record<string, Override>>(ARTIKEL, {});
++export function saveOverride(id: string, o: Override | null) {
++  const all = readOverrides();
++  if (o && Object.keys(o).length) all[id] = { ...o, updatedAt: new Date().toISOString() }; else delete all[id];
++  writeJSON(ARTIKEL, all);
++}
+diff --git a/lib/catalog.ts b/lib/catalog.ts
+index be4eb20..2abafac 100644
+--- a/lib/catalog.ts
++++ b/lib/catalog.ts
+@@ -7,20 +7,29 @@ import { buildIndex, buildSkuMap, runSearch, type SearchDoc } from './search';
+ import { gross, priceTiers, sellPrice } from './pricing';
+ import { sortColors } from './colors';
+ import { ratingFor } from './reviews';
++import { overridesMtime, readOverrides } from './artikel';
++import { slugify } from './format';
+ 
+ const LIVE = path.join(process.cwd(), 'data', 'products.json');
+ const SEED = path.join(process.cwd(), 'seed', 'products.json');
+ const file = () => (fs.existsSync(LIVE) ? LIVE : SEED);
+ 
+-type State = { mtime: number; products: Product[]; byId: Map<string, Product>; index: MiniSearch<SearchDoc>; skus: Map<string, string>; categories: Category[] };
++type State = { mtime: string; all: Product[]; base: Map<string, Product>; products: Product[]; byId: Map<string, Product>; index: MiniSearch<SearchDoc>; skus: Map<string, string>; categories: Category[] };
+ let state: State | null = null;
+ 
+ /** Lädt data/products.json neu, sobald der Sync die Datei aktualisiert hat – kein Neustart nötig */
+ function load(): State {
+   const FILE = file();
+-  const mtime = fs.statSync(FILE).mtimeMs;
++  const mtime = `${fs.statSync(FILE).mtimeMs}|${overridesMtime()}`;
+   if (state && state.mtime === mtime) return state;
+-  const products: Product[] = JSON.parse(fs.readFileSync(FILE, 'utf8'));
++  const raw: Product[] = JSON.parse(fs.readFileSync(FILE, 'utf8'));
++  const base = new Map(raw.map((p) => [p.id, p]));
++  const ov = readOverrides();
++  const merged: Product[] = raw.map((p) => (ov[p.id] ? { ...p, ...ov[p.id], id: p.id, custom: false } : p));
++  for (const [id, o] of Object.entries(ov)) if (o.custom && !base.has(id)) merged.push({ sku: id, name: 'Neuer Artikel', brand: '', category: 'Sonstiges', description: '', basePrice: null, images: [], colors: [], sizes: [], ...o, id } as Product);
++  for (const p of merged) { p.categorySlug = p.categorySlug && !ov[p.id]?.category ? p.categorySlug : slugify(p.category || 'sonstiges'); }
++  const all = merged.map((p, k) => [p, k] as const).sort((a, b) => Number(!!b[0].top) - Number(!!a[0].top) || a[1] - b[1]).map(([p]) => p);
++  const products = all.filter((p) => !p.hidden);
+   const catMap = new Map<string, Category>();
+   for (const p of products) {
+     const c = catMap.get(p.categorySlug) ?? { name: p.category, slug: p.categorySlug, count: 0 };
+@@ -29,6 +38,8 @@ function load(): State {
+   }
+   state = {
+     mtime,
++    all,
++    base,
+     products,
+     byId: new Map(products.map((p) => [p.id, p])),
+     index: buildIndex(products),
+@@ -42,7 +53,7 @@ function load(): State {
+ export type Ctx = { markup?: number | null; skus?: string[]; exclusive?: boolean; tiers?: string | null; /** Schaufenster: keine Preise */ locked?: boolean } | null | undefined;
+ 
+ export function toPublic(p: Product, ctx?: Ctx): PublicProduct {
+-  const { basePrice, baseTiers, ...rest } = p;
++  const { basePrice, baseTiers, hidden: _h, custom: _c, ...rest } = p;
+   const price = !ctx?.locked && basePrice != null && basePrice > 0 ? sellPrice(basePrice, p.categorySlug, ctx?.markup) : null;
+   // Echte Staffel-EK von L-Shop haben Vorrang – sonst Rabattstaffel auf den Verkaufspreis
+   const tiers = price == null ? []
+@@ -82,6 +93,10 @@ export function getCollection(ctx?: Ctx): PublicProduct[] {
+   const bySku = new Map(s.products.map((p) => [p.sku.toUpperCase(), p]));
+   return (ctx?.skus ?? []).flatMap((k) => { const p = bySku.get(k.toUpperCase()); return p ? [toPublic(p, ctx)] : []; });
+ }
++/** Admin: alle Artikel inkl. ausgeblendeter, mit EK */
++export const adminProducts = () => load().all;
++export const adminProduct = (id: string) => { const s = load(); return { p: s.all.find((x) => x.id === id) ?? null, original: s.base.get(id) ?? null }; };
++export const imageInUse = (src: string) => load().all.some((p) => p.images.includes(src) || p.colors.some((c) => c.image === src || c.images?.includes(src)));
+ /** Alle Artikel (Admin: Auswahl für Kollektionen) */
+ export const allProductsBrief = () => load().products.map((p) => ({ id: p.id, sku: p.sku, name: p.name, brand: p.brand }));
+ 
+@@ -92,7 +107,7 @@ export function search(q: string, limit = 48, ctx?: Ctx): PublicProduct[] {
+ }
+ 
+ /* ---------- „Meinten Sie …?“ bei 0 Treffern ---------- */
+-let vocab: { mtime: number; words: string[] } | null = null;
++let vocab: { mtime: string; words: string[] } | null = null;
+ const norm = (w: string) => w.toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss').replace(/[^a-z0-9]/g, '');
+ function lev(a: string, b: string) {
+   const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
+diff --git a/lib/pricing.ts b/lib/pricing.ts
+index 122b7b5..2793415 100644
+--- a/lib/pricing.ts
++++ b/lib/pricing.ts
+@@ -6,6 +6,8 @@ import { parseTiers, type PriceTier, type Tier } from './tiers';
+ let byCat: Record<string, number> = {};
+ try { byCat = JSON.parse(process.env.MARKUP_BY_CATEGORY || '{}'); } catch { byCat = {}; }
+ 
++/** Standard-Aufschlag je Kategorie (Admin-Anzeige) */
++export const markupFor = (categorySlug: string) => byCat[categorySlug] ?? markup;
+ /** override = kundenspezifischer Aufschlag (Zugangscode) – hat Vorrang vor Kategorie und Standard */
+ export function sellPrice(basePrice: number, categorySlug: string, override?: number | null): number {
+   const pct = override != null && Number.isFinite(override) ? override : byCat[categorySlug] ?? markup;
+diff --git a/lib/types.ts b/lib/types.ts
+index 5dfa24b..bb9e2c7 100644
+--- a/lib/types.ts
++++ b/lib/types.ts
+@@ -27,6 +27,12 @@ export type Product = {
+   /** Staffel-Einkaufspreise von L-Shop: ab Menge -> EK netto */
+   baseTiers?: { min: number; price: number }[];
+   tags?: string[];
++  /** Admin: im Shop ausgeblendet */
++  hidden?: boolean;
++  /** Admin: oben anzeigen */
++  top?: boolean;
++  /** Admin: selbst angelegter Artikel */
++  custom?: boolean;
+ };
+ 
+ /** Was der Browser sieht: Verkaufspreis statt Einkaufspreis */
+-- 
+2.43.0
+

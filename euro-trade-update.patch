@@ -1,0 +1,2477 @@
+From fdd324938348cf20f835c1bd83d1b5bfac182a7e Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Wed, 11 Nov 2026 00:25:13 +0100
+Subject: [PATCH] =?UTF-8?q?Veredelung,=20Gr=C3=B6=C3=9Fenmatrix,=20Kunden-?=
+ =?UTF-8?q?Codes=20mit=20Aufschlag/Kollektion,=20Admin=20mit=20Angeboten,?=
+ =?UTF-8?q?=20Zoom-Galerie?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+- Produktseite: Mengen je Größe und Farbe in einem Schritt, Veredelung (Druck/Stick,
+  Positionen, Logo-Upload, Hinweis) mit Logo-Vorschau auf dem Produktbild
+- Galerie wie bei Amazon: Thumbnails per Hover, Lupe mit Zoomfenster, Vollbild
+- Kunden & Codes im Admin: eigener Aufschlag, Kollektion (optional exklusiv), hinterlegtes Logo, sperren
+- Merkliste per Link teilen
+- Admin (/admin): Anfragen mit Status, Angebot bearbeiten, PDF, Versand per E-Mail,
+  Annahme-Link für Kunden (/angebot/...)
+- Signierte Zugangs-Cookies, Uploads mit sicheren Headern
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01AW9Go5bwJWAYsfGemt2b6Z
+---
+ .env.example                            |   9 +-
+ app/admin/anfrage/[no]/OfferEditor.tsx  | 107 +++++++++++++++++
+ app/admin/anfrage/[no]/page.tsx         |  63 ++++++++++
+ app/admin/kunden/CustomerEditor.tsx     | 117 ++++++++++++++++++
+ app/admin/kunden/page.tsx               |  19 +++
+ app/admin/login/AdminLoginForm.tsx      |  18 +++
+ app/admin/login/page.tsx                |  14 +++
+ app/admin/page.tsx                      |  45 +++++++
+ app/angebot/[token]/AcceptForm.tsx      |  28 +++++
+ app/angebot/[token]/page.tsx            |  49 ++++++++
+ app/api/admin/anfrage/[no]/pdf/route.ts |  10 ++
+ app/api/admin/anfrage/[no]/route.ts     |  75 ++++++++++++
+ app/api/admin/kunden/route.ts           |  25 ++++
+ app/api/admin/login/route.ts            |  24 ++++
+ app/api/anfrage/route.ts                |  77 ++++++------
+ app/api/angebot/[token]/pdf/route.ts    |   8 ++
+ app/api/angebot/[token]/route.ts        |  27 +++++
+ app/api/produkte/route.ts               |   6 +-
+ app/api/search/route.ts                 |   7 +-
+ app/api/upload/[id]/route.ts            |  23 ++++
+ app/api/upload/route.ts                 |  31 +++++
+ app/api/zugang/route.ts                 |  11 +-
+ app/globals.css                         |  99 +++++++++++++++
+ app/kategorie/[slug]/page.tsx           |  12 +-
+ app/layout.tsx                          |  21 ++--
+ app/merkliste/WishlistView.tsx          |  51 ++++++--
+ app/merkliste/page.tsx                  |   5 +-
+ app/page.tsx                            |  23 ++--
+ app/produkt/[id]/AddToCart.tsx          | 152 +++++++++++++++++++-----
+ app/produkt/[id]/page.tsx               |  14 ++-
+ app/suche/page.tsx                      |   5 +-
+ app/warenkorb/page.tsx                  |   8 +-
+ components/AdminLogout.tsx              |   4 +
+ components/AdminNav.tsx                 |  13 ++
+ components/CartContext.tsx              |  17 +--
+ components/Gallery.tsx                  |  83 +++++++++++++
+ components/ProductCard.tsx              |   2 +-
+ components/Wishlist.tsx                 |   5 +-
+ lib/access.ts                           |  49 ++++----
+ lib/catalog.ts                          |  49 ++++++--
+ lib/customer.ts                         |  18 +++
+ lib/deco.ts                             |  10 ++
+ lib/mail.ts                             |  15 +++
+ lib/pdf.ts                              | 124 +++++++++++++++++++
+ lib/pricing.ts                          |   5 +-
+ lib/store.ts                            | 108 +++++++++++++++++
+ middleware.ts                           |  32 +++--
+ package-lock.json                       |  43 +++++++
+ package.json                            |   1 +
+ 49 files changed, 1580 insertions(+), 181 deletions(-)
+ create mode 100644 app/admin/anfrage/[no]/OfferEditor.tsx
+ create mode 100644 app/admin/anfrage/[no]/page.tsx
+ create mode 100644 app/admin/kunden/CustomerEditor.tsx
+ create mode 100644 app/admin/kunden/page.tsx
+ create mode 100644 app/admin/login/AdminLoginForm.tsx
+ create mode 100644 app/admin/login/page.tsx
+ create mode 100644 app/admin/page.tsx
+ create mode 100644 app/angebot/[token]/AcceptForm.tsx
+ create mode 100644 app/angebot/[token]/page.tsx
+ create mode 100644 app/api/admin/anfrage/[no]/pdf/route.ts
+ create mode 100644 app/api/admin/anfrage/[no]/route.ts
+ create mode 100644 app/api/admin/kunden/route.ts
+ create mode 100644 app/api/admin/login/route.ts
+ create mode 100644 app/api/angebot/[token]/pdf/route.ts
+ create mode 100644 app/api/angebot/[token]/route.ts
+ create mode 100644 app/api/upload/[id]/route.ts
+ create mode 100644 app/api/upload/route.ts
+ create mode 100644 components/AdminLogout.tsx
+ create mode 100644 components/AdminNav.tsx
+ create mode 100644 components/Gallery.tsx
+ create mode 100644 lib/customer.ts
+ create mode 100644 lib/deco.ts
+ create mode 100644 lib/mail.ts
+ create mode 100644 lib/pdf.ts
+ create mode 100644 lib/store.ts
+
+diff --git a/.env.example b/.env.example
+index 3a70a8c..7f8ece1 100644
+--- a/.env.example
++++ b/.env.example
+@@ -9,8 +9,15 @@ MARKUP_PERCENT=35
+ PRICE_ROUND_99=true
+ MWST_PERCENT=19
+ 
++# ---- Admin (/admin: Anfragen, Angebote, Kunden & Codes) ----
++ADMIN_PASSWORD=
++# Absender im Angebots-PDF (Zeilen mit | trennen)
++# OFFER_SENDER=Euro-Trade · Sebastian Hosbach|Seehan 28 · 44263 Dortmund|Tel. 0173 2648097 · info@euro-trade.com
++
+ # ---- Zugang (geschlossener Shop) ----
+-# Leer = Shop offen für alle. Mehrere Codes mit Komma, Name nach Doppelpunkt optional:
++# true = Shop nur mit Code. Codes legen Sie bequem im Admin unter „Kunden & Codes“ an.
++SHOP_CLOSED=true
++# Optional zusätzlich Codes direkt hier (Komma-getrennt, Name nach Doppelpunkt):
+ # ACCESS_CODES=FIRMA24:Firma Muster GmbH,VEREIN-XY:SV Musterstadt
+ ACCESS_CODES=
+ # Langer Zufallswert (z. B. openssl rand -hex 32). Ändern = alle Freischaltungen ungültig
+diff --git a/app/admin/anfrage/[no]/OfferEditor.tsx b/app/admin/anfrage/[no]/OfferEditor.tsx
+new file mode 100644
+index 0000000..f8dac8b
+--- /dev/null
++++ b/app/admin/anfrage/[no]/OfferEditor.tsx
+@@ -0,0 +1,107 @@
++'use client';
++import { useState } from 'react';
++import { eur } from '@/lib/format';
++import type { Offer, OfferLine, Status } from '@/lib/store';
++
++function Money({ value, onChange, width = 110 }: { value: number; onChange: (n: number) => void; width?: number | string }) {
++  const fmt = (n: number) => String(n).replace('.', ',');
++  const [txt, setTxt] = useState(fmt(value));
++  const [focus, setFocus] = useState(false);
++  return <input inputMode="decimal" style={{ width }} value={focus ? txt : fmt(value)}
++    onFocus={() => { setTxt(fmt(value)); setFocus(true); }}
++    onChange={(e) => { setTxt(e.target.value); onChange(Math.round((Number(e.target.value.replace(',', '.')) || 0) * 100) / 100); }}
++    onBlur={() => setFocus(false)} />;
++}
++
++type Props = { no: string; initial: Offer; saved: boolean; status: Status; statuses: Record<Status, string>; mail: boolean; acceptUrl: string; sentAt: string | null };
++
++export default function OfferEditor({ no, initial, saved, status: st0, statuses, mail, acceptUrl, sentAt }: Props) {
++  const [o, setO] = useState<Offer>(initial);
++  const [status, setStatus] = useState<Status>(st0);
++  const [busy, setBusy] = useState('');
++  const [msg, setMsg] = useState<{ ok: boolean; t: string } | null>(null);
++  const [isSaved, setSaved] = useState(saved);
++  const [copied, setCopied] = useState(false);
++
++  const setLine = (k: number, patch: Partial<OfferLine>) => setO((x) => ({ ...x, lines: x.lines.map((l, n) => (n === k ? { ...l, ...patch } : l)) }));
++  const num = (v: string) => Number(String(v).replace(',', '.')) || 0;
++  const net = o.lines.reduce((s, l) => s + l.qty * l.price, 0) + (o.shipping || 0);
++  const vat = Math.round(net * o.vat) / 100;
++
++  async function call(action: 'save' | 'send' | 'status', extra: Record<string, unknown> = {}) {
++    setBusy(action); setMsg(null);
++    const r = await fetch(`/api/admin/anfrage/${no}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, offer: o, status, ...extra }) });
++    const d = await r.json().catch(() => ({}));
++    setBusy('');
++    if (!r.ok) { setMsg({ ok: false, t: d.error ?? 'Fehler' }); return false; }
++    if (d.status) setStatus(d.status);
++    if (action !== 'status') setSaved(true);
++    setMsg({ ok: true, t: d.message ?? 'Gespeichert.' });
++    return true;
++  }
++
++  return (
++    <>
++      <div className="box" style={{ overflowX: 'auto' }}>
++        <table className="atable offer">
++          <thead><tr><th style={{ width: '46%' }}>Position</th><th>Menge</th><th>Einzelpreis netto</th><th>Gesamt</th><th /></tr></thead>
++          <tbody>
++            {o.lines.map((l, k) => (
++              <tr key={`${k}-${o.lines.length}`}>
++                <td>
++                  <input value={l.text} onChange={(e) => setLine(k, { text: e.target.value })} />
++                  <input className="small" value={l.detail ?? ''} placeholder="Details (Farbe, Größe, Position …)" onChange={(e) => setLine(k, { detail: e.target.value })} />
++                </td>
++                <td><input type="number" min={0} value={l.qty} onChange={(e) => setLine(k, { qty: Math.max(0, Math.floor(num(e.target.value))) })} style={{ width: 80 }} /></td>
++                <td><Money value={l.price} onChange={(n) => setLine(k, { price: n })} /></td>
++                <td style={{ whiteSpace: 'nowrap' }}><strong>{eur(l.qty * l.price)}</strong></td>
++                <td><button type="button" className="x" onClick={() => setO((x) => ({ ...x, lines: x.lines.filter((_, n) => n !== k) }))} aria-label="Position entfernen">×</button></td>
++              </tr>
++            ))}
++          </tbody>
++        </table>
++        <div className="deco-row" style={{ marginTop: 10 }}>
++          <button type="button" className="btn alt" onClick={() => setO((x) => ({ ...x, lines: [...x.lines, { text: 'Veredelung: ', detail: '', qty: 1, price: 0 }] }))}>+ Position</button>
++          <button type="button" className="btn alt" onClick={() => setO((x) => ({ ...x, lines: [...x.lines, { text: 'Einrichtungskosten / Stickprogramm', detail: 'einmalig', qty: 1, price: 0 }] }))}>+ Einrichtungskosten</button>
++        </div>
++        <div className="offer-foot">
++          <div className="form" style={{ flex: 1, minWidth: 260 }}>
++            <label>Hinweis im Angebot</label>
++            <textarea value={o.note} onChange={(e) => setO({ ...o, note: e.target.value })} placeholder="z. B. Lieferung bis KW 50 möglich, Druckfreigabe per Mail …" />
++            <div className="two">
++              <div><label>Versand netto</label><Money value={o.shipping} width="100%" onChange={(n) => setO((x) => ({ ...x, shipping: n }))} /></div>
++              <div><label>Gültig (Tage)</label><input type="number" min={1} value={o.validDays} onChange={(e) => setO({ ...o, validDays: Math.max(1, Math.floor(num(e.target.value))) })} /></div>
++            </div>
++          </div>
++          <div className="offer-sum">
++            {o.shipping > 0 && <div className="tot"><span>Versand</span><span>{eur(o.shipping)}</span></div>}
++            <div className="tot"><span>Summe netto</span><span>{eur(net)}</span></div>
++            <div className="tot"><span>MwSt. {o.vat} %</span><span>{eur(vat)}</span></div>
++            <div className="tot big"><span>Gesamt</span><span>{eur(net + vat)}</span></div>
++          </div>
++        </div>
++      </div>
++
++      <div className="admin-actions">
++        <button className="btn alt" disabled={!!busy} onClick={() => call('save')}>{busy === 'save' ? 'Speichert …' : 'Angebot speichern'}</button>
++        <a className={`btn alt ${!isSaved ? 'disabled' : ''}`} href={isSaved ? `/api/admin/anfrage/${no}/pdf` : undefined} target="_blank" rel="noreferrer" style={{ display: 'inline-grid', placeItems: 'center' }} onClick={(e) => { if (!isSaved) e.preventDefault(); }}>PDF ansehen</a>
++        <button className="btn" disabled={!!busy || !o.lines.length} onClick={() => { if (confirm(mail ? 'Angebot jetzt per E-Mail an den Kunden senden?' : 'SMTP ist nicht eingerichtet. Angebot trotzdem als „gesendet“ markieren? Sie können den Link unten selbst verschicken.')) call('send'); }}>
++          {busy === 'send' ? 'Sendet …' : sentAt ? 'Angebot erneut senden' : 'Angebot an Kunden senden'}
++        </button>
++        <span style={{ flex: 1 }} />
++        <label className="muted" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>Status
++          <select value={status} onChange={(e) => { const s = e.target.value as Status; setStatus(s); call('status', { status: s }); }}>
++            {(Object.keys(statuses) as Status[]).map((s) => <option key={s} value={s}>{statuses[s]}</option>)}
++          </select>
++        </label>
++      </div>
++      {msg && <div className={`note ${msg.ok ? 'ok' : 'err'}`}>{msg.ok ? '✓ ' : ''}{msg.t}</div>}
++      {acceptUrl && isSaved && (
++        <p className="muted" style={{ fontSize: 13 }}>
++          Annahme-Link für den Kunden: <a className="alink" href={acceptUrl} target="_blank" rel="noreferrer">{acceptUrl}</a>{' '}
++          <button type="button" className="linkbtn" onClick={() => { navigator.clipboard.writeText(acceptUrl); setCopied(true); setTimeout(() => setCopied(false), 2000); }}>{copied ? '✓ kopiert' : 'kopieren'}</button>
++        </p>
++      )}
++    </>
++  );
++}
+diff --git a/app/admin/anfrage/[no]/page.tsx b/app/admin/anfrage/[no]/page.tsx
+new file mode 100644
+index 0000000..bf1f922
+--- /dev/null
++++ b/app/admin/anfrage/[no]/page.tsx
+@@ -0,0 +1,63 @@
++import Link from 'next/link';
++import { notFound } from 'next/navigation';
++import type { Metadata } from 'next';
++import AdminNav from '@/components/AdminNav';
++import OfferEditor from './OfferEditor';
++import { eur } from '@/lib/format';
++import { decoLabel } from '@/lib/deco';
++import { mailEnabled, shopUrl } from '@/lib/mail';
++import { STATUS, draftOffer, getInquiry } from '@/lib/store';
++
++export const metadata: Metadata = { title: 'Anfrage', robots: { index: false, follow: false } };
++const fmt = (d: string) => new Date(d).toLocaleString('de-DE', { dateStyle: 'medium', timeStyle: 'short' });
++
++export default function InquiryPage({ params }: { params: { no: string } }) {
++  const i = getInquiry(params.no);
++  if (!i) notFound();
++  const c = i.customer;
++  const logos = [...new Map(i.lines.filter((l) => l.deco?.logoId).map((l) => [l.deco!.logoId!, l.deco!.logoName ?? 'Logo'])).entries()];
++  return (
++    <>
++      <AdminNav active="anfragen" />
++      <div className="crumbs"><Link href="/admin">Anfragen</Link> › {i.no}</div>
++      <div className="list-head">
++        <h1 style={{ marginBottom: 0 }}>Anfrage {i.no}</h1>
++        <span className={`st st-${i.status}`}>{STATUS[i.status!]}</span>
++      </div>
++      <div className="admin-grid">
++        <div className="box">
++          <strong>Kunde</strong>
++          <p style={{ margin: '6px 0 0' }}>{c.company && <><b>{c.company}</b><br /></>}{c.name}<br /><a href={`mailto:${c.email}`} className="alink">{c.email}</a>{c.phone && <> · {c.phone}</>}{c.city && <><br />{c.city}</>}</p>
++          {i.zugangscode && <p className="muted" style={{ margin: '8px 0 0' }}>Zugangscode: {i.zugangscode}</p>}
++          {c.message && <p style={{ whiteSpace: 'pre-wrap', margin: '10px 0 0', background: '#f6f7f9', padding: 10, borderRadius: 8 }}>{c.message}</p>}
++          <p className="muted" style={{ fontSize: 13, margin: '10px 0 0' }}>Eingegangen: {fmt(i.date)}</p>
++        </div>
++        <div className="box">
++          <strong>Verlauf</strong>
++          <ul className="hist">{(i.history ?? []).slice().reverse().map((h, k) => <li key={k}><span className="muted">{fmt(h.date)}</span> {h.text}</li>)}</ul>
++          {logos.length > 0 && <>
++            <strong>Logos</strong>
++            <div className="logo-list">{logos.map(([id, n]) => <a key={id} href={`/api/upload/${id}?download`} className="logo-file"><img src={`/api/upload/${id}`} alt="" onError={undefined} /><span>{n}</span></a>)}</div>
++          </>}
++        </div>
++      </div>
++
++      <h2>Angefragte Positionen</h2>
++      <div className="box" style={{ padding: 0, overflowX: 'auto' }}>
++        <table className="atable">
++          <thead><tr><th>Art.-Nr.</th><th>Artikel</th><th>Farbe</th><th>Größe</th><th>Menge</th><th>Shoppreis</th><th>Summe</th></tr></thead>
++          <tbody>{i.lines.map((l, k) => (
++            <tr key={k}>
++              <td>{l.sku}</td>
++              <td>{l.id ? <Link href={`/produkt/${l.id}`} className="alink" target="_blank">{l.name}</Link> : l.name}{l.deco && <div className="deco-tag">✦ {decoLabel(l.deco)}{l.deco.note && <> – <i>{l.deco.note}</i></>}</div>}</td>
++              <td>{l.color}</td><td>{l.size}</td><td>{l.qty}</td><td>{eur(l.price)}</td><td>{l.price == null ? '–' : eur(l.sum)}</td>
++            </tr>))}
++          </tbody>
++        </table>
++      </div>
++
++      <h2>Angebot</h2>
++      <OfferEditor no={i.no} initial={i.offer ?? draftOffer(i)} saved={!!i.offer} status={i.status!} statuses={STATUS} mail={mailEnabled()} acceptUrl={i.token ? `${shopUrl()}/angebot/${i.token}` : ''} sentAt={i.offer?.sentAt ?? null} />
++    </>
++  );
++}
+diff --git a/app/admin/kunden/CustomerEditor.tsx b/app/admin/kunden/CustomerEditor.tsx
+new file mode 100644
+index 0000000..0922054
+--- /dev/null
++++ b/app/admin/kunden/CustomerEditor.tsx
+@@ -0,0 +1,117 @@
++'use client';
++import { useState } from 'react';
++import type { Customer } from '@/lib/store';
++
++type P = { sku: string; name: string; brand: string };
++const gen = () => Array.from(crypto.getRandomValues(new Uint8Array(6)), (b) => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[b % 32]).join('');
++
++export default function CustomerEditor({ initial, envCodes, products, defaultMarkup }: { initial: Customer[]; envCodes: { code: string; name: string }[]; products: P[]; defaultMarkup: number }) {
++  const [list, setList] = useState<Customer[]>(initial);
++  const [open, setOpen] = useState<number | null>(null);
++  const [dirty, setDirty] = useState(false);
++  const [msg, setMsg] = useState<{ ok: boolean; t: string } | null>(null);
++  const [busy, setBusy] = useState(false);
++  const [pick, setPick] = useState('');
++
++  const upd = (k: number, patch: Partial<Customer>) => { setList((l) => l.map((c, n) => (n === k ? { ...c, ...patch } : c))); setDirty(true); };
++  const add = () => { setList((l) => [{ code: gen(), name: '', markup: null, skus: [], exclusive: false, active: true }, ...l]); setOpen(0); setDirty(true); };
++  const del = (k: number) => { if (confirm('Kunde und Code wirklich löschen? Der Code funktioniert danach nicht mehr.')) { setList((l) => l.filter((_, n) => n !== k)); setOpen(null); setDirty(true); } };
++
++  async function save() {
++    setBusy(true); setMsg(null);
++    const r = await fetch('/api/admin/kunden', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ customers: list }) });
++    const d = await r.json().catch(() => ({}));
++    setBusy(false);
++    if (r.ok) { setDirty(false); setMsg({ ok: true, t: 'Gespeichert – Änderungen gelten sofort.' }); } else setMsg({ ok: false, t: d.error ?? 'Fehler' });
++  }
++  async function uploadLogo(k: number, f?: File | null) {
++    if (!f) return;
++    const fd = new FormData(); fd.append('file', f);
++    const r = await fetch('/api/upload', { method: 'POST', body: fd });
++    const d = await r.json().catch(() => ({}));
++    if (r.ok) upd(k, { logoId: d.id, logoName: d.name }); else alert(d.error ?? 'Upload fehlgeschlagen');
++  }
++  const pname = (sku: string) => products.find((p) => p.sku.toUpperCase() === sku)?.name ?? '(nicht im Katalog)';
++
++  return (
++    <>
++      <div className="admin-actions" style={{ marginTop: 0 }}>
++        <button className="btn" onClick={add}>+ Neuer Kunde / Code</button>
++        <button className="btn alt" disabled={!dirty || busy} onClick={save}>{busy ? 'Speichert …' : dirty ? 'Änderungen speichern' : 'Gespeichert'}</button>
++        {msg && <span className={msg.ok ? 'ok' : 'err'}>{msg.t}</span>}
++      </div>
++
++      {!list.length && <div className="box muted">Noch keine Kunden angelegt. Mit „Neuer Kunde / Code“ legen Sie den ersten an.</div>}
++      <div className="cust-list">
++        {list.map((c, k) => (
++          <div key={k} className={`box cust ${c.active === false ? 'off' : ''}`}>
++            <div className="cust-head" onClick={() => setOpen(open === k ? null : k)}>
++              <code className="code">{c.code || '—'}</code>
++              <strong>{c.name || <span className="muted">Neuer Kunde</span>}</strong>
++              <span className="muted">{c.markup != null ? `${c.markup} % Aufschlag` : `Standard (${defaultMarkup} %)`}</span>
++              {!!c.skus?.length && <span className="muted">· {c.skus.length} Artikel{c.exclusive ? ' (exklusiv)' : ''}</span>}
++              {c.logoId && <span className="muted">· Logo</span>}
++              {c.active === false && <span className="st st-abgelehnt">gesperrt</span>}
++              <span style={{ marginLeft: 'auto' }} className="muted">{open === k ? '▲' : '▼'}</span>
++            </div>
++            {open === k && (
++              <div className="form cust-body">
++                <div className="two">
++                  <div><label>Kunde / Verein *</label><input value={c.name} onChange={(e) => upd(k, { name: e.target.value })} placeholder="z. B. SV Musterstadt" /></div>
++                  <div><label>Zugangscode *</label>
++                    <div style={{ display: 'flex', gap: 6 }}><input value={c.code} onChange={(e) => upd(k, { code: e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, '') })} style={{ fontFamily: 'ui-monospace,monospace', letterSpacing: 1 }} /><button type="button" className="btn alt" style={{ height: 42 }} onClick={() => upd(k, { code: gen() })}>neu</button></div>
++                  </div>
++                </div>
++                <div className="two">
++                  <div><label>Aufschlag in % (leer = Standard {defaultMarkup} %)</label><input inputMode="decimal" value={c.markup ?? ''} onChange={(e) => upd(k, { markup: e.target.value === '' ? null : Number(e.target.value.replace(',', '.')) })} /></div>
++                  <div><label>Status</label>
++                    <label style={{ display: 'flex', gap: 8, fontWeight: 400, margin: '10px 0 0' }}><input type="checkbox" style={{ width: 'auto' }} checked={c.active !== false} onChange={(e) => upd(k, { active: e.target.checked })} /> Code aktiv</label>
++                  </div>
++                </div>
++
++                <label>Kollektion (Artikel, die der Kunde zuerst sieht)</label>
++                <div className="chips" style={{ marginTop: 4 }}>
++                  {(c.skus ?? []).map((s) => <span key={s} className="chip">{s} – {pname(s)} <button type="button" className="x" style={{ fontSize: 15 }} onClick={() => upd(k, { skus: c.skus!.filter((x) => x !== s) })}>×</button></span>)}
++                </div>
++                <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
++                  <input list="all-products" value={pick} onChange={(e) => setPick(e.target.value)} placeholder="Artikelnummer oder Name eingeben …" />
++                  <button type="button" className="btn alt" style={{ height: 42 }} onClick={() => {
++                    const q = pick.trim().toUpperCase().split(' ')[0];
++                    const p = products.find((x) => x.sku.toUpperCase() === q) ?? products.find((x) => `${x.sku} ${x.name}`.toUpperCase().includes(pick.trim().toUpperCase()));
++                    if (p && !(c.skus ?? []).includes(p.sku.toUpperCase())) upd(k, { skus: [...(c.skus ?? []), p.sku.toUpperCase()] });
++                    setPick('');
++                  }}>hinzufügen</button>
++                </div>
++                <label style={{ display: 'flex', gap: 8, fontWeight: 400 }}><input type="checkbox" style={{ width: 'auto' }} checked={!!c.exclusive} onChange={(e) => upd(k, { exclusive: e.target.checked })} /> Nur diese Kollektion anzeigen (restlicher Katalog ausgeblendet)</label>
++
++                <label>Hinterlegtes Logo</label>
++                {c.logoId ? (
++                  <div className="logo-file">
++                    {/\.(png|jpe?g|webp|svg)$/i.test(c.logoName ?? '') ? <img src={`/api/upload/${c.logoId}`} alt="" /> : <span className="file-ico">{c.logoName?.split('.').pop()?.toUpperCase()}</span>}
++                    <span>{c.logoName}</span>
++                    <button type="button" className="linkbtn" onClick={() => upd(k, { logoId: null, logoName: null })}>entfernen</button>
++                  </div>
++                ) : <label className="btn alt upl" style={{ width: 'fit-content' }}>Logo hochladen<input type="file" hidden accept=".png,.jpg,.jpeg,.webp,.svg,.pdf,.ai,.eps" onChange={(e) => uploadLogo(k, e.target.files?.[0])} /></label>}
++
++                <label>Interne Notiz</label>
++                <textarea value={c.note ?? ''} onChange={(e) => upd(k, { note: e.target.value })} placeholder="nur für Sie sichtbar" />
++                <div className="admin-actions">
++                  <button type="button" className="btn alt" onClick={() => navigator.clipboard.writeText(`Ihr Zugang zu unserem Shop: ${window.location.origin} – Code: ${c.code}`)}>Einladungstext kopieren</button>
++                  <span style={{ flex: 1 }} />
++                  <button type="button" className="linkbtn err" onClick={() => del(k)}>Kunde löschen</button>
++                </div>
++              </div>
++            )}
++          </div>
++        ))}
++      </div>
++      <datalist id="all-products">{products.map((p) => <option key={p.sku} value={`${p.sku} ${p.name}`}>{p.brand}</option>)}</datalist>
++
++      {envCodes.length > 0 && <>
++        <h2>Codes aus der .env-Datei</h2>
++        <p className="muted" style={{ marginTop: -6 }}>Diese Codes stehen in <code>ACCESS_CODES</code> auf dem Server und gelten mit Standard-Einstellungen. Legen Sie einen Kunden mit demselben Code hier an, um Aufschlag, Kollektion und Logo festzulegen.</p>
++        <div className="chips">{envCodes.map((c) => <span key={c.code} className="chip"><code>{c.code}</code> {c.name !== c.code ? `– ${c.name}` : ''}</span>)}</div>
++      </>}
++    </>
++  );
++}
+diff --git a/app/admin/kunden/page.tsx b/app/admin/kunden/page.tsx
+new file mode 100644
+index 0000000..30178d7
+--- /dev/null
++++ b/app/admin/kunden/page.tsx
+@@ -0,0 +1,19 @@
++import type { Metadata } from 'next';
++import AdminNav from '@/components/AdminNav';
++import CustomerEditor from './CustomerEditor';
++import { allProductsBrief } from '@/lib/catalog';
++import { allCustomers } from '@/lib/store';
++
++export const metadata: Metadata = { title: 'Kunden & Codes', robots: { index: false, follow: false } };
++
++export default function Kunden() {
++  const list = allCustomers();
++  return (
++    <>
++      <AdminNav active="kunden" />
++      <h1>Kunden & Zugangscodes</h1>
++      <p className="muted" style={{ marginTop: -8 }}>Jeder Code öffnet den Shop. Pro Kunde: eigener Aufschlag, eigene Kollektion und hinterlegtes Logo. Standard-Aufschlag: {process.env.MARKUP_PERCENT ?? 35} %.</p>
++      <CustomerEditor initial={list.filter((c) => c.source === 'admin')} envCodes={list.filter((c) => c.source === 'env').map((c) => ({ code: c.code, name: c.name }))} products={allProductsBrief()} defaultMarkup={Number(process.env.MARKUP_PERCENT ?? 35)} />
++    </>
++  );
++}
+diff --git a/app/admin/login/AdminLoginForm.tsx b/app/admin/login/AdminLoginForm.tsx
+new file mode 100644
+index 0000000..f01fae7
+--- /dev/null
++++ b/app/admin/login/AdminLoginForm.tsx
+@@ -0,0 +1,18 @@
++'use client';
++import { useState } from 'react';
++export default function AdminLoginForm({ next }: { next: string }) {
++  const [pw, setPw] = useState(''); const [err, setErr] = useState(''); const [busy, setBusy] = useState(false);
++  async function submit(e: React.FormEvent) {
++    e.preventDefault(); setBusy(true); setErr('');
++    const r = await fetch('/api/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pw }) });
++    const d = await r.json().catch(() => ({}));
++    if (r.ok) window.location.href = next; else { setErr(d.error ?? 'Anmeldung fehlgeschlagen.'); setBusy(false); }
++  }
++  return (
++    <form className="gate-form" onSubmit={submit}>
++      <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} placeholder="Passwort" autoFocus aria-label="Passwort" style={{ letterSpacing: 1, fontWeight: 400 }} />
++      <button className="btn" disabled={busy || !pw}>{busy ? 'Prüfe …' : 'Anmelden'}</button>
++      {err && <p className="err" style={{ margin: 0 }}>{err}</p>}
++    </form>
++  );
++}
+diff --git a/app/admin/login/page.tsx b/app/admin/login/page.tsx
+new file mode 100644
+index 0000000..6d33f22
+--- /dev/null
++++ b/app/admin/login/page.tsx
+@@ -0,0 +1,14 @@
++import type { Metadata } from 'next';
++import AdminLoginForm from './AdminLoginForm';
++
++export const metadata: Metadata = { title: 'Admin', robots: { index: false, follow: false } };
++export default function AdminLogin({ searchParams }: { searchParams: { weiter?: string } }) {
++  const next = searchParams.weiter?.startsWith('/admin') ? searchParams.weiter : '/admin';
++  return (
++    <div className="gate"><div className="gate-box">
++      <h1>Admin-Bereich</h1>
++      <p className="muted">Anfragen, Angebote und Kundencodes verwalten.</p>
++      <AdminLoginForm next={next} />
++    </div></div>
++  );
++}
+diff --git a/app/admin/page.tsx b/app/admin/page.tsx
+new file mode 100644
+index 0000000..8d1e708
+--- /dev/null
++++ b/app/admin/page.tsx
+@@ -0,0 +1,45 @@
++import Link from 'next/link';
++import type { Metadata } from 'next';
++import AdminNav from '@/components/AdminNav';
++import { eur } from '@/lib/format';
++import { STATUS, listInquiries, offerTotals, type Status } from '@/lib/store';
++
++export const metadata: Metadata = { title: 'Anfragen', robots: { index: false, follow: false } };
++const fmt = (d: string) => new Date(d).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
++
++export default function AdminHome({ searchParams }: { searchParams: { status?: string } }) {
++  const all = listInquiries();
++  const filter = searchParams.status as Status | undefined;
++  const items = filter && STATUS[filter] ? all.filter((i) => i.status === filter) : all;
++  const count = (s: Status) => all.filter((i) => i.status === s).length;
++  return (
++    <>
++      <AdminNav active="anfragen" />
++      <h1>Anfragen & Angebote</h1>
++      <div className="chips" style={{ margin: '0 0 16px' }}>
++        <Link className={`chip ${!filter ? 'chip-on' : ''}`} href="/admin">Alle ({all.length})</Link>
++        {(Object.keys(STATUS) as Status[]).map((s) => <Link key={s} className={`chip ${filter === s ? 'chip-on' : ''}`} href={`/admin?status=${s}`}>{STATUS[s]} ({count(s)})</Link>)}
++      </div>
++      {!items.length ? <div className="box muted">Noch keine Anfragen{filter ? ' mit diesem Status' : ''}.</div> : (
++        <div className="box" style={{ padding: 0, overflowX: 'auto' }}>
++          <table className="atable">
++            <thead><tr><th>Nr.</th><th>Datum</th><th>Kunde</th><th>Code</th><th>Stück</th><th>Betrag</th><th>Status</th></tr></thead>
++            <tbody>
++              {items.map((i) => (
++                <tr key={i.no}>
++                  <td><Link href={`/admin/anfrage/${i.no}`} className="alink">{i.no}</Link></td>
++                  <td>{fmt(i.date)}</td>
++                  <td><strong>{i.customer.company || i.customer.name}</strong>{i.customer.company && <div className="muted" style={{ fontSize: 12 }}>{i.customer.name}</div>}</td>
++                  <td className="muted">{i.zugangscode ?? '–'}</td>
++                  <td>{i.lines.reduce((s, l) => s + l.qty, 0)}{i.lines.some((l) => l.deco) && <span title="mit Veredelung"> ✦</span>}</td>
++                  <td>{i.offer ? <>{eur(offerTotals(i.offer).net)} <span className="muted" style={{ fontSize: 12 }}>Angebot</span></> : eur(i.total)}</td>
++                  <td><span className={`st st-${i.status}`}>{STATUS[i.status!]}</span></td>
++                </tr>
++              ))}
++            </tbody>
++          </table>
++        </div>
++      )}
++    </>
++  );
++}
+diff --git a/app/angebot/[token]/AcceptForm.tsx b/app/angebot/[token]/AcceptForm.tsx
+new file mode 100644
+index 0000000..5eba64f
+--- /dev/null
++++ b/app/angebot/[token]/AcceptForm.tsx
+@@ -0,0 +1,28 @@
++'use client';
++import { useState } from 'react';
++export default function AcceptForm({ token, defaultName, total }: { token: string; defaultName: string; total: string }) {
++  const [name, setName] = useState(defaultName); const [comment, setComment] = useState('');
++  const [agree, setAgree] = useState(false); const [state, setState] = useState<'idle' | 'busy' | 'done'>('idle'); const [err, setErr] = useState('');
++  async function submit(e: React.FormEvent) {
++    e.preventDefault(); setState('busy'); setErr('');
++    const r = await fetch(`/api/angebot/${token}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, comment }) });
++    const d = await r.json().catch(() => ({}));
++    if (r.ok) setState('done'); else { setErr(d.error ?? 'Fehler'); setState('idle'); }
++  }
++  if (state === 'done') return <p className="ok" style={{ margin: 0, fontWeight: 600 }}>✓ Vielen Dank! Ihre Annahme ist bei uns eingegangen – Sie erhalten gleich eine Bestätigung per E-Mail.</p>;
++  return (
++    <form className="form" onSubmit={submit}>
++      <strong style={{ fontSize: 17 }}>Angebot annehmen</strong>
++      <div className="two">
++        <div><label>Ihr Name *</label><input value={name} onChange={(e) => setName(e.target.value)} required /></div>
++        <div><label>Anmerkung</label><input value={comment} onChange={(e) => setComment(e.target.value)} placeholder="z. B. Wunschliefertermin" /></div>
++      </div>
++      <label style={{ display: 'flex', gap: 8, fontWeight: 400, marginTop: 14 }}>
++        <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} style={{ width: 'auto' }} />
++        <span>Ich nehme das Angebot über {total} verbindlich an.</span>
++      </label>
++      <button className="btn" disabled={!agree || !name.trim() || state === 'busy'}>{state === 'busy' ? 'Wird gesendet …' : 'Verbindlich annehmen'}</button>
++      {err && <p className="err">{err}</p>}
++    </form>
++  );
++}
+diff --git a/app/angebot/[token]/page.tsx b/app/angebot/[token]/page.tsx
+new file mode 100644
+index 0000000..0ffd534
+--- /dev/null
++++ b/app/angebot/[token]/page.tsx
+@@ -0,0 +1,49 @@
++import { notFound } from 'next/navigation';
++import type { Metadata } from 'next';
++import AcceptForm from './AcceptForm';
++import { eur } from '@/lib/format';
++import { inquiryByToken, offerTotals } from '@/lib/store';
++
++export const metadata: Metadata = { title: 'Ihr Angebot', robots: { index: false, follow: false } };
++const d = (x: Date) => x.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
++
++export default function OfferPage({ params }: { params: { token: string } }) {
++  const i = inquiryByToken(params.token);
++  if (!i?.offer?.sentAt) notFound();
++  const o = i.offer;
++  const t = offerTotals(o);
++  const valid = new Date(new Date(o.createdAt).getTime() + o.validDays * 86400000);
++  const expired = Date.now() > valid.getTime() + 86400000;
++  const accepted = ['angenommen', 'bestellt', 'geliefert'].includes(i.status ?? '');
++  return (
++    <div style={{ maxWidth: 860, margin: '0 auto' }}>
++      <div className="list-head">
++        <div>
++          <h1 style={{ marginBottom: 4 }}>Ihr Angebot {i.no}</h1>
++          <p className="muted" style={{ margin: 0 }}>für {i.customer.company || i.customer.name} · gültig bis {d(valid)}</p>
++        </div>
++        <a className="btn alt" href={`/api/angebot/${params.token}/pdf`} target="_blank" rel="noreferrer" style={{ display: 'inline-grid', placeItems: 'center' }}>PDF herunterladen</a>
++      </div>
++      <div className="box" style={{ overflowX: 'auto' }}>
++        <table className="atable">
++          <thead><tr><th>Pos.</th><th>Artikel / Leistung</th><th>Menge</th><th>Einzelpreis</th><th>Gesamt</th></tr></thead>
++          <tbody>{o.lines.map((l, k) => (
++            <tr key={k}><td>{k + 1}</td><td><strong>{l.text}</strong>{l.detail && <div className="muted" style={{ fontSize: 13 }}>{l.detail}</div>}</td><td>{l.qty}</td><td>{eur(l.price)}</td><td>{eur(l.qty * l.price)}</td></tr>
++          ))}</tbody>
++        </table>
++        <div className="offer-sum" style={{ marginLeft: 'auto', marginTop: 12 }}>
++          {o.shipping > 0 && <div className="tot"><span>Versand</span><span>{eur(o.shipping)}</span></div>}
++          <div className="tot"><span>Summe netto</span><span>{eur(t.net)}</span></div>
++          <div className="tot"><span>MwSt. {o.vat} %</span><span>{eur(t.vat)}</span></div>
++          <div className="tot big"><span>Gesamt</span><span>{eur(t.gross)}</span></div>
++        </div>
++        {o.note && <p style={{ whiteSpace: 'pre-wrap', marginTop: 16 }}>{o.note}</p>}
++      </div>
++      <div className="box" style={{ marginTop: 16 }}>
++        {accepted ? <p className="ok" style={{ margin: 0, fontWeight: 600 }}>✓ Sie haben dieses Angebot angenommen. Vielen Dank – wir melden uns mit der Druckfreigabe bzw. dem Liefertermin.</p>
++          : expired ? <p className="err" style={{ margin: 0 }}>Dieses Angebot ist abgelaufen. Antworten Sie gern auf unsere E-Mail – wir erstellen Ihnen ein neues.</p>
++          : <AcceptForm token={params.token} defaultName={i.customer.name} total={eur(t.gross)} />}
++      </div>
++    </div>
++  );
++}
+diff --git a/app/api/admin/anfrage/[no]/pdf/route.ts b/app/api/admin/anfrage/[no]/pdf/route.ts
+new file mode 100644
+index 0000000..16c9b6f
+--- /dev/null
++++ b/app/api/admin/anfrage/[no]/pdf/route.ts
+@@ -0,0 +1,10 @@
++import { isAdmin } from '@/lib/customer';
++import { offerPdf } from '@/lib/pdf';
++import { getInquiry } from '@/lib/store';
++
++export async function GET(_: Request, { params }: { params: { no: string } }) {
++  if (!(await isAdmin())) return new Response('Nicht angemeldet', { status: 401 });
++  const i = getInquiry(params.no);
++  if (!i?.offer) return new Response('Noch kein Angebot gespeichert', { status: 404 });
++  return new Response(await offerPdf(i), { headers: { 'Content-Type': 'application/pdf', 'Content-Disposition': `inline; filename="Angebot-${i.no}.pdf"` } });
++}
+diff --git a/app/api/admin/anfrage/[no]/route.ts b/app/api/admin/anfrage/[no]/route.ts
+new file mode 100644
+index 0000000..ae23eff
+--- /dev/null
++++ b/app/api/admin/anfrage/[no]/route.ts
+@@ -0,0 +1,75 @@
++import { NextResponse } from 'next/server';
++import { isAdmin } from '@/lib/customer';
++import { esc, sendMail, shopUrl } from '@/lib/mail';
++import { offerPdf } from '@/lib/pdf';
++import { STATUS, addHistory, getInquiry, offerTotals, randomId, saveInquiry, type Offer, type Status } from '@/lib/store';
++
++const eur = (n: number) => n.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
++
++function cleanOffer(o: any, prev?: Offer | null): Offer {
++  const n = (v: unknown) => (Number.isFinite(Number(v)) ? Number(v) : 0);
++  return {
++    lines: (Array.isArray(o?.lines) ? o.lines : []).slice(0, 300).map((l: any) => ({
++      text: String(l.text ?? '').slice(0, 300), detail: String(l.detail ?? '').slice(0, 300),
++      qty: Math.max(0, Math.floor(n(l.qty))), price: Math.round(n(l.price) * 100) / 100,
++    })).filter((l: any) => l.text.trim()),
++    shipping: Math.max(0, Math.round(n(o?.shipping) * 100) / 100),
++    note: String(o?.note ?? '').slice(0, 3000),
++    validDays: Math.max(1, Math.min(365, Math.floor(n(o?.validDays) || 14))),
++    vat: n(o?.vat) || Number(process.env.MWST_PERCENT ?? 19),
++    createdAt: prev?.createdAt ?? new Date().toISOString(),
++    sentAt: prev?.sentAt ?? null,
++  };
++}
++
++export async function POST(req: Request, { params }: { params: { no: string } }) {
++  if (!(await isAdmin())) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
++  const i = getInquiry(params.no);
++  if (!i) return NextResponse.json({ error: 'Anfrage nicht gefunden.' }, { status: 404 });
++  const body = await req.json().catch(() => ({}));
++  i.token ??= randomId(16);
++
++  if (body.action === 'status') {
++    const s = body.status as Status;
++    if (!STATUS[s]) return NextResponse.json({ error: 'Unbekannter Status.' }, { status: 400 });
++    if (s !== i.status) { i.status = s; addHistory(i, `Status: ${STATUS[s]}`); saveInquiry(i); }
++    return NextResponse.json({ ok: true, status: s, message: `Status: ${STATUS[s]}` });
++  }
++
++  const first = !i.offer;
++  i.offer = cleanOffer(body.offer, i.offer);
++  if (!i.offer.lines.length) return NextResponse.json({ error: 'Das Angebot hat keine Positionen.' }, { status: 400 });
++
++  if (body.action === 'save') {
++    addHistory(i, first ? 'Angebot erstellt' : 'Angebot geändert');
++    saveInquiry(i);
++    return NextResponse.json({ ok: true, message: 'Angebot gespeichert.' });
++  }
++
++  if (body.action === 'send') {
++    const t = offerTotals(i.offer);
++    const link = `${shopUrl()}/angebot/${i.token}`;
++    const shop = process.env.SHOP_NAME ?? 'Euro-Trade';
++    let sent = false;
++    try {
++      const pdf = await offerPdf(i);
++      sent = await sendMail({
++        to: i.customer.email, replyTo: process.env.INQUIRY_TO,
++        subject: `Ihr Angebot ${i.no} von ${shop}`,
++        attachments: [{ filename: `Angebot-${i.no}.pdf`, content: pdf }],
++        html: `<p>Guten Tag ${esc(i.customer.name)},</p><p>vielen Dank für Ihre Anfrage. Anbei erhalten Sie unser Angebot <b>${i.no}</b> über <b>${eur(t.gross)}</b> (${eur(t.net)} netto).</p>`
++          + `<p style="margin:24px 0"><a href="${link}" style="background:#0b4ea2;color:#fff;padding:12px 22px;border-radius:8px;text-decoration:none;font-weight:bold">Angebot ansehen & annehmen</a></p>`
++          + `<p>Bei Fragen antworten Sie einfach auf diese E-Mail.</p><p>Mit freundlichen Grüßen<br>${esc(shop)}</p>`,
++      });
++    } catch (e) {
++      console.error('Angebot senden fehlgeschlagen', e);
++      return NextResponse.json({ error: 'E-Mail konnte nicht gesendet werden – SMTP-Daten prüfen.' }, { status: 500 });
++    }
++    i.offer.sentAt = new Date().toISOString();
++    if (i.status === 'neu' || i.status === 'abgelehnt') i.status = 'angebot';
++    addHistory(i, sent ? `Angebot per E-Mail gesendet an ${i.customer.email}` : 'Angebot als gesendet markiert (ohne E-Mail)');
++    saveInquiry(i);
++    return NextResponse.json({ ok: true, status: i.status, message: sent ? `Angebot an ${i.customer.email} gesendet.` : 'Kein SMTP eingerichtet – bitte den Annahme-Link unten selbst an den Kunden schicken.' });
++  }
++  return NextResponse.json({ error: 'Unbekannte Aktion.' }, { status: 400 });
++}
+diff --git a/app/api/admin/kunden/route.ts b/app/api/admin/kunden/route.ts
+new file mode 100644
+index 0000000..78aefb2
+--- /dev/null
++++ b/app/api/admin/kunden/route.ts
+@@ -0,0 +1,25 @@
++import { NextResponse } from 'next/server';
++import { isAdmin } from '@/lib/customer';
++import { saveCustomers, type Customer } from '@/lib/store';
++
++export async function PUT(req: Request) {
++  if (!(await isAdmin())) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
++  const body = await req.json().catch(() => null);
++  const list: Customer[] = (Array.isArray(body?.customers) ? body.customers : []).slice(0, 2000).map((c: any) => ({
++    code: String(c.code ?? '').trim().toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 40),
++    name: String(c.name ?? '').trim().slice(0, 120),
++    markup: c.markup === '' || c.markup == null || !Number.isFinite(Number(c.markup)) ? null : Math.max(0, Math.min(500, Number(c.markup))),
++    skus: (Array.isArray(c.skus) ? c.skus : []).map((s: unknown) => String(s).trim().toUpperCase()).filter(Boolean).slice(0, 500),
++    exclusive: !!c.exclusive,
++    logoId: /^[a-f0-9]{24}$/.test(String(c.logoId ?? '')) ? String(c.logoId) : null,
++    logoName: c.logoId ? String(c.logoName ?? '').slice(0, 120) : null,
++    note: String(c.note ?? '').slice(0, 1000),
++    active: c.active !== false,
++  }));
++  const bad = list.find((c) => c.code.length < 4);
++  if (bad) return NextResponse.json({ error: 'Jeder Code braucht mindestens 4 Zeichen (A–Z, 0–9, -).' }, { status: 400 });
++  const dup = list.find((c, n) => list.findIndex((x) => x.code === c.code) !== n);
++  if (dup) return NextResponse.json({ error: `Der Code ${dup.code} ist doppelt vergeben.` }, { status: 400 });
++  saveCustomers(list.map((c) => ({ ...c, name: c.name || c.code })));
++  return NextResponse.json({ ok: true });
++}
+diff --git a/app/api/admin/login/route.ts b/app/api/admin/login/route.ts
+new file mode 100644
+index 0000000..fca5fbe
+--- /dev/null
++++ b/app/api/admin/login/route.ts
+@@ -0,0 +1,24 @@
++import { NextResponse } from 'next/server';
++import { ADMIN_COOKIE, adminToken } from '@/lib/access';
++
++const tries = new Map<string, number[]>();
++
++export async function POST(req: Request) {
++  const ip = req.headers.get('x-forwarded-for')?.split(',')[0] ?? 'local';
++  const now = Date.now();
++  const recent = (tries.get(ip) ?? []).filter((t) => now - t < 900_000);
++  if (recent.length >= 8) return NextResponse.json({ error: 'Zu viele Versuche – bitte in 15 Minuten erneut.' }, { status: 429 });
++  tries.set(ip, [...recent, now]);
++  if (!process.env.ADMIN_PASSWORD) return NextResponse.json({ error: 'ADMIN_PASSWORD ist in der .env nicht gesetzt.' }, { status: 500 });
++  const { password } = await req.json().catch(() => ({}));
++  if (password !== process.env.ADMIN_PASSWORD) return NextResponse.json({ error: 'Passwort falsch.' }, { status: 403 });
++  tries.delete(ip);
++  const res = NextResponse.json({ ok: true });
++  res.cookies.set(ADMIN_COOKIE, await adminToken(), { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', path: '/', maxAge: 30 * 86400 });
++  return res;
++}
++export async function DELETE() {
++  const res = NextResponse.json({ ok: true });
++  res.cookies.set(ADMIN_COOKIE, '', { path: '/', maxAge: 0 });
++  return res;
++}
+diff --git a/app/api/anfrage/route.ts b/app/api/anfrage/route.ts
+index 2165b36..ffaffa2 100644
+--- a/app/api/anfrage/route.ts
++++ b/app/api/anfrage/route.ts
+@@ -1,14 +1,21 @@
+ import { NextResponse } from 'next/server';
+-import fs from 'node:fs';
+-import path from 'node:path';
+-import nodemailer from 'nodemailer';
+ import { getProduct } from '@/lib/catalog';
+ import { eur } from '@/lib/format';
+-import { cookies } from 'next/headers';
+-import { ACCESS_COOKIE, codeForToken } from '@/lib/access';
++import { getCustomer } from '@/lib/customer';
++import { METHODS, POSITIONS, decoLabel, type Deco } from '@/lib/deco';
++import { esc, sendMail, shopUrl } from '@/lib/mail';
++import { randomId, saveInquiry, type InqLine, type Inquiry } from '@/lib/store';
+ 
+ const hits = new Map<string, number[]>();
+-const esc = (s: unknown) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
++
++function cleanDeco(d: any): Deco | null {
++  if (!d || typeof d !== 'object') return null;
++  const positions = (Array.isArray(d.positions) ? d.positions : []).filter((x: string) => POSITIONS.includes(x));
++  const method = METHODS.includes(d.method) ? d.method : METHODS[0];
++  if (!positions.length) return null;
++  const logoId = /^[a-f0-9]{24}$/.test(String(d.logoId ?? '')) ? String(d.logoId) : null;
++  return { method, positions, logoId, logoName: logoId ? String(d.logoName ?? '').slice(0, 120) : null, note: String(d.note ?? '').slice(0, 1000) };
++}
+ 
+ export async function POST(req: Request) {
+   // einfacher Spam-Schutz: max. 5 Anfragen / 10 Min. pro IP
+@@ -22,42 +29,36 @@ export async function POST(req: Request) {
+   const c = body?.customer ?? {};
+   if (c.website) return NextResponse.json({ ok: true }); // Honeypot
+   if (!c.name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(c.email ?? '')) return NextResponse.json({ error: 'Bitte Name und gültige E-Mail angeben.' }, { status: 400 });
++  const customer = Object.fromEntries(['name', 'company', 'email', 'phone', 'city', 'message'].map((k) => [k, String(c[k] ?? '').slice(0, 2000)]));
+ 
+-  // Preise serverseitig neu berechnen – nie dem Browser vertrauen
+-  const lines = (Array.isArray(body.lines) ? body.lines : []).slice(0, 200).flatMap((l: any) => {
+-    const p = getProduct(String(l.id));
++  // Preise serverseitig neu berechnen (mit Kunden-Aufschlag) – nie dem Browser vertrauen
++  const ctx = await getCustomer();
++  const lines: InqLine[] = (Array.isArray(body.lines) ? body.lines : []).slice(0, 300).flatMap((l: any) => {
++    const p = getProduct(String(l.id), ctx);
+     const qty = Math.max(1, Math.min(100000, Math.floor(Number(l.qty) || 1)));
+-    return p ? [{ sku: p.sku, name: p.name, color: String(l.color ?? ''), size: String(l.size ?? ''), qty, price: p.price, sum: (p.price ?? 0) * qty }] : [];
++    return p ? [{ id: p.id, sku: p.sku, name: p.name, color: String(l.color ?? '').slice(0, 80), size: String(l.size ?? '').slice(0, 40), qty, price: p.price, sum: (p.price ?? 0) * qty, deco: cleanDeco(l.deco) }] : [];
+   });
+   if (!lines.length) return NextResponse.json({ error: 'Warenkorb ist leer.' }, { status: 400 });
+-  const total = lines.reduce((s: number, l: any) => s + l.sum, 0);
+-  const access = await codeForToken(cookies().get(ACCESS_COOKIE)?.value);
+-  const via = access ? `${access.code}${access.label ? ` (${access.label})` : ''}` : '';
+-  const no = `A${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+-
+-  // Immer lokal sichern (auch wenn Mail ausfällt)
+-  const dir = path.join(process.cwd(), 'data', 'anfragen');
+-  fs.mkdirSync(dir, { recursive: true });
+-  fs.writeFileSync(path.join(dir, `${no}.json`), JSON.stringify({ no, date: new Date().toISOString(), zugangscode: via || null, customer: c, lines, total }, null, 2));
+-
+-  const rows = lines.map((l: any) => `<tr><td>${esc(l.sku)}</td><td>${esc(l.name)}</td><td>${esc(l.color)}</td><td>${esc(l.size)}</td><td align="right">${l.qty}</td><td align="right">${eur(l.price)}</td><td align="right">${l.price == null ? "auf Anfrage" : eur(l.sum)}</td></tr>`).join('');
+-  const table = `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;font:13px Arial"><tr style="background:#eee"><th>Art.-Nr.</th><th>Artikel</th><th>Farbe</th><th>Größe</th><th>Menge</th><th>Einzel</th><th>Summe</th></tr>${rows}<tr><td colspan="6" align="right"><b>Summe netto</b></td><td align="right"><b>${eur(total)}</b></td></tr></table>`;
+-  const customer = `<p><b>${esc(c.name)}</b>${c.company ? ` – ${esc(c.company)}` : ''}<br>${esc(c.email)} · ${esc(c.phone)}<br>${esc(c.city)}</p><p><b>Nachricht:</b><br>${esc(c.message).replace(/\n/g, '<br>')}</p>${via ? `<p><b>Zugangscode:</b> ${esc(via)}</p>` : ''}`;
+-
+-  if (process.env.SMTP_HOST) {
+-    try {
+-      const tx = nodemailer.createTransport({
+-        host: process.env.SMTP_HOST, port: Number(process.env.SMTP_PORT ?? 587), secure: Number(process.env.SMTP_PORT) === 465,
+-        auth: process.env.SMTP_USER ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS } : undefined,
+-      });
+-      const from = process.env.SMTP_FROM ?? process.env.SMTP_USER;
+-      await tx.sendMail({ from, to: process.env.INQUIRY_TO, replyTo: c.email, subject: `Neue Anfrage ${no} – ${c.company || c.name} – ${eur(total)}`, html: `<h2>Anfrage ${no}</h2>${customer}${table}` });
+-      await tx.sendMail({ from, to: c.email, subject: `Ihre Anfrage ${no} bei ${process.env.SHOP_NAME ?? 'Euro-Trade'}`, html: `<p>Guten Tag ${esc(c.name)},</p><p>vielen Dank für Ihre Anfrage. Wir melden uns innerhalb von 24 Stunden mit Ihrem Angebot.</p>${table}<p>Mit freundlichen Grüßen<br>${esc(process.env.SHOP_NAME ?? 'Euro-Trade')}</p>` });
+-    } catch (e) {
+-      console.error('Mailversand fehlgeschlagen', e); // Anfrage ist trotzdem gespeichert
+-    }
+-  } else {
+-    console.log(`[Anfrage ${no}] SMTP nicht konfiguriert – gespeichert in data/anfragen/${no}.json`);
++  const total = lines.reduce((s, l) => s + l.sum, 0);
++  const no = `A${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${randomId(3).toUpperCase()}`;
++  const via = ctx ? `${ctx.code}${ctx.name && ctx.name !== ctx.code ? ` (${ctx.name})` : ''}` : null;
++
++  const inq: Inquiry = { no, date: new Date().toISOString(), zugangscode: via, customer, lines, total, status: 'neu', token: randomId(16), offer: null, history: [{ date: new Date().toISOString(), text: 'Anfrage eingegangen' }] };
++  saveInquiry(inq); // immer lokal sichern (auch wenn Mail ausfällt)
++
++  const base = shopUrl();
++  const rows = lines.map((l) => `<tr><td>${esc(l.sku)}</td><td>${esc(l.name)}${l.deco ? `<br><small>✦ ${esc(decoLabel(l.deco))}${l.deco.note ? ` – ${esc(l.deco.note)}` : ''}</small>` : ''}</td><td>${esc(l.color)}</td><td>${esc(l.size)}</td><td align="right">${l.qty}</td><td align="right">${eur(l.price)}</td><td align="right">${l.price == null ? 'auf Anfrage' : eur(l.sum)}</td></tr>`).join('');
++  const table = `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;font:13px Arial"><tr style="background:#eee"><th>Art.-Nr.</th><th>Artikel</th><th>Farbe</th><th>Größe</th><th>Menge</th><th>Einzel</th><th>Summe</th></tr>${rows}<tr><td colspan="6" align="right"><b>Summe netto (Textil)</b></td><td align="right"><b>${eur(total)}</b></td></tr></table>`;
++  const logos = [...new Map(lines.filter((l) => l.deco?.logoId).map((l) => [l.deco!.logoId!, l.deco!.logoName])).entries()];
++  const who = `<p><b>${esc(customer.name)}</b>${customer.company ? ` – ${esc(customer.company)}` : ''}<br>${esc(customer.email)} · ${esc(customer.phone)}<br>${esc(customer.city)}</p>${customer.message ? `<p><b>Nachricht:</b><br>${esc(customer.message).replace(/\n/g, '<br>')}</p>` : ''}${via ? `<p><b>Zugangscode:</b> ${esc(via)}</p>` : ''}`;
++
++  try {
++    await sendMail({ to: process.env.INQUIRY_TO ?? '', replyTo: customer.email, subject: `Neue Anfrage ${no} – ${customer.company || customer.name} – ${eur(total)}`,
++      html: `<h2>Anfrage ${no}</h2>${who}${table}${logos.length ? `<p><b>Logos:</b> ${logos.map(([id, n]) => `<a href="${base}/api/upload/${id}?download">${esc(n)}</a>`).join(', ')}</p>` : ''}<p><a href="${base}/admin/anfrage/${no}">→ Im Admin öffnen und Angebot erstellen</a></p>` });
++    await sendMail({ to: customer.email, subject: `Ihre Anfrage ${no} bei ${process.env.SHOP_NAME ?? 'Euro-Trade'}`,
++      html: `<p>Guten Tag ${esc(customer.name)},</p><p>vielen Dank für Ihre Anfrage. Wir melden uns innerhalb von 24 Stunden mit Ihrem Angebot.</p>${table}<p>Mit freundlichen Grüßen<br>${esc(process.env.SHOP_NAME ?? 'Euro-Trade')}</p>` });
++  } catch (e) {
++    console.error('Mailversand fehlgeschlagen', e); // Anfrage ist trotzdem gespeichert
+   }
+   return NextResponse.json({ ok: true, no });
+ }
+diff --git a/app/api/angebot/[token]/pdf/route.ts b/app/api/angebot/[token]/pdf/route.ts
+new file mode 100644
+index 0000000..8c8a1b4
+--- /dev/null
++++ b/app/api/angebot/[token]/pdf/route.ts
+@@ -0,0 +1,8 @@
++import { offerPdf } from '@/lib/pdf';
++import { inquiryByToken } from '@/lib/store';
++
++export async function GET(_: Request, { params }: { params: { token: string } }) {
++  const i = inquiryByToken(params.token);
++  if (!i?.offer) return new Response('Nicht gefunden', { status: 404 });
++  return new Response(await offerPdf(i), { headers: { 'Content-Type': 'application/pdf', 'Content-Disposition': `inline; filename="Angebot-${i.no}.pdf"` } });
++}
+diff --git a/app/api/angebot/[token]/route.ts b/app/api/angebot/[token]/route.ts
+new file mode 100644
+index 0000000..221caae
+--- /dev/null
++++ b/app/api/angebot/[token]/route.ts
+@@ -0,0 +1,27 @@
++import { NextResponse } from 'next/server';
++import { esc, sendMail, shopUrl } from '@/lib/mail';
++import { addHistory, inquiryByToken, offerTotals, saveInquiry } from '@/lib/store';
++
++/** Kunde nimmt das Angebot an */
++export async function POST(req: Request, { params }: { params: { token: string } }) {
++  const i = inquiryByToken(params.token);
++  if (!i?.offer?.sentAt) return NextResponse.json({ error: 'Angebot nicht gefunden.' }, { status: 404 });
++  if (i.status === 'angenommen' || i.status === 'bestellt' || i.status === 'geliefert') return NextResponse.json({ ok: true, already: true });
++  const valid = new Date(new Date(i.offer.createdAt).getTime() + i.offer.validDays * 86400000);
++  if (Date.now() > valid.getTime() + 86400000) return NextResponse.json({ error: 'Dieses Angebot ist abgelaufen – bitte kontaktieren Sie uns für ein neues Angebot.' }, { status: 410 });
++  const { name, comment } = await req.json().catch(() => ({}));
++  if (!String(name ?? '').trim()) return NextResponse.json({ error: 'Bitte Ihren Namen angeben.' }, { status: 400 });
++
++  i.status = 'angenommen';
++  i.acceptedAt = new Date().toISOString();
++  addHistory(i, `Angebot angenommen von ${String(name).slice(0, 100)}${comment ? ` – „${String(comment).slice(0, 500)}“` : ''}`);
++  saveInquiry(i);
++  const t = offerTotals(i.offer);
++  try {
++    await sendMail({ to: process.env.INQUIRY_TO ?? '', subject: `✓ Angebot ${i.no} angenommen – ${i.customer.company || i.customer.name}`,
++      html: `<p><b>${esc(name)}</b> hat das Angebot <b>${i.no}</b> über ${t.gross.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })} angenommen.</p>${comment ? `<p>Kommentar: ${esc(comment)}</p>` : ''}<p><a href="${shopUrl()}/admin/anfrage/${i.no}">→ Im Admin öffnen</a></p>` });
++    await sendMail({ to: i.customer.email, subject: `Auftragsbestätigung zu Angebot ${i.no}`,
++      html: `<p>Guten Tag ${esc(i.customer.name)},</p><p>vielen Dank – wir haben Ihre Annahme des Angebots <b>${i.no}</b> erhalten und melden uns in Kürze mit der Druckfreigabe bzw. dem Liefertermin.</p><p>Mit freundlichen Grüßen<br>${esc(process.env.SHOP_NAME ?? 'Euro-Trade')}</p>` });
++  } catch (e) { console.error('Mail nach Annahme fehlgeschlagen', e); }
++  return NextResponse.json({ ok: true });
++}
+diff --git a/app/api/produkte/route.ts b/app/api/produkte/route.ts
+index 75eaf8a..3267c98 100644
+--- a/app/api/produkte/route.ts
++++ b/app/api/produkte/route.ts
+@@ -1,9 +1,11 @@
+ import { NextResponse } from 'next/server';
+ import { getProduct } from '@/lib/catalog';
++import { getCustomer } from '@/lib/customer';
+ 
+ /** Produkte zu einer Liste von IDs (für die Merkliste) */
+-export function GET(req: Request) {
++export async function GET(req: Request) {
++  const ctx = await getCustomer();
+   const ids = (new URL(req.url).searchParams.get('ids') ?? '').split(',').filter(Boolean).slice(0, 200);
+-  const products = ids.flatMap((id) => { const p = getProduct(id); return p ? [p] : []; });
++  const products = ids.flatMap((id) => { const p = getProduct(id, ctx); return p ? [p] : []; });
+   return NextResponse.json(products);
+ }
+diff --git a/app/api/search/route.ts b/app/api/search/route.ts
+index 1fb7ea4..e46200e 100644
+--- a/app/api/search/route.ts
++++ b/app/api/search/route.ts
+@@ -1,12 +1,13 @@
+ import { NextResponse } from 'next/server';
+ import { search } from '@/lib/catalog';
++import { getCustomer } from '@/lib/customer';
+ 
+ export const dynamic = 'force-dynamic';
+ 
+-export function GET(req: Request) {
++export async function GET(req: Request) {
+   const u = new URL(req.url);
+   const q = (u.searchParams.get('q') ?? '').slice(0, 100);
+   const limit = Math.min(Number(u.searchParams.get('limit') ?? 8), 50);
+-  const all = search(q, 200);
+-  return NextResponse.json({ total: all.length, items: all.slice(0, limit) }, { headers: { 'Cache-Control': 'public, max-age=60' } });
++  const all = search(q, 200, await getCustomer());
++  return NextResponse.json({ total: all.length, items: all.slice(0, limit) }, { headers: { 'Cache-Control': 'private, max-age=60' } });
+ }
+diff --git a/app/api/upload/[id]/route.ts b/app/api/upload/[id]/route.ts
+new file mode 100644
+index 0000000..fb5acbd
+--- /dev/null
++++ b/app/api/upload/[id]/route.ts
+@@ -0,0 +1,23 @@
++import fs from 'node:fs';
++import path from 'node:path';
++import { UPLOADS, readJSON } from '@/lib/store';
++
++const TYPES: Record<string, string> = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', svg: 'image/svg+xml', pdf: 'application/pdf', ai: 'application/postscript', eps: 'application/postscript' };
++
++export function GET(req: Request, { params }: { params: { id: string } }) {
++  if (!/^[a-f0-9]{24}$/.test(params.id)) return new Response('Nicht gefunden', { status: 404 });
++  const meta = readJSON<{ name: string; ext: string } | null>(path.join(UPLOADS, `${params.id}.json`), null);
++  const file = meta && path.join(UPLOADS, `${params.id}.${meta.ext}`);
++  if (!meta || !file || !fs.existsSync(file)) return new Response('Nicht gefunden', { status: 404 });
++  const download = new URL(req.url).searchParams.has('download');
++  return new Response(fs.readFileSync(file), {
++    headers: {
++      'Content-Type': TYPES[meta.ext] ?? 'application/octet-stream',
++      'Content-Disposition': `${download ? 'attachment' : 'inline'}; filename*=UTF-8''${encodeURIComponent(meta.name)}`,
++      // Hochgeladene Dateien nie als aktive Seite ausführen (z. B. SVG mit Skript)
++      'Content-Security-Policy': "default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; sandbox",
++      'X-Content-Type-Options': 'nosniff',
++      'Cache-Control': 'private, max-age=86400',
++    },
++  });
++}
+diff --git a/app/api/upload/route.ts b/app/api/upload/route.ts
+new file mode 100644
+index 0000000..5c84811
+--- /dev/null
++++ b/app/api/upload/route.ts
+@@ -0,0 +1,31 @@
++import { NextResponse } from 'next/server';
++import fs from 'node:fs';
++import path from 'node:path';
++import { UPLOADS, randomId, writeJSON } from '@/lib/store';
++
++const TYPES: Record<string, string> = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', svg: 'image/svg+xml', pdf: 'application/pdf', ai: 'application/postscript', eps: 'application/postscript' };
++const MAX = 15 * 1024 * 1024;
++const hits = new Map<string, number[]>();
++
++/** Logo-Upload (Kunden im Shop und Admin) */
++export async function POST(req: Request) {
++  const ip = req.headers.get('x-forwarded-for')?.split(',')[0] ?? 'local';
++  const now = Date.now();
++  const recent = (hits.get(ip) ?? []).filter((t) => now - t < 600_000);
++  if (recent.length >= 20) return NextResponse.json({ error: 'Zu viele Uploads – bitte später erneut.' }, { status: 429 });
++  hits.set(ip, [...recent, now]);
++
++  const form = await req.formData().catch(() => null);
++  const file = form?.get('file');
++  if (!(file instanceof File)) return NextResponse.json({ error: 'Keine Datei.' }, { status: 400 });
++  const ext = (file.name.split('.').pop() ?? '').toLowerCase();
++  if (!TYPES[ext]) return NextResponse.json({ error: 'Bitte PNG, JPG, SVG, PDF, AI oder EPS hochladen.' }, { status: 400 });
++  if (file.size > MAX) return NextResponse.json({ error: 'Datei ist größer als 15 MB.' }, { status: 400 });
++
++  const id = randomId();
++  fs.mkdirSync(UPLOADS, { recursive: true });
++  fs.writeFileSync(path.join(UPLOADS, `${id}.${ext}`), Buffer.from(await file.arrayBuffer()));
++  const name = file.name.replace(/[^\w.\- äöüÄÖÜß()]/g, '_').slice(0, 120);
++  writeJSON(path.join(UPLOADS, `${id}.json`), { name, ext, size: file.size, date: new Date().toISOString() });
++  return NextResponse.json({ id, name, preview: ['png', 'jpg', 'jpeg', 'webp', 'svg'].includes(ext) });
++}
+diff --git a/app/api/zugang/route.ts b/app/api/zugang/route.ts
+index d9b21e2..e8c5ed6 100644
+--- a/app/api/zugang/route.ts
++++ b/app/api/zugang/route.ts
+@@ -1,5 +1,6 @@
+ import { NextResponse } from 'next/server';
+-import { ACCESS_COOKIE, ACCESS_DAYS, accessCodes, tokenFor } from '@/lib/access';
++import { ACCESS_COOKIE, ACCESS_DAYS, normCode, signCode } from '@/lib/access';
++import { findCustomer } from '@/lib/store';
+ 
+ const tries = new Map<string, number[]>();
+ 
+@@ -12,19 +13,17 @@ export async function POST(req: Request) {
+   tries.set(ip, [...recent, now]);
+ 
+   const body = await req.json().catch(() => ({}));
+-  const code = String(body?.code ?? '').trim().toUpperCase();
+-  const match = accessCodes().find((c) => c.code === code);
+-  if (!match) return NextResponse.json({ error: 'Dieser Code ist ungültig.' }, { status: 403 });
++  const c = findCustomer(normCode(body?.code));
++  if (!c) return NextResponse.json({ error: 'Dieser Code ist ungültig.' }, { status: 403 });
+ 
+   tries.delete(ip);
+   const res = NextResponse.json({ ok: true });
+-  res.cookies.set(ACCESS_COOKIE, await tokenFor(match.code), {
++  res.cookies.set(ACCESS_COOKIE, await signCode(c.code), {
+     httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', path: '/', maxAge: ACCESS_DAYS * 86400,
+   });
+   return res;
+ }
+ 
+-/** Abmelden */
+ export async function DELETE() {
+   const res = NextResponse.json({ ok: true });
+   res.cookies.set(ACCESS_COOKIE, '', { path: '/', maxAge: 0 });
+diff --git a/app/globals.css b/app/globals.css
+index 8fc25cf..e3c4af8 100644
+--- a/app/globals.css
++++ b/app/globals.css
+@@ -162,3 +162,102 @@ footer .wrap{display:flex;gap:20px;flex-wrap:wrap;justify-content:space-between}
+   .logo-mark{width:34px;height:34px}
+   .qtyrow{flex-wrap:wrap}
+ }
++
++/* Größenmatrix */
++.matrix{display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:8px}
++.mx{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
++.mx span{font-size:13px;font-weight:600;text-align:center;padding:4px 2px;background:#f6f7f9;border-bottom:1px solid var(--line)}
++.mx input{border:0;height:38px;text-align:center;font-size:16px;width:100%;-moz-appearance:textfield}
++.mx input::-webkit-outer-spin-button,.mx input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
++.mx.on{border-color:var(--brand);box-shadow:0 0 0 1px var(--brand)}
++.mx.on span{background:#eef4fc;color:var(--brand)}
++.sw{position:relative}
++.sw-n{position:absolute;top:-7px;right:-9px;background:var(--brand);color:#fff;font-size:10px;font-weight:700;border-radius:999px;padding:1px 5px;line-height:1.4;border:2px solid #fff}
++.hint{font-size:13px;color:var(--muted);margin:8px 0 0}
++
++/* Veredelung */
++.deco-toggle{display:flex;gap:10px;align-items:center;margin-top:20px;padding:12px 14px;border:1px dashed var(--brand);border-radius:10px;background:#f5f9fe;cursor:pointer}
++.deco-toggle input{width:18px;height:18px}
++.deco{border:1px solid var(--line);border-top:0;border-radius:0 0 10px 10px;padding:14px;margin-top:-6px}
++.deco-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
++.deco-note{width:100%;min-height:70px;border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-top:10px}
++.upl{display:inline-grid;place-items:center;cursor:pointer;height:42px}
++.logo-file{display:flex;align-items:center;gap:10px;padding:8px;border:1px solid var(--line);border-radius:8px;background:#fff;max-width:100%}
++.logo-file img{width:44px;height:44px;object-fit:contain;background:repeating-conic-gradient(#f0f2f5 0 25%,#fff 0 50%) 0 0/12px 12px;border-radius:4px}
++.logo-file span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
++.file-ico{width:44px;height:44px;display:grid;place-items:center;background:#eef4fc;color:var(--brand);font-weight:800;font-size:11px;border-radius:4px;flex:none}
++.logo-prev{position:absolute;transform:translate(-50%,-50%);max-height:22%;object-fit:contain;pointer-events:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.25));mix-blend-mode:multiply}
++.prev-note{position:absolute;left:8px;bottom:8px;background:rgba(20,24,31,.72);color:#fff;font-size:11px;padding:3px 8px;border-radius:999px}
++.deco-tag{font-size:12px;color:var(--brand);margin-top:2px}
++
++/* Listen-Kopf */
++.list-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
++.btn.disabled{opacity:.5;pointer-events:none}
++
++/* Admin */
++.admin-nav{display:flex;gap:6px;align-items:center;flex-wrap:wrap;background:#14181f;color:#fff;border-radius:10px;padding:6px;margin-bottom:18px;font-size:14px}
++.admin-nav a{padding:7px 12px;border-radius:7px;color:#cfd6df}
++.admin-nav a.on,.admin-nav a:hover{background:rgba(255,255,255,.12);color:#fff}
++.admin-nav .linkbtn{color:#cfd6df;padding:0 10px}
++.atable{width:100%;border-collapse:collapse;font-size:14px}
++.atable th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
++.atable td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
++.atable tr:last-child td{border-bottom:0}
++.atable.offer td{vertical-align:middle}
++.atable input,.admin-actions select{border:1px solid var(--line);border-radius:6px;padding:7px 9px;width:100%}
++.atable input.small{font-size:12px;margin-top:4px;color:var(--muted)}
++.atable .x{background:none;border:0;color:var(--muted);font-size:20px}
++.alink{color:var(--brand);font-weight:600}
++.alink:hover{text-decoration:underline}
++.st{display:inline-block;font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;background:#eef0f3;color:#3b4250;white-space:nowrap}
++.st-neu{background:#fff4d6;color:#7a5600}.st-angebot{background:#e4efff;color:#0b4ea2}.st-angenommen{background:#dff5e6;color:#1d7a3e}
++.st-bestellt{background:#e9e4ff;color:#4b2fb0}.st-geliefert{background:#e6eaef;color:#2f3a48}.st-abgelehnt{background:#fde4e2;color:#b3261e}
++.chip-on{background:var(--brand)!important;color:#fff!important;border-color:var(--brand)!important}
++.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px}
++.hist{list-style:none;padding:0;margin:6px 0 14px;font-size:13px;max-height:160px;overflow:auto}
++.hist li{padding:3px 0}
++.logo-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
++.offer-foot{display:flex;gap:24px;flex-wrap:wrap;margin-top:14px;align-items:flex-end}
++.offer-sum{min-width:260px}
++.admin-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:16px 0}
++.admin-actions select{width:auto;height:40px}
++.cust-list{display:flex;flex-direction:column;gap:10px}
++.cust{padding:0}
++.cust.off{opacity:.65}
++.cust-head{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:14px 18px;cursor:pointer}
++.cust-body{padding:0 18px 16px;border-top:1px solid var(--line)}
++.code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#14181f;color:var(--accent);padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:1px}
++.linkbtn.err{color:var(--err)}
++@media (max-width:820px){.admin-grid{grid-template-columns:1fr}}
++
++/* Galerie mit Zoom (wie Amazon) */
++.pd{position:relative}
++.gal-main{display:flex;gap:10px;align-items:flex-start;position:relative}
++.gal-thumbs{display:flex;flex-direction:column;gap:8px;flex:none;max-height:560px;overflow-y:auto;scrollbar-width:thin}
++.gal-thumbs button{width:58px;height:58px;padding:0;border:2px solid var(--line);border-radius:8px;overflow:hidden;background:#fff;cursor:pointer}
++.gal-thumbs button.on{border-color:var(--brand);box-shadow:0 0 0 2px rgba(11,78,162,.2)}
++.gal-thumbs img{width:100%;height:100%;object-fit:cover;display:block}
++.gal .gallery{flex:1;min-width:0;position:relative}
++.gallery.zoomable{cursor:zoom-in}
++.gal-lens{position:absolute;background:rgba(255,255,255,.35);border:1px solid rgba(11,78,162,.55);box-shadow:0 0 0 9999px rgba(0,0,0,.06);pointer-events:none}
++.gal-zoom{position:absolute;left:calc(100% + 32px);top:0;width:100%;aspect-ratio:1;background-color:#fff;background-repeat:no-repeat;border:1px solid var(--line);border-radius:10px;box-shadow:0 18px 48px rgba(0,0,0,.18);z-index:30;pointer-events:none}
++.gal-hint{font-size:12px;color:var(--muted);text-align:center;margin:8px 0 0}
++.lightbox{position:fixed;inset:0;background:rgba(10,14,20,.92);z-index:200;display:grid;place-items:center;padding:40px 70px;cursor:zoom-out}
++.lightbox img{max-width:100%;max-height:calc(100vh - 80px);object-fit:contain;background:#fff;border-radius:8px;cursor:default}
++.lb-x{position:absolute;top:14px;right:18px;background:none;border:0;color:#fff;font-size:36px;line-height:1}
++.lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:64px;border:0;border-radius:10px;background:rgba(255,255,255,.12);color:#fff;font-size:40px;line-height:1}
++.lb-nav:hover{background:rgba(255,255,255,.22)}
++.lb-nav.l{left:12px}.lb-nav.r{right:12px}
++.lb-count{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);color:#fff;font-size:13px;opacity:.8}
++@media (max-width:820px){
++  .gal-main{flex-direction:column-reverse}
++  .gal-thumbs{flex-direction:row;max-height:none;overflow-x:auto;width:100%}
++  .gal-zoom,.gal-lens{display:none}
++  .gal .gallery{width:100%}
++  .lightbox{padding:50px 8px}
++  .lb-nav{width:40px;height:52px;font-size:32px}
++}
++/* Karten: zweites Bild beim Überfahren */
++.card .img .img2{position:absolute;inset:0;opacity:0;transition:opacity .25s;background:#fff}
++.card:hover .img .img2{opacity:1}
++@media (hover:none){.card .img .img2{display:none}}
+diff --git a/app/kategorie/[slug]/page.tsx b/app/kategorie/[slug]/page.tsx
+index bcc5f7b..61b2b39 100644
+--- a/app/kategorie/[slug]/page.tsx
++++ b/app/kategorie/[slug]/page.tsx
+@@ -2,16 +2,18 @@ import Link from 'next/link';
+ import { notFound } from 'next/navigation';
+ import ProductCard from '@/components/ProductCard';
+ import { getByCategory, getCategories } from '@/lib/catalog';
++import { getCustomer } from '@/lib/customer';
+ 
+-export function generateMetadata({ params }: { params: { slug: string } }) {
+-  const c = getCategories().find((x) => x.slug === params.slug);
++export async function generateMetadata({ params }: { params: { slug: string } }) {
++  const c = getCategories(await getCustomer()).find((x) => x.slug === params.slug);
+   return { title: c?.name ?? 'Kategorie' };
+ }
+ 
+-export default function CategoryPage({ params, searchParams }: { params: { slug: string }; searchParams: { sort?: string } }) {
+-  const cat = getCategories().find((x) => x.slug === params.slug);
++export default async function CategoryPage({ params, searchParams }: { params: { slug: string }; searchParams: { sort?: string } }) {
++  const ctx = await getCustomer();
++  const cat = getCategories(ctx).find((x) => x.slug === params.slug);
+   if (!cat) notFound();
+-  let items = getByCategory(params.slug);
++  let items = getByCategory(params.slug, ctx);
+   if (searchParams.sort === 'preis') items = [...items].sort((a, b) => (a.price ?? 1e9) - (b.price ?? 1e9));
+   if (searchParams.sort === 'preis-ab') items = [...items].sort((a, b) => (b.price ?? -1) - (a.price ?? -1));
+   return (
+diff --git a/app/layout.tsx b/app/layout.tsx
+index 2d4f560..9e80cd6 100644
+--- a/app/layout.tsx
++++ b/app/layout.tsx
+@@ -1,7 +1,8 @@
+ import './globals.css';
+ import { Suspense } from 'react';
+ import Link from 'next/link';
+-import { cookies } from 'next/headers';
++import { headers } from 'next/headers';
++import { redirect } from 'next/navigation';
+ import type { Metadata } from 'next';
+ import SearchBar from '@/components/SearchBar';
+ import Logo from '@/components/Logo';
+@@ -9,7 +10,8 @@ import LogoutLink from '@/components/LogoutLink';
+ import { CartButton, CartProvider } from '@/components/CartContext';
+ import { WishlistButton, WishlistProvider } from '@/components/Wishlist';
+ import { getCategories } from '@/lib/catalog';
+-import { ACCESS_COOKIE, accessEnabled, codeForToken } from '@/lib/access';
++import { shopClosed } from '@/lib/access';
++import { shopAccess } from '@/lib/customer';
+ 
+ const SHOP = process.env.SHOP_NAME ?? 'Euro-Trade';
+ export async function generateMetadata(): Promise<Metadata> {
+@@ -18,15 +20,20 @@ export async function generateMetadata(): Promise<Metadata> {
+     description: 'T-Shirts, Polos, Hoodies, Jacken, Caps und Taschen für Druck und Stick – schnell finden, Anfrage in einer Minute.',
+     metadataBase: new URL(process.env.SHOP_URL ?? 'https://euro-trade.com'),
+     // Geschlossener Shop: nicht in Suchmaschinen
+-    robots: accessEnabled() ? { index: false, follow: false } : undefined,
++    robots: shopClosed() ? { index: false, follow: false } : undefined,
+   };
+ }
+ export const dynamic = 'force-dynamic';
+ 
+ export default async function RootLayout({ children }: { children: React.ReactNode }) {
+-  const gated = accessEnabled();
+-  const open = !gated || !!(await codeForToken(cookies().get(ACCESS_COOKIE)?.value));
+-  const cats = open ? getCategories() : [];
++  const gated = shopClosed();
++  const path = headers().get('x-path') ?? '/';
++  const isPublic = ['/zugang', '/impressum', '/datenschutz', '/angebot', '/admin'].some((p) => path === p || path.startsWith(p + '/'));
++  const { ok, customer } = await shopAccess();
++  // Code im Admin gesperrt/gelöscht -> zurück zur Anmeldung
++  if (!ok && !isPublic) redirect('/zugang');
++  const open = ok && !path.startsWith('/zugang') && !path.startsWith('/admin');
++  const cats = open ? getCategories(customer) : [];
+   return (
+     <html lang="de">
+       <body>
+@@ -46,7 +53,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
+           <main className="wrap">{children}</main>
+           <footer><div className="wrap">
+             <span>© {new Date().getFullYear()} {SHOP} · Alle Preise netto zzgl. MwSt. und Versand</span>
+-            <span><Link href="/impressum">Impressum</Link> · <Link href="/datenschutz">Datenschutz</Link>{gated && open && <> · <LogoutLink /></>}</span>
++            <span><Link href="/impressum">Impressum</Link> · <Link href="/datenschutz">Datenschutz</Link>{gated && customer && <> · {customer.name} · <LogoutLink /></>}</span>
+           </div></footer>
+         </WishlistProvider></CartProvider>
+       </body>
+diff --git a/app/merkliste/WishlistView.tsx b/app/merkliste/WishlistView.tsx
+index 1b1f094..e34d9ac 100644
+--- a/app/merkliste/WishlistView.tsx
++++ b/app/merkliste/WishlistView.tsx
+@@ -5,33 +5,66 @@ import ProductCard from '@/components/ProductCard';
+ import { useWishlist } from '@/components/Wishlist';
+ import type { PublicProduct } from '@/lib/types';
+ 
+-export default function WishlistView() {
+-  const { ids, clear } = useWishlist();
++export default function WishlistView({ shared }: { shared: string[] | null }) {
++  const { ids, clear, addAll } = useWishlist();
+   const [items, setItems] = useState<PublicProduct[] | null>(null);
+-  const key = ids.join(',');
++  const [copied, setCopied] = useState(false);
++  const list = shared ?? ids;
++  const key = list.join(',');
+ 
+   useEffect(() => {
+     if (!key) { setItems([]); return; }
+     fetch(`/api/produkte?ids=${encodeURIComponent(key)}`).then((r) => r.json()).then(setItems).catch(() => setItems([]));
+   }, [key]);
+ 
+-  // Entfernte Artikel sofort ausblenden, ohne neu zu laden
+-  const shown = (items ?? []).filter((p) => ids.includes(p.id));
++  // Eigene Liste: entfernte Artikel sofort ausblenden
++  const shown = (items ?? []).filter((p) => shared || ids.includes(p.id));
++
++  async function share() {
++    const url = `${window.location.origin}/merkliste?liste=${ids.join(',')}`;
++    try {
++      if (navigator.share) await navigator.share({ title: 'Meine Auswahl', url });
++      else { await navigator.clipboard.writeText(url); setCopied(true); setTimeout(() => setCopied(false), 2500); }
++    } catch { /* abgebrochen */ }
++  }
++
++  if (items === null) return <h1>{shared ? 'Geteilte Auswahl' : 'Merkliste'}</h1>;
++
++  if (shared) {
++    const missing = shared.filter((x) => !ids.includes(x));
++    return (
++      <>
++        <div className="list-head">
++          <div>
++            <h1 style={{ marginBottom: 4 }}>Geteilte Auswahl <span className="muted" style={{ fontWeight: 400, fontSize: 18 }}>({shown.length})</span></h1>
++            <p className="muted" style={{ margin: 0 }}>Diese Artikel wurden für Sie zusammengestellt.</p>
++          </div>
++          {missing.length > 0
++            ? <button className="btn" onClick={() => addAll(missing)}>Alle auf meine Merkliste</button>
++            : <Link className="btn alt" href="/merkliste" style={{ display: 'inline-grid', placeItems: 'center' }}>Zu meiner Merkliste</Link>}
++        </div>
++        {shown.length ? <div className="grid">{shown.map((p) => <ProductCard key={p.id} p={p} />)}</div> : <p className="muted">Die Artikel dieser Auswahl sind nicht mehr verfügbar.</p>}
++      </>
++    );
++  }
+ 
+-  if (items === null) return <h1>Merkliste</h1>;
+   if (!shown.length) return (
+     <div className="box" style={{ maxWidth: 640, margin: '20px auto', textAlign: 'center' }}>
+       <h1>Ihre Merkliste ist leer</h1>
+-      <p className="muted">Tippen Sie bei einem Artikel auf das Herz, um ihn hier zu sammeln – praktisch zum Vergleichen und für spätere Anfragen.</p>
++      <p className="muted">Tippen Sie bei einem Artikel auf das Herz, um ihn hier zu sammeln – praktisch zum Vergleichen, für spätere Anfragen oder um eine Auswahl mit Ihrem Team zu teilen.</p>
+       <Link className="btn" href="/" style={{ display: 'inline-grid', placeItems: 'center' }}>Artikel entdecken</Link>
+     </div>
+   );
+   return (
+     <>
+-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
++      <div className="list-head">
+         <h1>Merkliste <span className="muted" style={{ fontWeight: 400, fontSize: 18 }}>({shown.length})</span></h1>
+-        <button type="button" className="linkbtn" onClick={() => { if (confirm('Merkliste wirklich leeren?')) clear(); }}>Liste leeren</button>
++        <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
++          <button type="button" className="btn" onClick={share}>{copied ? '✓ Link kopiert' : 'Auswahl teilen'}</button>
++          <button type="button" className="linkbtn" onClick={() => { if (confirm('Merkliste wirklich leeren?')) clear(); }}>Liste leeren</button>
++        </div>
+       </div>
++      <p className="muted" style={{ marginTop: -6 }}>Teilen Sie den Link z. B. mit Ihrem Team oder Ihren Vereinsmitgliedern – jeder kann daraus direkt bestellen.</p>
+       <div className="grid">{shown.map((p) => <ProductCard key={p.id} p={p} />)}</div>
+     </>
+   );
+diff --git a/app/merkliste/page.tsx b/app/merkliste/page.tsx
+index 28322e4..2fbb7ce 100644
+--- a/app/merkliste/page.tsx
++++ b/app/merkliste/page.tsx
+@@ -2,4 +2,7 @@ import type { Metadata } from 'next';
+ import WishlistView from './WishlistView';
+ 
+ export const metadata: Metadata = { title: 'Merkliste' };
+-export default function Merkliste() { return <WishlistView />; }
++export default function Merkliste({ searchParams }: { searchParams: { liste?: string } }) {
++  const shared = (searchParams.liste ?? '').split(',').map((x) => x.trim()).filter((x) => /^[a-z0-9-]{1,60}$/.test(x)).slice(0, 100);
++  return <WishlistView shared={shared.length ? shared : null} />;
++}
+diff --git a/app/page.tsx b/app/page.tsx
+index a62d6ba..9441280 100644
+--- a/app/page.tsx
++++ b/app/page.tsx
+@@ -1,20 +1,29 @@
+ import Link from 'next/link';
+ import ProductCard from '@/components/ProductCard';
+-import { getCategories, getFeatured, productCount } from '@/lib/catalog';
++import { getCategories, getCollection, getFeatured, productCount } from '@/lib/catalog';
++import { getCustomer } from '@/lib/customer';
+ 
+-export default function Home() {
+-  const cats = getCategories();
++export default async function Home() {
++  const ctx = await getCustomer();
++  const cats = getCategories(ctx);
++  const collection = getCollection(ctx);
+   return (
+     <>
+       <section className="hero">
+         <div>
+-          <h1>Markentextilien ab 1 Stück</h1>
+-          <p>{productCount().toLocaleString('de-DE')} Artikel · schon ab 1 Stück · auf Wunsch mit Druck oder Stick</p>
++          <h1>{ctx ? <>Willkommen, {ctx.name}</> : 'Markentextilien ab 1 Stück'}</h1>
++          <p>{productCount(ctx).toLocaleString('de-DE')} Artikel · schon ab 1 Stück · auf Wunsch mit Druck oder Stick</p>
+           <div className="chips">{cats.map((c) => <Link key={c.slug} className="chip" href={`/kategorie/${c.slug}`}>{c.name}</Link>)}</div>
+         </div>
+       </section>
+-      <h2>Beliebte Artikel</h2>
+-      <div className="grid">{getFeatured(16).map((p) => <ProductCard key={p.id} p={p} />)}</div>
++      {collection.length > 0 && <>
++        <h2>Ihre Kollektion</h2>
++        <div className="grid">{collection.map((p) => <ProductCard key={p.id} p={p} />)}</div>
++      </>}
++      {!(ctx?.exclusive && collection.length) && <>
++        <h2>{collection.length ? 'Weitere Artikel' : 'Beliebte Artikel'}</h2>
++        <div className="grid">{getFeatured(16, ctx).filter((p) => !collection.some((c) => c.id === p.id)).map((p) => <ProductCard key={p.id} p={p} />)}</div>
++      </>}
+     </>
+   );
+ }
+diff --git a/app/produkt/[id]/AddToCart.tsx b/app/produkt/[id]/AddToCart.tsx
+index b6f37cb..16578cd 100644
+--- a/app/produkt/[id]/AddToCart.tsx
++++ b/app/produkt/[id]/AddToCart.tsx
+@@ -1,70 +1,158 @@
+ 'use client';
+-import { Fragment, useState } from 'react';
++import { Fragment, useMemo, useState } from 'react';
+ import type { PublicProduct } from '@/lib/types';
+ import { eur } from '@/lib/format';
+-import ProductImage from '@/components/ProductImage';
++import Gallery from '@/components/Gallery';
+ import { useCart } from '@/components/CartContext';
+ import { swatchBg } from '@/lib/colors';
+ import { WishButton } from '@/components/Wishlist';
++import { METHODS, POSITIONS, PREVIEW, isImage, type Deco } from '@/lib/deco';
+ 
+-export default function AddToCart({ p }: { p: PublicProduct }) {
+-  const { add } = useCart();
++type Logo = { id: string; name: string };
++
++export default function AddToCart({ p, customerLogo }: { p: PublicProduct; customerLogo?: Logo | null }) {
++  const { addMany } = useCart();
+   const [color, setColor] = useState(p.colors[0]);
+-  const [img, setImg] = useState(0);
+-  const [size, setSize] = useState(p.sizes.length === 1 ? p.sizes[0] : '');
+-  const [qty, setQty] = useState(1);
++  // Mengen je Farbe + Größe ("Black|M" -> 5) – mehrere Farben in einem Schritt möglich
++  const [qty, setQty] = useState<Record<string, number>>({});
+   const [msg, setMsg] = useState('');
+-  const needSize = p.sizes.length > 1 && !size;
+-  const current = color?.image ?? p.images[img];
++
++  // Veredelung
++  const [decoOn, setDecoOn] = useState(false);
++  const [method, setMethod] = useState(METHODS[0]);
++  const [positions, setPositions] = useState<string[]>(['Brust links']);
++  const [logo, setLogo] = useState<Logo | null>(customerLogo ?? null);
++  const [uploading, setUploading] = useState(false);
++  const [upErr, setUpErr] = useState('');
++  const [note, setNote] = useState('');
++
++  const sizes = p.sizes.length ? p.sizes : [''];
++  const cname = color?.name ?? '';
++  const k = (c: string, s: string) => `${c}|${s}`;
++  const setQ = (s: string, v: number) => setQty((q) => ({ ...q, [k(cname, s)]: Math.max(0, Math.min(99999, Math.floor(v) || 0)) }));
++  const entries = Object.entries(qty).filter(([, v]) => v > 0);
++  const total = entries.reduce((s, [, v]) => s + v, 0);
++  const colorTotals = useMemo(() => {
++    const m: Record<string, number> = {};
++    for (const [key, v] of entries) { const c = key.split('|')[0]; m[c] = (m[c] ?? 0) + v; }
++    return m;
++  }, [qty]); // eslint-disable-line react-hooks/exhaustive-deps
++
++  const togglePos = (x: string) => setPositions((ps) => (ps.includes(x) ? ps.filter((y) => y !== x) : [...ps, x]));
++  const decoOk = !decoOn || (positions.length > 0 && (method === 'Beratung gewünscht' || !!logo));
++
++  async function upload(file?: File | null) {
++    if (!file) return;
++    setUploading(true); setUpErr('');
++    const fd = new FormData();
++    fd.append('file', file);
++    const r = await fetch('/api/upload', { method: 'POST', body: fd });
++    const d = await r.json().catch(() => ({}));
++    setUploading(false);
++    if (r.ok) setLogo({ id: d.id, name: d.name }); else setUpErr(d.error ?? 'Upload fehlgeschlagen.');
++  }
+ 
+   const onAdd = () => {
+-    add({ id: p.id, sku: p.sku, name: p.name, color: color?.name, hex: color?.hex, size, qty, price: p.price, category: p.category, image: p.images[0] });
+-    setMsg(`${qty} × ${p.name} (${[color?.name, size].filter(Boolean).join(', ')}) im Warenkorb.`);
++    const deco: Deco | null = decoOn ? { method, positions, logoId: logo?.id ?? null, logoName: logo?.name ?? null, note: note.trim() } : null;
++    const items = entries.map(([key, n]) => {
++      const [c, s] = key.split('|');
++      const col = p.colors.find((x) => x.name === c);
++      return { id: p.id, sku: p.sku, name: p.name, color: c || undefined, hex: col?.hex, size: s || undefined, qty: n, price: p.price, category: p.category, image: p.images[0], deco };
++    });
++    addMany(items);
++    setMsg(`${total} Stück von ${p.name} im Warenkorb${deco ? ' (mit Veredelung)' : ''}.`);
++    setQty({});
+   };
+   const specs = Object.entries(p.specs ?? {}).filter(([, v]) => v && v !== 'Keine Angabe');
++  const showPreview = decoOn && logo && isImage(logo.name);
+ 
+   return (
+     <div className="pd">
+       <div>
+-        <div className="gallery"><ProductImage p={p} src={current} hex={color?.hex} /></div>
+-        {p.images.length > 1 && (
+-          <div className="thumbs">
+-            {p.images.map((src, i) => (
+-              <button key={src} className={i === img ? 'on' : ''} onClick={() => setImg(i)} aria-label={`Bild ${i + 1}`}>
+-                <img src={src} alt="" loading="lazy" />
+-              </button>
+-            ))}
+-          </div>
+-        )}
++        <Gallery p={p} hex={color?.hex} overlay={showPreview ? <>
++          {positions.filter((x) => PREVIEW[x]).map((x) => {
++            const [l, t, w] = PREVIEW[x];
++            return <img key={x} className="logo-prev" src={`/api/upload/${logo!.id}`} alt="" style={{ left: `${l}%`, top: `${t}%`, width: `${w}%` }} />;
++          })}
++          <div className="prev-note">Vorschau · Position und Größe unverbindlich</div>
++        </> : null} />
+       </div>
+       <div>
+         <div className="muted" style={{ textTransform: 'uppercase', fontSize: 13, letterSpacing: '.4px' }}>{p.brand} · Art.-Nr. {p.sku}</div>
+         <h1 style={{ margin: '4px 0 0' }}>{p.name}</h1>
+         {p.price != null ? <>
+-          <div className="price">ab {eur(p.price)}</div>
+-          <div className="vat">netto zzgl. MwSt. ({eur(p.priceGross)} brutto) · schon ab 1 Stück</div>
++          <div className="price">{eur(p.price)} <span style={{ fontSize: 15, fontWeight: 500 }} className="muted">/ Stück</span></div>
++          <div className="vat">netto zzgl. MwSt. ({eur(p.priceGross)} brutto) · schon ab 1 Stück{decoOn ? ' · Veredelung wird im Angebot kalkuliert' : ''}</div>
+         </> : <>
+           <div className="price" style={{ fontSize: 22, color: 'var(--brand)' }}>Preis auf Anfrage</div>
+           <div className="vat">Schon ab 1 Stück · Ihren Preis erhalten Sie umgehend per E-Mail</div>
+         </>}
+ 
+         {p.colors.length > 0 && <>
+-          <div className="opt">Farbe: <span className="muted">{color?.name}</span> <span className="muted" style={{ fontWeight: 400 }}>({p.colors.length} Farben)</span></div>
++          <div className="opt">Farbe: <span className="muted">{cname}</span> <span className="muted" style={{ fontWeight: 400 }}>({p.colors.length} Farben)</span></div>
+           <div className="swatches">
+-            {p.colors.map((c) => <button key={c.name} title={c.name} aria-label={c.name} className={`sw ${c.name === color?.name ? 'on' : ''}`} style={{ background: swatchBg(c) }} onClick={() => setColor(c)} />)}
++            {p.colors.map((c) => (
++              <button key={c.name} title={c.name} aria-label={c.name} className={`sw ${c.name === cname ? 'on' : ''}`} style={{ background: swatchBg(c) }} onClick={() => setColor(c)}>
++                {colorTotals[c.name] ? <span className="sw-n">{colorTotals[c.name]}</span> : null}
++              </button>
++            ))}
+           </div>
+         </>}
+ 
+-        {p.sizes.length > 1 && <>
+-          <div className="opt">Größe</div>
+-          <div className="sizes">{p.sizes.map((s) => <button key={s} className={`size ${s === size ? 'on' : ''}`} onClick={() => setSize(s)}>{s}</button>)}</div>
+-        </>}
++        <div className="opt">{sizes.length > 1 ? <>Mengen je Größe <span className="muted" style={{ fontWeight: 400 }}>– für {cname || 'diese Farbe'}</span></> : 'Menge'}</div>
++        <div className="matrix">
++          {sizes.map((s) => (
++            <label key={s} className={`mx ${qty[k(cname, s)] ? 'on' : ''}`}>
++              {s && <span>{s}</span>}
++              <input type="number" inputMode="numeric" min={0} placeholder="0" value={qty[k(cname, s)] || ''} onChange={(e) => setQ(s, Number(e.target.value))} aria-label={`Menge ${s}`} />
++            </label>
++          ))}
++        </div>
++        {p.colors.length > 1 && <p className="hint">Tipp: Farbe wechseln und weitere Mengen eintragen – alles landet zusammen im Warenkorb.</p>}
++
++        {/* Veredelung */}
++        <label className="deco-toggle">
++          <input type="checkbox" checked={decoOn} onChange={(e) => setDecoOn(e.target.checked)} />
++          <span><strong>Mit Logo veredeln</strong> <span className="muted">– Druck oder Stick</span></span>
++        </label>
++        {decoOn && (
++          <div className="deco">
++            <div className="deco-row">
++              {METHODS.map((m) => <button key={m} type="button" className={`size ${m === method ? 'on' : ''}`} onClick={() => setMethod(m)}>{m}</button>)}
++            </div>
++            <div className="opt" style={{ marginTop: 14 }}>Position(en)</div>
++            <div className="deco-row">
++              {POSITIONS.map((x) => <button key={x} type="button" className={`size ${positions.includes(x) ? 'on' : ''}`} onClick={() => togglePos(x)}>{x}</button>)}
++            </div>
++            <div className="opt" style={{ marginTop: 14 }}>Logo</div>
++            {logo ? (
++              <div className="logo-file">
++                {isImage(logo.name) ? <img src={`/api/upload/${logo.id}`} alt="" /> : <span className="file-ico">{logo.name.split('.').pop()?.toUpperCase()}</span>}
++                <span>{logo.name}{customerLogo && logo.id === customerLogo.id && <span className="muted"> · hinterlegt</span>}</span>
++                <button type="button" className="linkbtn" onClick={() => setLogo(null)}>ändern</button>
++              </div>
++            ) : (
++              <div className="deco-row">
++                <label className="btn alt upl">
++                  {uploading ? 'Lädt hoch …' : 'Logo hochladen'}
++                  <input type="file" accept=".png,.jpg,.jpeg,.webp,.svg,.pdf,.ai,.eps" hidden onChange={(e) => upload(e.target.files?.[0])} />
++                </label>
++                {customerLogo && <button type="button" className="linkbtn" onClick={() => setLogo(customerLogo)}>Hinterlegtes Logo verwenden</button>}
++              </div>
++            )}
++            {upErr && <p className="err" style={{ margin: '6px 0 0', fontSize: 14 }}>{upErr}</p>}
++            <p className="hint">PNG, JPG, SVG, PDF, AI oder EPS bis 15 MB. Vektordateien liefern das beste Ergebnis.</p>
++            <textarea className="deco-note" placeholder="Hinweise, z. B. Logogröße ca. 8 cm, Farben, Text/Namen auf dem Rücken …" value={note} onChange={(e) => setNote(e.target.value)} />
++          </div>
++        )}
+ 
+         <div className="qtyrow">
+-          <input className="qty" type="number" min={1} value={qty} onChange={(e) => setQty(Math.max(1, Number(e.target.value) || 1))} aria-label="Menge" />
+-          <button className="btn" disabled={needSize} onClick={onAdd}>{needSize ? 'Bitte Größe wählen' : 'In den Warenkorb'}</button>
++          <button className="btn" disabled={!total || !decoOk} onClick={onAdd}>
++            {!total ? 'Menge eintragen' : !decoOk ? 'Logo / Position wählen' : `${total} Stück in den Warenkorb`}
++          </button>
+           <WishButton id={p.id} variant="full" />
+         </div>
++        {total > 0 && p.price != null && <div className="note muted">Summe Textil: {eur(total * p.price)} netto</div>}
+         {msg && <div className="note ok">✓ {msg} <a href="/warenkorb" style={{ textDecoration: 'underline' }}>Zum Warenkorb</a></div>}
+ 
+         {p.features?.length ? <ul className="feat">{p.features.map((f) => <li key={f}>{f}</li>)}</ul> : <p style={{ marginTop: 20 }}>{p.description}</p>}
+@@ -73,7 +161,7 @@ export default function AddToCart({ p }: { p: PublicProduct }) {
+           {p.composition && <><dt>Zusammensetzung</dt><dd>{p.composition}</dd></>}
+           {p.gender && <><dt>Schnitt</dt><dd>{p.gender}</dd></>}
+           {p.sizes.length > 0 && <><dt>Größen</dt><dd>{p.sizes.join(', ')}</dd></>}
+-          {specs.map(([k, v]) => <Fragment key={k}><dt>{k}</dt><dd>{v}</dd></Fragment>)}
++          {specs.map(([key, v]) => <Fragment key={key}><dt>{key}</dt><dd>{v}</dd></Fragment>)}
+         </dl>
+       </div>
+     </div>
+diff --git a/app/produkt/[id]/page.tsx b/app/produkt/[id]/page.tsx
+index bc4a7e6..1e8943c 100644
+--- a/app/produkt/[id]/page.tsx
++++ b/app/produkt/[id]/page.tsx
+@@ -3,20 +3,22 @@ import { notFound } from 'next/navigation';
+ import AddToCart from './AddToCart';
+ import ProductCard from '@/components/ProductCard';
+ import { getByCategory, getProduct } from '@/lib/catalog';
++import { getCustomer } from '@/lib/customer';
+ 
+-export function generateMetadata({ params }: { params: { id: string } }) {
+-  const p = getProduct(decodeURIComponent(params.id));
++export async function generateMetadata({ params }: { params: { id: string } }) {
++  const p = getProduct(decodeURIComponent(params.id), await getCustomer());
+   return p ? { title: p.name, description: p.description.slice(0, 155) } : {};
+ }
+ 
+-export default function ProductPage({ params }: { params: { id: string } }) {
+-  const p = getProduct(decodeURIComponent(params.id));
++export default async function ProductPage({ params }: { params: { id: string } }) {
++  const ctx = await getCustomer();
++  const p = getProduct(decodeURIComponent(params.id), ctx);
+   if (!p) notFound();
+-  const related = getByCategory(p.categorySlug).filter((x) => x.id !== p.id).slice(0, 8);
++  const related = getByCategory(p.categorySlug, ctx).filter((x) => x.id !== p.id).slice(0, 8);
+   return (
+     <>
+       <div className="crumbs"><Link href="/">Start</Link> › <Link href={`/kategorie/${p.categorySlug}`}>{p.category}</Link> › {p.name}</div>
+-      <AddToCart p={p} />
++      <AddToCart p={p} customerLogo={ctx?.logoId ? { id: ctx.logoId, name: ctx.logoName ?? 'Ihr Logo' } : null} />
+       {related.length > 0 && <><h2>Ähnliche Artikel</h2><div className="grid">{related.map((r) => <ProductCard key={r.id} p={r} />)}</div></>}
+     </>
+   );
+diff --git a/app/suche/page.tsx b/app/suche/page.tsx
+index 745e857..30f6284 100644
+--- a/app/suche/page.tsx
++++ b/app/suche/page.tsx
+@@ -1,13 +1,14 @@
+ import ProductCard from '@/components/ProductCard';
+ import { search } from '@/lib/catalog';
++import { getCustomer } from '@/lib/customer';
+ 
+ export function generateMetadata({ searchParams }: { searchParams: { q?: string } }) {
+   return { title: `Suche: ${searchParams.q ?? ''}`, robots: { index: false } };
+ }
+ 
+-export default function SearchPage({ searchParams }: { searchParams: { q?: string } }) {
++export default async function SearchPage({ searchParams }: { searchParams: { q?: string } }) {
+   const q = (searchParams.q ?? '').trim();
+-  const res = q ? search(q, 200) : [];
++  const res = q ? search(q, 200, await getCustomer()) : [];
+   return (
+     <>
+       <h1>{q ? <>Ergebnisse für „{q}“</> : 'Suche'}</h1>
+diff --git a/app/warenkorb/page.tsx b/app/warenkorb/page.tsx
+index 3ef8f30..1fa15cd 100644
+--- a/app/warenkorb/page.tsx
++++ b/app/warenkorb/page.tsx
+@@ -4,6 +4,7 @@ import Link from 'next/link';
+ import { useCart } from '@/components/CartContext';
+ import ProductImage from '@/components/ProductImage';
+ import { eur } from '@/lib/format';
++import { decoLabel } from '@/lib/deco';
+ 
+ export default function CartPage() {
+   const { lines, setQty, remove, clear } = useCart();
+@@ -18,7 +19,7 @@ export default function CartPage() {
+     const f = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
+     const r = await fetch('/api/anfrage', {
+       method: 'POST', headers: { 'Content-Type': 'application/json' },
+-      body: JSON.stringify({ customer: f, lines: lines.map(({ id, color, size, qty }) => ({ id, color, size, qty })) }),
++      body: JSON.stringify({ customer: f, lines: lines.map(({ id, color, size, qty, deco }) => ({ id, color, size, qty, deco })) }),
+     });
+     const d = await r.json().catch(() => ({}));
+     if (r.ok) { setState('done'); clear(); } else { setState('error'); setErr(d.error ?? 'Senden fehlgeschlagen.'); }
+@@ -50,6 +51,7 @@ export default function CartPage() {
+               <div>
+                 <Link href={`/produkt/${encodeURIComponent(l.id)}`} style={{ fontWeight: 600 }}>{l.name}</Link>
+                 <div className="muted" style={{ fontSize: 13 }}>{[l.color, l.size, l.sku].filter(Boolean).join(' · ')}{l.price != null && <> · {eur(l.price)}/Stk.</>}</div>
++                {l.deco && <div className="deco-tag">✦ {decoLabel(l.deco)}</div>}
+               </div>
+               <input className="qty" style={{ width: 80, height: 40 }} type="number" min={1} value={l.qty} onChange={(e) => setQty(l.key, Number(e.target.value) || 1)} aria-label="Menge" />
+               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+@@ -73,8 +75,8 @@ export default function CartPage() {
+             <div><label>Telefon</label><input name="phone" type="tel" /></div>
+           </div>
+           <label>PLZ / Ort</label><input name="city" />
+-          <label>Veredelung / Nachricht</label>
+-          <textarea name="message" placeholder="Optional: Druck/Stick gewünscht? Liefertermin? …" />
++          <label>Nachricht</label>
++          <textarea name="message" placeholder="Optional: Liefertermin, Lieferadresse, Fragen …" />
+           <input className="hp" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
+           <label style={{ display: 'flex', gap: 8, fontWeight: 400 }}>
+             <input type="checkbox" name="privacy" required style={{ width: 'auto' }} />
+diff --git a/components/AdminLogout.tsx b/components/AdminLogout.tsx
+new file mode 100644
+index 0000000..1aa9388
+--- /dev/null
++++ b/components/AdminLogout.tsx
+@@ -0,0 +1,4 @@
++'use client';
++export default function AdminLogout() {
++  return <button type="button" className="linkbtn" onClick={async () => { await fetch('/api/admin/login', { method: 'DELETE' }); window.location.href = '/admin/login'; }}>Abmelden</button>;
++}
+diff --git a/components/AdminNav.tsx b/components/AdminNav.tsx
+new file mode 100644
+index 0000000..e90bf63
+--- /dev/null
++++ b/components/AdminNav.tsx
+@@ -0,0 +1,13 @@
++import Link from 'next/link';
++import AdminLogout from './AdminLogout';
++export default function AdminNav({ active }: { active: 'anfragen' | 'kunden' }) {
++  return (
++    <div className="admin-nav">
++      <Link href="/admin" className={active === 'anfragen' ? 'on' : ''}>Anfragen & Angebote</Link>
++      <Link href="/admin/kunden" className={active === 'kunden' ? 'on' : ''}>Kunden & Codes</Link>
++      <span style={{ flex: 1 }} />
++      <Link href="/">Zum Shop</Link>
++      <AdminLogout />
++    </div>
++  );
++}
+diff --git a/components/CartContext.tsx b/components/CartContext.tsx
+index dcb158e..aee3ae5 100644
+--- a/components/CartContext.tsx
++++ b/components/CartContext.tsx
+@@ -1,8 +1,9 @@
+ 'use client';
+ import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
++import type { Deco } from '@/lib/deco';
+ 
+-export type CartLine = { key: string; id: string; sku: string; name: string; color?: string; size?: string; qty: number; price: number | null; hex?: string; category: string; image?: string };
+-type Ctx = { lines: CartLine[]; add: (l: Omit<CartLine, 'key'>) => void; setQty: (key: string, qty: number) => void; remove: (key: string) => void; clear: () => void; count: number };
++export type CartLine = { key: string; id: string; sku: string; name: string; color?: string; size?: string; qty: number; price: number | null; hex?: string; category: string; image?: string; deco?: Deco | null };
++type Ctx = { lines: CartLine[]; add: (l: Omit<CartLine, 'key'>) => void; addMany: (ls: Omit<CartLine, 'key'>[]) => void; setQty: (key: string, qty: number) => void; remove: (key: string) => void; clear: () => void; count: number };
+ 
+ const CartCtx = createContext<Ctx | null>(null);
+ const KEY = 'et-cart-v2'; // v1 enthielt Demo-Artikel
+@@ -12,16 +13,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
+   useEffect(() => { try { setLines(JSON.parse(localStorage.getItem(KEY) || '[]')); } catch {} }, []);
+   const save = (next: CartLine[]) => { setLines(next); try { localStorage.setItem(KEY, JSON.stringify(next)); } catch {} };
+ 
+-  const add: Ctx['add'] = (l) => {
+-    const key = `${l.id}|${l.color ?? ''}|${l.size ?? ''}`;
+-    const ex = lines.find((x) => x.key === key);
+-    save(ex ? lines.map((x) => (x.key === key ? { ...x, qty: x.qty + l.qty } : x)) : [...lines, { ...l, key }]);
++  const merge = (base: CartLine[], l: Omit<CartLine, 'key'>) => {
++    const key = `${l.id}|${l.color ?? ''}|${l.size ?? ''}|${l.deco ? JSON.stringify(l.deco) : ''}`;
++    const ex = base.find((x) => x.key === key);
++    return ex ? base.map((x) => (x.key === key ? { ...x, qty: x.qty + l.qty } : x)) : [...base, { ...l, key }];
+   };
++  const add: Ctx['add'] = (l) => save(merge(lines, l));
++  const addMany: Ctx['addMany'] = (ls) => save(ls.reduce(merge, lines));
+   const setQty = (key: string, qty: number) => save(lines.map((x) => (x.key === key ? { ...x, qty: Math.max(1, qty) } : x)));
+   const remove = (key: string) => save(lines.filter((x) => x.key !== key));
+   const clear = () => save([]);
+   const count = lines.reduce((s, l) => s + l.qty, 0);
+-  return <CartCtx.Provider value={{ lines, add, setQty, remove, clear, count }}>{children}</CartCtx.Provider>;
++  return <CartCtx.Provider value={{ lines, add, addMany, setQty, remove, clear, count }}>{children}</CartCtx.Provider>;
+ }
+ export const useCart = () => useContext(CartCtx)!;
+ 
+diff --git a/components/Gallery.tsx b/components/Gallery.tsx
+new file mode 100644
+index 0000000..48afb3f
+--- /dev/null
++++ b/components/Gallery.tsx
+@@ -0,0 +1,83 @@
++'use client';
++import { useEffect, useRef, useState, type ReactNode } from 'react';
++import ProductImage from './ProductImage';
++import type { PublicProduct } from '@/lib/types';
++
++/** L-Shop: 665px-Vorschau -> Originalbild für den Zoom */
++export const hiRes = (src: string) => src.replace(/\/generated\/product\/(\d+)\/\d+_\d+_\d+\//, '/master/product/$1/');
++const Z = 2.6; // Zoomfaktor
++
++type Props = { p: PublicProduct; hex?: string; overlay?: ReactNode };
++
++/** Produktgalerie wie bei Amazon: Thumbnails per Hover, Lupe mit Zoomfenster neben dem Bild, Vollbild per Klick */
++export default function Gallery({ p, hex, overlay }: Props) {
++  const imgs = p.images;
++  const [i, setI] = useState(0);
++  const [zoom, setZoom] = useState<{ lx: number; ly: number; lw: number; lh: number; bx: number; by: number; bw: number; bh: number } | null>(null);
++  const [full, setFull] = useState(false);
++  const box = useRef<HTMLDivElement>(null);
++  const src = imgs[i];
++
++  // Hi-Res vorladen, damit der Zoom sofort scharf ist
++  useEffect(() => { if (src) { const im = new Image(); im.src = hiRes(src); } }, [src]);
++  useEffect(() => {
++    if (!full) return;
++    const k = (e: KeyboardEvent) => {
++      if (e.key === 'Escape') setFull(false);
++      if (e.key === 'ArrowRight') setI((x) => (x + 1) % imgs.length);
++      if (e.key === 'ArrowLeft') setI((x) => (x - 1 + imgs.length) % imgs.length);
++    };
++    window.addEventListener('keydown', k);
++    document.body.style.overflow = 'hidden';
++    return () => { window.removeEventListener('keydown', k); document.body.style.overflow = ''; };
++  }, [full, imgs.length]);
++
++  function move(e: React.MouseEvent) {
++    const el = box.current?.querySelector('img.pimg') as HTMLImageElement | null;
++    if (!el || !el.naturalWidth || window.matchMedia('(hover: none), (max-width: 820px)').matches) return;
++    const r = el.getBoundingClientRect();
++    // tatsächlich sichtbare Bildfläche (object-fit: contain)
++    const s = Math.min(r.width / el.naturalWidth, r.height / el.naturalHeight);
++    const w = el.naturalWidth * s, h = el.naturalHeight * s;
++    const ox = r.left + (r.width - w) / 2, oy = r.top + (r.height - h) / 2;
++    const x = e.clientX - ox, y = e.clientY - oy;
++    if (x < 0 || y < 0 || x > w || y > h) { setZoom(null); return; }
++    const pane = r.width; // Zoomfenster = so groß wie die Galerie
++    const lw = Math.min(w, pane / Z), lh = Math.min(h, pane / Z);
++    const lx = Math.max(0, Math.min(w - lw, x - lw / 2)), ly = Math.max(0, Math.min(h - lh, y - lh / 2));
++    setZoom({ lx: lx + (r.width - w) / 2, ly: ly + (r.height - h) / 2, lw, lh, bx: -lx * Z, by: -ly * Z, bw: w * Z, bh: h * Z });
++  }
++
++  return (
++    <div className="gal">
++      <div className="gal-main">
++        {imgs.length > 1 && (
++          <div className="gal-thumbs">
++            {imgs.map((t, k) => (
++              <button key={t} className={k === i ? 'on' : ''} onMouseEnter={() => setI(k)} onFocus={() => setI(k)} onClick={() => setI(k)} aria-label={`Bild ${k + 1}`}>
++                <img src={t} alt="" loading="lazy" />
++              </button>
++            ))}
++          </div>
++        )}
++        <div ref={box} className={`gallery ${src ? 'zoomable' : ''}`} onMouseMove={src ? move : undefined} onMouseLeave={() => setZoom(null)} onClick={() => src && setFull(true)}>
++          <ProductImage p={p} src={src} hex={hex} />
++          {overlay}
++          {zoom && <div className="gal-lens" style={{ left: zoom.lx, top: zoom.ly, width: zoom.lw, height: zoom.lh }} />}
++        </div>
++        {zoom && src && <div className="gal-zoom" style={{ backgroundImage: `url("${hiRes(src)}"), url("${src}")`, backgroundSize: `${zoom.bw}px ${zoom.bh}px`, backgroundPosition: `${zoom.bx}px ${zoom.by}px` }} />}
++      </div>
++      {src && <p className="gal-hint">{imgs.length > 1 ? 'Mit der Maus über Bild fahren zum Vergrößern · Klick für Vollbild' : 'Mit der Maus über Bild fahren zum Vergrößern'}</p>}
++
++      {full && src && (
++        <div className="lightbox" onClick={() => setFull(false)} role="dialog" aria-modal="true">
++          <button className="lb-x" aria-label="Schließen">×</button>
++          {imgs.length > 1 && <button className="lb-nav l" aria-label="Vorheriges Bild" onClick={(e) => { e.stopPropagation(); setI((x) => (x - 1 + imgs.length) % imgs.length); }}>‹</button>}
++          <img src={hiRes(src)} alt={p.name} onClick={(e) => e.stopPropagation()} onError={(e) => { (e.target as HTMLImageElement).src = src; }} />
++          {imgs.length > 1 && <button className="lb-nav r" aria-label="Nächstes Bild" onClick={(e) => { e.stopPropagation(); setI((x) => (x + 1) % imgs.length); }}>›</button>}
++          {imgs.length > 1 && <div className="lb-count">{i + 1} / {imgs.length}</div>}
++        </div>
++      )}
++    </div>
++  );
++}
+diff --git a/components/ProductCard.tsx b/components/ProductCard.tsx
+index 3939545..1bce961 100644
+--- a/components/ProductCard.tsx
++++ b/components/ProductCard.tsx
+@@ -8,7 +8,7 @@ import { WishButton } from './Wishlist';
+ export default function ProductCard({ p }: { p: PublicProduct }) {
+   return (
+     <Link href={`/produkt/${encodeURIComponent(p.id)}`} className="card">
+-      <div className="img"><ProductImage p={p} /><WishButton id={p.id} /></div>
++      <div className="img"><ProductImage p={p} />{p.images[1] && <img className="pimg img2" src={p.images[1]} alt="" loading="lazy" aria-hidden />}<WishButton id={p.id} /></div>
+       <div className="b">
+         <div className="brand">{p.brand}</div>
+         <div className="name">{p.name}</div>
+diff --git a/components/Wishlist.tsx b/components/Wishlist.tsx
+index 37c7b0e..ff9e945 100644
+--- a/components/Wishlist.tsx
++++ b/components/Wishlist.tsx
+@@ -1,7 +1,7 @@
+ 'use client';
+ import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+ 
+-type Ctx = { ids: string[]; has: (id: string) => boolean; toggle: (id: string) => void; clear: () => void };
++type Ctx = { ids: string[]; has: (id: string) => boolean; toggle: (id: string) => void; clear: () => void; addAll: (ids: string[]) => void };
+ const WishCtx = createContext<Ctx | null>(null);
+ const KEY = 'et-merkliste-v1';
+ 
+@@ -11,7 +11,8 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
+   const save = (next: string[]) => { setIds(next); try { localStorage.setItem(KEY, JSON.stringify(next)); } catch {} };
+   const has = (id: string) => ids.includes(id);
+   const toggle = (id: string) => save(has(id) ? ids.filter((x) => x !== id) : [id, ...ids]);
+-  return <WishCtx.Provider value={{ ids, has, toggle, clear: () => save([]) }}>{children}</WishCtx.Provider>;
++  const addAll = (more: string[]) => save([...ids, ...more.filter((x) => !ids.includes(x))]);
++  return <WishCtx.Provider value={{ ids, has, toggle, clear: () => save([]), addAll }}>{children}</WishCtx.Provider>;
+ }
+ export const useWishlist = () => useContext(WishCtx)!;
+ 
+diff --git a/lib/access.ts b/lib/access.ts
+index f88c556..d12e4ad 100644
+--- a/lib/access.ts
++++ b/lib/access.ts
+@@ -1,35 +1,34 @@
+-// Zugangscodes – funktioniert in Middleware (Edge) und im Node-Server (Web Crypto)
+-// .env:  ACCESS_CODES=FIRMA24:Firma Muster GmbH,TEAM-XY:Verein XY   (Name nach dem Doppelpunkt ist optional)
+-//        ACCESS_SECRET=<langer Zufallswert>   – ändern = alle Freischaltungen ungültig
++// Signierte Cookies für Kunden-Zugang und Admin – läuft in Middleware (Edge) und Node (Web Crypto)
+ export const ACCESS_COOKIE = 'et_access';
++export const ADMIN_COOKIE = 'et_admin';
+ export const ACCESS_DAYS = 180;
+ 
+-export type AccessCode = { code: string; label: string };
++const enc = new TextEncoder();
++const hex = (b: ArrayBuffer) => Array.from(new Uint8Array(b), (x) => x.toString(16).padStart(2, '0')).join('');
++const secret = () => process.env.ACCESS_SECRET || 'euro-trade';
+ 
+-export function accessCodes(): AccessCode[] {
+-  return (process.env.ACCESS_CODES ?? '')
+-    .split(',')
+-    .map((x) => x.trim())
+-    .filter(Boolean)
+-    .map((x) => {
+-      const [code, ...rest] = x.split(':');
+-      return { code: code.trim().toUpperCase(), label: rest.join(':').trim() };
+-    })
+-    .filter((c) => c.code);
++export async function hmac(msg: string, key = secret()): Promise<string> {
++  const k = await crypto.subtle.importKey('raw', enc.encode(key), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
++  return hex(await crypto.subtle.sign('HMAC', k, enc.encode(msg)));
+ }
+ 
+-/** Shop ist nur gesperrt, wenn mindestens ein Code hinterlegt ist */
+-export const accessEnabled = () => accessCodes().length > 0;
++export const normCode = (c: string) => String(c ?? '').trim().toUpperCase();
+ 
+-export async function tokenFor(code: string): Promise<string> {
+-  const data = new TextEncoder().encode(`${process.env.ACCESS_SECRET ?? 'euro-trade'}|${code.trim().toUpperCase()}`);
+-  const buf = await crypto.subtle.digest('SHA-256', data);
+-  return Array.from(new Uint8Array(buf), (b) => b.toString(16).padStart(2, '0')).join('');
+-}
++/** Shop geschlossen? – SHOP_CLOSED=true oder Codes in ACCESS_CODES */
++export const shopClosed = () => process.env.SHOP_CLOSED === 'true' || !!(process.env.ACCESS_CODES ?? '').trim();
+ 
+-/** Liefert den freigeschalteten Code zum Cookie-Wert – oder null (Code entfernt / ungültig) */
+-export async function codeForToken(token?: string | null): Promise<AccessCode | null> {
++/** Cookie-Wert: CODE.signatur */
++export async function signCode(code: string) { const c = normCode(code); return `${encodeURIComponent(c)}.${await hmac('code|' + c)}`; }
++export async function verifyCodeToken(token?: string | null): Promise<string | null> {
+   if (!token) return null;
+-  for (const c of accessCodes()) if ((await tokenFor(c.code)) === token) return c;
+-  return null;
++  const i = token.lastIndexOf('.');
++  if (i < 1) return null;
++  const code = decodeURIComponent(token.slice(0, i));
++  return (await hmac('code|' + code)) === token.slice(i + 1) ? code : null;
++}
++
++/** Admin-Cookie: hängt am Passwort – Passwort ändern = alle Admin-Sitzungen ungültig */
++export async function adminToken() { return hmac('admin|' + (process.env.ADMIN_PASSWORD ?? '')); }
++export async function isAdminToken(token?: string | null) {
++  return !!process.env.ADMIN_PASSWORD && !!token && token === (await adminToken());
+ }
+diff --git a/lib/catalog.ts b/lib/catalog.ts
+index 87d65db..ab64d64 100644
+--- a/lib/catalog.ts
++++ b/lib/catalog.ts
+@@ -37,23 +37,50 @@ function load(): State {
+   return state;
+ }
+ 
+-export function toPublic(p: Product): PublicProduct {
++/** Kundenkontext: eigener Aufschlag, eigene Kollektion */
++export type Ctx = { markup?: number | null; skus?: string[]; exclusive?: boolean } | null | undefined;
++
++export function toPublic(p: Product, ctx?: Ctx): PublicProduct {
+   const { basePrice, ...rest } = p;
+-  const price = basePrice != null && basePrice > 0 ? sellPrice(basePrice, p.categorySlug) : null;
++  const price = basePrice != null && basePrice > 0 ? sellPrice(basePrice, p.categorySlug, ctx?.markup) : null;
+   return { ...rest, colors: sortColors(p.colors), price, priceGross: price != null ? gross(price) : null };
+ }
+ 
+-export const getCategories = () => load().categories;
+-export const getProduct = (id: string) => {
++const skuSet = (ctx: Ctx) => new Set((ctx?.skus ?? []).map((x) => x.toUpperCase()));
++/** Sichtbar für diesen Kunden? (exklusive Kunden sehen nur ihre Kollektion) */
++const visible = (ctx: Ctx) => {
++  const set = skuSet(ctx);
++  return ctx?.exclusive && set.size ? (p: Product) => set.has(p.sku.toUpperCase()) : () => true;
++};
++const products = (ctx: Ctx) => load().products.filter(visible(ctx));
++
++export function getCategories(ctx?: Ctx): Category[] {
++  if (!(ctx?.exclusive && ctx.skus?.length)) return load().categories;
++  const m = new Map<string, Category>();
++  for (const p of products(ctx)) {
++    const c = m.get(p.categorySlug) ?? { name: p.category, slug: p.categorySlug, count: 0 };
++    c.count++; m.set(p.categorySlug, c);
++  }
++  return [...m.values()].sort((a, b) => b.count - a.count);
++}
++export const getProduct = (id: string, ctx?: Ctx) => {
+   const p = load().byId.get(id);
+-  return p ? toPublic(p) : null;
++  return p && visible(ctx)(p) ? toPublic(p, ctx) : null;
+ };
+-export const getByCategory = (slug: string) =>
+-  load().products.filter((p) => p.categorySlug === slug).map(toPublic);
+-export const getFeatured = (n = 12) => load().products.slice(0, n).map(toPublic);
+-export const productCount = () => load().products.length;
++export const getByCategory = (slug: string, ctx?: Ctx) => products(ctx).filter((p) => p.categorySlug === slug).map((p) => toPublic(p, ctx));
++export const getFeatured = (n = 12, ctx?: Ctx) => products(ctx).slice(0, n).map((p) => toPublic(p, ctx));
++export const productCount = (ctx?: Ctx) => products(ctx).length;
++/** Kundenkollektion in der hinterlegten Reihenfolge */
++export function getCollection(ctx?: Ctx): PublicProduct[] {
++  const s = load();
++  const bySku = new Map(s.products.map((p) => [p.sku.toUpperCase(), p]));
++  return (ctx?.skus ?? []).flatMap((k) => { const p = bySku.get(k.toUpperCase()); return p ? [toPublic(p, ctx)] : []; });
++}
++/** Alle Artikel (Admin: Auswahl für Kollektionen) */
++export const allProductsBrief = () => load().products.map((p) => ({ sku: p.sku, name: p.name, brand: p.brand }));
+ 
+-export function search(q: string, limit = 48): PublicProduct[] {
++export function search(q: string, limit = 48, ctx?: Ctx): PublicProduct[] {
+   const s = load();
+-  return runSearch(s.index, q, limit, s.skus).map((id) => toPublic(s.byId.get(id)!));
++  const ok = visible(ctx);
++  return runSearch(s.index, q, limit * 2, s.skus).map((id) => s.byId.get(id)!).filter(ok).slice(0, limit).map((p) => toPublic(p, ctx));
+ }
+diff --git a/lib/customer.ts b/lib/customer.ts
+new file mode 100644
+index 0000000..819b410
+--- /dev/null
++++ b/lib/customer.ts
+@@ -0,0 +1,18 @@
++import 'server-only';
++import { cookies } from 'next/headers';
++import { ACCESS_COOKIE, ADMIN_COOKIE, isAdminToken, shopClosed, verifyCodeToken } from './access';
++import { findCustomer, type Customer } from './store';
++
++/** Angemeldeter Kunde (aus signiertem Cookie) – null, wenn kein/ungültiger/gesperrter Code */
++export async function getCustomer(): Promise<Customer | null> {
++  const code = await verifyCodeToken(cookies().get(ACCESS_COOKIE)?.value);
++  return code ? findCustomer(code) : null;
++}
++export async function isAdmin() { return isAdminToken(cookies().get(ADMIN_COOKIE)?.value); }
++
++/** Darf der Besucher den Shop sehen? (offen, Kunde oder Admin) */
++export async function shopAccess(): Promise<{ ok: boolean; customer: Customer | null }> {
++  const customer = await getCustomer();
++  if (!shopClosed() || customer) return { ok: true, customer };
++  return { ok: await isAdmin(), customer: null };
++}
+diff --git a/lib/deco.ts b/lib/deco.ts
+new file mode 100644
+index 0000000..eb75012
+--- /dev/null
++++ b/lib/deco.ts
+@@ -0,0 +1,10 @@
++// Veredelung – geteilt zwischen Shop (Client) und Server
++export type Deco = { positions: string[]; method: string; logoId?: string | null; logoName?: string | null; note?: string };
++export const METHODS = ['Druck', 'Stick', 'Beratung gewünscht'];
++export const POSITIONS = ['Brust links', 'Brust mittig', 'Brust rechts', 'Rücken', 'Nacken', 'Ärmel links', 'Ärmel rechts'];
++/** Vorschau-Position auf dem Frontbild (Prozent: links, oben, Breite) */
++export const PREVIEW: Record<string, [number, number, number]> = {
++  'Brust links': [60, 30, 14], 'Brust rechts': [40, 30, 14], 'Brust mittig': [50, 34, 28],
++};
++export const isImage = (name?: string | null) => /\.(png|jpe?g|webp|svg)$/i.test(name ?? '');
++export const decoLabel = (d?: Deco | null) => (d ? `${d.method}: ${d.positions.join(', ')}${d.logoName ? ` · Logo: ${d.logoName}` : ''}` : '');
+diff --git a/lib/mail.ts b/lib/mail.ts
+new file mode 100644
+index 0000000..55bc7bd
+--- /dev/null
++++ b/lib/mail.ts
+@@ -0,0 +1,15 @@
++import 'server-only';
++import nodemailer from 'nodemailer';
++
++export const mailEnabled = () => !!process.env.SMTP_HOST;
++export async function sendMail(opts: { to: string; subject: string; html: string; replyTo?: string; attachments?: { filename: string; content: Buffer }[] }) {
++  if (!mailEnabled()) { console.log(`[Mail nicht konfiguriert] ${opts.subject} -> ${opts.to}`); return false; }
++  const tx = nodemailer.createTransport({
++    host: process.env.SMTP_HOST, port: Number(process.env.SMTP_PORT ?? 587), secure: Number(process.env.SMTP_PORT) === 465,
++    auth: process.env.SMTP_USER ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS } : undefined,
++  });
++  await tx.sendMail({ from: process.env.SMTP_FROM ?? process.env.SMTP_USER, ...opts });
++  return true;
++}
++export const esc = (s: unknown) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
++export const shopUrl = () => (process.env.SHOP_URL ?? 'https://euro-trade.com').replace(/\/$/, '');
+diff --git a/lib/pdf.ts b/lib/pdf.ts
+new file mode 100644
+index 0000000..c13bd03
+--- /dev/null
++++ b/lib/pdf.ts
+@@ -0,0 +1,124 @@
++import 'server-only';
++import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from 'pdf-lib';
++import { offerTotals, type Inquiry } from './store';
++
++const eur = (n: number) => n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' EUR';
++const date = (d: Date) => d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
++const BRAND = rgb(0.043, 0.306, 0.635);
++const INK = rgb(0.08, 0.09, 0.12);
++const MUTED = rgb(0.36, 0.4, 0.46);
++const LINE = rgb(0.86, 0.88, 0.91);
++
++/** Absenderzeilen – überschreibbar per .env OFFER_SENDER="Zeile 1|Zeile 2|…" */
++const sender = () => (process.env.OFFER_SENDER ?? 'Euro-Trade · Sebastian Hosbach|Seehan 28 · 44263 Dortmund|Tel. 0173 2648097 · info@euro-trade.com').split('|');
++
++export async function offerPdf(i: Inquiry): Promise<Buffer> {
++  const o = i.offer!;
++  const doc = await PDFDocument.create();
++  const font = await doc.embedFont(StandardFonts.Helvetica);
++  const bold = await doc.embedFont(StandardFonts.HelveticaBold);
++  doc.setTitle(`Angebot ${i.no}`);
++  doc.setAuthor(process.env.SHOP_NAME ?? 'Euro-Trade');
++
++  // Nur Zeichen, die Helvetica (WinAnsi) kann – Rest ersetzen
++  const ok = new Map<string, boolean>();
++  const clean = (s: string) => Array.from(String(s ?? '')).map((ch) => {
++    if (!ok.has(ch)) { try { font.encodeText(ch); ok.set(ch, true); } catch { ok.set(ch, false); } }
++    return ok.get(ch) ? ch : ch === '✦' ? '*' : '?';
++  }).join('');
++  const wrap = (s: string, f: PDFFont, size: number, max: number) => {
++    const out: string[] = [];
++    for (const para of clean(s).split('\n')) {
++      let line = '';
++      for (const w of para.split(' ')) {
++        const t = line ? `${line} ${w}` : w;
++        if (f.widthOfTextAtSize(t, size) > max && line) { out.push(line); line = w; } else line = t;
++      }
++      out.push(line);
++    }
++    return out;
++  };
++
++  const W = 595.28, H = 841.89, L = 56, R = W - 56;
++  let page: PDFPage = doc.addPage([W, H]);
++  let y = H - 56;
++  const text = (s: string, x: number, yy: number, o2: { f?: PDFFont; size?: number; color?: ReturnType<typeof rgb>; right?: boolean } = {}) => {
++    const f = o2.f ?? font, size = o2.size ?? 10, t = clean(s);
++    page.drawText(t, { x: o2.right ? x - f.widthOfTextAtSize(t, size) : x, y: yy, size, font: f, color: o2.color ?? INK });
++  };
++  const footer = () => {
++    page.drawLine({ start: { x: L, y: 48 }, end: { x: R, y: 48 }, thickness: 0.5, color: LINE });
++    text(sender().join('  ·  '), L, 36, { size: 7.5, color: MUTED });
++  };
++
++  // Kopf
++  page.drawRectangle({ x: L, y: y - 22, width: 26, height: 26, color: rgb(0.949, 0.718, 0.02) });
++  text('E', L + 7.5, y - 15, { f: bold, size: 15, color: rgb(0.04, 0.18, 0.39) });
++  text(process.env.SHOP_NAME ?? 'Euro-Trade', L + 36, y - 10, { f: bold, size: 18, color: BRAND });
++  text('Textil · Werbemittel', L + 36, y - 22, { size: 8, color: MUTED });
++  sender().forEach((s, k) => text(s, R, y - 2 - k * 11, { size: 8.5, color: MUTED, right: true }));
++  y -= 70;
++
++  // Empfänger + Daten
++  const c = i.customer;
++  const addr = [c.company, c.name, c.city, c.email].filter(Boolean);
++  text(sender()[0] + ' · ' + (sender()[1] ?? ''), L, y + 14, { size: 7, color: MUTED });
++  addr.forEach((s, k) => text(s, L, y - k * 13, { size: 10.5, f: k === 0 ? bold : font }));
++  const created = new Date(o.createdAt);
++  const valid = new Date(created.getTime() + o.validDays * 86400000);
++  [['Angebot-Nr.', i.no], ['Datum', date(created)], ['Gültig bis', date(valid)], ...(i.zugangscode ? [['Kunden-Code', i.zugangscode.split(' (')[0]]] : [])]
++    .forEach(([k, v], n) => { text(k, R - 150, y - n * 13, { size: 9, color: MUTED }); text(v, R, y - n * 13, { size: 9.5, f: bold, right: true }); });
++  y -= Math.max(addr.length, 4) * 13 + 30;
++
++  text(`Angebot ${i.no}`, L, y, { f: bold, size: 16 });
++  y -= 18;
++  text(`Guten Tag ${c.name}, vielen Dank für Ihre Anfrage. Gerne bieten wir Ihnen an:`, L, y, { size: 10, color: MUTED });
++  y -= 26;
++
++  // Tabelle
++  const cols = { pos: L, text: L + 28, qty: R - 175, price: R - 85, sum: R };
++  const head = () => {
++    page.drawRectangle({ x: L - 6, y: y - 6, width: R - L + 12, height: 20, color: rgb(0.94, 0.96, 0.99) });
++    text('Pos.', cols.pos, y, { f: bold, size: 8.5 }); text('Artikel / Leistung', cols.text, y, { f: bold, size: 8.5 });
++    text('Menge', cols.qty, y, { f: bold, size: 8.5, right: true }); text('Einzelpreis', cols.price, y, { f: bold, size: 8.5, right: true }); text('Gesamt', cols.sum, y, { f: bold, size: 8.5, right: true });
++    y -= 22;
++  };
++  const newPage = () => { footer(); page = doc.addPage([W, H]); y = H - 60; head(); };
++  head();
++  o.lines.forEach((l, n) => {
++    const t = wrap(l.text, bold, 9.5, cols.qty - cols.text - 50);
++    const d = l.detail ? wrap(l.detail, font, 8.5, cols.qty - cols.text - 50) : [];
++    const h = (t.length - 1) * 12 + d.length * 11 + 6;
++    if (y - h < 120) newPage();
++    text(String(n + 1), cols.pos, y, { size: 9.5 });
++    t.forEach((s, k) => text(s, cols.text, y - k * 12, { f: bold, size: 9.5 }));
++    d.forEach((s, k) => text(s, cols.text, y - t.length * 12 - k * 11 + 1, { size: 8.5, color: MUTED }));
++    text(l.qty.toLocaleString('de-DE'), cols.qty, y, { size: 9.5, right: true });
++    text(eur(l.price), cols.price, y, { size: 9.5, right: true });
++    text(eur(l.qty * l.price), cols.sum, y, { size: 9.5, right: true });
++    y -= h;
++    page.drawLine({ start: { x: L - 6, y }, end: { x: R + 6, y }, thickness: 0.4, color: LINE });
++    y -= 15;
++  });
++
++  // Summen
++  const tot = offerTotals(o);
++  if (y < 190) newPage();
++  y -= 10;
++  const sumRow = (k: string, v: string, b = false) => { text(k, cols.price, y, { size: b ? 11 : 9.5, f: b ? bold : font, right: true }); text(v, cols.sum, y, { size: b ? 11 : 9.5, f: b ? bold : font, right: true }); y -= b ? 18 : 14; };
++  if (o.shipping) sumRow('Versand', eur(o.shipping));
++  sumRow('Summe netto', eur(tot.net));
++  sumRow(`zzgl. ${o.vat} % MwSt.`, eur(tot.vat));
++  page.drawLine({ start: { x: cols.qty - 40, y: y + 10 }, end: { x: R, y: y + 10 }, thickness: 0.8, color: INK });
++  y -= 4;
++  sumRow('Gesamtbetrag', eur(tot.gross), true);
++  y -= 14;
++
++  const notes = [o.note, `Dieses Angebot ist gültig bis ${date(valid)}. Lieferzeit nach Auftragsbestätigung und Freigabe der Veredelung ca. 7–14 Werktage.`, 'Sie können das Angebot bequem über den Link in unserer E-Mail annehmen oder einfach auf diese E-Mail antworten.'].filter(Boolean) as string[];
++  for (const n of notes) for (const s of wrap(n, font, 9.5, R - L)) { if (y < 80) { footer(); page = doc.addPage([W, H]); y = H - 60; } text(s, L, y, { size: 9.5 }); y -= 13; }
++  y -= 8;
++  text('Mit freundlichen Grüßen', L, y, { size: 9.5 });
++  text(sender()[0], L, y - 13, { size: 9.5, f: bold });
++  footer();
++  return Buffer.from(await doc.save());
++}
+diff --git a/lib/pricing.ts b/lib/pricing.ts
+index af1b603..c2203b3 100644
+--- a/lib/pricing.ts
++++ b/lib/pricing.ts
+@@ -4,8 +4,9 @@ const round99 = (process.env.PRICE_ROUND_99 ?? 'true') === 'true';
+ let byCat: Record<string, number> = {};
+ try { byCat = JSON.parse(process.env.MARKUP_BY_CATEGORY || '{}'); } catch { byCat = {}; }
+ 
+-export function sellPrice(basePrice: number, categorySlug: string): number {
+-  const pct = byCat[categorySlug] ?? markup;
++/** override = kundenspezifischer Aufschlag (Zugangscode) – hat Vorrang vor Kategorie und Standard */
++export function sellPrice(basePrice: number, categorySlug: string, override?: number | null): number {
++  const pct = override != null && Number.isFinite(override) ? override : byCat[categorySlug] ?? markup;
+   let p = basePrice * (1 + pct / 100);
+   if (round99 && p >= 1) p = Math.ceil(p * 10) / 10 - 0.01; // z. B. 4,23 -> 4,29
+   return Math.round(p * 100) / 100;
+diff --git a/lib/store.ts b/lib/store.ts
+new file mode 100644
+index 0000000..4bc1dbb
+--- /dev/null
++++ b/lib/store.ts
+@@ -0,0 +1,108 @@
++import 'server-only';
++import fs from 'node:fs';
++import path from 'node:path';
++import crypto from 'node:crypto';
++
++export const DATA = path.join(process.cwd(), 'data');
++export const UPLOADS = path.join(DATA, 'uploads');
++const INQ = path.join(DATA, 'anfragen');
++
++export function readJSON<T>(file: string, fallback: T): T {
++  try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return fallback; }
++}
++export function writeJSON(file: string, data: unknown) {
++  fs.mkdirSync(path.dirname(file), { recursive: true });
++  const tmp = `${file}.${process.pid}.tmp`;
++  fs.writeFileSync(tmp, JSON.stringify(data, null, 2));
++  fs.renameSync(tmp, file);
++}
++export const randomId = (bytes = 12) => crypto.randomBytes(bytes).toString('hex');
++
++/* ---------- Kunden (Zugangscodes) ---------- */
++export type Customer = {
++  code: string;
++  name: string;
++  /** Aufschlag in % – leer = Standard (MARKUP_PERCENT) */
++  markup?: number | null;
++  /** Artikelnummern der Kundenkollektion */
++  skus?: string[];
++  /** true = Kunde sieht NUR seine Kollektion */
++  exclusive?: boolean;
++  /** hinterlegtes Logo (Upload-ID) */
++  logoId?: string | null;
++  logoName?: string | null;
++  note?: string;
++  active?: boolean;
++};
++const CUST = path.join(DATA, 'kunden.json');
++
++/** Codes aus .env (ACCESS_CODES=CODE:Name,…) – zusätzlich zu den im Admin angelegten */
++function envCustomers(): Customer[] {
++  return (process.env.ACCESS_CODES ?? '').split(',').map((x) => x.trim()).filter(Boolean).map((x) => {
++    const [code, ...rest] = x.split(':');
++    return { code: code.trim().toUpperCase(), name: rest.join(':').trim() || code.trim().toUpperCase(), active: true };
++  });
++}
++export function fileCustomers(): Customer[] { return readJSON<Customer[]>(CUST, []); }
++export function saveCustomers(list: Customer[]) { writeJSON(CUST, list); }
++export function allCustomers(): (Customer & { source: 'admin' | 'env' })[] {
++  const file = fileCustomers().map((c) => ({ ...c, source: 'admin' as const }));
++  const env = envCustomers().filter((e) => !file.some((f) => f.code === e.code)).map((c) => ({ ...c, source: 'env' as const }));
++  return [...file, ...env];
++}
++export const findCustomer = (code: string) => allCustomers().find((c) => c.code === code.toUpperCase() && c.active !== false) ?? null;
++
++/* ---------- Anfragen / Angebote ---------- */
++import type { Deco } from './deco';
++export type { Deco };
++export type InqLine = { id?: string; sku: string; name: string; color: string; size: string; qty: number; price: number | null; sum: number; deco?: Deco | null };
++export type OfferLine = { text: string; detail?: string; qty: number; price: number };
++export type Offer = { lines: OfferLine[]; shipping: number; note: string; validDays: number; createdAt: string; sentAt?: string | null; vat: number };
++export type Status = 'neu' | 'angebot' | 'angenommen' | 'bestellt' | 'geliefert' | 'abgelehnt';
++export const STATUS: Record<Status, string> = { neu: 'Neu', angebot: 'Angebot gesendet', angenommen: 'Angenommen', bestellt: 'Bestellt', geliefert: 'Geliefert', abgelehnt: 'Abgelehnt' };
++export type Inquiry = {
++  no: string; date: string; zugangscode: string | null;
++  customer: Record<string, string>; lines: InqLine[]; total: number;
++  status?: Status; token?: string; offer?: Offer | null;
++  history?: { date: string; text: string }[];
++  acceptedAt?: string | null;
++};
++
++export function listInquiries(): Inquiry[] {
++  if (!fs.existsSync(INQ)) return [];
++  return fs.readdirSync(INQ).filter((f) => f.endsWith('.json'))
++    .map((f) => readJSON<Inquiry | null>(path.join(INQ, f), null)).filter(Boolean)
++    .map((i) => ({ ...i!, status: i!.status ?? 'neu' }))
++    .sort((a, b) => b.date.localeCompare(a.date));
++}
++export function getInquiry(no: string): Inquiry | null {
++  if (!/^[A-Z0-9-]+$/.test(no)) return null;
++  const i = readJSON<Inquiry | null>(path.join(INQ, `${no}.json`), null);
++  return i ? { ...i, status: i.status ?? 'neu' } : null;
++}
++export function saveInquiry(i: Inquiry) { writeJSON(path.join(INQ, `${i.no}.json`), i); }
++export function inquiryByToken(token: string) {
++  if (!/^[a-f0-9]{32,}$/.test(token)) return null;
++  return listInquiries().find((i) => i.token === token) ?? null;
++}
++export function addHistory(i: Inquiry, text: string) { i.history = [...(i.history ?? []), { date: new Date().toISOString(), text }]; }
++
++/** Summen eines Angebots */
++export function offerTotals(o: Offer) {
++  const net = o.lines.reduce((s, l) => s + l.qty * l.price, 0) + (o.shipping || 0);
++  const vat = Math.round(net * o.vat) / 100;
++  return { net: Math.round(net * 100) / 100, vat, gross: Math.round((net + vat) * 100) / 100 };
++}
++
++/** Angebot aus der Anfrage vorbelegen (Shoppreise + Veredelung als eigene Position) */
++export function draftOffer(i: Inquiry): Offer {
++  const lines: OfferLine[] = i.lines.map((l) => ({ text: `${l.sku} ${l.name}`, detail: [l.color, l.size].filter(Boolean).join(', '), qty: l.qty, price: l.price ?? 0 }));
++  const decos = new Map<string, { d: Deco; qty: number }>();
++  for (const l of i.lines) if (l.deco) {
++    const k = JSON.stringify(l.deco);
++    const e = decos.get(k) ?? { d: l.deco, qty: 0 };
++    e.qty += l.qty; decos.set(k, e);
++  }
++  for (const { d, qty } of decos.values()) lines.push({ text: `Veredelung: ${d.method}`, detail: d.positions.join(', '), qty, price: 0 });
++  return { lines, shipping: 0, note: '', validDays: 14, createdAt: new Date().toISOString(), vat: Number(process.env.MWST_PERCENT ?? 19) };
++}
+diff --git a/middleware.ts b/middleware.ts
+index 882dee1..588024a 100644
+--- a/middleware.ts
++++ b/middleware.ts
+@@ -1,20 +1,30 @@
+ import { NextResponse, type NextRequest } from 'next/server';
+-import { ACCESS_COOKIE, accessEnabled, codeForToken } from '@/lib/access';
++import { ACCESS_COOKIE, ADMIN_COOKIE, isAdminToken, shopClosed, verifyCodeToken } from '@/lib/access';
+ 
+-// Diese Seiten bleiben immer erreichbar (Impressum/Datenschutz sind Pflicht)
+-const PUBLIC = ['/zugang', '/api/zugang', '/impressum', '/datenschutz', '/icon.svg', '/favicon.ico', '/robots.txt'];
++// Immer erreichbar: Zugang, Pflichtseiten, Angebots-Links aus der E-Mail, Admin-Login
++const PUBLIC = ['/zugang', '/api/zugang', '/impressum', '/datenschutz', '/angebot', '/api/angebot', '/admin/login', '/api/admin/login', '/icon.svg', '/favicon.ico', '/robots.txt'];
++const match = (path: string, list: string[]) => list.some((p) => path === p || path.startsWith(p + '/'));
+ 
+ export async function middleware(req: NextRequest) {
+-  if (!accessEnabled()) return NextResponse.next();
+   const { pathname, search } = req.nextUrl;
+-  if (PUBLIC.some((p) => pathname === p || pathname.startsWith(p + '/'))) return NextResponse.next();
+-  if (await codeForToken(req.cookies.get(ACCESS_COOKIE)?.value)) return NextResponse.next();
++  const headers = new Headers(req.headers);
++  headers.set('x-path', pathname);
++  const pass = () => NextResponse.next({ request: { headers } });
++  const deny = (to: string) => {
++    if (pathname.startsWith('/api/')) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
++    const url = req.nextUrl.clone();
++    url.pathname = to;
++    url.search = pathname !== '/' ? `?weiter=${encodeURIComponent(pathname + search)}` : '';
++    return NextResponse.redirect(url);
++  };
+ 
+-  if (pathname.startsWith('/api/')) return NextResponse.json({ error: 'Bitte zuerst mit Ihrem Zugangscode anmelden.' }, { status: 401 });
+-  const url = req.nextUrl.clone();
+-  url.pathname = '/zugang';
+-  url.search = pathname !== '/' ? `?weiter=${encodeURIComponent(pathname + search)}` : '';
+-  return NextResponse.redirect(url);
++  if (match(pathname, PUBLIC)) return pass();
++  const admin = await isAdminToken(req.cookies.get(ADMIN_COOKIE)?.value);
++  if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) return admin ? pass() : deny('/admin/login');
++  if (!shopClosed() || admin) return pass();
++  // Signatur prüfen – ob der Code noch aktiv ist, prüft der Server (Codes können im Admin gesperrt werden)
++  if (await verifyCodeToken(req.cookies.get(ACCESS_COOKIE)?.value)) return pass();
++  return deny('/zugang');
+ }
+ 
+ export const config = { matcher: ['/((?!_next/static|_next/image).*)'] };
+diff --git a/package-lock.json b/package-lock.json
+index 6e07cd5..8c72283 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -11,6 +11,7 @@
+         "minisearch": "7.2.0",
+         "next": "14.2.35",
+         "nodemailer": "6.9.16",
++        "pdf-lib": "1.17.1",
+         "react": "18.3.1",
+         "react-dom": "18.3.1",
+         "server-only": "^0.0.1"
+@@ -173,6 +174,24 @@
+         "node": ">= 10"
+       }
+     },
++    "node_modules/@pdf-lib/standard-fonts": {
++      "version": "1.0.0",
++      "resolved": "https://registry.npmjs.org/@pdf-lib/standard-fonts/-/standard-fonts-1.0.0.tgz",
++      "integrity": "sha512-hU30BK9IUN/su0Mn9VdlVKsWBS6GyhVfqjwl1FjZN4TxP6cCw0jP2w7V3Hf5uX7M0AZJ16vey9yE0ny7Sa59ZA==",
++      "license": "MIT",
++      "dependencies": {
++        "pako": "^1.0.6"
++      }
++    },
++    "node_modules/@pdf-lib/upng": {
++      "version": "1.0.1",
++      "resolved": "https://registry.npmjs.org/@pdf-lib/upng/-/upng-1.0.1.tgz",
++      "integrity": "sha512-dQK2FUMQtowVP00mtIksrlZhdFXQZPC+taih1q4CvPZ5vqdxR/LKBaFg0oAfzd1GlHZXXSPdQfzQnt+ViGvEIQ==",
++      "license": "MIT",
++      "dependencies": {
++        "pako": "^1.0.10"
++      }
++    },
+     "node_modules/@swc/counter": {
+       "version": "0.1.3",
+       "resolved": "https://registry.npmjs.org/@swc/counter/-/counter-0.1.3.tgz",
+@@ -388,6 +407,30 @@
+         "node": ">=6.0.0"
+       }
+     },
++    "node_modules/pako": {
++      "version": "1.0.11",
++      "resolved": "https://registry.npmjs.org/pako/-/pako-1.0.11.tgz",
++      "integrity": "sha512-4hLB8Py4zZce5s4yd9XzopqwVv/yGNhV1Bl8NTmCq1763HeK2+EwVTv+leGeL13Dnh2wfbqowVPXCIO0z4taYw==",
++      "license": "(MIT AND Zlib)"
++    },
++    "node_modules/pdf-lib": {
++      "version": "1.17.1",
++      "resolved": "https://registry.npmjs.org/pdf-lib/-/pdf-lib-1.17.1.tgz",
++      "integrity": "sha512-V/mpyJAoTsN4cnP31vc0wfNA1+p20evqqnap0KLoRUN0Yk/p3wN52DOEsL4oBFcLdb76hlpKPtzJIgo67j/XLw==",
++      "license": "MIT",
++      "dependencies": {
++        "@pdf-lib/standard-fonts": "^1.0.0",
++        "@pdf-lib/upng": "^1.0.1",
++        "pako": "^1.0.11",
++        "tslib": "^1.11.1"
++      }
++    },
++    "node_modules/pdf-lib/node_modules/tslib": {
++      "version": "1.14.1",
++      "resolved": "https://registry.npmjs.org/tslib/-/tslib-1.14.1.tgz",
++      "integrity": "sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==",
++      "license": "0BSD"
++    },
+     "node_modules/picocolors": {
+       "version": "1.1.1",
+       "resolved": "https://registry.npmjs.org/picocolors/-/picocolors-1.1.1.tgz",
+diff --git a/package.json b/package.json
+index b4f1119..de2cd7a 100644
+--- a/package.json
++++ b/package.json
+@@ -13,6 +13,7 @@
+     "minisearch": "7.2.0",
+     "next": "14.2.35",
+     "nodemailer": "6.9.16",
++    "pdf-lib": "1.17.1",
+     "react": "18.3.1",
+     "react-dom": "18.3.1",
+     "server-only": "^0.0.1"
+-- 
+2.43.0
+

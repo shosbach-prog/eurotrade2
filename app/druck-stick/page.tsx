@@ -43,6 +43,9 @@ const SIZES = [
   ['Rücken', 'bis ca. 30 × 40 cm', 'Großer Schriftzug, Namen und Nummern'],
   ['Nacken', 'ca. 6–8 cm breit', 'Dezentes Zweitlogo oder Webadresse'],
   ['Ärmel', 'ca. 6–8 cm breit', 'Sponsor, Flagge oder Zusatzlogo'],
+  ['Cap / Mütze vorne', 'ca. 5–10 cm breit', 'Logo-Stick auf Front oder Umschlag'],
+  ['Handtuch Bordüre / Ecke', 'ca. 8–20 cm breit', 'Name oder Logo als Stick auf Bordüre oder Ecke'],
+  ['Tasche Vorderseite', 'bis ca. 25 × 30 cm', 'Großes Motiv auf Baumwolltaschen und Rucksäcken'],
 ];
 
 export default function DruckStick() {

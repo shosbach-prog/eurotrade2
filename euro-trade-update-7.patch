@@ -1,0 +1,745 @@
+From 3e10fe466f2f0c12042d1aaa04c3c6fd112205a8 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Wed, 11 Nov 2026 04:25:50 +0100
+Subject: [PATCH] =?UTF-8?q?Professionelle=20HTML-Mails,=20Logo=20euro-trad?=
+ =?UTF-8?q?e.com=20in=20frischeren=20Farben,=20Datenschutzerkl=C3=A4rung?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+- Mail-Layout (Outlook/Gmail-tauglich, Text-Version): Anfrage, Bestätigung, Angebot, Annahme,
+  Auftragsbestätigung, Zugangsanfrage – mit Artikelbildern, Summen, Buttons
+- Logo: Wortmarke euro-trade.com (.com kleiner), Azurblau-Verlauf + Sonnengelb, auch in Mail und PDF
+- Datenschutzerklärung vollständig (Hosting, L-Shop-Bilder, Cookies/Local Storage, Formulare, Uploads, WhatsApp)
+- Docker: Log-Begrenzung, Healthcheck auf öffentliche Seite
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01AW9Go5bwJWAYsfGemt2b6Z
+---
+ app/api/admin/anfrage/[no]/route.ts | 17 +++++-
+ app/api/anfrage/route.ts            | 40 +++++++++++---
+ app/api/angebot/[token]/route.ts    | 24 ++++++--
+ app/api/zugang-anfrage/route.ts     | 14 ++++-
+ app/datenschutz/page.tsx            | 72 +++++++++++++++++++++++-
+ app/globals.css                     | 56 ++++++++++---------
+ app/icon.svg                        |  2 +-
+ app/layout.tsx                      |  2 +-
+ components/Logo.tsx                 | 35 +++++++-----
+ docker-compose.yml                  |  4 +-
+ lib/mail-templates.ts               | 85 +++++++++++++++++++++++++++++
+ lib/mail.ts                         |  5 +-
+ lib/pdf.ts                          | 11 ++--
+ 13 files changed, 297 insertions(+), 70 deletions(-)
+ create mode 100644 lib/mail-templates.ts
+
+diff --git a/app/api/admin/anfrage/[no]/route.ts b/app/api/admin/anfrage/[no]/route.ts
+index ae23eff..7fb72d5 100644
+--- a/app/api/admin/anfrage/[no]/route.ts
++++ b/app/api/admin/anfrage/[no]/route.ts
+@@ -1,6 +1,7 @@
+ import { NextResponse } from 'next/server';
+ import { isAdmin } from '@/lib/customer';
+ import { esc, sendMail, shopUrl } from '@/lib/mail';
++import { button, h1, infoBox, layout, offerTable, p, quote, signature } from '@/lib/mail-templates';
+ import { offerPdf } from '@/lib/pdf';
+ import { STATUS, addHistory, getInquiry, offerTotals, randomId, saveInquiry, type Offer, type Status } from '@/lib/store';
+ 
+@@ -57,9 +58,19 @@ export async function POST(req: Request, { params }: { params: { no: string } })
+         to: i.customer.email, replyTo: process.env.INQUIRY_TO,
+         subject: `Ihr Angebot ${i.no} von ${shop}`,
+         attachments: [{ filename: `Angebot-${i.no}.pdf`, content: pdf }],
+-        html: `<p>Guten Tag ${esc(i.customer.name)},</p><p>vielen Dank für Ihre Anfrage. Anbei erhalten Sie unser Angebot <b>${i.no}</b> über <b>${eur(t.gross)}</b> (${eur(t.net)} netto).</p>`
+-          + `<p style="margin:24px 0"><a href="${link}" style="background:#0b4ea2;color:#fff;padding:12px 22px;border-radius:8px;text-decoration:none;font-weight:bold">Angebot ansehen & annehmen</a></p>`
+-          + `<p>Bei Fragen antworten Sie einfach auf diese E-Mail.</p><p>Mit freundlichen Grüßen<br>${esc(shop)}</p>`,
++        html: layout({
++          preheader: `Ihr Angebot über ${eur(t.gross)} – mit einem Klick online annehmen.`, title: `Angebot ${i.no}`,
++          body: h1(`Ihr Angebot ${i.no}`)
++            + p(`Guten Tag ${esc(i.customer.name)},`)
++            + p(`vielen Dank für Ihre Anfrage. Gerne bieten wir Ihnen Folgendes an – das Angebot finden Sie zusätzlich als PDF im Anhang.`)
++            + infoBox([['Angebot-Nr.', i.no], ['Gesamtbetrag', `${eur(t.gross)}`], ['davon netto', eur(t.net)], ['Gültig bis', new Date(new Date(i.offer.createdAt).getTime() + i.offer.validDays * 86400000).toLocaleDateString('de-DE')]])
++            + offerTable(i.offer, t)
++            + (i.offer.note ? quote(i.offer.note) : '')
++            + button(link, 'Angebot ansehen & annehmen', '#1d7a3e')
++            + p('Nach Ihrer Annahme erhalten Sie von uns eine Vorschau zur Druck- bzw. Stickfreigabe. Erst danach geht Ihr Auftrag in Produktion.', true)
++            + p('Fragen oder Änderungswünsche? Antworten Sie einfach auf diese E-Mail.')
++            + signature(),
++        }),
+       });
+     } catch (e) {
+       console.error('Angebot senden fehlgeschlagen', e);
+diff --git a/app/api/anfrage/route.ts b/app/api/anfrage/route.ts
+index 2603bd2..7cbf669 100644
+--- a/app/api/anfrage/route.ts
++++ b/app/api/anfrage/route.ts
+@@ -1,9 +1,9 @@
+ import { NextResponse } from 'next/server';
+ import { getProduct } from '@/lib/catalog';
+-import { eur } from '@/lib/format';
+ import { getCustomer } from '@/lib/customer';
+ import { FONTS, METHODS, POSITIONS, TEXT_COLORS, decoLabel, type Deco } from '@/lib/deco';
+ import { esc, sendMail, shopUrl } from '@/lib/mail';
++import { button, contactBlock, eur, h1, infoBox, itemsTable, layout, p, quote, signature, type MailLine } from '@/lib/mail-templates';
+ import { unitFor } from '@/lib/tiers';
+ import { randomId, saveInquiry, type InqLine, type Inquiry } from '@/lib/store';
+ 
+@@ -62,16 +62,40 @@ export async function POST(req: Request) {
+   saveInquiry(inq); // immer lokal sichern (auch wenn Mail ausfällt)
+ 
+   const base = shopUrl();
+-  const rows = lines.map((l) => `<tr><td>${esc(l.sku)}</td><td>${esc(l.name)}${l.deco ? `<br><small>✦ ${esc(decoLabel(l.deco))}${l.deco.note ? ` – ${esc(l.deco.note)}` : ''}</small>` : ''}</td><td>${esc(l.color)}</td><td>${esc(l.size)}</td><td align="right">${l.qty}</td><td align="right">${eur(l.price)}</td><td align="right">${l.price == null ? 'auf Anfrage' : eur(l.sum)}</td></tr>`).join('');
+-  const table = `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;font:13px Arial"><tr style="background:#eee"><th>Art.-Nr.</th><th>Artikel</th><th>Farbe</th><th>Größe</th><th>Menge</th><th>Einzel</th><th>Summe</th></tr>${rows}<tr><td colspan="6" align="right"><b>Summe netto (Textil)</b></td><td align="right"><b>${eur(total)}</b></td></tr></table>`;
++  const imgOf = new Map(raw.map(({ p }) => [p.id, p.images[0] ?? '']));
++  const mlines: MailLine[] = lines.map((l) => ({ sku: l.sku, name: l.name, color: l.color, size: l.size, qty: l.qty, price: l.price, sum: l.sum, deco: l.deco ? decoLabel(l.deco) : undefined, note: l.deco?.note || undefined, image: imgOf.get(l.id!) ?? '' }));
++  const pieces = lines.reduce((s, l) => s + l.qty, 0);
++  const hasDeco = lines.some((l) => l.deco);
++  const totals: [string, string, boolean?][] = [[`Summe Textil netto (${pieces} Stück)`, eur(total), true]];
+   const logos = [...new Map(lines.filter((l) => l.deco?.logoId).map((l) => [l.deco!.logoId!, l.deco!.logoName])).entries()];
+-  const who = `<p><b>${esc(customer.name)}</b>${customer.company ? ` – ${esc(customer.company)}` : ''}<br>${esc(customer.email)} · ${esc(customer.phone)}<br>${esc(customer.city)}${customer.date ? `<br><b>Wunschtermin:</b> ${esc(new Date(customer.date).toLocaleDateString('de-DE'))}` : ''}</p>${customer.message ? `<p><b>Nachricht:</b><br>${esc(customer.message).replace(/\n/g, '<br>')}</p>` : ''}${via ? `<p><b>Zugangscode:</b> ${esc(via)}</p>` : ''}`;
++  const dateTxt = customer.date ? new Date(customer.date).toLocaleDateString('de-DE') : '';
++
++  const toShop = layout({
++    preheader: `${customer.company || customer.name} · ${pieces} Stück · ${eur(total)}`, title: `Neue Anfrage ${no}`,
++    body: h1(`Neue Anfrage ${no}`)
++      + infoBox([['Kunde', esc(customer.company || customer.name)], ['Stückzahl', String(pieces)], ['Summe Textil netto', eur(total)], ...(dateTxt ? [['Wunschtermin', dateTxt] as [string, string]] : []), ...(via ? [['Zugangscode', esc(via)] as [string, string]] : [])], '#ffc21a')
++      + contactBlock(customer)
++      + (customer.message ? `<div style="font-size:13px;font-weight:700;margin:0 0 6px">Nachricht</div>${quote(customer.message)}` : '')
++      + itemsTable(mlines, totals)
++      + (logos.length ? p(`<strong>Logos:</strong> ${logos.map(([id, n]) => `<a href="${base}/api/upload/${id}?download" style="color:#0a5cf0">${esc(n)}</a>`).join(', ')}`) : '')
++      + button(`${base}/admin/anfrage/${no}`, 'Angebot erstellen →'),
++  });
++  const toCustomer = layout({
++    preheader: `Wir haben Ihre Anfrage erhalten – Ihr Angebot folgt innerhalb von 24 Stunden.`, title: `Ihre Anfrage ${no}`,
++    body: h1('Vielen Dank für Ihre Anfrage!')
++      + p(`Guten Tag ${esc(customer.name)},`)
++      + p(`wir haben Ihre Anfrage erhalten und erstellen Ihnen jetzt ein individuelles Angebot${hasDeco ? ' inklusive Veredelung' : ''}. Sie erhalten es <strong>innerhalb von 24 Stunden</strong> per E-Mail – mit einem Klick können Sie es dann online annehmen.`)
++      + infoBox([['Anfrage-Nr.', no], ['Stückzahl', String(pieces)], ['Richtwert Textil netto', eur(total)], ...(dateTxt ? [['Ihr Wunschtermin', dateTxt] as [string, string]] : [])])
++      + itemsTable(mlines, totals)
++      + p(`Die angegebenen Preise sind Richtwerte zzgl. MwSt. Versand${hasDeco ? ' und Veredelung' : ''} kalkulieren wir im Angebot.`, true)
++      + button(`${base}/konto`, 'Anfrage-Status ansehen')
++      + p('Fragen oder Änderungen? Antworten Sie einfach auf diese E-Mail.')
++      + signature(),
++  });
+ 
+   try {
+-    await sendMail({ to: process.env.INQUIRY_TO ?? '', replyTo: customer.email, subject: `Neue Anfrage ${no} – ${customer.company || customer.name} – ${eur(total)}`,
+-      html: `<h2>Anfrage ${no}</h2>${who}${table}${logos.length ? `<p><b>Logos:</b> ${logos.map(([id, n]) => `<a href="${base}/api/upload/${id}?download">${esc(n)}</a>`).join(', ')}</p>` : ''}<p><a href="${base}/admin/anfrage/${no}">→ Im Admin öffnen und Angebot erstellen</a></p>` });
+-    await sendMail({ to: customer.email, subject: `Ihre Anfrage ${no} bei ${process.env.SHOP_NAME ?? 'Euro-Trade'}`,
+-      html: `<p>Guten Tag ${esc(customer.name)},</p><p>vielen Dank für Ihre Anfrage. Wir melden uns innerhalb von 24 Stunden mit Ihrem Angebot.</p>${table}<p>Mit freundlichen Grüßen<br>${esc(process.env.SHOP_NAME ?? 'Euro-Trade')}</p>` });
++    await sendMail({ to: process.env.INQUIRY_TO ?? '', replyTo: customer.email, subject: `Neue Anfrage ${no} – ${customer.company || customer.name} – ${eur(total)}`, html: toShop });
++    await sendMail({ to: customer.email, replyTo: process.env.INQUIRY_TO, subject: `Ihre Anfrage ${no} bei ${process.env.SHOP_NAME ?? 'Euro-Trade'}`, html: toCustomer });
+   } catch (e) {
+     console.error('Mailversand fehlgeschlagen', e); // Anfrage ist trotzdem gespeichert
+   }
+diff --git a/app/api/angebot/[token]/route.ts b/app/api/angebot/[token]/route.ts
+index 221caae..b5f7969 100644
+--- a/app/api/angebot/[token]/route.ts
++++ b/app/api/angebot/[token]/route.ts
+@@ -1,5 +1,6 @@
+ import { NextResponse } from 'next/server';
+ import { esc, sendMail, shopUrl } from '@/lib/mail';
++import { button, eur, h1, infoBox, layout, offerTable, p, quote, signature } from '@/lib/mail-templates';
+ import { addHistory, inquiryByToken, offerTotals, saveInquiry } from '@/lib/store';
+ 
+ /** Kunde nimmt das Angebot an */
+@@ -18,10 +19,25 @@ export async function POST(req: Request, { params }: { params: { token: string }
+   saveInquiry(i);
+   const t = offerTotals(i.offer);
+   try {
+-    await sendMail({ to: process.env.INQUIRY_TO ?? '', subject: `✓ Angebot ${i.no} angenommen – ${i.customer.company || i.customer.name}`,
+-      html: `<p><b>${esc(name)}</b> hat das Angebot <b>${i.no}</b> über ${t.gross.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })} angenommen.</p>${comment ? `<p>Kommentar: ${esc(comment)}</p>` : ''}<p><a href="${shopUrl()}/admin/anfrage/${i.no}">→ Im Admin öffnen</a></p>` });
+-    await sendMail({ to: i.customer.email, subject: `Auftragsbestätigung zu Angebot ${i.no}`,
+-      html: `<p>Guten Tag ${esc(i.customer.name)},</p><p>vielen Dank – wir haben Ihre Annahme des Angebots <b>${i.no}</b> erhalten und melden uns in Kürze mit der Druckfreigabe bzw. dem Liefertermin.</p><p>Mit freundlichen Grüßen<br>${esc(process.env.SHOP_NAME ?? 'Euro-Trade')}</p>` });
++    await sendMail({ to: process.env.INQUIRY_TO ?? '', replyTo: i.customer.email, subject: `✓ Angebot ${i.no} angenommen – ${i.customer.company || i.customer.name} – ${eur(t.gross)}`,
++      html: layout({ preheader: `${i.customer.company || i.customer.name} hat ${eur(t.gross)} angenommen`, title: `Angebot ${i.no} angenommen`,
++        body: h1('✓ Angebot angenommen')
++          + infoBox([['Angebot-Nr.', i.no], ['Kunde', esc(i.customer.company || i.customer.name)], ['Angenommen von', esc(name)], ['Gesamtbetrag', eur(t.gross)]], '#1d7a3e')
++          + (comment ? `<div style="font-size:13px;font-weight:700;margin:0 0 6px">Anmerkung des Kunden</div>${quote(String(comment))}` : '')
++          + p('Nächste Schritte: Ware bei L-Shop bestellen, Druck-/Stickvorschau zur Freigabe senden, Liefertermin bestätigen.', true)
++          + button(`${shopUrl()}/admin/anfrage/${i.no}`, 'Im Admin öffnen →') }) });
++    await sendMail({ to: i.customer.email, replyTo: process.env.INQUIRY_TO, subject: `Auftragsbestätigung zu Angebot ${i.no}`,
++      html: layout({ preheader: 'Vielen Dank für Ihren Auftrag – so geht es weiter.', title: `Auftragsbestätigung ${i.no}`,
++        body: h1('Vielen Dank für Ihren Auftrag!')
++          + p(`Guten Tag ${esc(i.customer.name)},`)
++          + p(`wir haben Ihre Annahme des Angebots <strong>${i.no}</strong> erhalten und machen uns an die Arbeit.`)
++          + infoBox([['Auftrag', i.no], ['Gesamtbetrag', eur(t.gross)], ['Angenommen am', new Date().toLocaleDateString('de-DE')]], '#1d7a3e')
++          + `<div style="font-size:15px;font-weight:700;margin:4px 0 8px">So geht es weiter</div>`
++          + `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 18px">${['Wir bestellen die Textilien und prüfen Ihre Logo-Daten.', 'Sie erhalten eine Vorschau zur Druck- bzw. Stickfreigabe.', 'Nach Ihrer Freigabe produzieren wir – meist in 7–14 Werktagen.', 'Lieferung mit Sendungsverfolgung an Ihre Adresse.'].map((x, n) => `<tr><td valign="top" style="padding:4px 10px 4px 0"><span style="display:inline-block;width:22px;height:22px;border-radius:11px;background:#ffc21a;color:#14181f;font-weight:800;font-size:12px;text-align:center;line-height:22px">${n + 1}</span></td><td style="padding:4px 0;font-size:14px">${x}</td></tr>`).join('')}</table>`
++          + offerTable(i.offer, t)
++          + button(`${shopUrl()}/angebot/${params.token}`, 'Auftrag ansehen')
++          + p('Bei Fragen antworten Sie einfach auf diese E-Mail.')
++          + signature() }) });
+   } catch (e) { console.error('Mail nach Annahme fehlgeschlagen', e); }
+   return NextResponse.json({ ok: true });
+ }
+diff --git a/app/api/zugang-anfrage/route.ts b/app/api/zugang-anfrage/route.ts
+index 91ab9ea..05ade93 100644
+--- a/app/api/zugang-anfrage/route.ts
++++ b/app/api/zugang-anfrage/route.ts
+@@ -1,5 +1,6 @@
+ import { NextResponse } from 'next/server';
+ import { esc, sendMail, shopUrl } from '@/lib/mail';
++import { button, contactBlock, h1, infoBox, layout, p, quote, signature } from '@/lib/mail-templates';
+ import { listAccessRequests, randomId, saveAccessRequests } from '@/lib/store';
+ 
+ const hits = new Map<string, number[]>();
+@@ -19,9 +20,18 @@ export async function POST(req: Request) {
+   saveAccessRequests([...listAccessRequests(), r]);
+   try {
+     await sendMail({ to: process.env.INQUIRY_TO ?? '', replyTo: r.email, subject: `Zugangsanfrage: ${r.company || r.name}`,
+-      html: `<h2>Neue Zugangsanfrage</h2><p><b>${esc(r.name)}</b>${r.company ? ` – ${esc(r.company)}` : ''}<br>${esc(r.email)} · ${esc(r.phone)}<br>Art: ${esc(r.type)}</p><p>${esc(r.message).replace(/\n/g, '<br>')}</p><p><a href="${shopUrl()}/admin/kunden">→ Im Admin als Kunde anlegen</a></p>` });
++      html: layout({ preheader: `${r.company || r.name} möchte Zugang zum Shop`, title: 'Neue Zugangsanfrage',
++        body: h1('Neue Zugangsanfrage') + infoBox([['Wer', esc(r.company || r.name)], ['Art', esc(r.type || '–')]], '#ffc21a')
++          + contactBlock({ name: r.name, company: r.company, email: r.email, phone: r.phone })
++          + (r.message ? `<div style="font-size:13px;font-weight:700;margin:0 0 6px">Vorhaben</div>${quote(r.message)}` : '')
++          + button(`${shopUrl()}/admin/kunden`, 'Als Kunde anlegen →') }) });
+     await sendMail({ to: r.email, subject: `Ihre Zugangsanfrage bei ${process.env.SHOP_NAME ?? 'Euro-Trade'}`,
+-      html: `<p>Guten Tag ${esc(r.name)},</p><p>vielen Dank für Ihr Interesse! Wir melden uns innerhalb von 24 Stunden mit Ihrem persönlichen Zugangscode.</p><p>Mit freundlichen Grüßen<br>${esc(process.env.SHOP_NAME ?? 'Euro-Trade')}</p>` });
++      html: layout({ preheader: 'Ihr persönlicher Zugangscode folgt innerhalb von 24 Stunden.', title: 'Ihre Zugangsanfrage',
++        body: h1('Vielen Dank für Ihr Interesse!') + p(`Guten Tag ${esc(r.name)},`)
++          + p(`wir haben Ihre Anfrage erhalten. Innerhalb von <strong>24 Stunden</strong> melden wir uns mit Ihrem persönlichen Zugangscode – damit sehen Sie Ihre Konditionen, können Logos hochladen und erhalten Angebote mit einem Klick.`)
++          + p('Bis dahin finden Sie auf unserer Website alles rund um Druck und Stick:', true)
++          + button(`${shopUrl()}/druck-stick`, 'Druck & Stick im Vergleich')
++          + p('Fragen? Antworten Sie einfach auf diese E-Mail.') + signature() }) });
+   } catch (e) { console.error('Mail Zugangsanfrage fehlgeschlagen', e); }
+   return NextResponse.json({ ok: true });
+ }
+diff --git a/app/datenschutz/page.tsx b/app/datenschutz/page.tsx
+index 9e2bff1..7cbccbd 100644
+--- a/app/datenschutz/page.tsx
++++ b/app/datenschutz/page.tsx
+@@ -1,4 +1,70 @@
+-export const metadata = { title: 'Datenschutz' };
+-export default function Page() {
+-  return <div className="box"><h1>Datenschutzerklärung</h1><p>[Datenschutzerklärung hier einfügen – Anfrageformular (Art. 6 Abs. 1 lit. b DSGVO), Hosting, E-Mail-Versand, Warenkorb im lokalen Browserspeicher, keine Tracking-Cookies.]</p></div>;
++import type { Metadata } from 'next';
++
++export const metadata: Metadata = { title: 'Datenschutz' };
++
++const S = ({ t, children }: { t: string; children: React.ReactNode }) => (<section><h2>{t}</h2>{children}</section>);
++
++export default function Datenschutz() {
++  return (
++    <div className="box legal" style={{ maxWidth: 860 }}>
++      <h1>Datenschutzerklärung</h1>
++      <p className="muted">Stand: November 2026</p>
++
++      <S t="1. Verantwortlicher">
++        <p>Sebastian Hosbach · Euro-Trade<br />Seehan 28, 44263 Dortmund<br />Telefon: 0173 2648097 · E-Mail: <a href="mailto:info@euro-trade.com">info@euro-trade.com</a></p>
++        <p>Ein Datenschutzbeauftragter ist nicht bestellt, da die gesetzlichen Voraussetzungen hierfür nicht vorliegen.</p>
++      </S>
++
++      <S t="2. Überblick">
++        <p>Wir verarbeiten personenbezogene Daten nur, soweit dies für den Betrieb dieser Website, die Bearbeitung Ihrer Anfragen und die Abwicklung von Aufträgen erforderlich ist. Wir setzen <strong>keine Analyse- oder Tracking-Dienste, keine Werbe-Cookies und keine Social-Media-Plugins</strong> ein.</p>
++      </S>
++
++      <S t="3. Hosting und Server-Logfiles">
++        <p>Die Website wird auf einem Server der IONOS SE, Elgendorfer Str. 57, 56410 Montabaur, in einem Rechenzentrum in Deutschland betrieben. Beim Aufruf werden technisch notwendige Daten verarbeitet (IP-Adresse, Datum und Uhrzeit, aufgerufene Seite, Browser-Typ, Referrer). Dies dient der Auslieferung der Website und ihrer Sicherheit, etwa der Abwehr von Angriffen.</p>
++        <p>Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einem sicheren, stabilen Betrieb). Mit IONOS besteht ein Vertrag zur Auftragsverarbeitung nach Art. 28 DSGVO. Zugriffe werden nicht dauerhaft protokolliert. Technische Fehlermeldungen landen in einem größenbegrenzten Protokollspeicher und werden automatisch überschrieben. Zum Schutz vor Missbrauch werden IP-Adressen bei Formularen kurzzeitig im Arbeitsspeicher gehalten (höchstens 1 Stunde).</p>
++      </S>
++
++      <S t="4. Produktbilder von L-SHOP-TEAM">
++        <p>Produktbilder und Größentabellen werden direkt von den Servern unseres Lieferanten L-SHOP-TEAM GmbH, Otto-Hahn-Straße 27, 59423 Unna, geladen. Dabei wird Ihre IP-Adresse technisch bedingt an L-SHOP-TEAM übermittelt. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer aktuellen und vollständigen Produktdarstellung).</p>
++      </S>
++
++      <S t="5. Cookies und lokaler Speicher">
++        <p>Wir verwenden ausschließlich technisch notwendige Cookies:</p>
++        <ul>
++          <li><strong>et_access</strong> – speichert, dass Sie sich mit Ihrem Zugangscode angemeldet haben (Laufzeit 180 Tage).</li>
++          <li><strong>et_admin</strong> – nur für die Shop-Verwaltung (Laufzeit 30 Tage).</li>
++        </ul>
++        <p>Zusätzlich werden Warenkorb, Merkliste, zuletzt angesehene Artikel, Ihre zuletzt verwendeten Formulardaten und die Nummern Ihrer Anfragen <strong>nur lokal in Ihrem Browser</strong> (Local Storage) gespeichert. Diese Daten werden nicht an uns übertragen, bis Sie eine Anfrage absenden. Sie können sie jederzeit über die Browser-Einstellungen löschen.</p>
++        <p>Rechtsgrundlage ist § 25 Abs. 2 Nr. 2 TDDDG, da die Speicherung für den von Ihnen gewünschten Dienst unbedingt erforderlich ist, sowie Art. 6 Abs. 1 lit. b und f DSGVO.</p>
++      </S>
++
++      <S t="6. Zugangsanfrage">
++        <p>Wenn Sie über die Startseite einen Zugang anfragen, verarbeiten wir Name, Verein/Firma, E-Mail-Adresse, Telefonnummer (freiwillig), die Art Ihrer Organisation und Ihre Nachricht, um Ihnen einen Zugangscode zu erteilen und mit Ihnen Kontakt aufzunehmen.</p>
++        <p>Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (vorvertragliche Maßnahmen auf Ihre Anfrage). Nicht zustande gekommene Anfragen löschen wir spätestens nach 12 Monaten.</p>
++      </S>
++
++      <S t="7. Anfragen, Angebote und Aufträge">
++        <p>Für Angebotsanfragen über den Warenkorb verarbeiten wir Ihre Kontaktdaten (Name, Firma, E-Mail, Telefon, Ort), den Wunschliefertermin, Ihre Nachricht, die gewählten Artikel und, falls angegeben, Ihre Veredelungswünsche einschließlich Texten und hochgeladener Logo-Dateien. Wir nutzen diese Daten, um Ihnen ein Angebot zu erstellen, es per E-Mail zuzusenden und den Auftrag abzuwickeln. Das Angebot können Sie über einen persönlichen Link einsehen und annehmen. Bei der Annahme speichern wir Ihren Namen, Ihre Anmerkung und den Zeitpunkt.</p>
++        <p>Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO. Für die Herstellung und Lieferung geben wir die erforderlichen Daten an unseren Lieferanten L-SHOP-TEAM GmbH sowie gegebenenfalls an Veredelungsbetriebe und Versanddienstleister weiter.</p>
++        <p>Angebots- und Auftragsdaten speichern wir für die Dauer der Geschäftsbeziehung und darüber hinaus, soweit gesetzliche Aufbewahrungspflichten bestehen (§ 147 AO, § 257 HGB: bis zu 10 Jahre). Nicht angenommene Anfragen und hochgeladene Logos löschen wir spätestens nach 24 Monaten, sofern Sie keine längere Speicherung wünschen, etwa für Nachbestellungen.</p>
++      </S>
++
++      <S t="8. E-Mail-Versand">
++        <p>Bestätigungen, Angebote und Auftragsbestätigungen versenden wir über den E-Mail-Dienst der IONOS SE (Auftragsverarbeitung nach Art. 28 DSGVO). Wenn Sie uns per E-Mail kontaktieren, verarbeiten wir Ihre Angaben zur Bearbeitung Ihres Anliegens (Art. 6 Abs. 1 lit. b bzw. f DSGVO).</p>
++      </S>
++
++      <S t="9. WhatsApp und Telefon">
++        <p>Über den Kontakt-Button können Sie uns per WhatsApp, Telefon oder E-Mail erreichen. Erst wenn Sie „WhatsApp“ anklicken, werden Sie zu WhatsApp weitergeleitet. Anbieter ist die WhatsApp Ireland Ltd., 4 Grand Canal Square, Dublin 2, Irland. Dabei können Daten auch in die USA übermittelt werden; WhatsApp bzw. Meta ist nach dem EU-US Data Privacy Framework zertifiziert. Für die Datenverarbeitung durch WhatsApp gilt deren Datenschutzerklärung. Die Nutzung ist freiwillig, Sie können uns jederzeit auch per Telefon oder E-Mail erreichen. Rechtsgrundlage ist Art. 6 Abs. 1 lit. a DSGVO (Ihre Entscheidung, diesen Kanal zu nutzen) bzw. lit. b DSGVO.</p>
++      </S>
++
++      <S t="10. Ihre Rechte">
++        <p>Sie haben jederzeit das Recht auf Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung der Verarbeitung (Art. 18), Datenübertragbarkeit (Art. 20) sowie Widerspruch gegen Verarbeitungen auf Grundlage berechtigter Interessen (Art. 21 DSGVO). Eine erteilte Einwilligung können Sie jederzeit mit Wirkung für die Zukunft widerrufen. Eine formlose E-Mail an <a href="mailto:info@euro-trade.com">info@euro-trade.com</a> genügt.</p>
++        <p>Sie haben außerdem das Recht, sich bei einer Datenschutz-Aufsichtsbehörde zu beschweren, zum Beispiel bei der für uns zuständigen Landesbeauftragten für Datenschutz und Informationsfreiheit Nordrhein-Westfalen, Kavalleriestraße 2–4, 40213 Düsseldorf.</p>
++      </S>
++
++      <S t="11. Sicherheit">
++        <p>Die Übertragung erfolgt verschlüsselt per HTTPS. Zugangs- und Verwaltungsbereiche sind passwort- bzw. codegeschützt, Angebotslinks enthalten zufällige, nicht erratbare Schlüssel.</p>
++      </S>
++    </div>
++  );
+ }
+diff --git a/app/globals.css b/app/globals.css
+index 3e80838..8192253 100644
+--- a/app/globals.css
++++ b/app/globals.css
+@@ -1,6 +1,6 @@
+ :root{
+   --bg:#f6f7f9; --card:#fff; --ink:#14181f; --muted:#5d6675; --line:#e3e6eb;
+-  --brand:#0b4ea2; --brand-ink:#fff; --accent:#f2b705; --ok:#1d7a3e; --err:#b3261e;
++  --brand:#0a5cf0; --brand-ink:#fff; --accent:#ffc21a; --ok:#1d7a3e; --err:#b3261e;
+   --radius:10px; --shadow:0 1px 2px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.05);
+ }
+ *{box-sizing:border-box}
+@@ -12,15 +12,16 @@ input,select,textarea{font:inherit}
+ .wrap{max-width:1240px;margin:0 auto;padding:0 16px}
+ 
+ /* Header */
+-.hdr{background:var(--brand);color:var(--brand-ink);position:sticky;top:0;z-index:50;box-shadow:0 2px 10px rgba(0,0,0,.12)}
++.hdr{background:linear-gradient(100deg,#0646c9 0%,#0a5cf0 55%,#1a8bff 100%);color:var(--brand-ink);position:sticky;top:0;z-index:50;box-shadow:0 2px 10px rgba(0,0,0,.12)}
+ .hdr-row{display:flex;align-items:center;gap:20px;height:72px}
+ .logo{white-space:nowrap;display:flex;align-items:center}
+ .logo-wrap{display:flex;align-items:center;gap:11px}
+ .logo-mark{flex:none;filter:drop-shadow(0 2px 6px rgba(0,0,0,.18));transition:transform .2s}
+ .logo:hover .logo-mark{transform:rotate(-6deg) scale(1.04)}
+ .logo-text{display:flex;flex-direction:column;line-height:1}
+-.logo-name{font-weight:800;font-size:23px;letter-spacing:-.6px}
+-.logo-name span{color:var(--accent);margin-left:1px}
++.logo-name{font-weight:800;font-size:24px;letter-spacing:-.7px;white-space:nowrap}
++.logo-name .logo-b{color:var(--accent)}
++.logo-name .logo-tld{font-size:.62em;font-weight:700;color:#cfe0ff;letter-spacing:0;margin-left:1px}
+ .logo-tag{font-size:10.5px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase;opacity:.72;margin-top:4px}
+ .hdr-actions{display:flex;gap:8px}
+ .cart-btn{display:flex;align-items:center;gap:8px;white-space:nowrap;padding:10px 14px;border-radius:8px;background:rgba(255,255,255,.12)}
+@@ -38,7 +39,7 @@ input,select,textarea{font:inherit}
+ .search .go{position:absolute;right:4px;top:4px;height:38px;width:42px;border:0;border-radius:6px;background:var(--accent);color:#111;display:grid;place-items:center}
+ .sugg{position:absolute;left:0;right:0;top:52px;background:#fff;color:var(--ink);border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.18);overflow:hidden}
+ .sugg a{display:flex;gap:12px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line)}
+-.sugg a.on,.sugg a:hover{background:#eef4fc}
++.sugg a.on,.sugg a:hover{background:#ebf2ff}
+ .sugg .thumb{width:44px;height:44px;flex:none}
+ .sugg .t{font-weight:600;font-size:14px}
+ .sugg .s{color:var(--muted);font-size:12px}
+@@ -54,7 +55,7 @@ h2{font-size:20px;margin:28px 0 12px}
+ .muted{color:var(--muted)}
+ .crumbs{font-size:13px;color:var(--muted);margin-bottom:8px}
+ .crumbs a:hover{text-decoration:underline}
+-.hero{background:linear-gradient(120deg,#0b4ea2,#0a3a78);color:#fff;border-radius:14px;padding:32px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
++.hero{background:linear-gradient(120deg,#0646c9,#0a5cf0 60%,#1a8bff);color:#fff;border-radius:14px;padding:32px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
+ .hero h1{font-size:30px;margin:0 0 6px;color:#fff}
+ .hero p{margin:0;opacity:.9}
+ .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+@@ -87,7 +88,7 @@ h2{font-size:20px;margin:28px 0 12px}
+ .sw.on{box-shadow:0 0 0 2px var(--brand)}
+ .sizes{display:flex;flex-wrap:wrap;gap:8px}
+ .size{min-width:52px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff}
+-.size.on{border-color:var(--brand);background:#eef4fc;color:var(--brand);font-weight:700}
++.size.on{border-color:var(--brand);background:#ebf2ff;color:var(--brand);font-weight:700}
+ .qtyrow{display:flex;gap:10px;margin-top:20px;align-items:center}
+ .qty{width:110px;height:48px;border:1px solid var(--line);border-radius:8px;padding:0 12px;font-size:16px}
+ .btn{height:48px;padding:0 22px;border:0;border-radius:8px;background:var(--brand);color:#fff;font-weight:700}
+@@ -149,7 +150,7 @@ footer .wrap{display:flex;gap:20px;flex-wrap:wrap;justify-content:space-between}
+ /* Zugang */
+ .gate{display:grid;place-items:center;padding:40px 0}
+ .gate-box{background:#fff;border-radius:16px;box-shadow:var(--shadow);padding:36px 32px;max-width:460px;width:100%;text-align:center}
+-.gate-lock{width:56px;height:56px;border-radius:50%;background:#eef4fc;color:var(--brand);display:grid;place-items:center;margin:0 auto 14px}
++.gate-lock{width:56px;height:56px;border-radius:50%;background:#ebf2ff;color:var(--brand);display:grid;place-items:center;margin:0 auto 14px}
+ .gate-box h1{margin:0 0 8px}
+ .gate-form{display:flex;flex-direction:column;gap:12px;margin-top:22px}
+ .gate-form input{height:52px;border:1px solid var(--line);border-radius:10px;text-align:center;font-size:20px;font-weight:700;letter-spacing:3px}
+@@ -170,13 +171,13 @@ footer .wrap{display:flex;gap:20px;flex-wrap:wrap;justify-content:space-between}
+ .mx input{border:0;height:38px;text-align:center;font-size:16px;width:100%;-moz-appearance:textfield}
+ .mx input::-webkit-outer-spin-button,.mx input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+ .mx.on{border-color:var(--brand);box-shadow:0 0 0 1px var(--brand)}
+-.mx.on span{background:#eef4fc;color:var(--brand)}
++.mx.on span{background:#ebf2ff;color:var(--brand)}
+ .sw{position:relative}
+ .sw-n{position:absolute;top:-7px;right:-9px;background:var(--brand);color:#fff;font-size:10px;font-weight:700;border-radius:999px;padding:1px 5px;line-height:1.4;border:2px solid #fff}
+ .hint{font-size:13px;color:var(--muted);margin:8px 0 0}
+ 
+ /* Veredelung */
+-.deco-toggle{display:flex;gap:10px;align-items:center;margin-top:20px;padding:12px 14px;border:1px dashed var(--brand);border-radius:10px;background:#f5f9fe;cursor:pointer}
++.deco-toggle{display:flex;gap:10px;align-items:center;margin-top:20px;padding:12px 14px;border:1px dashed var(--brand);border-radius:10px;background:#f3f7ff;cursor:pointer}
+ .deco-toggle input{width:18px;height:18px}
+ .deco{border:1px solid var(--line);border-top:0;border-radius:0 0 10px 10px;padding:14px;margin-top:-6px}
+ .deco-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+@@ -185,7 +186,7 @@ footer .wrap{display:flex;gap:20px;flex-wrap:wrap;justify-content:space-between}
+ .logo-file{display:flex;align-items:center;gap:10px;padding:8px;border:1px solid var(--line);border-radius:8px;background:#fff;max-width:100%}
+ .logo-file img{width:44px;height:44px;object-fit:contain;background:repeating-conic-gradient(#f0f2f5 0 25%,#fff 0 50%) 0 0/12px 12px;border-radius:4px}
+ .logo-file span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
+-.file-ico{width:44px;height:44px;display:grid;place-items:center;background:#eef4fc;color:var(--brand);font-weight:800;font-size:11px;border-radius:4px;flex:none}
++.file-ico{width:44px;height:44px;display:grid;place-items:center;background:#ebf2ff;color:var(--brand);font-weight:800;font-size:11px;border-radius:4px;flex:none}
+ .logo-prev{position:absolute;transform:translate(-50%,-50%);max-height:22%;object-fit:contain;pointer-events:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.25));mix-blend-mode:multiply}
+ .prev-note{position:absolute;left:8px;bottom:8px;background:rgba(20,24,31,.72);color:#fff;font-size:11px;padding:3px 8px;border-radius:999px}
+ .deco-tag{font-size:12px;color:var(--brand);margin-top:2px}
+@@ -210,7 +211,7 @@ footer .wrap{display:flex;gap:20px;flex-wrap:wrap;justify-content:space-between}
+ .alink{color:var(--brand);font-weight:600}
+ .alink:hover{text-decoration:underline}
+ .st{display:inline-block;font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;background:#eef0f3;color:#3b4250;white-space:nowrap}
+-.st-neu{background:#fff4d6;color:#7a5600}.st-angebot{background:#e4efff;color:#0b4ea2}.st-angenommen{background:#dff5e6;color:#1d7a3e}
++.st-neu{background:#fff4d6;color:#7a5600}.st-angebot{background:#e4efff;color:#0a5cf0}.st-angenommen{background:#dff5e6;color:#1d7a3e}
+ .st-bestellt{background:#e9e4ff;color:#4b2fb0}.st-geliefert{background:#e6eaef;color:#2f3a48}.st-abgelehnt{background:#fde4e2;color:#b3261e}
+ .chip-on{background:var(--brand)!important;color:#fff!important;border-color:var(--brand)!important}
+ .admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px}
+@@ -235,11 +236,11 @@ footer .wrap{display:flex;gap:20px;flex-wrap:wrap;justify-content:space-between}
+ .gal-main{display:flex;gap:10px;align-items:flex-start;position:relative}
+ .gal-thumbs{display:flex;flex-direction:column;gap:8px;flex:none;max-height:560px;overflow-y:auto;scrollbar-width:thin}
+ .gal-thumbs button{width:58px;height:58px;padding:0;border:2px solid var(--line);border-radius:8px;overflow:hidden;background:#fff;cursor:pointer}
+-.gal-thumbs button.on{border-color:var(--brand);box-shadow:0 0 0 2px rgba(11,78,162,.2)}
++.gal-thumbs button.on{border-color:var(--brand);box-shadow:0 0 0 2px rgba(10,92,240,.2)}
+ .gal-thumbs img{width:100%;height:100%;object-fit:cover;display:block}
+ .gal .gallery{flex:1;min-width:0;position:relative}
+ .gallery.zoomable{cursor:zoom-in}
+-.gal-lens{position:absolute;background:rgba(255,255,255,.35);border:1px solid rgba(11,78,162,.55);box-shadow:0 0 0 9999px rgba(0,0,0,.06);pointer-events:none}
++.gal-lens{position:absolute;background:rgba(255,255,255,.35);border:1px solid rgba(10,92,240,.55);box-shadow:0 0 0 9999px rgba(0,0,0,.06);pointer-events:none}
+ .gal-zoom{position:absolute;left:calc(100% + 32px);top:0;width:100%;aspect-ratio:1;background-color:#fff;background-repeat:no-repeat;border:1px solid var(--line);border-radius:10px;box-shadow:0 18px 48px rgba(0,0,0,.18);z-index:30;pointer-events:none}
+ .gal-hint{font-size:12px;color:var(--muted);text-align:center;margin:8px 0 0}
+ .lightbox{position:fixed;inset:0;background:rgba(10,14,20,.92);z-index:200;display:grid;place-items:center;padding:40px 70px;cursor:zoom-out}
+@@ -266,7 +267,7 @@ footer .wrap{display:flex;gap:20px;flex-wrap:wrap;justify-content:space-between}
+ .tier{border:1px solid var(--line);border-radius:8px;padding:6px 10px;display:flex;flex-direction:column;min-width:92px;background:#fff;font-size:12px;color:var(--muted)}
+ .tier b{font-size:15px;color:var(--ink)}
+ .tier small{color:var(--ok);font-weight:700}
+-.tier.on{border-color:var(--brand);background:#eef4fc;box-shadow:0 0 0 1px var(--brand)}
++.tier.on{border-color:var(--brand);background:#ebf2ff;box-shadow:0 0 0 1px var(--brand)}
+ .req{display:flex;justify-content:space-between;gap:14px;align-items:center;padding:10px 0;border-top:1px solid var(--line);flex-wrap:wrap}
+ .req:first-of-type{margin-top:8px}
+ .ref-admin{display:flex;flex-direction:column;gap:12px}
+@@ -282,7 +283,7 @@ footer .wrap{display:flex;gap:20px;flex-wrap:wrap;justify-content:space-between}
+ .pub-nav .pub-login{background:var(--accent);color:#111;font-weight:700}
+ .pub-nav .pub-login:hover{background:#ffc928;color:#111}
+ .landing h2{font-size:26px;margin:0 0 16px;letter-spacing:-.3px}
+-.l-hero{display:grid;grid-template-columns:1.5fr 1fr;gap:28px;align-items:center;background:linear-gradient(125deg,#0b4ea2 0%,#0a3a78 60%,#082d5e 100%);color:#fff;border-radius:18px;padding:44px;position:relative;overflow:hidden}
++.l-hero{display:grid;grid-template-columns:1.5fr 1fr;gap:28px;align-items:center;background:linear-gradient(125deg,#0646c9 0%,#0a5cf0 55%,#1a8bff 100%);color:#fff;border-radius:18px;padding:44px;position:relative;overflow:hidden}
+ .l-hero::after{content:"";position:absolute;right:-120px;top:-120px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(242,183,5,.28),transparent 65%);pointer-events:none}
+ .l-kicker{display:inline-block;font-size:12px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+ .l-hero h1{font-size:40px;line-height:1.12;margin:0 0 14px;color:#fff;letter-spacing:-.8px}
+@@ -307,7 +308,7 @@ footer .wrap{display:flex;gap:20px;flex-wrap:wrap;justify-content:space-between}
+ .l-ref img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+ .l-ref figcaption{padding:14px 16px;display:flex;flex-direction:column;gap:4px;font-size:14px}
+ .l-ref figcaption span:not(.l-tag){color:var(--muted)}
+-.l-tag{align-self:flex-start;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;background:#eef4fc;color:var(--brand);padding:2px 8px;border-radius:999px}
++.l-tag{align-self:flex-start;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;background:#ebf2ff;color:var(--brand);padding:2px 8px;border-radius:999px}
+ .l-request{display:grid;grid-template-columns:1fr 1.2fr;gap:28px;align-items:start}
+ .sel{width:100%;border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:#fff}
+ 
+@@ -351,12 +352,12 @@ footer .wrap{display:flex;gap:20px;flex-wrap:wrap;justify-content:space-between}
+ .szgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+ .szgrid.single{grid-template-columns:160px}
+ .sz{border:1px solid var(--line);border-radius:10px;background:#fff;padding:8px 6px 6px;display:flex;flex-direction:column;align-items:center;gap:6px;transition:border-color .12s,box-shadow .12s}
+-.sz.on{border-color:var(--brand);box-shadow:0 0 0 1px var(--brand);background:#f5f9fe}
++.sz.on{border-color:var(--brand);box-shadow:0 0 0 1px var(--brand);background:#f3f7ff}
+ .sz-l{font-weight:700;font-size:14px}
+ .sz.on .sz-l{color:var(--brand)}
+ .step{display:flex;align-items:center;width:100%;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+ .step button{width:28px;height:34px;border:0;background:#f3f5f8;font-size:18px;line-height:1;color:var(--ink);flex:none}
+-.step button:hover:not(:disabled){background:#e4ecf7;color:var(--brand)}
++.step button:hover:not(:disabled){background:#e1ebff;color:var(--brand)}
+ .step button:disabled{color:#c3c8d0;cursor:default}
+ .step input{flex:1;min-width:0;width:100%;border:0;height:34px;text-align:center;font-size:16px;font-weight:600;-moz-appearance:textfield}
+ .step input::-webkit-outer-spin-button,.step input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+@@ -371,7 +372,7 @@ footer .wrap{display:flex;gap:20px;flex-wrap:wrap;justify-content:space-between}
+ .sel-main{flex:1;min-width:0}
+ .sel-main b{font-size:14px}
+ .sel-sizes{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
+-.sel-sizes span{font-size:12px;background:#eef4fc;color:var(--brand);border-radius:6px;padding:1px 7px;font-weight:600}
++.sel-sizes span{font-size:12px;background:#ebf2ff;color:var(--brand);border-radius:6px;padding:1px 7px;font-weight:600}
+ .sel-n{font-weight:700;font-size:14px;white-space:nowrap}
+ .sel-row .x{background:none;border:0;color:var(--muted);font-size:20px;padding:0 2px}
+ .sel-row .linkbtn{font-size:13px}
+@@ -406,8 +407,8 @@ footer .wrap{display:flex;gap:20px;flex-wrap:wrap;justify-content:space-between}
+ 
+ /* Produktseite: Hilfen */
+ .opt-row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+-.sizechart{display:inline-flex;gap:6px;align-items:center;font-size:13px;font-weight:600;color:var(--brand);border:1px solid #cfe0f5;border-radius:999px;padding:3px 10px;background:#f5f9fe}
+-.sizechart:hover{background:#e7f0fb}
++.sizechart{display:inline-flex;gap:6px;align-items:center;font-size:13px;font-weight:600;color:var(--brand);border:1px solid #c9dafb;border-radius:999px;padding:3px 10px;background:#f3f7ff}
++.sizechart:hover{background:#e4edff}
+ .delivery{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--ok);margin-top:10px}
+ .info-i{position:relative;display:inline-block;vertical-align:middle;margin-left:4px}
+ .info-i>button{width:18px;height:18px;border-radius:50%;border:1px solid #b9c4d3;background:#fff;color:var(--muted);font:700 11px/1 Georgia,serif;padding:0;cursor:help}
+@@ -439,7 +440,7 @@ footer .wrap{display:flex;gap:20px;flex-wrap:wrap;justify-content:space-between}
+ .f-fams{display:flex;flex-wrap:wrap;gap:6px}
+ .f-fam{display:flex;align-items:center;gap:6px;font-size:12px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:3px 9px 3px 4px}
+ .f-fam span{width:16px;height:16px;border-radius:50%;border:1px solid rgba(0,0,0,.15)}
+-.f-fam.on{border-color:var(--brand);background:#eef4fc;color:var(--brand);font-weight:600}
++.f-fam.on{border-color:var(--brand);background:#ebf2ff;color:var(--brand);font-weight:600}
+ .f-sizes{display:flex;flex-wrap:wrap;gap:6px}
+ .f-sizes .size{min-width:44px;padding:5px 8px;font-size:13px}
+ .f-check{display:flex;align-items:center;gap:8px;padding:3px 0;cursor:pointer}
+@@ -460,7 +461,7 @@ footer .wrap{display:flex;gap:20px;flex-wrap:wrap;justify-content:space-between}
+ .cl-meta{font-size:13px;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin-top:2px}
+ .cl-meta select{border:1px solid var(--line);border-radius:6px;padding:2px 6px;font-size:13px;background:#fff}
+ .deco-tag .linkbtn{font-size:12px;color:var(--muted);margin-left:6px}
+-.deco-all{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;background:#f5f9fe;border:1px dashed var(--brand);border-radius:10px;padding:10px 12px;margin:10px 0;font-size:14px}
++.deco-all{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;background:#f3f7ff;border:1px dashed var(--brand);border-radius:10px;padding:10px 12px;margin:10px 0;font-size:14px}
+ @media (max-width:600px){.cline{grid-template-columns:56px 1fr;row-gap:8px}.cline .step{grid-column:2}.cline>div:last-child{grid-column:2;justify-content:space-between!important}}
+ .my-list{display:flex;flex-direction:column;gap:12px}
+ .my-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+@@ -470,11 +471,11 @@ footer .wrap{display:flex;gap:20px;flex-wrap:wrap;justify-content:space-between}
+ @media (max-width:1100px){.hide-md{display:none}}
+ /* Kontakt */
+ .contact{position:fixed;right:18px;bottom:18px;z-index:95;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+-.contact-btn{width:56px;height:56px;border-radius:50%;border:0;background:var(--brand);color:#fff;font-size:28px;display:grid;place-items:center;box-shadow:0 8px 24px rgba(11,78,162,.4)}
++.contact-btn{width:56px;height:56px;border-radius:50%;border:0;background:var(--brand);color:#fff;font-size:28px;display:grid;place-items:center;box-shadow:0 8px 24px rgba(10,92,240,.4)}
+ .contact-btn:hover{filter:brightness(1.1)}
+ .contact-menu{background:#fff;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.2);padding:14px;display:flex;flex-direction:column;gap:6px;min-width:240px;font-size:14px}
+ .contact-menu a{display:flex;gap:10px;align-items:center;padding:9px 10px;border-radius:8px;border:1px solid var(--line)}
+-.contact-menu a:hover{background:#f5f9fe;border-color:#cfe0f5}
++.contact-menu a:hover{background:#f3f7ff;border-color:#c9dafb}
+ .contact-menu .c-wa{color:#128c4b;font-weight:600}
+ @media (max-width:820px){body:has(.mbar) .contact{bottom:84px}.contact-btn{width:50px;height:50px}}
+ .drawer{box-shadow:none;visibility:hidden;transition:transform .25s ease,visibility 0s .25s}
+@@ -488,3 +489,6 @@ footer .wrap{padding-right:84px}
+ .stock.no{color:var(--err)}
+ .sz.out{background:#fafafa}
+ .sz.out .sz-l{color:#9aa1ab;text-decoration:line-through}
++.legal h2{font-size:18px;margin:26px 0 8px}
++.legal p,.legal li{color:#2b313b;line-height:1.65}
++.legal a{color:var(--brand);text-decoration:underline}
+diff --git a/app/icon.svg b/app/icon.svg
+index a067d48..922adf3 100644
+--- a/app/icon.svg
++++ b/app/icon.svg
+@@ -1 +1 @@
+-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><rect x="1" y="1" width="46" height="46" rx="12" fill="#f2b705"/><path d="M13 13h18M13 35h18M13 13v22M13 24h20" stroke="#0a2f63" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M30 18.5 37 24l-7 5.5" stroke="#0a2f63" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
++<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe45c"/><stop offset="1" stop-color="#ffb300"/></linearGradient></defs><rect x="1" y="1" width="46" height="46" rx="13" fill="url(#g)"/><path d="M13 13h18M13 35h18M13 13v22M13 24h20" stroke="#0638b8" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M30 18.5 37 24l-7 5.5" stroke="#0638b8" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+diff --git a/app/layout.tsx b/app/layout.tsx
+index ace7bce..d832501 100644
+--- a/app/layout.tsx
++++ b/app/layout.tsx
+@@ -42,7 +42,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
+           {previewMode() && ok && !path.startsWith('/start') && <div className="preview-bar">Vorschau-Modus – nur für Sie sichtbar. Preise sind Platzhalter. Kunden-Codes sind gesperrt, bis Sie <code>SHOP_PREVIEW=false</code> setzen.</div>}
+           <header className="hdr">
+             <div className="wrap hdr-row">
+-              <Link href="/" className="logo" aria-label={`${SHOP} – Startseite`}><Logo name={SHOP} /></Link>
++              <Link href="/" className="logo" aria-label={`${SHOP} – Startseite`}><Logo domain={process.env.SHOP_DOMAIN ?? 'euro-trade.com'} /></Link>
+               {open ? <>
+                 <Suspense fallback={<div className="search" />}><SearchBar /></Suspense>
+                 <div className="hdr-actions"><AccountButton /><WishlistButton /><CartButton /></div>
+diff --git a/components/Logo.tsx b/components/Logo.tsx
+index 7777d45..35ff211 100644
+--- a/components/Logo.tsx
++++ b/components/Logo.tsx
+@@ -1,30 +1,37 @@
+-/** Euro-Trade Logo: Bildmarke (E mit Handelspfeil) + Wortmarke */
++/** euro-trade.com Logo: Bildmarke (E mit Handelspfeil) + Domain als Wortmarke */
+ export function LogoMark({ size = 40 }: { size?: number }) {
+   return (
+     <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden className="logo-mark">
+-      <rect x="1" y="1" width="46" height="46" rx="12" fill="#f2b705" />
+-      <rect x="1" y="1" width="46" height="46" rx="12" fill="url(#lg-shine)" />
+-      <path d="M13 13h18M13 35h18M13 13v22" stroke="#0a2f63" strokeWidth="5" strokeLinecap="round" fill="none" />
+-      <path d="M13 24h20" stroke="#0a2f63" strokeWidth="5" strokeLinecap="round" />
+-      <path d="M30 18.5 37 24l-7 5.5" stroke="#0a2f63" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+       <defs>
+-        <linearGradient id="lg-shine" x1="0" y1="0" x2="0" y2="1">
+-          <stop offset="0" stopColor="#fff" stopOpacity=".28" />
+-          <stop offset=".55" stopColor="#fff" stopOpacity="0" />
+-        </linearGradient>
++        <linearGradient id="lm-bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#ffe45c" /><stop offset="1" stopColor="#ffb300" /></linearGradient>
+       </defs>
++      <rect x="1" y="1" width="46" height="46" rx="13" fill="url(#lm-bg)" />
++      <path d="M13 13h18M13 35h18M13 13v22M13 24h20" stroke="#0638b8" strokeWidth="5" strokeLinecap="round" fill="none" />
++      <path d="M30 18.5 37 24l-7 5.5" stroke="#0638b8" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+     </svg>
+   );
+ }
+ 
+-export default function Logo({ name = 'Euro-Trade' }: { name?: string }) {
+-  const [a, b] = name.split('-');
++/** Wortmarke „euro-trade.com“ – Domain aus SHOP_DOMAIN, „.com“ kleiner */
++export function Wordmark({ domain = 'euro-trade.com' }: { domain?: string }) {
++  const dot = domain.lastIndexOf('.');
++  const main = dot > 0 ? domain.slice(0, dot) : domain;
++  const tld = dot > 0 ? domain.slice(dot) : '';
++  const [a, ...rest] = main.split('-');
++  return (
++    <span className="logo-name">
++      {a}{rest.length > 0 && <span className="logo-b">-{rest.join('-')}</span>}{tld && <span className="logo-tld">{tld}</span>}
++    </span>
++  );
++}
++
++export default function Logo({ domain = 'euro-trade.com' }: { domain?: string }) {
+   return (
+     <span className="logo-wrap">
+       <LogoMark />
+       <span className="logo-text">
+-        <span className="logo-name">{b ? <>{a}<span>{b}</span></> : name}</span>
+-        <span className="logo-tag">Textil · Werbemittel</span>
++        <Wordmark domain={domain} />
++        <span className="logo-tag">Textil · Werbemittel · Veredelung</span>
+       </span>
+     </span>
+   );
+diff --git a/docker-compose.yml b/docker-compose.yml
+index 8faa688..1a55d63 100644
+--- a/docker-compose.yml
++++ b/docker-compose.yml
+@@ -7,10 +7,11 @@ services:
+     env_file: .env
+     volumes:
+       - ./data:/app/data
++    logging: { driver: json-file, options: { max-size: "10m", max-file: "3" } }
+     ports:
+       - "127.0.0.1:3000:3000"   # nur lokal; öffentlich geht's über Caddy
+     healthcheck:
+-      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/search?q=test"]
++      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/impressum"]
+       interval: 30s
+       timeout: 5s
+       retries: 3
+@@ -25,6 +26,7 @@ services:
+       - caddy_data:/data
+       - caddy_config:/config
+     depends_on: [shop]
++    logging: { driver: json-file, options: { max-size: "10m", max-file: "3" } }
+ 
+ volumes:
+   caddy_data:
+diff --git a/lib/mail-templates.ts b/lib/mail-templates.ts
+new file mode 100644
+index 0000000..63853bd
+--- /dev/null
++++ b/lib/mail-templates.ts
+@@ -0,0 +1,85 @@
++import 'server-only';
++import { esc, shopUrl } from './mail';
++
++// E-Mail-Layout: tabellenbasiert mit Inline-Styles – funktioniert in Outlook, Gmail, Apple Mail & Co.
++const C = { brand: '#0a5cf0', dark: '#0638b8', accent: '#ffc21a', ink: '#14181f', muted: '#5d6675', line: '#e3e6eb', bg: '#f2f4f7', ok: '#1d7a3e' };
++const F = "font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
++const shop = () => process.env.SHOP_NAME ?? 'Euro-Trade';
++const sender = () => (process.env.OFFER_SENDER ?? 'Euro-Trade · Sebastian Hosbach|Seehan 28 · 44263 Dortmund|Tel. 0173 2648097 · info@euro-trade.com').split('|');
++
++export const eur = (n: number | null | undefined) => (n == null ? 'auf Anfrage' : n.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' }));
++
++/** Rahmen: Kopf mit Logo, Inhalt, Fußzeile mit Kontakt/Impressum */
++export function layout(opts: { preheader: string; title: string; body: string; footerNote?: string }) {
++  return `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>${esc(opts.title)}</title></head>
++<body style="margin:0;padding:0;background:${C.bg};${F};color:${C.ink};-webkit-text-size-adjust:100%">
++<div style="display:none;max-height:0;overflow:hidden;opacity:0">${esc(opts.preheader)}&#8203;&#847;&#8203;&#847;&#8203;&#847;</div>
++<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${C.bg}"><tr><td align="center" style="padding:28px 12px">
++  <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px">
++    <tr><td style="background:${C.brand};background-image:linear-gradient(100deg,#0646c9 0%,#0a5cf0 55%,#1a8bff 100%);border-radius:14px 14px 0 0;padding:22px 28px">
++      <table role="presentation" cellpadding="0" cellspacing="0"><tr>
++        <td style="background:${C.accent};background-image:linear-gradient(135deg,#ffe45c,#ffb300);border-radius:10px;width:40px;height:40px;text-align:center;vertical-align:middle;${F};font-size:23px;font-weight:900;color:${C.dark}">E</td>
++        <td style="padding-left:12px;${F}"><div style="font-size:22px;font-weight:800;color:#ffffff;letter-spacing:-.5px;line-height:1">euro<span style="color:${C.accent}">-trade</span><span style="font-size:14px;font-weight:700;color:#cfe0ff">.com</span></div>
++          <div style="font-size:10px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase;color:#cfe0ff;margin-top:5px">Textil · Werbemittel · Veredelung</div></td>
++      </tr></table>
++    </td></tr>
++    <tr><td style="background:#ffffff;padding:32px 28px 28px;${F};font-size:15px;line-height:1.6;color:${C.ink}">
++      ${opts.body}
++    </td></tr>
++    <tr><td style="background:#ffffff;border-top:1px solid ${C.line};border-radius:0 0 14px 14px;padding:18px 28px 22px;${F};font-size:12px;line-height:1.6;color:${C.muted}">
++      ${opts.footerNote ? `<p style="margin:0 0 10px">${opts.footerNote}</p>` : ''}
++      ${sender().map(esc).join('<br>')}<br>
++      <a href="${shopUrl()}" style="color:${C.brand};text-decoration:none">${esc(shopUrl().replace(/^https?:\/\//, ''))}</a> · <a href="${shopUrl()}/impressum" style="color:${C.muted}">Impressum</a> · <a href="${shopUrl()}/datenschutz" style="color:${C.muted}">Datenschutz</a>
++    </td></tr>
++  </table>
++</td></tr></table></body></html>`;
++}
++
++export const h1 = (t: string) => `<h1 style="margin:0 0 14px;font-size:22px;line-height:1.3;color:${C.ink};${F}">${t}</h1>`;
++export const p = (t: string, muted = false) => `<p style="margin:0 0 14px;${muted ? `color:${C.muted};font-size:14px` : ''}">${t}</p>`;
++export const button = (href: string, label: string, color = C.brand) =>
++  `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:22px 0"><tr><td style="background:${color};border-radius:8px"><a href="${href}" style="display:inline-block;padding:13px 26px;${F};font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:8px">${label}</a></td></tr></table>`;
++/** hervorgehobene Box (z. B. Nummer, Summe) */
++export const infoBox = (rows: [string, string][], accent = C.brand) =>
++  `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:6px 0 20px;background:#f5f8fc;border-left:4px solid ${accent};border-radius:8px"><tr><td style="padding:14px 18px;${F};font-size:14px">
++  ${rows.map(([k, v]) => `<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="color:${C.muted};padding:3px 0">${k}</td><td align="right" style="font-weight:700;padding:3px 0">${v}</td></tr></table>`).join('')}
++  </td></tr></table>`;
++
++export type MailLine = { sku: string; name: string; color?: string; size?: string; qty: number; price: number | null; sum: number; deco?: string; note?: string; image?: string };
++/** Artikeltabelle mit optionalem Bild, Veredelung und Summen */
++export function itemsTable(lines: MailLine[], totals: [string, string, boolean?][]) {
++  const rows = lines.map((l) => `<tr>
++    ${l.image !== undefined ? `<td width="56" style="padding:12px 10px 12px 0;border-bottom:1px solid ${C.line};vertical-align:top">${l.image ? `<img src="${esc(l.image)}" width="48" height="48" alt="" style="display:block;width:48px;height:48px;object-fit:cover;border-radius:6px;border:1px solid ${C.line}">` : ''}</td>` : ''}
++    <td style="padding:12px 8px 12px 0;border-bottom:1px solid ${C.line};vertical-align:top;${F};font-size:14px">
++      <div style="font-weight:700">${esc(l.name)}</div>
++      <div style="color:${C.muted};font-size:12px">${[l.sku, l.color, l.size].filter(Boolean).map(esc).join(' · ')}</div>
++      ${l.deco ? `<div style="color:${C.brand};font-size:12px;margin-top:3px">✦ ${esc(l.deco)}</div>` : ''}
++      ${l.note ? `<div style="color:${C.muted};font-size:12px;font-style:italic">„${esc(l.note)}“</div>` : ''}
++    </td>
++    <td align="right" style="padding:12px 0 12px 8px;border-bottom:1px solid ${C.line};vertical-align:top;white-space:nowrap;${F};font-size:14px">${l.qty} × ${eur(l.price)}<div style="font-weight:700">${l.price == null ? '' : eur(l.sum)}</div></td>
++  </tr>`).join('');
++  const tot = totals.map(([k, v, big]) => `<tr><td ${lines[0]?.image !== undefined ? 'colspan="2"' : ''} align="right" style="padding:${big ? '10px' : '4px'} 12px 0 0;${F};font-size:${big ? 16 : 14}px;${big ? 'font-weight:800' : `color:${C.muted}`}">${k}</td><td align="right" style="padding:${big ? '10px' : '4px'} 0 0;white-space:nowrap;${F};font-size:${big ? 16 : 14}px;font-weight:${big ? 800 : 600}">${v}</td></tr>`).join('');
++  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:8px 0 18px;border-top:2px solid ${C.ink}">${rows}${tot}</table>`;
++}
++/** Kontaktdaten des Kunden (für Mails an den Shop) */
++export function contactBlock(c: Record<string, string>, extra: [string, string][] = []) {
++  const rows: [string, string][] = [
++    ['Name', esc(c.name)], ...(c.company ? [['Firma / Verein', esc(c.company)] as [string, string]] : []),
++    ['E-Mail', `<a href="mailto:${esc(c.email)}" style="color:${C.brand}">${esc(c.email)}</a>`],
++    ...(c.phone ? [['Telefon', `<a href="tel:${esc(c.phone)}" style="color:${C.brand}">${esc(c.phone)}</a>`] as [string, string]] : []),
++    ...(c.city ? [['Ort', esc(c.city)] as [string, string]] : []), ...extra,
++  ];
++  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 18px;border:1px solid ${C.line};border-radius:8px"><tr><td style="padding:12px 16px">${rows.map(([k, v]) => `<div style="${F};font-size:14px;padding:2px 0"><span style="color:${C.muted};display:inline-block;min-width:120px">${k}</span> ${v}</div>`).join('')}</td></tr></table>`;
++}
++export const quote = (t: string) => `<div style="margin:0 0 18px;padding:12px 16px;background:#f6f7f9;border-radius:8px;${F};font-size:14px;white-space:pre-wrap">${esc(t)}</div>`;
++export const signature = () => p(`Mit freundlichen Grüßen<br><strong>${esc(sender()[0])}</strong>`);
++/** Text-Version (für Mailprogramme ohne HTML und bessere Zustellbarkeit) */
++export const toText = (html: string) => html.replace(/<style[\s\S]*?<\/style>|<title[\s\S]*?<\/title>/g, '').replace(/<div style="display:none[\s\S]*?<\/div>/, '').replace(/<br\s*\/?>/g, '\n').replace(/<\/(p|tr|h1|div|table)>/g, '\n').replace(/<a [^>]*href="([^"]+)"[^>]*>([^<]*)<\/a>/g, '$2 ($1)').replace(/<[^>]+>/g, '').replace(/&#8203;|&#847;/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/[ \t]+/g, ' ').replace(/\n\s*\n\s*\n+/g, '\n\n').trim();
++
++/** Angebotspositionen als Mail-Tabelle */
++export function offerTable(o: { lines: { text: string; detail?: string; qty: number; price: number }[]; shipping: number; vat: number }, t: { net: number; vat: number; gross: number }) {
++  return itemsTable(
++    o.lines.map((l) => ({ sku: '', name: l.text, color: l.detail, qty: l.qty, price: l.price, sum: Math.round(l.qty * l.price * 100) / 100 })),
++    [...(o.shipping ? [['Versand', eur(o.shipping)] as [string, string]] : []), ['Summe netto', eur(t.net)], [`zzgl. ${o.vat} % MwSt.`, eur(t.vat)], ['Gesamtbetrag', eur(t.gross), true]],
++  );
++}
+diff --git a/lib/mail.ts b/lib/mail.ts
+index 55bc7bd..b43e192 100644
+--- a/lib/mail.ts
++++ b/lib/mail.ts
+@@ -2,13 +2,14 @@ import 'server-only';
+ import nodemailer from 'nodemailer';
+ 
+ export const mailEnabled = () => !!process.env.SMTP_HOST;
+-export async function sendMail(opts: { to: string; subject: string; html: string; replyTo?: string; attachments?: { filename: string; content: Buffer }[] }) {
++export async function sendMail(opts: { to: string; subject: string; html: string; text?: string; replyTo?: string; attachments?: { filename: string; content: Buffer }[] }) {
+   if (!mailEnabled()) { console.log(`[Mail nicht konfiguriert] ${opts.subject} -> ${opts.to}`); return false; }
+   const tx = nodemailer.createTransport({
+     host: process.env.SMTP_HOST, port: Number(process.env.SMTP_PORT ?? 587), secure: Number(process.env.SMTP_PORT) === 465,
+     auth: process.env.SMTP_USER ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS } : undefined,
+   });
+-  await tx.sendMail({ from: process.env.SMTP_FROM ?? process.env.SMTP_USER, ...opts });
++  const { toText } = await import('./mail-templates');
++  await tx.sendMail({ from: process.env.SMTP_FROM ?? process.env.SMTP_USER, text: opts.text ?? toText(opts.html), ...opts });
+   return true;
+ }
+ export const esc = (s: unknown) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+diff --git a/lib/pdf.ts b/lib/pdf.ts
+index c13bd03..164ef99 100644
+--- a/lib/pdf.ts
++++ b/lib/pdf.ts
+@@ -4,7 +4,7 @@ import { offerTotals, type Inquiry } from './store';
+ 
+ const eur = (n: number) => n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' EUR';
+ const date = (d: Date) => d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+-const BRAND = rgb(0.043, 0.306, 0.635);
++const BRAND = rgb(0.039, 0.361, 0.941);
+ const INK = rgb(0.08, 0.09, 0.12);
+ const MUTED = rgb(0.36, 0.4, 0.46);
+ const LINE = rgb(0.86, 0.88, 0.91);
+@@ -52,10 +52,11 @@ export async function offerPdf(i: Inquiry): Promise<Buffer> {
+   };
+ 
+   // Kopf
+-  page.drawRectangle({ x: L, y: y - 22, width: 26, height: 26, color: rgb(0.949, 0.718, 0.02) });
+-  text('E', L + 7.5, y - 15, { f: bold, size: 15, color: rgb(0.04, 0.18, 0.39) });
+-  text(process.env.SHOP_NAME ?? 'Euro-Trade', L + 36, y - 10, { f: bold, size: 18, color: BRAND });
+-  text('Textil · Werbemittel', L + 36, y - 22, { size: 8, color: MUTED });
++  page.drawRectangle({ x: L, y: y - 22, width: 26, height: 26, color: rgb(1, 0.76, 0.1) });
++  text('E', L + 7.5, y - 15, { f: bold, size: 15, color: rgb(0.024, 0.22, 0.72) });
++  text('euro-trade', L + 36, y - 10, { f: bold, size: 18, color: BRAND });
++  text('.com', L + 36 + bold.widthOfTextAtSize('euro-trade', 18), y - 10, { f: bold, size: 11, color: MUTED });
++  text('Textil · Werbemittel · Veredelung', L + 36, y - 22, { size: 8, color: MUTED });
+   sender().forEach((s, k) => text(s, R, y - 2 - k * 11, { size: 8.5, color: MUTED, right: true }));
+   y -= 70;
+ 
+-- 
+2.43.0
+

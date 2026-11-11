@@ -1,0 +1,1087 @@
+From 3dff0751abbeb0877711e73935cfd7adc8bb05f2 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Wed, 11 Nov 2026 04:37:35 +0100
+Subject: [PATCH] =?UTF-8?q?Bewertungen=20(nur=20verifizierte=20K=C3=A4ufer?=
+ =?UTF-8?q?)=20und=20Kategorieseiten=20im=20Snocks-Stil?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+- Bewertungseinladung automatisch bei Status „Geliefert“, Formular /bewerten/[token] (Shop + je Artikel)
+- Freigabe/Antwort im Admin, Sterne auf Karten, Produktseite (Verteilung, Liste, schema.org), Start- und Kategorieseite
+- Hinweis zur Echtheitsprüfung nach § 5b UWG
+- Kategorieseite: Banner mit Bildern und Bewertung, Vorteilsleiste, Filter als Dropdown-Leiste oben,
+  aktive Filter-Chips, „Mehr laden“, Bewertungen, SEO-Text und FAQ
+- Karten: echte Badges (Top bewertet, Staffel, Nachhaltig), Größenbereich, „ab“-Preis
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01AW9Go5bwJWAYsfGemt2b6Z
+---
+ app/admin/anfrage/[no]/OfferEditor.tsx |   9 ++-
+ app/admin/bewertungen/Moderation.tsx   |  41 ++++++++++
+ app/admin/bewertungen/page.tsx         |  17 ++++
+ app/api/admin/anfrage/[no]/route.ts    |  20 ++++-
+ app/api/admin/bewertungen/route.ts     |  16 ++++
+ app/api/bewerten/[token]/route.ts      |  36 +++++++++
+ app/bewerten/[token]/ReviewForm.tsx    |  62 ++++++++++++++
+ app/bewerten/[token]/page.tsx          |  23 ++++++
+ app/datenschutz/page.tsx               |   4 +
+ app/globals.css                        | 108 +++++++++++++++++++++----
+ app/kategorie/[slug]/page.tsx          |  33 +++++++-
+ app/layout.tsx                         |   2 +-
+ app/page.tsx                           |   3 +
+ app/produkt/[id]/AddToCart.tsx         |   2 +
+ app/produkt/[id]/page.tsx              |   2 +
+ app/start/page.tsx                     |   4 +
+ components/AdminNav.tsx                |   3 +-
+ components/FilterGrid.tsx              |  58 ++++++++-----
+ components/ProductCard.tsx             |  27 +++++--
+ components/ProductReviews.tsx          |  48 +++++++++++
+ components/ReviewList.tsx              |  19 +++++
+ components/Stars.tsx                   |  17 ++++
+ lib/catalog.ts                         |   3 +-
+ lib/category-content.ts                |  25 ++++++
+ lib/review-mail.ts                     |  24 ++++++
+ lib/reviews.ts                         |  31 +++++++
+ lib/store.ts                           |  12 +++
+ lib/types.ts                           |   2 +-
+ middleware.ts                          |   2 +-
+ 29 files changed, 602 insertions(+), 51 deletions(-)
+ create mode 100644 app/admin/bewertungen/Moderation.tsx
+ create mode 100644 app/admin/bewertungen/page.tsx
+ create mode 100644 app/api/admin/bewertungen/route.ts
+ create mode 100644 app/api/bewerten/[token]/route.ts
+ create mode 100644 app/bewerten/[token]/ReviewForm.tsx
+ create mode 100644 app/bewerten/[token]/page.tsx
+ create mode 100644 components/ProductReviews.tsx
+ create mode 100644 components/ReviewList.tsx
+ create mode 100644 components/Stars.tsx
+ create mode 100644 lib/category-content.ts
+ create mode 100644 lib/review-mail.ts
+ create mode 100644 lib/reviews.ts
+
+diff --git a/app/admin/anfrage/[no]/OfferEditor.tsx b/app/admin/anfrage/[no]/OfferEditor.tsx
+index f8dac8b..d0c84c4 100644
+--- a/app/admin/anfrage/[no]/OfferEditor.tsx
++++ b/app/admin/anfrage/[no]/OfferEditor.tsx
+@@ -28,7 +28,7 @@ export default function OfferEditor({ no, initial, saved, status: st0, statuses,
+   const net = o.lines.reduce((s, l) => s + l.qty * l.price, 0) + (o.shipping || 0);
+   const vat = Math.round(net * o.vat) / 100;
+ 
+-  async function call(action: 'save' | 'send' | 'status', extra: Record<string, unknown> = {}) {
++  async function call(action: 'save' | 'send' | 'status' | 'review', extra: Record<string, unknown> = {}) {
+     setBusy(action); setMsg(null);
+     const r = await fetch(`/api/admin/anfrage/${no}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, offer: o, status, ...extra }) });
+     const d = await r.json().catch(() => ({}));
+@@ -95,6 +95,13 @@ export default function OfferEditor({ no, initial, saved, status: st0, statuses,
+           </select>
+         </label>
+       </div>
++      {['angenommen', 'bestellt', 'geliefert'].includes(status) && (
++        <div className="admin-actions" style={{ marginTop: 0 }}>
++          <button className="btn alt" disabled={!!busy} onClick={() => call('review')}>★ Bewertungseinladung senden</button>
++          <button type="button" className="linkbtn" onClick={() => navigator.clipboard.writeText(acceptUrl.replace('/angebot/', '/bewerten/'))}>Bewertungslink kopieren</button>
++          <span className="muted" style={{ fontSize: 13 }}>Wird beim Status „Geliefert“ automatisch gesendet.</span>
++        </div>
++      )}
+       {msg && <div className={`note ${msg.ok ? 'ok' : 'err'}`}>{msg.ok ? '✓ ' : ''}{msg.t}</div>}
+       {acceptUrl && isSaved && (
+         <p className="muted" style={{ fontSize: 13 }}>
+diff --git a/app/admin/bewertungen/Moderation.tsx b/app/admin/bewertungen/Moderation.tsx
+new file mode 100644
+index 0000000..6b2a280
+--- /dev/null
++++ b/app/admin/bewertungen/Moderation.tsx
+@@ -0,0 +1,41 @@
++'use client';
++import { useState } from 'react';
++import type { Review } from '@/lib/store';
++
++const LBL = { pending: 'Wartet auf Freigabe', approved: 'Veröffentlicht', rejected: 'Abgelehnt' } as const;
++export default function Moderation({ initial }: { initial: Review[] }) {
++  const [list, setList] = useState(initial);
++  const [tab, setTab] = useState<'pending' | 'approved' | 'rejected'>('pending');
++  async function patch(id: string, data: Partial<Review>) {
++    const r = await fetch('/api/admin/bewertungen', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, ...data }) });
++    if (r.ok) setList((l) => l.map((x) => (x.id === id ? { ...x, ...data } : x)));
++  }
++  const shown = list.filter((r) => r.status === tab);
++  return (
++    <>
++      <div className="chips" style={{ margin: '0 0 14px' }}>
++        {(Object.keys(LBL) as (keyof typeof LBL)[]).map((k) => <button key={k} className={`chip ${tab === k ? 'chip-on' : ''}`} onClick={() => setTab(k)}>{LBL[k]} ({list.filter((r) => r.status === k).length})</button>)}
++      </div>
++      {!shown.length && <div className="box muted">Keine Bewertungen in dieser Ansicht.</div>}
++      <div className="cust-list">
++        {shown.map((r) => (
++          <div key={r.id} className="box">
++            <div className="my-top">
++              <div><span style={{ color: '#ffb300', fontSize: 18 }}>{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</span> <b>{r.productName ?? 'Shop / Service'}</b> <span className="muted">· {r.name}{r.company ? ` · ${r.company}` : ''} · Auftrag {r.inquiryNo} · {new Date(r.date).toLocaleDateString('de-DE')}</span></div>
++            </div>
++            {r.title && <p style={{ margin: '8px 0 0', fontWeight: 700 }}>{r.title}</p>}
++            {r.text && <p style={{ margin: '4px 0 0', whiteSpace: 'pre-wrap' }}>{r.text}</p>}
++            <div className="form" style={{ marginTop: 10 }}>
++              <textarea placeholder="Öffentliche Antwort (optional)" defaultValue={r.reply ?? ''} onBlur={(e) => e.target.value !== (r.reply ?? '') && patch(r.id, { reply: e.target.value })} style={{ minHeight: 60 }} />
++            </div>
++            <div className="admin-actions" style={{ marginBottom: 0 }}>
++              {r.status !== 'approved' && <button className="btn" onClick={() => patch(r.id, { status: 'approved' })}>Veröffentlichen</button>}
++              {r.status !== 'rejected' && <button className="btn alt" onClick={() => patch(r.id, { status: 'rejected' })}>Ablehnen</button>}
++              {r.status !== 'pending' && <button className="linkbtn" onClick={() => patch(r.id, { status: 'pending' })}>zurück auf „wartend“</button>}
++            </div>
++          </div>
++        ))}
++      </div>
++    </>
++  );
++}
+diff --git a/app/admin/bewertungen/page.tsx b/app/admin/bewertungen/page.tsx
+new file mode 100644
+index 0000000..bd0442f
+--- /dev/null
++++ b/app/admin/bewertungen/page.tsx
+@@ -0,0 +1,17 @@
++import type { Metadata } from 'next';
++import AdminNav from '@/components/AdminNav';
++import Moderation from './Moderation';
++import { listReviews } from '@/lib/store';
++
++export const metadata: Metadata = { title: 'Bewertungen', robots: { index: false, follow: false } };
++export default function Bewertungen() {
++  const all = listReviews().slice().sort((a, b) => b.date.localeCompare(a.date));
++  return (
++    <>
++      <AdminNav active="bewertungen" />
++      <h1>Bewertungen</h1>
++      <p className="muted" style={{ marginTop: -8 }}>Nur Kunden mit abgeschlossenem Auftrag können bewerten. Bitte negative Bewertungen nicht zurückhalten, nur weil sie negativ sind (UWG). Ablehnen nur bei Beleidigungen, persönlichen Daten oder fehlendem Bezug. Antworten sind öffentlich sichtbar.</p>
++      <Moderation initial={all} />
++    </>
++  );
++}
+diff --git a/app/api/admin/anfrage/[no]/route.ts b/app/api/admin/anfrage/[no]/route.ts
+index 7fb72d5..2fb6c91 100644
+--- a/app/api/admin/anfrage/[no]/route.ts
++++ b/app/api/admin/anfrage/[no]/route.ts
+@@ -3,6 +3,7 @@ import { isAdmin } from '@/lib/customer';
+ import { esc, sendMail, shopUrl } from '@/lib/mail';
+ import { button, h1, infoBox, layout, offerTable, p, quote, signature } from '@/lib/mail-templates';
+ import { offerPdf } from '@/lib/pdf';
++import { sendReviewRequest } from '@/lib/review-mail';
+ import { STATUS, addHistory, getInquiry, offerTotals, randomId, saveInquiry, type Offer, type Status } from '@/lib/store';
+ 
+ const eur = (n: number) => n.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
+@@ -33,8 +34,23 @@ export async function POST(req: Request, { params }: { params: { no: string } })
+   if (body.action === 'status') {
+     const s = body.status as Status;
+     if (!STATUS[s]) return NextResponse.json({ error: 'Unbekannter Status.' }, { status: 400 });
+-    if (s !== i.status) { i.status = s; addHistory(i, `Status: ${STATUS[s]}`); saveInquiry(i); }
+-    return NextResponse.json({ ok: true, status: s, message: `Status: ${STATUS[s]}` });
++    let extra = '';
++    if (s !== i.status) {
++      i.status = s; addHistory(i, `Status: ${STATUS[s]}`);
++      // nach Lieferung automatisch um eine Bewertung bitten (einmalig)
++      if (s === 'geliefert' && !i.reviewRequestedAt) {
++        try { if (await sendReviewRequest(i)) { i.reviewRequestedAt = new Date().toISOString(); addHistory(i, 'Bewertungseinladung gesendet'); extra = ' · Bewertungseinladung gesendet'; } }
++        catch (e) { console.error('Bewertungseinladung fehlgeschlagen', e); }
++      }
++      saveInquiry(i);
++    }
++    return NextResponse.json({ ok: true, status: s, message: `Status: ${STATUS[s]}${extra}` });
++  }
++
++  if (body.action === 'review') {
++    try { await sendReviewRequest(i); } catch { return NextResponse.json({ error: 'E-Mail konnte nicht gesendet werden.' }, { status: 500 }); }
++    i.reviewRequestedAt = new Date().toISOString(); addHistory(i, 'Bewertungseinladung gesendet'); saveInquiry(i);
++    return NextResponse.json({ ok: true, message: `Bewertungseinladung an ${i.customer.email} gesendet.` });
+   }
+ 
+   const first = !i.offer;
+diff --git a/app/api/admin/bewertungen/route.ts b/app/api/admin/bewertungen/route.ts
+new file mode 100644
+index 0000000..6b99beb
+--- /dev/null
++++ b/app/api/admin/bewertungen/route.ts
+@@ -0,0 +1,16 @@
++import { NextResponse } from 'next/server';
++import { isAdmin } from '@/lib/customer';
++import { listReviews, saveReviews } from '@/lib/store';
++
++/** Bewertung freigeben/ablehnen/beantworten – Inhalte der Kunden werden nicht verändert */
++export async function PATCH(req: Request) {
++  if (!(await isAdmin())) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
++  const { id, status, reply } = await req.json().catch(() => ({}));
++  const list = listReviews();
++  const r = list.find((x) => x.id === id);
++  if (!r) return NextResponse.json({ error: 'Nicht gefunden.' }, { status: 404 });
++  if (['pending', 'approved', 'rejected'].includes(status)) r.status = status;
++  if (typeof reply === 'string') r.reply = reply.trim().slice(0, 800) || undefined;
++  saveReviews(list);
++  return NextResponse.json({ ok: true });
++}
+diff --git a/app/api/bewerten/[token]/route.ts b/app/api/bewerten/[token]/route.ts
+new file mode 100644
+index 0000000..39ad128
+--- /dev/null
++++ b/app/api/bewerten/[token]/route.ts
+@@ -0,0 +1,36 @@
++import { NextResponse } from 'next/server';
++import { esc, sendMail, shopUrl } from '@/lib/mail';
++import { button, h1, layout, p } from '@/lib/mail-templates';
++import { inquiryByToken, listReviews, randomId, saveReviews, type Review } from '@/lib/store';
++
++export async function POST(req: Request, { params }: { params: { token: string } }) {
++  const i = inquiryByToken(params.token);
++  if (!i || !['angenommen', 'bestellt', 'geliefert'].includes(i.status ?? '')) return NextResponse.json({ error: 'Link ungültig.' }, { status: 404 });
++  const b = await req.json().catch(() => ({}));
++  const name = String(b.name ?? '').trim().slice(0, 40);
++  if (!name) return NextResponse.json({ error: 'Bitte einen Namen angeben.' }, { status: 400 });
++  const company = String(b.company ?? '').trim().slice(0, 80);
++  const clean = (e: any) => ({ rating: Math.max(0, Math.min(5, Math.round(Number(e?.rating) || 0))), title: String(e?.title ?? '').trim().slice(0, 80), text: String(e?.text ?? '').trim().slice(0, 1000) });
++  const products = new Map(i.lines.filter((l) => l.id).map((l) => [l.id!, l]));
++  const now = new Date().toISOString();
++  const fresh: Review[] = [];
++  const s = clean(b.shop);
++  if (s.rating) fresh.push({ id: randomId(6), productId: null, name, company, ...s, date: now, inquiryNo: i.no, status: 'pending' });
++  for (const [id, e] of Object.entries(b.items ?? {})) {
++    const l = products.get(id); const c = clean(e);
++    if (l && c.rating) fresh.push({ id: randomId(6), productId: id, sku: l.sku, productName: l.name, name, company, ...c, date: now, inquiryNo: i.no, status: 'pending' });
++  }
++  if (!fresh.length) return NextResponse.json({ error: 'Bitte mindestens eine Sternebewertung vergeben.' }, { status: 400 });
++  // pro Auftrag und Produkt nur eine Bewertung – neue ersetzt eine noch nicht veröffentlichte
++  const keep = listReviews().filter((r) => !(r.inquiryNo === i.no && fresh.some((f) => f.productId === r.productId) && r.status === 'pending'));
++  const dup = keep.some((r) => r.inquiryNo === i.no && fresh.some((f) => f.productId === r.productId));
++  if (dup) return NextResponse.json({ error: 'Sie haben diesen Auftrag bereits bewertet. Vielen Dank!' }, { status: 409 });
++  saveReviews([...keep, ...fresh]);
++  try {
++    await sendMail({ to: process.env.INQUIRY_TO ?? '', subject: `Neue Bewertung (${fresh.map((f) => '★'.repeat(f.rating)).join(' / ')}) – ${i.customer.company || i.customer.name}`,
++      html: layout({ preheader: `${fresh.length} neue Bewertung(en) warten auf Freigabe`, title: 'Neue Bewertung',
++        body: h1('Neue Bewertung zur Freigabe') + fresh.map((f) => p(`<span style="color:#ffb300;font-size:18px">${'★'.repeat(f.rating)}${'☆'.repeat(5 - f.rating)}</span> <strong>${esc(f.productName ?? 'Shop/Service')}</strong>${f.title ? `<br><strong>${esc(f.title)}</strong>` : ''}${f.text ? `<br>${esc(f.text)}` : ''}`)).join('')
++          + button(`${shopUrl()}/admin/bewertungen`, 'Prüfen & freigeben →') }) });
++  } catch (e) { console.error('Mail Bewertung fehlgeschlagen', e); }
++  return NextResponse.json({ ok: true });
++}
+diff --git a/app/bewerten/[token]/ReviewForm.tsx b/app/bewerten/[token]/ReviewForm.tsx
+new file mode 100644
+index 0000000..8c18492
+--- /dev/null
++++ b/app/bewerten/[token]/ReviewForm.tsx
+@@ -0,0 +1,62 @@
++'use client';
++import { useState } from 'react';
++
++type P = { id: string; name: string; sku: string };
++type Entry = { rating: number; title: string; text: string };
++
++function StarInput({ value, onChange }: { value: number; onChange: (n: number) => void }) {
++  const [hover, setHover] = useState(0);
++  const labels = ['', 'Schlecht', 'Mäßig', 'Gut', 'Sehr gut', 'Hervorragend'];
++  return (
++    <div className="star-input" onMouseLeave={() => setHover(0)}>
++      {[1, 2, 3, 4, 5].map((n) => (
++        <button key={n} type="button" aria-label={`${n} Sterne`} className={(hover || value) >= n ? 'on' : ''} onMouseEnter={() => setHover(n)} onClick={() => onChange(n)}>★</button>
++      ))}
++      <span className="muted">{labels[hover || value]}</span>
++    </div>
++  );
++}
++
++export default function ReviewForm({ token, products, defaultName, company, done: done0 }: { token: string; products: P[]; defaultName: string; company: string; done: boolean }) {
++  const [shop, setShop] = useState<Entry>({ rating: 0, title: '', text: '' });
++  const [items, setItems] = useState<Record<string, Entry>>(Object.fromEntries(products.map((p) => [p.id, { rating: 0, title: '', text: '' }])));
++  const [name, setName] = useState(defaultName);
++  const [showCompany, setShowCompany] = useState(!!company);
++  const [state, setState] = useState<'idle' | 'busy' | 'done'>(done0 ? 'done' : 'idle');
++  const [err, setErr] = useState('');
++  const any = shop.rating > 0 || Object.values(items).some((x) => x.rating > 0);
++
++  async function submit(e: React.FormEvent) {
++    e.preventDefault(); setState('busy'); setErr('');
++    const r = await fetch(`/api/bewerten/${token}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, company: showCompany ? company : '', shop, items }) });
++    const d = await r.json().catch(() => ({}));
++    if (r.ok) setState('done'); else { setErr(d.error ?? 'Senden fehlgeschlagen.'); setState('idle'); }
++  }
++  if (state === 'done') return <div className="box" style={{ textAlign: 'center' }}><h2 style={{ marginTop: 0 }}>Vielen Dank für Ihre Bewertung! ★</h2><p>Wir prüfen sie kurz und veröffentlichen sie dann im Shop. Ihre Rückmeldung hilft uns und anderen Kunden sehr.</p><a href="/" className="btn" style={{ display: 'inline-grid', placeItems: 'center' }}>Zum Shop</a></div>;
++
++  const block = (title: string, v: Entry, set: (e: Entry) => void, ph: string) => (
++    <div className="box rev-form">
++      <strong>{title}</strong>
++      <StarInput value={v.rating} onChange={(n) => set({ ...v, rating: n })} />
++      {v.rating > 0 && <>
++        <input placeholder="Überschrift (optional), z. B. „Top Qualität, schnelle Lieferung“" value={v.title} maxLength={80} onChange={(e) => set({ ...v, title: e.target.value })} />
++        <textarea placeholder={ph} value={v.text} maxLength={1000} onChange={(e) => set({ ...v, text: e.target.value })} />
++      </>}
++    </div>
++  );
++  return (
++    <form onSubmit={submit} className="rev-forms">
++      {block('Wie zufrieden sind Sie insgesamt mit euro-trade.com?', shop, setShop, 'Beratung, Angebot, Lieferung, Kommunikation … (optional)')}
++      {products.map((p) => <div key={p.id}>{block(p.name, items[p.id], (e) => setItems((x) => ({ ...x, [p.id]: e })), 'Qualität, Passform, Veredelung … (optional)')}</div>)}
++      <div className="box form">
++        <div className="two">
++          <div><label>Angezeigter Name</label><input value={name} onChange={(e) => setName(e.target.value)} maxLength={40} required /></div>
++          {company && <div><label style={{ display: 'flex', gap: 8, fontWeight: 400, marginTop: 34 }}><input type="checkbox" checked={showCompany} onChange={(e) => setShowCompany(e.target.checked)} style={{ width: 'auto' }} /> „{company}“ anzeigen</label></div>}
++        </div>
++        <p className="muted" style={{ fontSize: 13 }}>Ihre Bewertung wird mit Name, Datum und dem Hinweis „Verifizierter Kauf“ im Shop veröffentlicht. Ihre E-Mail-Adresse wird nicht angezeigt.</p>
++        <button className="btn" disabled={!any || state === 'busy'}>{state === 'busy' ? 'Wird gesendet …' : 'Bewertung absenden'}</button>
++        {err && <p className="err">{err}</p>}
++      </div>
++    </form>
++  );
++}
+diff --git a/app/bewerten/[token]/page.tsx b/app/bewerten/[token]/page.tsx
+new file mode 100644
+index 0000000..9649a4f
+--- /dev/null
++++ b/app/bewerten/[token]/page.tsx
+@@ -0,0 +1,23 @@
++import { notFound } from 'next/navigation';
++import type { Metadata } from 'next';
++import ReviewForm from './ReviewForm';
++import { inquiryByToken, listReviews } from '@/lib/store';
++
++export const metadata: Metadata = { title: 'Bewertung abgeben', robots: { index: false } };
++export const dynamic = 'force-dynamic';
++
++export default function Bewerten({ params }: { params: { token: string } }) {
++  const i = inquiryByToken(params.token);
++  if (!i || !['angenommen', 'bestellt', 'geliefert'].includes(i.status ?? '')) notFound();
++  const products = [...new Map(i.lines.filter((l) => l.id).map((l) => [l.id!, { id: l.id!, name: l.name, sku: l.sku }])).values()];
++  const existing = listReviews().filter((r) => r.inquiryNo === i.no);
++  const first = i.customer.name.trim().split(/\s+/);
++  const display = first.length > 1 ? `${first[0]} ${first[first.length - 1][0]}.` : first[0];
++  return (
++    <div style={{ maxWidth: 760, margin: '0 auto' }}>
++      <h1>Ihre Bewertung</h1>
++      <p className="muted" style={{ marginTop: -6 }}>Auftrag {i.no} · Vielen Dank, dass Sie sich einen Moment Zeit nehmen.</p>
++      <ReviewForm token={params.token} products={products} defaultName={display} company={i.customer.company ?? ''} done={existing.length > 0} />
++    </div>
++  );
++}
+diff --git a/app/datenschutz/page.tsx b/app/datenschutz/page.tsx
+index edec132..90dd255 100644
+--- a/app/datenschutz/page.tsx
++++ b/app/datenschutz/page.tsx
+@@ -59,6 +59,10 @@ export default function Datenschutz() {
+         <p>Rechtsgrundlage ist Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Sie können sie jederzeit über den Abmeldelink in jeder E-Mail oder per Nachricht an uns widerrufen. Nach der Abmeldung löschen wir Ihre Adresse, soweit wir sie nicht zum Nachweis einer früheren Einwilligung kurzfristig aufbewahren müssen (Art. 6 Abs. 1 lit. f DSGVO). Unbestätigte Anmeldungen löschen wir nach 30 Tagen.</p>
+       </section>
+ 
++      <S t="7b. Bewertungen">
++        <p>Nach Abschluss eines Auftrags laden wir Sie per E-Mail ein, Ihre Bestellung zu bewerten (Art. 6 Abs. 1 lit. f DSGVO, berechtigtes Interesse an Kundenfeedback; Sie können dem jederzeit widersprechen). Wenn Sie eine Bewertung abgeben, veröffentlichen wir Sternebewertung, Überschrift, Text, den von Ihnen gewählten Anzeigenamen, optional Ihre Firma bzw. Ihren Verein sowie Monat und Jahr. Ihre E-Mail-Adresse wird nicht veröffentlicht. Rechtsgrundlage für die Veröffentlichung ist Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO), die Sie jederzeit per E-Mail widerrufen können. Die Bewertung wird dann gelöscht.</p>
++      </S>
++
+       <S t="8. E-Mail-Versand">
+         <p>Bestätigungen, Angebote und Auftragsbestätigungen versenden wir über den E-Mail-Dienst der IONOS SE (Auftragsverarbeitung nach Art. 28 DSGVO). Wenn Sie uns per E-Mail kontaktieren, verarbeiten wir Ihre Angaben zur Bearbeitung Ihres Anliegens (Art. 6 Abs. 1 lit. b bzw. f DSGVO).</p>
+       </S>
+diff --git a/app/globals.css b/app/globals.css
+index e438e78..2d58b88 100644
+--- a/app/globals.css
++++ b/app/globals.css
+@@ -429,34 +429,49 @@ footer .wrap{display:flex;gap:20px;flex-wrap:wrap;justify-content:space-between}
+ .preview-bar{background:#b3261e;color:#fff;font-size:13px;font-weight:600;text-align:center;padding:6px 16px}
+ .preview-bar code{background:rgba(255,255,255,.18);padding:1px 6px;border-radius:4px}
+ 
+-/* Filter */
+-.fg{display:grid;grid-template-columns:230px 1fr;gap:22px;align-items:start}
+-.filters{background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:14px 16px;position:sticky;top:90px;max-height:calc(100vh - 110px);overflow:auto}
+-.f-head{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-bottom:4px}
+-.f-head .linkbtn{font-size:13px;color:var(--muted)}
+-.f-close,.f-apply,.f-open{display:none}
+-.f-group{border-top:1px solid var(--line);padding:12px 0 6px;font-size:14px}
+-.f-group>b{display:block;margin-bottom:8px;font-size:13px}
++/* Filter – Leiste oben wie bei Snocks */
++.fg{display:block}
++.fg-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:10px;position:relative;z-index:20}
++.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
++.f-head,.f-close,.f-apply,.f-open{display:none}
++.f-group{position:relative}
++.f-btn{display:flex;align-items:center;gap:6px;height:40px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:14px;font-weight:600;color:var(--ink)}
++.f-btn:hover,.f-group.open .f-btn{border-color:var(--ink)}
++.f-group.act .f-btn{border-color:var(--brand);color:var(--brand);background:#f3f7ff}
++.f-n{background:var(--brand);color:#fff;border-radius:999px;font-size:11px;padding:1px 6px}
++.f-car{font-size:11px;color:var(--muted)}
++.f-pop{display:none;position:absolute;top:calc(100% + 6px);left:0;min-width:240px;max-height:340px;overflow:auto;background:#fff;border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.16);padding:14px;z-index:30}
++.f-group.open .f-pop{display:block}
+ .f-fams{display:flex;flex-wrap:wrap;gap:6px}
+ .f-fam{display:flex;align-items:center;gap:6px;font-size:12px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:3px 9px 3px 4px}
+ .f-fam span{width:16px;height:16px;border-radius:50%;border:1px solid rgba(0,0,0,.15)}
+ .f-fam.on{border-color:var(--brand);background:#ebf2ff;color:var(--brand);font-weight:600}
+ .f-sizes{display:flex;flex-wrap:wrap;gap:6px}
+ .f-sizes .size{min-width:44px;padding:5px 8px;font-size:13px}
+-.f-check{display:flex;align-items:center;gap:8px;padding:3px 0;cursor:pointer}
+-.f-check span{margin-left:auto;color:var(--muted);font-size:12px}
+-.f-group input[type=range]{width:100%}
+-.fg-bar{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
++.f-check{display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer;font-size:14px;white-space:nowrap}
++.f-check span{margin-left:auto;padding-left:14px;color:var(--muted);font-size:12px}
++.f-pop input[type=range]{width:100%;margin-top:8px}
+ .fg-sort{margin-left:auto;display:flex;gap:8px;align-items:center;font-size:14px}
+-.fg-sort select{border:1px solid var(--line);border-radius:8px;padding:7px 10px;background:#fff}
++.fg-sort select{border:1px solid var(--line);border-radius:999px;padding:8px 12px;background:#fff;font-weight:600}
++.fg-info{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 14px;font-size:14px}
++.f-chip{border:0;background:#14181f;color:#fff;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:600}
++.more{display:flex;flex-direction:column;align-items:center;gap:10px;margin:28px auto 0;max-width:320px}
++.more-bar{width:100%;height:4px;background:#e6e9ee;border-radius:999px;overflow:hidden}
++.more-bar i{display:block;height:100%;background:var(--ink)}
++.more .btn{width:100%}
+ @media (max-width:820px){
+-  .fg{grid-template-columns:1fr}
+   .f-open{display:inline-grid;place-items:center;height:40px}
+-  .filters{position:fixed;inset:0;top:auto;max-height:85vh;border-radius:16px 16px 0 0;z-index:160;transform:translateY(100%);transition:transform .25s;padding-bottom:20px}
++  .filters{position:fixed;inset:auto 0 0 0;max-height:85vh;overflow:auto;display:block;background:#fff;border-radius:16px 16px 0 0;z-index:160;transform:translateY(100%);transition:transform .25s;padding:16px 16px 20px}
+   .filters.open{transform:none;box-shadow:0 -12px 40px rgba(0,0,0,.25)}
++  .f-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+   .f-close{display:block;background:none;border:0;font-size:26px;color:var(--muted)}
+   .f-apply{display:block;width:100%;margin-top:12px}
++  .f-group{border-top:1px solid var(--line);padding:10px 0}
++  .f-btn{border:0;padding:0;height:auto;background:none!important;font-size:14px}
++  .f-car{display:none}
++  .f-pop{display:block;position:static;box-shadow:none;padding:8px 0 0;max-height:none;min-width:0}
+ }
++
+ .cline{grid-template-columns:64px 1fr auto auto}
+ .cl-meta{font-size:13px;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin-top:2px}
+ .cl-meta select{border:1px solid var(--line);border-radius:6px;padding:2px 6px;font-size:13px;background:#fff}
+@@ -529,3 +544,66 @@ footer .wrap{padding-right:84px}
+ .form-line{letter-spacing:1px;color:var(--muted)}
+ @media (max-width:900px){.ret-grid{grid-template-columns:1fr 1fr}}
+ @media (max-width:520px){.ret-grid{grid-template-columns:1fr}}
++
++/* Sterne */
++.stars{display:inline-flex;align-items:center;gap:5px;font-size:13px;white-space:nowrap}
++.stars-in{position:relative;display:inline-block;line-height:0}
++.stars-bg,.stars-fg{display:inline-flex}
++.stars-fg{position:absolute;inset:0 auto 0 0;overflow:hidden}
++.stars-n{color:var(--muted)}
++/* Karten wie bei Snocks */
++.card .b{gap:4px}
++.card .name{font-size:15px}
++.card .brand{text-transform:none;letter-spacing:0;font-size:13px}
++.card-rating{min-height:16px}
++.badges{position:absolute;left:8px;top:8px;display:flex;flex-direction:column;gap:5px;align-items:flex-start;z-index:2}
++.badge-p{font-size:11px;font-weight:800;padding:3px 8px;border-radius:6px;letter-spacing:.2px}
++.b-top{background:#14181f;color:#ffc21a}
++.b-deal{background:var(--accent);color:#14181f}
++.b-eco{background:#e3f5e9;color:#1d7a3e}
++.dots-more{font-size:12px;color:var(--muted);align-self:center}
++.price .ab{font-weight:500;color:var(--muted);font-size:14px}
++/* Bewertungen */
++.pd-rating{display:inline-block;margin-top:4px}
++.pd-rating:hover .stars-n{text-decoration:underline}
++.rev-section{margin-top:40px}
++.rev-grid{display:grid;grid-template-columns:260px 1fr;gap:18px;align-items:start}
++.rev-sum{text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;position:sticky;top:90px}
++.rev-big{font-size:46px;font-weight:900;line-height:1}
++.rev-dist{width:100%;margin-top:8px;display:flex;flex-direction:column;gap:4px;font-size:12px}
++.rev-dist div{display:grid;grid-template-columns:30px 1fr 24px;gap:6px;align-items:center}
++.rev-dist i{height:7px;background:#eef0f3;border-radius:999px;overflow:hidden;display:block}
++.rev-dist b{display:block;height:100%;background:#ffb300}
++.rev-list{display:flex;flex-direction:column;gap:10px}
++.rev{margin:0;background:#fff;border-radius:12px;box-shadow:var(--shadow);padding:16px 18px;display:flex;flex-direction:column;gap:6px}
++.rev-top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
++.rev-ver{font-size:12px;font-weight:700;color:var(--ok)}
++.rev-title{font-size:15px}
++.rev blockquote{margin:0;color:#2b313b;font-size:14px;line-height:1.55}
++.rev figcaption{font-size:12px;color:var(--muted)}
++.rev-reply{font-size:13px;background:#f3f7ff;border-left:3px solid var(--brand);padding:8px 10px;border-radius:6px}
++.rev-note{font-size:12px;color:var(--muted);margin:12px 0 0;max-width:900px}
++.rev-strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
++.rev-overall .stars{font-size:15px}
++.rev-forms{display:flex;flex-direction:column;gap:12px}
++.rev-form{display:flex;flex-direction:column;gap:10px}
++.rev-form input,.rev-form textarea{border:1px solid var(--line);border-radius:8px;padding:10px 12px;width:100%}
++.rev-form textarea{min-height:80px}
++.star-input{display:flex;align-items:center;gap:2px}
++.star-input button{background:none;border:0;font-size:34px;line-height:1;color:#d9dde3;padding:0 2px;cursor:pointer;transition:transform .1s}
++.star-input button.on{color:#ffb300}
++.star-input button:hover{transform:scale(1.12)}
++.star-input .muted{margin-left:10px;font-size:14px}
++@media (max-width:820px){.rev-grid{grid-template-columns:1fr}.rev-sum{position:static}}
++/* Kategorieseite */
++.cat-hero{display:grid;grid-template-columns:1.2fr 1fr;gap:24px;align-items:center;background:linear-gradient(120deg,#f3f7ff,#fff8dc);border-radius:18px;padding:26px 30px;margin-bottom:12px;overflow:hidden}
++.cat-hero h1{font-size:34px;margin:0 0 6px;letter-spacing:-.6px}
++.cat-hero p{margin:8px 0 0;color:#3b4250;font-size:16px;max-width:560px}
++.cat-hero-imgs{display:flex;gap:10px;justify-content:flex-end}
++.cat-hero-imgs img{width:31%;aspect-ratio:3/4;object-fit:cover;border-radius:12px;background:#fff;box-shadow:var(--shadow)}
++.usp{list-style:none;display:flex;gap:8px 22px;flex-wrap:wrap;justify-content:center;padding:10px 0;margin:0 0 6px;font-size:13px;color:#3b4250}
++.usp li::before{content:"✓ ";color:var(--ok);font-weight:800}
++.cat-seo{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:44px;align-items:start}
++.cat-seo p{color:#3b4250;line-height:1.65}
++.cat-seo h2{margin-top:0}
++@media (max-width:820px){.cat-hero{grid-template-columns:1fr;padding:20px}.cat-hero h1{font-size:28px}.cat-hero-imgs{justify-content:flex-start}.cat-seo{grid-template-columns:1fr}}
+diff --git a/app/kategorie/[slug]/page.tsx b/app/kategorie/[slug]/page.tsx
+index c6eb175..5e6b226 100644
+--- a/app/kategorie/[slug]/page.tsx
++++ b/app/kategorie/[slug]/page.tsx
+@@ -1,23 +1,50 @@
+ import Link from 'next/link';
+ import { notFound } from 'next/navigation';
+ import FilterGrid from '@/components/FilterGrid';
++import { ReviewStrip } from '@/components/ProductReviews';
++import Stars from '@/components/Stars';
+ import { getByCategory, getCategories } from '@/lib/catalog';
+ import { getCustomer } from '@/lib/customer';
++import { categoryContent } from '@/lib/category-content';
++import { latestReviews } from '@/lib/reviews';
+ 
+ export async function generateMetadata({ params }: { params: { slug: string } }) {
+   const c = getCategories(await getCustomer()).find((x) => x.slug === params.slug);
+-  return { title: c?.name ?? 'Kategorie' };
++  return { title: c?.name ?? 'Kategorie', description: c ? categoryContent(c.slug, c.name).intro : undefined };
+ }
+ 
+ export default async function CategoryPage({ params }: { params: { slug: string } }) {
+   const ctx = await getCustomer();
+   const cat = getCategories(ctx).find((x) => x.slug === params.slug);
+   if (!cat) notFound();
++  const items = getByCategory(params.slug, ctx);
++  const txt = categoryContent(cat.slug, cat.name);
++  const rated = items.filter((p) => p.rating);
++  const catRating = rated.length ? { avg: rated.reduce((s, p) => s + p.rating!.avg * p.rating!.count, 0) / rated.reduce((s, p) => s + p.rating!.count, 0), count: rated.reduce((s, p) => s + p.rating!.count, 0) } : null;
++  const heroImgs = items.flatMap((p) => p.images.slice(0, 1)).slice(0, 3);
+   return (
+     <>
+       <div className="crumbs"><Link href="/">Start</Link> › {cat.name}</div>
+-      <h1>{cat.name}</h1>
+-      <FilterGrid items={getByCategory(params.slug, ctx)} />
++      <section className="cat-hero">
++        <div className="cat-hero-text">
++          <h1>{cat.name}</h1>
++          {catRating && <div className="cat-rating"><Stars value={catRating.avg} size={16} showValue count={catRating.count} /></div>}
++          <p>{txt.intro}</p>
++        </div>
++        <div className="cat-hero-imgs">{heroImgs.map((src) => <img key={src} src={src} alt="" loading="lazy" />)}</div>
++      </section>
++      <ul className="usp">
++        <li><b>Ab 1 Stück</b> · Staffelpreise ab 10</li>
++        <li><b>Druck & Stick</b> aus einer Hand</li>
++        <li><b>Vorschau</b> vor jeder Produktion</li>
++        <li><b>Angebot in 24 h</b></li>
++      </ul>
++      <FilterGrid items={items} />
++      <ReviewStrip reviews={latestReviews(6, items.map((p) => p.id))} overall={catRating} title={`Bewertungen zu ${cat.name}`} />
++      <section className="cat-seo">
++        <div><h2>{cat.name} mit Ihrem Logo</h2>{txt.seo.map((x) => <p key={x}>{x}</p>)}<p><Link className="alink" href="/druck-stick">Druck & Stick im Vergleich →</Link></p></div>
++        <div className="faq"><h2>Häufige Fragen</h2>{txt.faq.map(([q, a]) => <details key={q} className="box"><summary>{q}</summary><p>{a}</p></details>)}</div>
++      </section>
+     </>
+   );
+ }
+diff --git a/app/layout.tsx b/app/layout.tsx
+index a848117..275981c 100644
+--- a/app/layout.tsx
++++ b/app/layout.tsx
+@@ -29,7 +29,7 @@ export const dynamic = 'force-dynamic';
+ export default async function RootLayout({ children }: { children: React.ReactNode }) {
+   const gated = shopClosed();
+   const path = headers().get('x-path') ?? '/';
+-  const isPublic = ['/widerruf', '/newsletter', '/start', '/druck-stick', '/zugang', '/impressum', '/datenschutz', '/angebot', '/admin'].some((p) => path === p || path.startsWith(p + '/'));
++  const isPublic = ['/bewerten', '/widerruf', '/newsletter', '/start', '/druck-stick', '/zugang', '/impressum', '/datenschutz', '/angebot', '/admin'].some((p) => path === p || path.startsWith(p + '/'));
+   const { ok, customer } = await shopAccess();
+   // Code im Admin gesperrt/gelöscht -> zurück zur Anmeldung
+   if (!ok && !isPublic) redirect('/zugang');
+diff --git a/app/page.tsx b/app/page.tsx
+index f2f0e26..deb8d0f 100644
+--- a/app/page.tsx
++++ b/app/page.tsx
+@@ -4,6 +4,8 @@ import { getCategories, getCollection, getFeatured, productCount } from '@/lib/c
+ import { getCustomer } from '@/lib/customer';
+ import { RecentlyViewed } from '@/components/Recent';
+ import NewsletterBox from './start/NewsletterBox';
++import { ReviewStrip } from '@/components/ProductReviews';
++import { latestReviews, overall } from '@/lib/reviews';
+ import { discountTiers } from '@/lib/store';
+ 
+ export default async function Home() {
+@@ -28,6 +30,7 @@ export default async function Home() {
+         <h2>{collection.length ? 'Weitere Artikel' : 'Beliebte Artikel'}</h2>
+         <div className="grid">{getFeatured(16, ctx).filter((p) => !collection.some((c) => c.id === p.id)).map((p) => <ProductCard key={p.id} p={p} />)}</div>
+       </>}
++      <ReviewStrip reviews={latestReviews(6)} overall={overall()} />
+       <div style={{ marginTop: 40 }}><NewsletterBox tiers={discountTiers()} /></div>
+     </>
+   );
+diff --git a/app/produkt/[id]/AddToCart.tsx b/app/produkt/[id]/AddToCart.tsx
+index 0ad190f..a55491c 100644
+--- a/app/produkt/[id]/AddToCart.tsx
++++ b/app/produkt/[id]/AddToCart.tsx
+@@ -7,6 +7,7 @@ import { useCart } from '@/components/CartContext';
+ import { swatchBg } from '@/lib/colors';
+ import { WishButton } from '@/components/Wishlist';
+ import Info from '@/components/Info';
++import Stars from '@/components/Stars';
+ import { FONTS, METHODS, MOTIFS, POSITIONS, PREVIEW, TEXT_COLORS, colorHex, fontCss, isImage, type Deco, type Motif } from '@/lib/deco';
+ import { nextTier, unitFor } from '@/lib/tiers';
+ 
+@@ -96,6 +97,7 @@ export default function AddToCart({ p, customerLogo, delivery }: { p: PublicProd
+       <div>
+         <div className="muted" style={{ textTransform: 'uppercase', fontSize: 13, letterSpacing: '.4px' }}>{p.brand} · Art.-Nr. {p.sku}</div>
+         <h1 style={{ margin: '4px 0 0' }}>{p.name}</h1>
++        {p.rating && <a href="#bewertungen" className="pd-rating"><Stars value={p.rating.avg} size={16} showValue count={p.rating.count} /></a>}
+         {p.price != null ? <>
+           <div className="price">{eur(p.price)} <span style={{ fontSize: 15, fontWeight: 500 }} className="muted">/ Stück</span></div>
+           <div className="vat">netto zzgl. MwSt. ({eur(p.priceGross)} brutto) · schon ab 1 Stück{decoOn ? ' · Veredelung wird im Angebot kalkuliert' : ''}</div>
+diff --git a/app/produkt/[id]/page.tsx b/app/produkt/[id]/page.tsx
+index 77b05e9..8df23c1 100644
+--- a/app/produkt/[id]/page.tsx
++++ b/app/produkt/[id]/page.tsx
+@@ -5,6 +5,7 @@ import ProductCard from '@/components/ProductCard';
+ import { getByCategory, getProduct } from '@/lib/catalog';
+ import { getCustomer } from '@/lib/customer';
+ import { RecentTracker, RecentlyViewed } from '@/components/Recent';
++import ProductReviews from '@/components/ProductReviews';
+ 
+ export async function generateMetadata({ params }: { params: { id: string } }) {
+   const p = getProduct(decodeURIComponent(params.id), await getCustomer());
+@@ -21,6 +22,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
+       <div className="crumbs"><Link href="/">Start</Link> › <Link href={`/kategorie/${p.categorySlug}`}>{p.category}</Link> › {p.name}</div>
+       <AddToCart p={p} customerLogo={ctx?.logoId ? { id: ctx.logoId, name: ctx.logoName ?? 'Ihr Logo' } : null} delivery={process.env.DELIVERY_TEXT ?? 'Lieferung ca. 3–5 Werktage · mit Veredelung ca. 7–14 Werktage nach Freigabe'} />
+       <RecentTracker id={p.id} />
++      <ProductReviews productId={p.id} name={p.name} />
+       {related.length > 0 && <><h2>Ähnliche Artikel</h2><div className="grid">{related.map((r) => <ProductCard key={r.id} p={r} />)}</div></>}
+       <RecentlyViewed exclude={p.id} />
+     </>
+diff --git a/app/start/page.tsx b/app/start/page.tsx
+index add0866..84c657d 100644
+--- a/app/start/page.tsx
++++ b/app/start/page.tsx
+@@ -3,6 +3,8 @@ import type { Metadata } from 'next';
+ import AccessForm from '../zugang/AccessForm';
+ import RequestForm from './RequestForm';
+ import NewsletterBox from './NewsletterBox';
++import { ReviewStrip } from '@/components/ProductReviews';
++import { latestReviews, overall } from '@/lib/reviews';
+ import { discountTiers, listReferences } from '@/lib/store';
+ import { getCategories } from '@/lib/catalog';
+ 
+@@ -82,6 +84,8 @@ export default function Start() {
+         </section>
+       )}
+ 
++      <ReviewStrip reviews={latestReviews(6)} overall={overall()} />
++
+       <NewsletterBox tiers={discountTiers()} />
+ 
+       <section id="anfragen" className="l-section l-request">
+diff --git a/components/AdminNav.tsx b/components/AdminNav.tsx
+index a1186c3..1ec8da2 100644
+--- a/components/AdminNav.tsx
++++ b/components/AdminNav.tsx
+@@ -1,10 +1,11 @@
+ import Link from 'next/link';
+ import AdminLogout from './AdminLogout';
+-export default function AdminNav({ active }: { active: 'anfragen' | 'kunden' | 'referenzen' | 'newsletter' }) {
++export default function AdminNav({ active }: { active: 'anfragen' | 'kunden' | 'referenzen' | 'newsletter' | 'bewertungen' }) {
+   return (
+     <div className="admin-nav">
+       <Link href="/admin" className={active === 'anfragen' ? 'on' : ''}>Anfragen & Angebote</Link>
+       <Link href="/admin/kunden" className={active === 'kunden' ? 'on' : ''}>Kunden & Codes</Link>
++      <Link href="/admin/bewertungen" className={active === 'bewertungen' ? 'on' : ''}>Bewertungen</Link>
+       <Link href="/admin/referenzen" className={active === 'referenzen' ? 'on' : ''}>Referenzen</Link>
+       <Link href="/admin/newsletter" className={active === 'newsletter' ? 'on' : ''}>Newsletter</Link>
+       <span style={{ flex: 1 }} />
+diff --git a/components/FilterGrid.tsx b/components/FilterGrid.tsx
+index b1b1ee7..8bacd97 100644
+--- a/components/FilterGrid.tsx
++++ b/components/FilterGrid.tsx
+@@ -20,6 +20,8 @@ export default function FilterGrid({ items }: { items: PublicProduct[] }) {
+   const [maxP, setMaxP] = useState<number | null>(null);
+   const [sort, setSort] = useState<Sort>('empfohlen');
+   const [open, setOpen] = useState(false);
++  const [dd, setDd] = useState<string | null>(null);
++  const [limit, setLimit] = useState(24);
+ 
+   const facets = useMemo(() => {
+     const count = (vals: string[][]) => { const m = new Map<string, number>(); vals.forEach((v) => new Set(v).forEach((x) => m.set(x, (m.get(x) ?? 0) + 1))); return m; };
+@@ -50,35 +52,51 @@ export default function FilterGrid({ items }: { items: PublicProduct[] }) {
+   const active = brands.length + fams.length + sizes.length + genders.length + (maxP != null ? 1 : 0);
+   const reset = () => { setBrands([]); setFams([]); setSizes([]); setGenders([]); setMaxP(null); };
+ 
++  const grp = (id: string, label: string, n: number, body: React.ReactNode) => (
++    <div className={`f-group ${dd === id ? 'open' : ''} ${n ? 'act' : ''}`}>
++      <button type="button" className="f-btn" onClick={() => setDd(dd === id ? null : id)} aria-expanded={dd === id}>{label}{n ? <span className="f-n">{n}</span> : null}<span className="f-car">▾</span></button>
++      <div className="f-pop">{body}</div>
++    </div>
++  );
+   const panel = (
+-    <aside className={`filters ${open ? 'open' : ''}`}>
++    <aside className={`filters ${open ? 'open' : ''}`} onMouseLeave={() => setDd(null)}>
+       <div className="f-head"><strong>Filter</strong>{active > 0 && <button className="linkbtn" onClick={reset}>zurücksetzen</button>}<button className="x f-close" onClick={() => setOpen(false)} aria-label="Filter schließen">×</button></div>
+-      {facets.fam.length > 1 && <div className="f-group"><b>Farbe</b><div className="f-fams">{facets.fam.map(([f, n]) => (
+-        <button key={f} className={`f-fam ${fams.includes(f) ? 'on' : ''}`} onClick={() => tog(setFams, f)} title={`${f} (${n})`}><span style={{ background: FAMILY_HEX[f] }} />{f}</button>))}</div></div>}
+-      {facets.size.length > 1 && <div className="f-group"><b>Größe</b><div className="f-sizes">{facets.size.map(([s]) => <button key={s} className={`size ${sizes.includes(s) ? 'on' : ''}`} onClick={() => tog(setSizes, s)}>{s}</button>)}</div></div>}
+-      {facets.gender.length > 1 && <div className="f-group"><b>Schnitt</b>{facets.gender.map(([g, n]) => <label key={g} className="f-check"><input type="checkbox" checked={genders.includes(g)} onChange={() => tog(setGenders, g)} />{g}<span>{n}</span></label>)}</div>}
+-      {facets.brand.length > 1 && <div className="f-group"><b>Marke</b>{facets.brand.map(([b, n]) => <label key={b} className="f-check"><input type="checkbox" checked={brands.includes(b)} onChange={() => tog(setBrands, b)} />{b}<span>{n}</span></label>)}</div>}
+-      {facets.max > facets.min && <div className="f-group"><b>Preis bis {eur(maxP ?? facets.max)}</b><input type="range" min={facets.min} max={facets.max} step={1} value={maxP ?? facets.max} onChange={(e) => setMaxP(Number(e.target.value) >= facets.max ? null : Number(e.target.value))} /></div>}
++      {facets.fam.length > 1 && grp('fam', 'Farbe', fams.length, <div className="f-fams">{facets.fam.map(([f, n]) => (
++        <button key={f} className={`f-fam ${fams.includes(f) ? 'on' : ''}`} onClick={() => tog(setFams, f)} title={`${f} (${n})`}><span style={{ background: FAMILY_HEX[f] }} />{f}</button>))}</div>)}
++      {facets.size.length > 1 && grp('size', 'Größe', sizes.length, <div className="f-sizes">{facets.size.map(([s]) => <button key={s} className={`size ${sizes.includes(s) ? 'on' : ''}`} onClick={() => tog(setSizes, s)}>{s}</button>)}</div>)}
++      {facets.gender.length > 1 && grp('gender', 'Schnitt', genders.length, <>{facets.gender.map(([g, n]) => <label key={g} className="f-check"><input type="checkbox" checked={genders.includes(g)} onChange={() => tog(setGenders, g)} />{g}<span>{n}</span></label>)}</>)}
++      {facets.brand.length > 1 && grp('brand', 'Marke', brands.length, <>{facets.brand.map(([b, n]) => <label key={b} className="f-check"><input type="checkbox" checked={brands.includes(b)} onChange={() => tog(setBrands, b)} />{b}<span>{n}</span></label>)}</>)}
++      {facets.max > facets.min && grp('price', 'Preis', maxP != null ? 1 : 0, <><b style={{ fontSize: 13 }}>bis {eur(maxP ?? facets.max)}</b><input type="range" min={facets.min} max={facets.max} step={1} value={maxP ?? facets.max} onChange={(e) => setMaxP(Number(e.target.value) >= facets.max ? null : Number(e.target.value))} /></>)}
+       <button className="btn f-apply" onClick={() => setOpen(false)}>{shown.length} Artikel anzeigen</button>
+     </aside>
+   );
++  const chips = [...fams.map((x) => ({ l: x, f: () => tog(setFams, x) })), ...sizes.map((x) => ({ l: `Größe ${x}`, f: () => tog(setSizes, x) })), ...genders.map((x) => ({ l: x, f: () => tog(setGenders, x) })), ...brands.map((x) => ({ l: x, f: () => tog(setBrands, x) })), ...(maxP != null ? [{ l: `bis ${eur(maxP)}`, f: () => setMaxP(null) }] : [])];
+ 
+   return (
+     <div className="fg">
+-      {panel}
+-      <div style={{ minWidth: 0 }}>
+-        <div className="fg-bar">
+-          <button className="btn alt f-open" onClick={() => setOpen(true)}>Filter{active ? ` (${active})` : ''}</button>
+-          <span className="muted">{shown.length} Artikel</span>
+-          <label className="muted fg-sort">Sortieren
+-            <select value={sort} onChange={(e) => setSort(e.target.value as Sort)}>
+-              <option value="empfohlen">Empfohlen</option><option value="preis">Preis aufsteigend</option><option value="preis-ab">Preis absteigend</option><option value="name">Name A–Z</option>
+-            </select>
+-          </label>
+-        </div>
+-        {shown.length ? <div className="grid">{shown.map((p) => <ProductCard key={p.id} p={p} />)}</div>
+-          : <div className="box muted">Keine Artikel mit diesen Filtern. <button className="linkbtn" onClick={reset}>Filter zurücksetzen</button></div>}
++      <div className="fg-top">
++        <button className="btn alt f-open" onClick={() => setOpen(true)}>Filter{active ? ` (${active})` : ''}</button>
++        {panel}
++        <label className="muted fg-sort">Sortieren
++          <select value={sort} onChange={(e) => setSort(e.target.value as Sort)}>
++            <option value="empfohlen">Empfohlen</option><option value="preis">Preis aufsteigend</option><option value="preis-ab">Preis absteigend</option><option value="name">Name A–Z</option>
++          </select>
++        </label>
+       </div>
++      <div className="fg-info">
++        <span className="muted">{shown.length} Artikel</span>
++        {chips.map((c) => <button key={c.l} className="f-chip" onClick={c.f}>{c.l} ×</button>)}
++        {chips.length > 1 && <button className="linkbtn muted" onClick={reset}>Alle entfernen</button>}
++      </div>
++      {shown.length ? <div className="grid">{shown.slice(0, limit).map((p) => <ProductCard key={p.id} p={p} />)}</div>
++        : <div className="box muted">Keine Artikel mit diesen Filtern. <button className="linkbtn" onClick={reset}>Filter zurücksetzen</button></div>}
++      {shown.length > limit && (
++        <div className="more">
++          <div className="more-bar"><i style={{ width: `${(limit / shown.length) * 100}%` }} /></div>
++          <span className="muted">{limit} von {shown.length} Artikeln</span>
++          <button className="btn alt" onClick={() => setLimit((l) => l + 24)}>Mehr laden</button>
++        </div>
++      )}
+     </div>
+   );
+ }
+diff --git a/components/ProductCard.tsx b/components/ProductCard.tsx
+index 29d7d07..18ae174 100644
+--- a/components/ProductCard.tsx
++++ b/components/ProductCard.tsx
+@@ -4,19 +4,36 @@ import { eur } from '@/lib/format';
+ import ProductImage from './ProductImage';
+ import { swatchBg } from '@/lib/colors';
+ import { WishButton } from './Wishlist';
++import Stars from './Stars';
++
++/** echte Merkmale als Badges – keine erfundenen Labels */
++function badges(p: PublicProduct): { t: string; c: string }[] {
++  const b: { t: string; c: string }[] = [];
++  if (p.rating && p.rating.count >= 3 && p.rating.avg >= 4.5) b.push({ t: 'Top bewertet', c: 'b-top' });
++  if (p.price != null && p.tiers.length) b.push({ t: `bis −${Math.round((1 - p.tiers[p.tiers.length - 1].price / p.price) * 100)} % Staffel`, c: 'b-deal' });
++  if (/bio|organic|recycl/i.test(`${p.name} ${p.material ?? ''} ${(p.features ?? []).join(' ')}`)) b.push({ t: 'Nachhaltig', c: 'b-eco' });
++  return b.slice(0, 2);
++}
++const sizeRange = (s: string[]) => (s.length > 1 ? `${s[0]}–${s[s.length - 1]}` : s[0] ?? '');
+ 
+ export default function ProductCard({ p }: { p: PublicProduct }) {
++  const min = p.price != null ? (p.tiers.length ? p.tiers[p.tiers.length - 1].price : p.price) : null;
+   return (
+     <Link href={`/produkt/${encodeURIComponent(p.id)}`} className="card">
+-      <div className="img"><ProductImage p={p} />{p.images[1] && <img className="pimg img2" src={p.images[1]} alt="" loading="lazy" aria-hidden />}<WishButton id={p.id} /></div>
++      <div className="img">
++        <ProductImage p={p} />{p.images[1] && <img className="pimg img2" src={p.images[1]} alt="" loading="lazy" aria-hidden />}
++        <div className="badges">{badges(p).map((x) => <span key={x.t} className={`badge-p ${x.c}`}>{x.t}</span>)}</div>
++        <WishButton id={p.id} />
++      </div>
+       <div className="b">
+-        <div className="brand">{p.brand}</div>
++        {p.rating ? <div className="card-rating"><Stars value={p.rating.avg} size={13} count={p.rating.count} /></div> : null}
+         <div className="name">{p.name}</div>
++        <div className="brand">{p.brand}{p.sizes.length > 0 && ` · ${sizeRange(p.sizes)}`}</div>
+         <div className="dots">
+-          {p.colors.slice(0, 8).map((c) => <span key={c.name} className="dot" title={c.name} style={{ background: swatchBg(c) }} />)}
+-          {p.colors.length > 8 && <span className="muted" style={{ fontSize: 12 }}>+{p.colors.length - 8}</span>}
++          {p.colors.slice(0, 7).map((c) => <span key={c.name} className="dot" title={c.name} style={{ background: swatchBg(c) }} />)}
++          {p.colors.length > 7 && <span className="dots-more">+{p.colors.length - 7}</span>}
+         </div>
+-        <div className="price">{p.price != null ? <>ab {eur(p.tiers.length ? p.tiers[p.tiers.length - 1].price : p.price)} <small>netto</small></> : <small style={{ fontSize: 14, color: 'var(--brand)', fontWeight: 600 }}>Preis auf Anfrage</small>}</div>
++        <div className="price">{min != null ? <><span className="ab">ab</span> {eur(min)} <small>netto</small></> : <small style={{ fontSize: 14, color: 'var(--brand)', fontWeight: 600 }}>Preis auf Anfrage</small>}</div>
+       </div>
+     </Link>
+   );
+diff --git a/components/ProductReviews.tsx b/components/ProductReviews.tsx
+new file mode 100644
+index 0000000..2ab7fb4
+--- /dev/null
++++ b/components/ProductReviews.tsx
+@@ -0,0 +1,48 @@
++import Stars from './Stars';
++import { ReviewCard, ReviewNote } from './ReviewList';
++import { reviewsFor } from '@/lib/reviews';
++
++/** Bewertungsbereich auf der Produktseite */
++export default function ProductReviews({ productId, name }: { productId: string; name: string }) {
++  const list = reviewsFor(productId);
++  if (!list.length) return (
++    <section id="bewertungen" className="rev-section">
++      <h2>Bewertungen</h2>
++      <div className="box muted">Für diesen Artikel gibt es noch keine Bewertungen. Nach Ihrer Bestellung laden wir Sie ein, als Erste/r zu bewerten.</div>
++    </section>
++  );
++  const avg = list.reduce((s, r) => s + r.rating, 0) / list.length;
++  const dist = [5, 4, 3, 2, 1].map((n) => ({ n, c: list.filter((r) => r.rating === n).length }));
++  const ld = { '@context': 'https://schema.org', '@type': 'Product', name, aggregateRating: { '@type': 'AggregateRating', ratingValue: avg.toFixed(1), reviewCount: list.length }, review: list.slice(0, 5).map((r) => ({ '@type': 'Review', reviewRating: { '@type': 'Rating', ratingValue: r.rating }, author: { '@type': 'Person', name: r.name }, datePublished: r.date.slice(0, 10), reviewBody: r.text })) };
++  return (
++    <section id="bewertungen" className="rev-section">
++      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
++      <h2>Bewertungen</h2>
++      <div className="rev-grid">
++        <div className="box rev-sum">
++          <div className="rev-big">{avg.toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</div>
++          <Stars value={avg} size={20} />
++          <div className="muted" style={{ fontSize: 13 }}>{list.length} verifizierte {list.length === 1 ? 'Bewertung' : 'Bewertungen'}</div>
++          <div className="rev-dist">{dist.map(({ n, c }) => <div key={n}><span>{n} ★</span><i><b style={{ width: `${(c / list.length) * 100}%` }} /></i><span>{c}</span></div>)}</div>
++        </div>
++        <div className="rev-list">{list.slice(0, 20).map((r) => <ReviewCard key={r.id} r={r} />)}</div>
++      </div>
++      <ReviewNote />
++    </section>
++  );
++}
++
++/** Kundenstimmen (Startseite/Kategorie) */
++export function ReviewStrip({ reviews, overall, title = 'Das sagen unsere Kunden' }: { reviews: import('@/lib/store').Review[]; overall: { avg: number; count: number } | null; title?: string }) {
++  if (!reviews.length || !overall) return null;
++  return (
++    <section className="rev-section">
++      <div className="list-head" style={{ marginBottom: 6 }}>
++        <h2 style={{ margin: 0 }}>{title}</h2>
++        <span className="rev-overall"><Stars value={overall.avg} size={18} showValue count={overall.count} /></span>
++      </div>
++      <div className="rev-strip">{reviews.map((r) => <ReviewCard key={r.id} r={r} showProduct />)}</div>
++      <ReviewNote />
++    </section>
++  );
++}
+diff --git a/components/ReviewList.tsx b/components/ReviewList.tsx
+new file mode 100644
+index 0000000..cc7dd61
+--- /dev/null
++++ b/components/ReviewList.tsx
+@@ -0,0 +1,19 @@
++import Stars from './Stars';
++import type { Review } from '@/lib/store';
++
++const d = (x: string) => new Date(x).toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
++
++export function ReviewCard({ r, showProduct }: { r: Review; showProduct?: boolean }) {
++  return (
++    <figure className="rev">
++      <div className="rev-top"><Stars value={r.rating} size={15} /><span className="rev-ver">✓ Verifizierter Kauf</span></div>
++      {r.title && <b className="rev-title">{r.title}</b>}
++      {r.text && <blockquote>{r.text}</blockquote>}
++      <figcaption>{r.name}{r.company ? ` · ${r.company}` : ''} · {d(r.date)}{showProduct && r.productName && <> · <span className="muted">{r.productName}</span></>}</figcaption>
++      {r.reply && <div className="rev-reply"><b>Antwort von euro-trade.com:</b> {r.reply}</div>}
++    </figure>
++  );
++}
++
++/** Hinweis nach § 5b Abs. 3 UWG: ob und wie die Echtheit geprüft wird */
++export const ReviewNote = () => <p className="rev-note">Alle Bewertungen stammen von Kundinnen und Kunden, die bei uns bestellt haben. Wir laden ausschließlich nach abgeschlossenem Auftrag über einen persönlichen Link zur Bewertung ein (verifiziert über die Auftragsnummer). Bewertungen werden vor Veröffentlichung geprüft; positive wie negative werden gleichermaßen veröffentlicht, sofern sie nicht gegen gesetzliche Vorgaben verstoßen.</p>;
+diff --git a/components/Stars.tsx b/components/Stars.tsx
+new file mode 100644
+index 0000000..39f6060
+--- /dev/null
++++ b/components/Stars.tsx
+@@ -0,0 +1,17 @@
++/** Sterne mit Teilfüllung, z. B. 4,6 */
++export default function Stars({ value, size = 16, count, showValue }: { value: number; size?: number; count?: number; showValue?: boolean }) {
++  const pct = Math.max(0, Math.min(100, (value / 5) * 100));
++  const row = (fill: string) => Array.from({ length: 5 }, (_, i) => (
++    <svg key={i} width={size} height={size} viewBox="0 0 24 24" aria-hidden><path fill={fill} d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z" /></svg>
++  ));
++  return (
++    <span className="stars" aria-label={`${value.toLocaleString('de-DE', { maximumFractionDigits: 1 })} von 5 Sternen${count != null ? `, ${count} Bewertungen` : ''}`}>
++      <span className="stars-in" style={{ height: size }}>
++        <span className="stars-bg">{row('#d9dde3')}</span>
++        <span className="stars-fg" style={{ width: `${pct}%` }}>{row('#ffb300')}</span>
++      </span>
++      {showValue && <b>{value.toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</b>}
++      {count != null && <span className="stars-n">({count.toLocaleString('de-DE')})</span>}
++    </span>
++  );
++}
+diff --git a/lib/catalog.ts b/lib/catalog.ts
+index a3fca48..e9a5c86 100644
+--- a/lib/catalog.ts
++++ b/lib/catalog.ts
+@@ -6,6 +6,7 @@ import type { Category, Product, PublicProduct } from './types';
+ import { buildIndex, buildSkuMap, runSearch, type SearchDoc } from './search';
+ import { gross, priceTiers, sellPrice } from './pricing';
+ import { sortColors } from './colors';
++import { ratingFor } from './reviews';
+ 
+ const LIVE = path.join(process.cwd(), 'data', 'products.json');
+ const SEED = path.join(process.cwd(), 'seed', 'products.json');
+@@ -48,7 +49,7 @@ export function toPublic(p: Product, ctx?: Ctx): PublicProduct {
+     : baseTiers?.length && !ctx?.tiers
+       ? baseTiers.filter((t) => t.min > 1 && t.price > 0).sort((a, b) => a.min - b.min).map((t) => ({ min: t.min, price: sellPrice(t.price, p.categorySlug, ctx?.markup) })).filter((t) => t.price < price)
+       : priceTiers(price, ctx?.tiers);
+-  return { ...rest, colors: sortColors(p.colors), price, priceGross: price != null ? gross(price) : null, tiers };
++  return { ...rest, colors: sortColors(p.colors), price, priceGross: price != null ? gross(price) : null, tiers, rating: ratingFor(p.id) };
+ }
+ 
+ const skuSet = (ctx: Ctx) => new Set((ctx?.skus ?? []).map((x) => x.toUpperCase()));
+diff --git a/lib/category-content.ts b/lib/category-content.ts
+new file mode 100644
+index 0000000..b167209
+--- /dev/null
++++ b/lib/category-content.ts
+@@ -0,0 +1,25 @@
++// Texte für Kategorieseiten (Einleitung, SEO-Text, FAQ) – je Kategorie anpassbar
++type C = { intro: string; seo: string[]; faq: [string, string][] };
++const T: Record<string, Partial<C>> = {
++  sweatshirts: { intro: 'Hoodies, Sweatshirts und Zipper für Verein, Team und Firma – kuschelig, robust und ideal für Logo-Druck oder Stick.', seo: ['Ob Vereinshoodie, Firmen-Sweatshirt oder Zipper für die Crew: Sweatshirts sind die Allrounder unter den Teamtextilien. Achten Sie auf die Grammatur – ab etwa 280 g/m² wirken Hoodies hochwertig und formstabil, leichtere Qualitäten eignen sich für Frühling und Sommer.', 'Für Logos auf der Brust empfehlen wir Stick (edel, langlebig), für große Rückenmotive Siebdruck oder Digitaltransfer.'] },
++  poloshirts: { intro: 'Poloshirts für Team, Service und Außendienst – gepflegt, pflegeleicht und perfekt für ein gesticktes Logo.', seo: ['Poloshirts verbinden einen professionellen Auftritt mit hohem Tragekomfort. Piqué-Qualitäten sind atmungsaktiv und formstabil, Mischgewebe mit Polyester trocknen schneller und knittern weniger – ideal für Gastronomie, Handwerk und Messe.', 'Klassiker ist ein gesticktes Logo auf der linken Brust; Namen oder Funktionen lassen sich zusätzlich auf dem Ärmel oder Rücken platzieren.'] },
++  't-shirts': { intro: 'T-Shirts für Events, Vereine und Promotion – vom günstigen Basic bis zum Bio-Premium-Shirt.', seo: ['T-Shirts sind das beliebteste Werbetextil: günstig, vielseitig und ideal für große Auflagen. Für Events und Promotion reichen leichtere Qualitäten, für Merchandise und Teamwear lohnen sich schwerere, gekämmte Baumwollshirts.'] },
++  jacken: { intro: 'Jacken, Fleece und Bodywarmer für draußen – wetterfest, funktional und mit Ihrem Logo ein starker Auftritt.', seo: ['Jacken sind langlebige Werbeträger und werden jahrelang getragen. Softshell schützt vor Wind und leichtem Regen, Fleece wärmt, Bodywarmer geben Bewegungsfreiheit. Für Logos auf Funktionsmaterial empfehlen wir Stick oder spezielle Transferfolien.'] },
++  'caps-muetzen': { intro: 'Caps und Mützen – das kleine Teamtextil mit großer Wirkung, ideal mit gesticktem Logo.', seo: ['Caps und Beanies sind beliebte Giveaways und Merch-Artikel. Bestickt wirken Logos besonders plastisch und hochwertig.'] },
++  'hemden-blusen': { intro: 'Hemden und Blusen für einen professionellen Auftritt im Büro, am Empfang und im Service.', seo: ['Bügelleichte Hemden und Blusen sind ideal für Teams mit Kundenkontakt. Ein dezent gesticktes Logo auf der Brust rundet den Auftritt ab.'] },
++  decken: { intro: 'Kuscheldecken als hochwertiges Präsent für Kunden, Mitarbeitende und Vereinsmitglieder.', seo: ['Decken sind ein Geschenk mit langer Lebensdauer – ob für Stadion, Sofa oder Babyzimmer. Mit Stick oder Patch werden sie zum persönlichen Präsent.'] },
++  arbeitskleidung: { intro: 'Arbeitskleidung, Kittel und Kasacks für Praxis, Pflege, Küche und Handwerk – robust und industriewäschetauglich.', seo: ['Berufsbekleidung muss viel aushalten. Achten Sie auf Waschtemperatur und Industriewäsche-Eignung; für Logos auf Arbeitskleidung empfehlen wir Stick.'] },
++};
++export function categoryContent(slug: string, name: string): C {
++  const t = T[slug] ?? {};
++  return {
++    intro: t.intro ?? `${name} für Verein, Team und Firma – schon ab 1 Stück, auf Wunsch mit Ihrem Logo bedruckt oder bestickt.`,
++    seo: t.seo ?? [`In unserer Kategorie ${name} finden Sie Markenqualität für Vereine, Unternehmen und Events. Alle Artikel sind schon ab 1 Stück erhältlich und lassen sich mit Logo, Text oder Namen veredeln.`],
++    faq: t.faq ?? [
++      [`Kann ich ${name} auch einzeln bestellen?`, 'Ja, alle Artikel gibt es schon ab 1 Stück. Ab 10 Stück greifen automatisch günstigere Staffelpreise – über alle Farben und Größen eines Artikels hinweg.'],
++      ['Wie bekomme ich mein Logo auf den Artikel?', 'Wählen Sie am Artikel „Veredeln mit Logo oder Text“, laden Sie Ihr Logo hoch und wählen Sie Position und Verfahren. Vor der Produktion erhalten Sie eine Vorschau zur Freigabe.'],
++      ['Wie schnell wird geliefert?', 'Unveredelte Ware in ca. 3–5 Werktagen, veredelte Ware in ca. 7–14 Werktagen nach Ihrer Freigabe.'],
++      ['Kann ich unterschiedliche Größen und Farben mischen?', 'Ja. Tragen Sie einfach für jede Farbe die gewünschten Mengen je Größe ein – alles landet zusammen im Warenkorb und zählt gemeinsam für den Staffelpreis.'],
++    ],
++  };
++}
+diff --git a/lib/review-mail.ts b/lib/review-mail.ts
+new file mode 100644
+index 0000000..5af7a00
+--- /dev/null
++++ b/lib/review-mail.ts
+@@ -0,0 +1,24 @@
++import 'server-only';
++import { esc, sendMail, shopUrl } from './mail';
++import { button, h1, layout, p, signature } from './mail-templates';
++import type { Inquiry } from './store';
++
++/** Einladung zur Bewertung (nach Lieferung) */
++export async function sendReviewRequest(i: Inquiry) {
++  const link = `${shopUrl()}/bewerten/${i.token}`;
++  const products = [...new Map(i.lines.map((l) => [l.id ?? l.sku, l.name])).values()];
++  return sendMail({
++    to: i.customer.email, replyTo: process.env.INQUIRY_TO, subject: `Wie zufrieden sind Sie mit Ihrer Bestellung ${i.no}?`,
++    html: layout({
++      preheader: 'Ihre Meinung hilft anderen Vereinen und Unternehmen – dauert nur 1 Minute.', title: 'Ihre Bewertung',
++      body: h1('Wie gefällt Ihnen Ihre Bestellung?')
++        + p(`Guten Tag ${esc(i.customer.name)},`)
++        + p(`Ihre Bestellung <strong>${i.no}</strong> sollte inzwischen bei Ihnen angekommen sein. Wir würden uns sehr freuen, wenn Sie uns kurz sagen, wie zufrieden Sie sind – mit den Artikeln und mit uns.`)
++        + p(`Bewerten können Sie: ${products.map(esc).join(', ')}.`, true)
++        + `<div style="margin:6px 0 4px;font-size:30px;letter-spacing:4px;color:#ffb300">★★★★★</div>`
++        + button(link, 'Jetzt bewerten', '#1d7a3e')
++        + p('Etwas war nicht in Ordnung? Antworten Sie einfach auf diese E-Mail – wir kümmern uns sofort darum.', true)
++        + signature(),
++    }),
++  });
++}
+diff --git a/lib/reviews.ts b/lib/reviews.ts
+new file mode 100644
+index 0000000..0da9bc0
+--- /dev/null
++++ b/lib/reviews.ts
+@@ -0,0 +1,31 @@
++import 'server-only';
++import fs from 'node:fs';
++import path from 'node:path';
++import { DATA, listReviews, type Review } from './store';
++
++export type Rating = { avg: number; count: number };
++let cache: { mtime: number; by: Map<string, Rating>; approved: Review[] } | null = null;
++
++function load() {
++  const f = path.join(DATA, 'bewertungen.json');
++  const mtime = fs.existsSync(f) ? fs.statSync(f).mtimeMs : 0;
++  if (cache && cache.mtime === mtime) return cache;
++  const approved = listReviews().filter((r) => r.status === 'approved').sort((a, b) => b.date.localeCompare(a.date));
++  const by = new Map<string, Rating>();
++  for (const r of approved) {
++    const k = r.productId ?? '__shop';
++    const c = by.get(k) ?? { avg: 0, count: 0 };
++    c.avg = (c.avg * c.count + r.rating) / (c.count + 1); c.count++;
++    by.set(k, c);
++  }
++  cache = { mtime, by, approved };
++  return cache;
++}
++export const ratingFor = (productId: string) => load().by.get(productId) ?? null;
++export const reviewsFor = (productId: string) => load().approved.filter((r) => r.productId === productId);
++/** Gesamtbewertung über alle Bewertungen (Produkte + Shop) */
++export function overall(): Rating | null {
++  const a = load().approved;
++  return a.length ? { avg: a.reduce((s, r) => s + r.rating, 0) / a.length, count: a.length } : null;
++}
++export const latestReviews = (n = 6, productIds?: string[]) => load().approved.filter((r) => r.text && (!productIds || (r.productId && productIds.includes(r.productId)))).slice(0, n);
+diff --git a/lib/store.ts b/lib/store.ts
+index 656044d..a51c504 100644
+--- a/lib/store.ts
++++ b/lib/store.ts
+@@ -70,6 +70,7 @@ export type Inquiry = {
+   acceptedAt?: string | null;
+   /** Willkommensrabatt aus dem Newsletter */
+   discount?: { code: string; pct: number } | null;
++  reviewRequestedAt?: string | null;
+ };
+ 
+ export function listInquiries(): Inquiry[] {
+@@ -149,3 +150,14 @@ export function validCode(code: string) {
+   if (!/^ET-[A-Z0-9]{6}$/.test(c)) return null;
+   return listSubscribers().find((s) => s.code === c && s.confirmed && !s.unsubscribedAt && !s.usedAt) ?? null;
+ }
++
++/* ---------- Bewertungen (nur verifizierte Käufer) ---------- */
++export type Review = {
++  id: string; productId: string | null; /** null = Bewertung des Shops/Services */
++  sku?: string; productName?: string;
++  name: string; company?: string; rating: number; title: string; text: string;
++  date: string; inquiryNo: string; status: 'pending' | 'approved' | 'rejected'; reply?: string;
++};
++const REV = path.join(DATA, 'bewertungen.json');
++export const listReviews = () => readJSON<Review[]>(REV, []);
++export const saveReviews = (r: Review[]) => writeJSON(REV, r);
+diff --git a/lib/types.ts b/lib/types.ts
+index 1d973d3..6471971 100644
+--- a/lib/types.ts
++++ b/lib/types.ts
+@@ -30,6 +30,6 @@ export type Product = {
+ };
+ 
+ /** Was der Browser sieht: Verkaufspreis statt Einkaufspreis */
+-export type PublicProduct = Omit<Product, 'basePrice' | 'baseTiers'> & { price: number | null; priceGross: number | null; /** Staffelpreise netto (ab Menge) */ tiers: { min: number; price: number }[] };
++export type PublicProduct = Omit<Product, 'basePrice' | 'baseTiers'> & { price: number | null; priceGross: number | null; /** Staffelpreise netto (ab Menge) */ tiers: { min: number; price: number }[]; /** Kundenbewertung (nur freigegebene, verifizierte) */ rating?: { avg: number; count: number } | null };
+ 
+ export type Category = { name: string; slug: string; count: number };
+diff --git a/middleware.ts b/middleware.ts
+index 4d373d2..184f0d0 100644
+--- a/middleware.ts
++++ b/middleware.ts
+@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
+ import { ACCESS_COOKIE, ADMIN_COOKIE, isAdminToken, previewMode, shopClosed, verifyCodeToken } from '@/lib/access';
+ 
+ // Immer erreichbar: Zugang, Pflichtseiten, Angebots-Links aus der E-Mail, Admin-Login
+-const PUBLIC = ['/widerruf', '/newsletter', '/api/newsletter', '/start', '/druck-stick', '/api/zugang-anfrage', '/api/bild', '/sitemap.xml', '/zugang', '/api/zugang', '/impressum', '/datenschutz', '/angebot', '/api/angebot', '/admin/login', '/api/admin/login', '/icon.svg', '/favicon.ico', '/robots.txt'];
++const PUBLIC = ['/bewerten', '/api/bewerten', '/widerruf', '/newsletter', '/api/newsletter', '/start', '/druck-stick', '/api/zugang-anfrage', '/api/bild', '/sitemap.xml', '/zugang', '/api/zugang', '/impressum', '/datenschutz', '/angebot', '/api/angebot', '/admin/login', '/api/admin/login', '/icon.svg', '/favicon.ico', '/robots.txt'];
+ const match = (path: string, list: string[]) => list.some((p) => path === p || path.startsWith(p + '/'));
+ 
+ export async function middleware(req: NextRequest) {
+-- 
+2.43.0
+

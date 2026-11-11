@@ -1,0 +1,2240 @@
+[
+  {
+    "artikelnummer": "AQ010",
+    "name": "Men´s Classic Fit Polo",
+    "marke": "Asquith & Fox",
+    "kategorie": "Poloshirts",
+    "beschreibung_punkte": [
+      "100% ringgesponnene, gekämmte Baumwolle",
+      "Classic fit",
+      "Aus festerem Pikée-Gewebe",
+      "Weiches Finish"
+    ],
+    "beschreibung": "",
+    "material": "100% Baumwolle (Charcoal, Heather Black, Teal Heather: 60% Baumwolle / 40% Polyester), (Heather Grey: 85% Baumwolle / 15% Viskose)",
+    "grammatur": "200 g/m²",
+    "groessen": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL",
+      "4XL",
+      "5XL"
+    ],
+    "farben": [
+      {
+        "farbe": "Burgundy",
+        "hex": "#572932",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Cherry Red",
+        "hex": "#BA0C2F",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Cornflower",
+        "hex": "#418FDE",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Hot Pink",
+        "hex": "#ce0058",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Kelly",
+        "hex": "#09DC00",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Khaki",
+        "hex": "#A89968",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Lime",
+        "hex": "#6CC24A",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Natural",
+        "hex": "#D9C89E",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Orange",
+        "hex": "#FE5000",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Pink Carnation",
+        "hex": "#E782A9",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Sky",
+        "hex": "#9BB8D3",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Slate",
+        "hex": "#505759",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Sunflower",
+        "hex": "#EAAA00",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Turquoise",
+        "hex": "#00B5E2",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "French Navy",
+        "hex": "#081F2C",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Denim",
+        "hex": "#403A60",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Olive",
+        "hex": "#5B6238",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Mint",
+        "hex": "#A0DAB3",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Cardinal Red",
+        "hex": "#862633",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Orchid",
+        "hex": "#AC4FC6",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Peacock",
+        "hex": "#074F71",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Bright Royal",
+        "hex": "#003DA5",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Heather Black",
+        "hex": "#2D2926",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Teal Heather",
+        "hex": "#006272",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Bright Ocean",
+        "hex": "#a8dfe8",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Jade",
+        "hex": "#007680",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Lavender",
+        "hex": "#A5B0E3",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Fern",
+        "hex": "#28724F",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Black",
+        "hex": "#000000",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      },
+      {
+        "farbe": "Bottle",
+        "hex": "#22372b",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      },
+      {
+        "farbe": "Charcoal",
+        "hex": "#53565A",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      },
+      {
+        "farbe": "Heather Grey",
+        "hex": "#888B8D",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      },
+      {
+        "farbe": "Navy",
+        "hex": "#0C2340",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      },
+      {
+        "farbe": "Purple",
+        "hex": "#512D6D",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      },
+      {
+        "farbe": "Red",
+        "hex": "#C8102E",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      },
+      {
+        "farbe": "Royal",
+        "hex": "#003087",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      },
+      {
+        "farbe": "Sapphire",
+        "hex": "#00629B",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      },
+      {
+        "farbe": "White",
+        "hex": "#FFFFFF",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      }
+    ],
+    "eigenschaften": {
+      "Materialzusammensetzung": "100% Baumwolle (Charcoal, Heather Black, Teal Heather: 60% Baumwolle / 40% Polyester), (Heather Grey: 85% Baumwolle / 15% Viskose)",
+      "Material": "Piqué",
+      "Grammatur in g/m²": "200 g/m²",
+      "Größenlauf": "S, M, L, XL, XXL, 3XL, 4XL, 5XL",
+      "Farbigkeit": "1-farbig | Meliert",
+      "Verarbeitung": "Gekämmte Baumwolle",
+      "Veredelungsangabe Hersteller": "Bestickung | Siebdruck | Transferdruck",
+      "Produkt": "Poloshirts",
+      "Details": "Seitenschlitze",
+      "Polo Shirts (Art)": "Alltag/Freizeit",
+      "Ärmel": "Kurzarm | Set-In",
+      "Knöpfe": "Knopfleiste - 2 oder weniger Knöpfe | Knöpfe Ton in Ton",
+      "Passform": "Regular (normal geschnitten)",
+      "Zertifizierung": "OEKO-TEX® STANDARD 100",
+      "OEKO-TEX®": "OEKO-TEX® STANDARD 100: 11-77025 Shirley",
+      "Pflegehinweis": "30 °C waschbar | Bügeln erlaubt",
+      "Warennummer": "61051000",
+      "Hersteller-Katalognummer": "AQ010",
+      "Ursprungsland Bezeichnung": "Bangladesch"
+    },
+    "bilder": [
+      "https://shop.l-shop-team.de/out/pictures/master/product/1/2552350.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/2/2552448.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/3/2595041.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/4/2595042.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/5/2595119.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/6/2595120.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/7/2595121.jpg"
+    ],
+    "bild_lokal": "bilder/AQ010.jpg",
+    "quelle_url": "https://shop.l-shop-team.de/Sortiment/Polo-Shirts/100-Baumwolle-oxid/Men-s-Classic-Fit-Polo-Solids.html",
+    "ek_preis": null
+  },
+  {
+    "artikelnummer": "ARB931",
+    "name": "Babiezz® Soft Knitted Blanket",
+    "marke": "ARTG",
+    "kategorie": "Decken",
+    "beschreibung_punkte": [
+      "Hochwertiges, atmungsaktives Acrylgarn",
+      "Sanfte Berührung"
+    ],
+    "beschreibung": "",
+    "material": "100% Polyacryl",
+    "grammatur": "250 g/m²",
+    "groessen": [
+      "80 x 100 cm"
+    ],
+    "farben": [
+      {
+        "farbe": "Earthy Green",
+        "hex": "#8b978c",
+        "groessen": [
+          "80 x 100 cm"
+        ]
+      },
+      {
+        "farbe": "Smoke Blue",
+        "hex": "#5B7F95",
+        "groessen": [
+          "80 x 100 cm"
+        ]
+      },
+      {
+        "farbe": "Stone",
+        "hex": "#d4c5be",
+        "groessen": [
+          "80 x 100 cm"
+        ]
+      },
+      {
+        "farbe": "Antique Pink",
+        "hex": "#bb6a6e",
+        "groessen": [
+          "80 x 100 cm"
+        ]
+      }
+    ],
+    "eigenschaften": {
+      "Materialzusammensetzung": "100% Polyacryl",
+      "Material": "Strick",
+      "Grammatur in g/m²": "250 g/m²",
+      "Größenlauf": "80 x 100 cm",
+      "Farbigkeit": "1-farbig",
+      "Veredelungsangabe Hersteller": "Keine Angabe",
+      "Produkt": "Decken",
+      "Funktion": "Atmungsaktiv",
+      "Pflegehinweis": "40 °C waschbar",
+      "Warennummer": "63014090",
+      "Hersteller-Katalognummer": "ARB931",
+      "Ursprungsland Bezeichnung": "Türkei"
+    },
+    "bilder": [
+      "https://shop.l-shop-team.de/out/pictures/master/product/1/2729805.jpg"
+    ],
+    "bild_lokal": "bilder/ARB931.jpg",
+    "quelle_url": "https://shop.l-shop-team.de/Sortiment/Frottierware/Handtuecher-oxid/Babiezz-Soft-Knitted-Blanket.html",
+    "ek_preis": null
+  },
+  {
+    "artikelnummer": "ARS1745",
+    "name": "Originalzz® Sherpa Fleece Blanket DeLuxe",
+    "marke": "ARTG",
+    "kategorie": "Decken",
+    "beschreibung_punkte": [
+      "Luxuriöses, superweiches Sherpa-Futter",
+      "Besonders glatte Vorderseite aus Micro-Mink-Polyester",
+      "Kann vollständig per Sublimationsdruck bedruckt werden"
+    ],
+    "beschreibung": "",
+    "material": "100% Polyester",
+    "grammatur": "",
+    "groessen": [
+      "127 x 152 cm"
+    ],
+    "farben": [
+      {
+        "farbe": "White/White",
+        "hex": "#F5F4F8",
+        "groessen": [
+          "127 x 152 cm"
+        ]
+      },
+      {
+        "farbe": "White/Grey",
+        "hex": "#F5F4F8",
+        "groessen": [
+          "127 x 152 cm"
+        ]
+      },
+      {
+        "farbe": "White/Black",
+        "hex": "#F5F4F8",
+        "groessen": [
+          "127 x 152 cm"
+        ]
+      },
+      {
+        "farbe": "White/Beige",
+        "hex": "#F5F4F8",
+        "groessen": [
+          "127 x 152 cm"
+        ]
+      }
+    ],
+    "eigenschaften": {
+      "Materialzusammensetzung": "100% Polyester",
+      "Material": "Fleece",
+      "Größenlauf": "127 x 152 cm",
+      "Farbigkeit": "1-farbig",
+      "Veredelungsangabe Hersteller": "Bestickung | Sublimationsdruck",
+      "Produkt": "Decken",
+      "Decken (Art)": "Fleecedecken",
+      "Pflegehinweis": "Trockner geeignet | Bügeln erlaubt",
+      "Ursprungsland Bezeichnung": "Türkei",
+      "Warennummer": "63014010",
+      "Hersteller-Katalognummer": "ARS1745"
+    },
+    "bilder": [
+      "https://shop.l-shop-team.de/out/pictures/master/product/1/2557024.jpg"
+    ],
+    "bild_lokal": "bilder/ARS1745.jpg",
+    "quelle_url": "https://shop.l-shop-team.de/Sortiment/Winteraccessoires-Muetzen/Decken/Originalzz-Sherpa-Fleece-Blanket-DeLuxe.html",
+    "ek_preis": null
+  },
+  {
+    "artikelnummer": "BCWU620",
+    "name": "Hooded Sweat",
+    "marke": "B&C BE INSPIRED",
+    "kategorie": "Sweatshirts & -jacken",
+    "beschreibung_punkte": [
+      "Ringgesponnene, gekämmte Baumwolle/recycelter Polyester",
+      "Gefütterte Kapuze mit Kordelzug und Metallösen",
+      "Ärmelabschlüsse und unterer Saum in 1x1 Ripp mit Elasthan",
+      "Kängurutasche vorne mit verstärkten Nähten",
+      "Schultern und Armausschnitte mit Flatlock-Steppnähten",
+      "Zeitgemäßer Schnitt",
+      "Seitennähte",
+      "Dieses Produkt wird über Better Cotton nach dem Prinzip der Massenbilanz bezogen und enthält daher möglicherweise keine Better-Cotton-Baumwolle"
+    ],
+    "beschreibung": "",
+    "material": "80% Baumwolle / 20% Polyester",
+    "grammatur": "280 g/m²",
+    "groessen": [
+      "XXS",
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+    ],
+    "farben": [
+      {
+        "farbe": "Royal Blue",
+        "hex": "#154E8F",
+        "groessen": [
+          "XXS",
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL"
+        ]
+      },
+      {
+        "farbe": "Heather Grey",
+        "hex": "#b1b3b4",
+        "groessen": [
+          "XXS",
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL"
+        ]
+      },
+      {
+        "farbe": "Steel Grey (Solid)",
+        "hex": "#727a7f",
+        "groessen": [
+          "XXS",
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL"
+        ]
+      },
+      {
+        "farbe": "Black",
+        "hex": "#000000",
+        "groessen": [
+          "XXS",
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Navy",
+        "hex": "#1F2532",
+        "groessen": [
+          "XXS",
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Red",
+        "hex": "#db001b",
+        "groessen": [
+          "XXS",
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      }
+    ],
+    "eigenschaften": {
+      "Materialzusammensetzung": "80% Baumwolle / 20% Polyester",
+      "Grammatur in g/m²": "280 g/m²",
+      "Größenlauf": "XXS, XS, S, M, L, XL, XXL, 3XL",
+      "Farbigkeit": "1-farbig | Meliert",
+      "Verarbeitung": "Gekämmte Baumwolle | Seitennähte",
+      "Veredelungsangabe Hersteller": "Bestickung | Digitaldruck | Siebdruck | Transferdruck",
+      "Produkt": "Sweatshirts & -jacken",
+      "Sweatshirts- & jacken (Art)": "Hoodies",
+      "Ärmel": "Langarm | Set-In | mit Bündchen",
+      "Kragen / Kapuze": "Mit Kapuze",
+      "Passform": "Regular (normal geschnitten)",
+      "Polybeutel": "Nein",
+      "Zertifizierung": "Recycelter Polyester | OEKO-TEX® STANDARD 100",
+      "OEKO-TEX®": "OEKO-TEX® STANDARD 100: 2402037 Centexbel",
+      "Pflegehinweis": "40 °C waschbar | Trockner geeignet | Bügeln erlaubt",
+      "Warennummer": "61102099",
+      "Ursprungsland Bezeichnung": "Bangladesch",
+      "Hersteller-Katalognummer": "WU620"
+    },
+    "bilder": [
+      "https://shop.l-shop-team.de/out/pictures/master/product/1/2432139.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/2/1815791.jpg"
+    ],
+    "bild_lokal": "bilder/BCWU620.jpg",
+    "quelle_url": "https://shop.l-shop-team.de/Sortiment/Sweat-Shirts-oxid-1/Hooded-Sweats/Hooded-Sweat.html",
+    "ek_preis": null
+  },
+  {
+    "artikelnummer": "CB336B",
+    "name": "Kids Deep Cuffed Tonal Patch Beanie",
+    "marke": "Beechfield",
+    "kategorie": "Mützen",
+    "beschreibung_punkte": [
+      "Enthält zertifiziertes recyceltes Polyester",
+      "Gerippter Strick",
+      "Doppellagiger Strick",
+      "Speziell entwickelte Krone für maximalen Komfort",
+      "Tonfarbener Baumwoll-Twill-Aufnäher zur Dekoration",
+      "Breites Design mit Bündchen für optimale Dekoration",
+      "Abreißbares Etikett für einfaches Umbranding"
+    ],
+    "beschreibung": "",
+    "material": "100% Polyester",
+    "grammatur": "",
+    "groessen": [
+      "One Size"
+    ],
+    "farben": [
+      {
+        "farbe": "Black",
+        "hex": "#1B1B1F",
+        "groessen": [
+          "One Size"
+        ]
+      },
+      {
+        "farbe": "Cloud Grey",
+        "hex": "#d0d3d4",
+        "groessen": [
+          "One Size"
+        ]
+      },
+      {
+        "farbe": "Dusty Green",
+        "hex": "#8a9b8e",
+        "groessen": [
+          "One Size"
+        ]
+      },
+      {
+        "farbe": "Natural Stone",
+        "hex": "#b6ada5",
+        "groessen": [
+          "One Size"
+        ]
+      },
+      {
+        "farbe": "Peach",
+        "hex": "#e0a3a8",
+        "groessen": [
+          "One Size"
+        ]
+      },
+      {
+        "farbe": "French Navy",
+        "hex": "#263c4a",
+        "groessen": [
+          "One Size"
+        ]
+      },
+      {
+        "farbe": "Dusty Blue",
+        "hex": "#688197",
+        "groessen": [
+          "One Size"
+        ]
+      }
+    ],
+    "eigenschaften": {
+      "Materialzusammensetzung": "100% Polyester",
+      "Material": "Strick",
+      "Größenlauf": "3-8 Jahre",
+      "Farbigkeit": "1-farbig",
+      "Veredelungsangabe Hersteller": "Bestickung | Siebdruck | Transferdruck",
+      "Label": "Heraustrennbares Label",
+      "Produkt": "Mützen",
+      "Mützen (Art)": "Beanies",
+      "Details": "Patch",
+      "Zertifizierung": "Recycelter Polyester | OEKO-TEX® STANDARD 100",
+      "OEKO-TEX®": "OEKO-TEX® STANDARD 100: 24.HCN.43885 HOHENSTEIN",
+      "Pflegehinweis": "nicht waschbar | Bügeln erlaubt",
+      "Hersteller-Katalognummer": "B336B",
+      "Ursprungsland Bezeichnung": "China",
+      "Warennummer": "65050090"
+    },
+    "bilder": [
+      "https://shop.l-shop-team.de/out/pictures/master/product/1/2647957.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/2/2648368.jpg"
+    ],
+    "bild_lokal": "bilder/CB336B.jpg",
+    "quelle_url": "https://shop.l-shop-team.de/Sortiment/Winteraccessoires-Muetzen/Muetzen/Kids-Deep-Cuffed-Tonal-Patch-Beanie.html",
+    "ek_preis": null
+  },
+  {
+    "artikelnummer": "HRM801",
+    "name": "Women´s Hooded Jacket",
+    "marke": "HRM",
+    "kategorie": "Sweatshirts & -jacken",
+    "beschreibung_punkte": [
+      "Weiches Mischgewebe",
+      "Modischer, körperbetonter Schnitt (leicht tailliert)",
+      "Sehr glatte Oberflächenstruktur mit angerauter Innenseite",
+      "Kapuze mit mittig bestickter, flacher Kontrast-Kordel und Kontrast-Innenfutter",
+      "Beidseitig je drei HRM-Metall-Ösen",
+      "Verstärktes, farblich passendes Nackenband",
+      "Hochwertiger Reißverschluss mit besonderem HRM-Metall-Schieber",
+      "Saum und Abschluss von Taschen und Ärmeln aus elastischen 2x2 Ripp-Strick-Bündchen",
+      "Gewebtes Flaglabel in der linken Seitennaht"
+    ],
+    "beschreibung": "",
+    "material": "80% Baumwolle / 20% Polyester (Grey Melange: 90% Baumwolle / 10% Viskose)",
+    "grammatur": "320 g/m²",
+    "groessen": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL",
+      "4XL",
+      "5XL"
+    ],
+    "farben": [
+      {
+        "farbe": "Black",
+        "hex": "#080b0b",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      },
+      {
+        "farbe": "Off White",
+        "hex": "#f2f5f5",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      },
+      {
+        "farbe": "Red",
+        "hex": "#ce0000",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      },
+      {
+        "farbe": "Navy",
+        "hex": "#171b4b",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      },
+      {
+        "farbe": "Royal Blue",
+        "hex": "#0d45f2",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      },
+      {
+        "farbe": "Grey Melange",
+        "hex": "#607373",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      },
+      {
+        "farbe": "Denim",
+        "hex": "#093e6b",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      },
+      {
+        "farbe": "Raspberry",
+        "hex": "#bf0d8a",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      },
+      {
+        "farbe": "Dark Grey",
+        "hex": "#1c232a",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      },
+      {
+        "farbe": "Bottle Green",
+        "hex": "#105017",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      },
+      {
+        "farbe": "Olive",
+        "hex": "#70755e",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      },
+      {
+        "farbe": "Sand",
+        "hex": "#ddd9d0",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      },
+      {
+        "farbe": "Sky Blue",
+        "hex": "#a8bcd0",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      },
+      {
+        "farbe": "Stone",
+        "hex": "#9fa5b3",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      }
+    ],
+    "eigenschaften": {
+      "Materialzusammensetzung": "80% Baumwolle / 20% Polyester (Grey Melange: 90% Baumwolle / 10% Viskose)",
+      "Grammatur in g/m²": "320 g/m²",
+      "Größenlauf": "XS, S, M, L, XL, XXL, 3XL, 4XL, 5XL",
+      "Farbigkeit": "Kontrast / Mehrfarbig",
+      "Verarbeitung": "Innen angeraut | Seitennähte",
+      "Veredelungsangabe Hersteller": "Bestickung | Siebdruck | Transferdruck",
+      "Produkt": "Sweatshirts & -jacken",
+      "Details": "Reißverschluss Metall",
+      "Sweatshirts- & jacken (Art)": "Zip-Hoodies",
+      "Ausschnitt": "Nackenband",
+      "Ärmel": "Langarm | Set-In | mit Bündchen",
+      "Kragen / Kapuze": "Mit Kapuze",
+      "Passform": "Slim (enger geschnitten)",
+      "Polybeutel": "Einzeln",
+      "Pflegehinweis": "40 °C waschbar | Trockner geeignet | Bügeln erlaubt",
+      "Ursprungsland Bezeichnung": "Bangladesch",
+      "Warennummer": "61102099",
+      "Hersteller-Katalognummer": "801"
+    },
+    "bilder": [
+      "https://shop.l-shop-team.de/out/pictures/master/product/1/1392321.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/2/1749846.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/3/1749847.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/4/1749848.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/5/1749849.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/6/1749850.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/7/1749851.jpg"
+    ],
+    "bild_lokal": "bilder/HRM801.jpg",
+    "quelle_url": "https://shop.l-shop-team.de/Sortiment/Sweat-Shirts-oxid-1/Hooded-Jackets/Women-s-Hooded-Jacket.html",
+    "ek_preis": null
+  },
+  {
+    "artikelnummer": "JN8046",
+    "name": "Men´s Hoodie Interlock",
+    "marke": "Daiber",
+    "kategorie": "Sweatshirts & -jacken",
+    "beschreibung_punkte": [
+      "Hochwertige Interlock Qualität",
+      "Angenehme Materialmischung aus BIO-Baumwolle, recyceltem Polyester und Elasthan",
+      "Technische Details",
+      "Kängurutasche mit zusätzlicher Reißverschlusstasche",
+      "Reißverschlusstasche auf linkem Ärmel",
+      "Reißverschlusstaschen umrandet mit modischem Tape"
+    ],
+    "beschreibung": "",
+    "material": "63% Baumwolle / 33% Polyester / 4% Elasthan",
+    "grammatur": "360 g/m²",
+    "groessen": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+    ],
+    "farben": [
+      {
+        "farbe": "Black",
+        "hex": "#1B1B1F",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Milky Blue",
+        "hex": "#7e9aab",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Navy",
+        "hex": "#003254",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Sandstone",
+        "hex": "#CFC6C0",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      }
+    ],
+    "eigenschaften": {
+      "Materialzusammensetzung": "63% Baumwolle / 33% Polyester / 4% Elasthan",
+      "Grammatur in g/m²": "360 g/m²",
+      "Größenlauf": "S, M, L, XL, XXL, 3XL",
+      "Farbigkeit": "1-farbig",
+      "Veredelungsangabe Hersteller": "Bestickung | Transferdruck",
+      "Produkt": "Sweatshirts & -jacken",
+      "Details": "Ärmeltasche",
+      "Sweatshirts- & jacken (Art)": "Hoodies",
+      "Ärmel": "Langarm | Set-In | mit Bündchen",
+      "Kragen / Kapuze": "Mit Kapuze",
+      "Passform": "Slim (enger geschnitten)",
+      "Polybeutel": "Nein",
+      "Zertifizierung": "Bio-Baumwolle | Recycelter Polyester | OEKO-TEX® STANDARD 100",
+      "OEKO-TEX®": "OEKO-TEX® STANDARD 100: 15.0.70467 HOHENSTEIN HTTI",
+      "Pflegehinweis": "30 °C waschbar | Bügeln erlaubt",
+      "Hersteller-Katalognummer": "8046",
+      "Ursprungsland Bezeichnung": "Pakistan",
+      "Warennummer": "61102099"
+    },
+    "bilder": [
+      "https://shop.l-shop-team.de/out/pictures/master/product/1/2570168.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/2/2513492.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/3/2513493.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/4/2513494.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/5/2513495.jpg"
+    ],
+    "bild_lokal": "bilder/JN8046.jpg",
+    "quelle_url": "https://shop.l-shop-team.de/Sortiment/Sweat-Shirts-oxid-1/Hooded-Sweats/Men-s-Hoodie-Interlock.html",
+    "ek_preis": null
+  },
+  {
+    "artikelnummer": "MV470064",
+    "name": "Men´s Shirt Modern Fit Long Sleeve",
+    "marke": "Marvelis",
+    "kategorie": "Hemden",
+    "beschreibung_punkte": [
+      "Modern fit",
+      "Bügelfrei",
+      "New Kent Kragen",
+      "Brusttasche mit Bestickung",
+      "Langärmelig",
+      "White, Navy, Black: 100% Popeline; Blue, Anthracite: 100% Chambray",
+      "White bis 60 °C waschbar"
+    ],
+    "beschreibung": "",
+    "material": "100% Baumwolle",
+    "grammatur": "120 g/m²",
+    "groessen": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45",
+      "46",
+      "47",
+      "48"
+    ],
+    "farben": [
+      {
+        "farbe": "Anthracite",
+        "hex": "#41424A",
+        "groessen": [
+          "38",
+          "39",
+          "40",
+          "41",
+          "42",
+          "43",
+          "44",
+          "45",
+          "46",
+          "47",
+          "48"
+        ]
+      },
+      {
+        "farbe": "Black",
+        "hex": "#2D2C2F",
+        "groessen": [
+          "38",
+          "39",
+          "40",
+          "41",
+          "42",
+          "43",
+          "44",
+          "45",
+          "46",
+          "47",
+          "48"
+        ]
+      },
+      {
+        "farbe": "Blue",
+        "hex": "#7A9DCB",
+        "groessen": [
+          "38",
+          "39",
+          "40",
+          "41",
+          "42",
+          "43",
+          "44",
+          "45",
+          "46",
+          "47",
+          "48"
+        ]
+      },
+      {
+        "farbe": "Navy",
+        "hex": "#2B3042",
+        "groessen": [
+          "38",
+          "39",
+          "40",
+          "41",
+          "42",
+          "43",
+          "44",
+          "45",
+          "46",
+          "47",
+          "48"
+        ]
+      },
+      {
+        "farbe": "White",
+        "hex": "#F1F2F1",
+        "groessen": [
+          "38",
+          "39",
+          "40",
+          "41",
+          "42",
+          "43",
+          "44",
+          "45",
+          "46",
+          "47",
+          "48"
+        ]
+      }
+    ],
+    "eigenschaften": {
+      "Materialzusammensetzung": "100% Baumwolle",
+      "Material": "Popeline",
+      "Grammatur in g/m²": "120 g/m²",
+      "Größenlauf": "38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48",
+      "Farbigkeit": "1-farbig | Pastell",
+      "Veredelungsangabe Hersteller": "Keine Angabe",
+      "Produkt": "Hemden",
+      "Hemden (Art)": "Business",
+      "Details": "Brusttasche",
+      "Ärmel": "Langarm",
+      "Kragen / Kapuze": "Kent Kragen",
+      "Passform": "Modern",
+      "Einsatzgebiet": "Berufsbekleidung",
+      "Polybeutel": "Einzeln",
+      "Zertifizierung": "OEKO-TEX® STANDARD 100",
+      "OEKO-TEX®": "OEKO-TEX® STANDARD 100: Z0.0.4481 Hohenstein HTTI",
+      "Pflegehinweis": "40 °C waschbar | Trockner geeignet | Bügeln erlaubt | Bügelfrei",
+      "Ursprungsland Bezeichnung": "Indonesien",
+      "Hersteller-Katalognummer": "470064/470464",
+      "Warennummer": "62052000"
+    },
+    "bilder": [
+      "https://shop.l-shop-team.de/out/pictures/master/product/1/2477845.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/2/2499194.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/3/2499795.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/4/2499796.jpg"
+    ],
+    "bild_lokal": "bilder/MV470064.jpg",
+    "quelle_url": "https://shop.l-shop-team.de/Sortiment/Business/Hemden-Blusen-Popeline-oxid/Men-s-Shirt-Modern-Fit-Long-Sleeve.html",
+    "ek_preis": null
+  },
+  {
+    "artikelnummer": "MY111",
+    "name": "my mate - Men´s Long Tee",
+    "marke": "Miners mate",
+    "kategorie": "T-Shirts",
+    "beschreibung_punkte": [
+      "Klassische, lange Passform",
+      "Ringgesponnene Baumwolle",
+      "Single Jersey",
+      "Entfernbares miners mate Etikett",
+      "Neutrales Größenetikett im Kragen, seitlich versetzt",
+      "Vorgeschrumpft",
+      "Enzym- und silikongewaschen"
+    ],
+    "beschreibung": "",
+    "material": "Uni Farben: 100% Baumwolle; Heather Farben: 60% Baumwolle / 40% Polyester; Heather Grey: 85% Baumwolle / 15% Viskose",
+    "grammatur": "160 g/m²",
+    "groessen": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+    ],
+    "farben": [
+      {
+        "farbe": "White/White",
+        "hex": "#F4F5F0",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Black/Heather Black",
+        "hex": "#28282D",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Black/Black",
+        "hex": "#28282D",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Heather Grey/Grey Solid",
+        "hex": "#625D5D",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Grey Solid/Heather Grey",
+        "hex": "#625D5D",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Navy/Heather Navy",
+        "hex": "#2C313D",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Olive/Heather Olive",
+        "hex": "#44413C",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Burgundy/Heather Burgundy",
+        "hex": "#502B33",
+        "groessen": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      }
+    ],
+    "eigenschaften": {
+      "Materialzusammensetzung": "Uni Farben: 100% Baumwolle; Heather Farben: 60% Baumwolle / 40% Polyester; Heather Grey: 85% Baumwolle / 15% Viskose",
+      "Material": "Jersey",
+      "Grammatur in g/m²": "160 g/m²",
+      "Größenlauf": "S, M, L, XL, XXL, 3XL",
+      "Farbigkeit": "Kontrast / Mehrfarbig | Meliert",
+      "Verarbeitung": "Enzyme Washed | Einlaufvorbehandelt / Vorgeschrumpft | Seitennähte",
+      "Veredelungsangabe Hersteller": "Bestickung | Digitaldruck | Siebdruck | Transferdruck",
+      "Label": "Kein Label im Nacken/Bund | Heraustrennbares Label",
+      "Produkt": "T-Shirts",
+      "T-Shirts (Art)": "Alltag/Freizeit",
+      "Ausschnitt": "Rundhals | Nackenband",
+      "Ärmel": "Kurzarm | Raglan",
+      "Passform": "Long (länger geschnitten) | Regular (normal geschnitten)",
+      "Polybeutel": "Nein",
+      "Digitaler Produktpass": "https://tracing.dpp.ourimpact.info/?productId=MY111",
+      "Pflegehinweis": "40 °C waschbar | Bügeln erlaubt",
+      "Hersteller-Katalognummer": "MY111",
+      "Warennummer": "61091000",
+      "Ursprungsland Bezeichnung": "Bangladesch"
+    },
+    "bilder": [
+      "https://shop.l-shop-team.de/out/pictures/master/product/1/2693087.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/2/1881208.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/3/1881209.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/4/1881210.jpg"
+    ],
+    "bild_lokal": "bilder/MY111.jpg",
+    "quelle_url": "https://shop.l-shop-team.de/Sortiment/Fashion-T-Shirts-oxid/Rundhals/my-mate-Men-s-Long-Tee.html",
+    "ek_preis": null
+  },
+  {
+    "artikelnummer": "NN310",
+    "name": "Invincible Women´s Onna-Stretch Tunic",
+    "marke": "Onna by Premier",
+    "kategorie": "Kittel & Kasacks",
+    "beschreibung_punkte": [
+      "33% zertifiziertes recyceltes Polyester",
+      "Atmungsaktiver Vier-Wege-Stretch für Bewegungsfreiheit und ganztägigen Tragekomfort",
+      "Strapazierfähig, knitterfrei und pflegeleicht",
+      "V-Ausschnitt mit zwei Vordertaschen",
+      "Aus recyceltem Polyester",
+      "Moderne Passform mit Abnähern auf der Rückseite und Seitenschlitzen",
+      "Markenetikett kann bei Bedarf entfernt werden."
+    ],
+    "beschreibung": "",
+    "material": "75% Polyester / 19% Viskose / 6% Elasthan",
+    "grammatur": "210 g/m²",
+    "groessen": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL",
+      "4XL",
+      "5XL"
+    ],
+    "farben": [
+      {
+        "farbe": "Action Navy",
+        "hex": "#1F2A44",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      },
+      {
+        "farbe": "Calm Pink",
+        "hex": "#B46B7A",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      },
+      {
+        "farbe": "Ceil Blue",
+        "hex": "#5F8DDA",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      },
+      {
+        "farbe": "Clean Green",
+        "hex": "#00594C",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      },
+      {
+        "farbe": "Dynamo Grey",
+        "hex": "#5B6770",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      },
+      {
+        "farbe": "Exact Black",
+        "hex": "#2D2926",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      },
+      {
+        "farbe": "Vital White",
+        "hex": "#ffffff",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      }
+    ],
+    "eigenschaften": {
+      "Materialzusammensetzung": "75% Polyester / 19% Viskose / 6% Elasthan",
+      "Material": "Stretch",
+      "Grammatur in g/m²": "210 g/m²",
+      "Größenlauf": "XS, S, M, L, XL, XXL, 3XL, 4XL, 5XL",
+      "Farbigkeit": "1-farbig",
+      "Veredelungsangabe Hersteller": "Bestickung | Siebdruck | Transferdruck",
+      "Label": "Heraustrennbares Label",
+      "Produkt": "Kittel & Kasacks",
+      "Details": "Seitenschlitze",
+      "Ausschnitt": "V-Ausschnitt",
+      "Ärmel": "Kurzarm | Set-In",
+      "Funktion": "Atmungsaktiv",
+      "Einsatzgebiet": "Berufsbekleidung",
+      "Zertifizierung": "Recycelter Polyester | OEKO-TEX® STANDARD 100",
+      "OEKO-TEX®": "OEKO-TEX® STANDARD 100: 11-72299 Shirley",
+      "Pflegehinweis": "60 °C waschbar | Trockner geeignet | Easy care | Bügeln erlaubt",
+      "Hersteller-Katalognummer": "NN310",
+      "Ursprungsland Bezeichnung": "Myanmar",
+      "Warennummer": "62114310"
+    },
+    "bilder": [
+      "https://shop.l-shop-team.de/out/pictures/master/product/1/2372289.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/2/2384981.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/3/2384982.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/4/2384983.jpg"
+    ],
+    "bild_lokal": "bilder/NN310.jpg",
+    "quelle_url": "https://shop.l-shop-team.de/Sortiment/Gastronomie-Beauty-oxid/Kasaks-und-Kittel/Invincible-Women-s-Onna-Stretch-Tunic.html",
+    "ek_preis": null
+  },
+  {
+    "artikelnummer": "P04",
+    "name": "Essential Hoodie",
+    "marke": "Mantis",
+    "kategorie": "Sweatshirts & -jacken",
+    "beschreibung_punkte": [
+      "Zertifizierung als Bio-Baumwolle in Arbeit/ recyceltes Polyester (rPET)",
+      "Gebürstetes Fleece",
+      "Unisex-Style",
+      "Eingesetzte Ärmel",
+      "Doppellagige Kapuze",
+      "Runde Kordeln in gleicher Farbe mit Metall-Enden",
+      "Metall-Ösen",
+      "Farblich abgestimmtes Fischgrät-Nackenband",
+      "Bedruckbarer Einsatz im Nacken",
+      "Ripp-Strick an Saum und Ärmelbündchen",
+      "Kängurutasche",
+      "Abreißbares Nackenetikett",
+      "Pflegeetikett mit QR-Code zur Rückverfolgung der Lieferkette",
+      "Pflegeetikett aus Bio-Baumwolle"
+    ],
+    "beschreibung": "",
+    "material": "81% Baumwolle / 19% Polyester",
+    "grammatur": "280 g/m²",
+    "groessen": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+    ],
+    "farben": [
+      {
+        "farbe": "Black",
+        "hex": "#1B1B1F",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Burgundy",
+        "hex": "#76232F",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Heather Grey Melange",
+        "hex": "",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Natural",
+        "hex": "#EFDBB2",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Navy",
+        "hex": "#00253A",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Soft Olive",
+        "hex": "#848A62",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Soft Pink",
+        "hex": "#EBC5D3",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      }
+    ],
+    "eigenschaften": {
+      "Materialzusammensetzung": "81% Baumwolle / 19% Polyester",
+      "Grammatur in g/m²": "280 g/m²",
+      "Größenlauf": "XS, S, M, L, XL, XXL, 3XL",
+      "Farbigkeit": "1-farbig",
+      "Verarbeitung": "Innen angeraut",
+      "Veredelungsangabe Hersteller": "Bestickung | Digitaldruck | Siebdruck | Transferdruck",
+      "Label": "Heraustrennbares Label",
+      "Produkt": "Sweatshirts & -jacken",
+      "Sweatshirts- & jacken (Art)": "Hoodies",
+      "Ausschnitt": "Nackenband",
+      "Ärmel": "Langarm | Set-In | mit Bündchen",
+      "Kragen / Kapuze": "Mit Kapuze",
+      "Zertifizierung": "Bio-Baumwolle | Recycelter Polyester | OEKO-TEX® STANDARD 100",
+      "OEKO-TEX®": "OEKO-TEX® STANDARD 100: 14449 Shirley",
+      "Digitaler Produktpass": "https://wellmade.dpp.ourimpact.info/?productId=120",
+      "Pflegehinweis": "40 °C waschbar | Bügeln erlaubt",
+      "Hersteller-Katalognummer": "M04",
+      "Ursprungsland Bezeichnung": "Pakistan",
+      "Warennummer": "61102099"
+    },
+    "bilder": [
+      "https://shop.l-shop-team.de/out/pictures/master/product/1/2177733.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/2/2220564.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/3/2220565.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/4/2874344.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/5/2874345.jpg"
+    ],
+    "bild_lokal": "bilder/P04.jpg",
+    "quelle_url": "https://shop.l-shop-team.de/Sortiment/Sweat-Shirts-oxid-1/Hooded-Sweats/Essential-Hoodie.html",
+    "ek_preis": null
+  },
+  {
+    "artikelnummer": "RT234J",
+    "name": "Junior Soft Padded Bodywarmer",
+    "marke": "Result Core",
+    "kategorie": "Westen & Bodywarmer",
+    "beschreibung_punkte": [
+      "Anhänger",
+      "Reißverschlusstaschen",
+      "Durchgehender Reißverschluss an der Vorderseite",
+      "Reflektierende Details im Hüftbereich seitlich",
+      "Elastische Armöffnungen",
+      "Kontrastfutter und -details",
+      "Eingefasster, weicher Ärmelausschnitt und Saum",
+      "Neutrales Etikett im Kragen für einfache Veredelung bzw. Personalisierung",
+      "Füllung: 160 g/m² Polyester",
+      "Veredelungszugang mit Reißverschluss innen im Brustbereich links",
+      "Wasserabweisend",
+      "Windproof"
+    ],
+    "beschreibung": "",
+    "material": "100% Polyester",
+    "grammatur": "",
+    "groessen": [
+      "XXS (2-3)",
+      "XS (3-4J)",
+      "S (5-6)",
+      "M (7-8)",
+      "L (9-10)"
+    ],
+    "farben": [
+      {
+        "farbe": "Black/Orange",
+        "hex": "#000000",
+        "groessen": [
+          "XXS (2-3)",
+          "XS (3-4J)",
+          "S (5-6)",
+          "M (7-8)",
+          "L (9-10)"
+        ]
+      },
+      {
+        "farbe": "Navy/Lime",
+        "hex": "#161E44",
+        "groessen": [
+          "XXS (2-3)",
+          "XS (3-4J)",
+          "S (5-6)",
+          "M (7-8)",
+          "L (9-10)"
+        ]
+      },
+      {
+        "farbe": "Navy/Royal",
+        "hex": "#161E44",
+        "groessen": [
+          "XXS (2-3)",
+          "XS (3-4J)",
+          "S (5-6)",
+          "M (7-8)",
+          "L (9-10)"
+        ]
+      },
+      {
+        "farbe": "Royal/Navy",
+        "hex": "#3F479A",
+        "groessen": [
+          "XXS (2-3)",
+          "XS (3-4J)",
+          "S (5-6)",
+          "M (7-8)",
+          "L (9-10)"
+        ]
+      }
+    ],
+    "eigenschaften": {
+      "Materialzusammensetzung": "100% Polyester",
+      "Größenlauf": "XXS (2/3 Jahre), XS (3/4 Jahre), S (5/6 Jahre), M (7/8 Jahre), L (9/10 Jahre)",
+      "Farbigkeit": "1-farbig | Kontrast / Mehrfarbig",
+      "Veredelungsangabe Hersteller": "Bestickung",
+      "Label": "Kein Label im Nacken/Bund",
+      "Produkt": "Westen & Bodywarmer",
+      "Westen (Art)": "Bodywarmer",
+      "Details": "Seitentaschen mit Reißverschluss",
+      "Kragen / Kapuze": "Stehkragen ohne Kapuze",
+      "Funktion": "Wasserabweisend | Winddicht",
+      "Veredelungszugang": "Veredelungszugang Brust",
+      "Polybeutel": "Nein",
+      "Pflegehinweis": "40 °C waschbar",
+      "Ursprungsland Bezeichnung": "China",
+      "Hersteller-Katalognummer": "R234J",
+      "Warennummer": "62024010"
+    },
+    "bilder": [
+      "https://shop.l-shop-team.de/out/pictures/master/product/1/902245.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/2/1879209.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/3/1879210.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/4/1879211.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/5/2488050.jpg"
+    ],
+    "bild_lokal": "bilder/RT234J.jpg",
+    "quelle_url": "https://shop.l-shop-team.de/Sortiment/Jacken/Jacken-Kinder-Wind-und-wasserabweisend/Core-Junior-Bodywarmer.html",
+    "ek_preis": null
+  },
+  {
+    "artikelnummer": "TJ9120",
+    "name": "Mountain Fleece",
+    "marke": "Tee Jays",
+    "kategorie": "Jacken",
+    "beschreibung_punkte": [
+      "Ripstop",
+      "Zwei Fronttaschen mit Reißverschluss",
+      "Brusttasche",
+      "Elastisches Formband am Ärmelsaum",
+      "Verstärkte Einsätze",
+      "SBS-Reißverschlüsse",
+      "Antipilling-Fleece",
+      "Verstellbarer Saum mit Kordelstopper"
+    ],
+    "beschreibung": "",
+    "material": "100% Polyester, Ripstop: 92% Polyester / 8% Elasthan",
+    "grammatur": "344 g/m²",
+    "groessen": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL",
+      "4XL",
+      "5XL"
+    ],
+    "farben": [
+      {
+        "farbe": "Deep Green/Black",
+        "hex": "#51534A",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Clay/Black",
+        "hex": "#776e64",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL"
+        ]
+      },
+      {
+        "farbe": "Black/Black",
+        "hex": "#2D2926",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "3XL",
+          "4XL",
+          "5XL"
+        ]
+      }
+    ],
+    "eigenschaften": {
+      "Materialzusammensetzung": "100% Polyester, Ripstop: 92% Polyester / 8% Elasthan",
+      "Material": "Fleece",
+      "Grammatur in g/m²": "344 g/m²",
+      "Größenlauf": "XS, S, M, L, XL, XXL, 3XL, 4XL, 5XL",
+      "Farbigkeit": "1-farbig",
+      "Veredelungsangabe Hersteller": "Bestickung",
+      "Produkt": "Jacken",
+      "Jacken (Art)": "Fleecejacken",
+      "Details": "Brusttasche | Seitentaschen mit Reißverschluss | Rückennaht",
+      "Ärmel": "Langarm | mit Bündchen",
+      "Kragen / Kapuze": "Stehkragen ohne Kapuze",
+      "Passform": "längeres Rückenteil",
+      "Polybeutel": "Einzeln",
+      "Zertifizierung": "OEKO-TEX® STANDARD 100",
+      "OEKO-TEX®": "OEKO-TEX® STANDARD 100: 2176-338 DTI",
+      "Pflegehinweis": "30 °C waschbar",
+      "Hersteller-Katalognummer": "9120",
+      "Warennummer": "61103091",
+      "Ursprungsland Bezeichnung": "China"
+    },
+    "bilder": [
+      "https://shop.l-shop-team.de/out/pictures/master/product/1/2230640.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/2/2221350.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/3/2221351.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/4/2221352.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/5/2221353.jpg"
+    ],
+    "bild_lokal": "bilder/TJ9120.jpg",
+    "quelle_url": "https://shop.l-shop-team.de/Sortiment/Fleece/Fleece-Bodywarmer/Mountain-Fleece.html",
+    "ek_preis": null
+  },
+  {
+    "artikelnummer": "TR510",
+    "name": "Women´s Recycled Seamless ´3D Fit´ Multi-Sport Flex Bra",
+    "marke": "TriDri®",
+    "kategorie": "Unterwäsche",
+    "beschreibung_punkte": [
+      "Recyceltes Nylon",
+      "Nahtloser Sport-BH",
+      "Angewachsener Bund",
+      "Feuchtigkeitstransportierendes Material",
+      "Figurbetontes Design mit Rippdetails an den Seiten und am Rücken",
+      "Mittlere Stützkraft",
+      "Herausnehmbare Polster",
+      "Verstellbare Träger"
+    ],
+    "beschreibung": "",
+    "material": "56% Nylon / 36% Polyester / 8% Elasthan",
+    "grammatur": "290 g/m²",
+    "groessen": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "farben": [
+      {
+        "farbe": "Black",
+        "hex": "#000000",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL"
+        ]
+      },
+      {
+        "farbe": "Light Pink Melange",
+        "hex": "",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL"
+        ]
+      },
+      {
+        "farbe": "Lilac Melange",
+        "hex": "",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL"
+        ]
+      },
+      {
+        "farbe": "Sky Blue Melange",
+        "hex": "",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL"
+        ]
+      },
+      {
+        "farbe": "Sage Green Melange",
+        "hex": "",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL"
+        ]
+      },
+      {
+        "farbe": "Cool Grey Melange",
+        "hex": "",
+        "groessen": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL"
+        ]
+      }
+    ],
+    "eigenschaften": {
+      "Materialzusammensetzung": "56% Nylon / 36% Polyester / 8% Elasthan",
+      "Grammatur in g/m²": "290 g/m²",
+      "Größenlauf": "XS, S, M, L, XL",
+      "Farbigkeit": "1-farbig | Pastell",
+      "Veredelungsangabe Hersteller": "Bestickung | Siebdruck | Transferdruck",
+      "Label": "Kein Label im Nacken/Bund",
+      "Produkt": "Unterwäsche",
+      "Ärmel": "Spaghetti-Träger",
+      "Passform": "Slim (enger geschnitten)",
+      "Einsatzgebiet": "Sport",
+      "Zertifizierung": "Recyceltes Nylon",
+      "Pflegehinweis": "40 °C waschbar",
+      "Hersteller-Katalognummer": "TR510",
+      "Warennummer": "62121090",
+      "Ursprungsland Bezeichnung": "China"
+    },
+    "bilder": [
+      "https://shop.l-shop-team.de/out/pictures/master/product/1/2552411.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/2/2517463.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/3/2517464.jpg",
+      "https://shop.l-shop-team.de/out/pictures/master/product/4/2517465.jpg"
+    ],
+    "bild_lokal": "bilder/TR510.jpg",
+    "quelle_url": "https://shop.l-shop-team.de/Sortiment/Sport-Activity/Trainingsoberteile/Women-s-Recycled-Seamless-3D-Fit-Multi-Sport-Flex-Bra.html",
+    "ek_preis": null
+  }
+]

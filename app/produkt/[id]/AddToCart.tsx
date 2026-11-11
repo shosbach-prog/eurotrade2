@@ -8,7 +8,7 @@ import { swatchBg } from '@/lib/colors';
 import { WishButton } from '@/components/Wishlist';
 import Info from '@/components/Info';
 import Stars from '@/components/Stars';
-import { FONTS, METHODS, MOTIFS, POSITIONS, PREVIEW, TEXT_COLORS, colorHex, fontCss, isImage, type Deco, type Motif } from '@/lib/deco';
+import { FONTS, METHODS, MOTIFS, positionsFor, PREVIEW, TEXT_COLORS, colorHex, fontCss, isImage, type Deco, type Motif } from '@/lib/deco';
 import { nextTier, unitFor } from '@/lib/tiers';
 
 type Logo = { id: string; name: string };
@@ -24,7 +24,8 @@ export default function AddToCart({ p, customerLogo, delivery, copy }: { p: Publ
   // Veredelung
   const [decoOn, setDecoOn] = useState(false);
   const [method, setMethod] = useState(METHODS[0]);
-  const [positions, setPositions] = useState<string[]>(['Brust links']);
+  const posList = useMemo(() => positionsFor(p), [p]);
+  const [positions, setPositions] = useState<string[]>([posList[0]]);
   const [logo, setLogo] = useState<Logo | null>(customerLogo ?? null);
   const [uploading, setUploading] = useState(false);
   const [upErr, setUpErr] = useState('');
@@ -178,7 +179,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy }: { p: Publ
             </div>
             <div className="opt" style={{ marginTop: 14 }}>Position(en)</div>
             <div className="deco-row">
-              {POSITIONS.map((x) => <button key={x} type="button" className={`size ${positions.includes(x) ? 'on' : ''}`} onClick={() => togglePos(x)}>{x}</button>)}
+              {posList.map((x) => <button key={x} type="button" className={`size ${positions.includes(x) ? 'on' : ''}`} onClick={() => togglePos(x)}>{x}</button>)}
             </div>
             <div className="opt" style={{ marginTop: 14 }}>Motiv</div>
             <div className="deco-row">

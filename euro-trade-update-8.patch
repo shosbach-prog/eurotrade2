@@ -1,0 +1,862 @@
+From d8ca5c1b74d65f743b69ac9b23af73bfdc1201ad Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Wed, 11 Nov 2026 04:31:46 +0100
+Subject: [PATCH] =?UTF-8?q?Newsletter=20mit=20Willkommensrabatt=20(Double-?=
+ =?UTF-8?q?Opt-in),=20Seite=20R=C3=BCckgabe=20&=20Widerruf?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+- Startseite: Anmeldung „Bis zu 30 % Rabatt auf die erste Bestellung“ (Stufen per NEWSLETTER_TIERS)
+- Bestätigungs-Mail, persönlicher Code ET-XXXXXX, Abmeldelink, Admin-Übersicht + CSV-Export
+- Warenkorb: Rabattcode einlösen, Rabatt als Position im Angebot, nach Annahme als eingelöst markiert
+- /widerruf: Übersicht, Ablauf, FAQ, Muster-Widerrufsbelehrung und -formular, Ausschluss veredelter Ware
+- Datenschutz um Newsletter ergänzt
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01AW9Go5bwJWAYsfGemt2b6Z
+---
+ .env.example                                |  6 ++
+ app/admin/anfrage/[no]/page.tsx             |  1 +
+ app/admin/newsletter/page.tsx               | 41 +++++++++++
+ app/angebot/[token]/AcceptForm.tsx          |  2 +-
+ app/api/admin/newsletter/route.ts           | 13 ++++
+ app/api/anfrage/route.ts                    | 12 ++--
+ app/api/angebot/[token]/route.ts            |  8 ++-
+ app/api/newsletter/route.ts                 | 28 ++++++++
+ app/api/rabatt/route.ts                     |  9 +++
+ app/datenschutz/page.tsx                    | 10 +++
+ app/globals.css                             | 37 ++++++++++
+ app/layout.tsx                              |  6 +-
+ app/newsletter/abmelden/[token]/page.tsx    | 15 ++++
+ app/newsletter/bestaetigen/[token]/page.tsx | 26 +++++++
+ app/page.tsx                                |  3 +
+ app/robots.ts                               |  2 +-
+ app/sitemap.ts                              |  2 +-
+ app/start/NewsletterBox.tsx                 | 50 +++++++++++++
+ app/start/page.tsx                          |  5 +-
+ app/warenkorb/page.tsx                      | 21 +++++-
+ app/widerruf/page.tsx                       | 77 +++++++++++++++++++++
+ components/AdminNav.tsx                     |  3 +-
+ lib/mail-templates.ts                       |  2 +-
+ lib/newsletter.ts                           | 65 +++++++++++++++++
+ lib/store.ts                                | 29 ++++++++
+ middleware.ts                               |  2 +-
+ 26 files changed, 458 insertions(+), 17 deletions(-)
+ create mode 100644 app/admin/newsletter/page.tsx
+ create mode 100644 app/api/admin/newsletter/route.ts
+ create mode 100644 app/api/newsletter/route.ts
+ create mode 100644 app/api/rabatt/route.ts
+ create mode 100644 app/newsletter/abmelden/[token]/page.tsx
+ create mode 100644 app/newsletter/bestaetigen/[token]/page.tsx
+ create mode 100644 app/start/NewsletterBox.tsx
+ create mode 100644 app/widerruf/page.tsx
+ create mode 100644 lib/newsletter.ts
+
+diff --git a/.env.example b/.env.example
+index 1d326d5..a8b402e 100644
+--- a/.env.example
++++ b/.env.example
+@@ -30,6 +30,12 @@ ACCESS_CODES=
+ # Langer Zufallswert (z. B. openssl rand -hex 32). Ändern = alle Freischaltungen ungültig
+ ACCESS_SECRET=
+ 
++# ---- Newsletter-Willkommensrabatt: Prozent:ab Netto-Warenwert ----
++NEWSLETTER_TIERS=10:45,20:90,30:155
++
++# ---- Newsletter-Willkommensrabatt: Prozent:ab Netto-Warenwert ----
++NEWSLETTER_TIERS=10:45,20:90,30:155
++
+ # ---- Kontakt & Lieferzeit (Shop) ----
+ CONTACT_WHATSAPP=491732648097
+ CONTACT_PHONE=0173 2648097
+diff --git a/app/admin/anfrage/[no]/page.tsx b/app/admin/anfrage/[no]/page.tsx
+index da0563f..3f9ad34 100644
+--- a/app/admin/anfrage/[no]/page.tsx
++++ b/app/admin/anfrage/[no]/page.tsx
+@@ -30,6 +30,7 @@ export default function InquiryPage({ params }: { params: { no: string } }) {
+           <p style={{ margin: '6px 0 0' }}>{c.company && <><b>{c.company}</b><br /></>}{c.name}<br /><a href={`mailto:${c.email}`} className="alink">{c.email}</a>{c.phone && <> · {c.phone}</>}{c.city && <><br />{c.city}</>}</p>
+           {c.date && <p style={{ margin: '8px 0 0' }}><b>Wunschliefertermin:</b> {new Date(c.date).toLocaleDateString('de-DE')}</p>}
+           {i.zugangscode && <p className="muted" style={{ margin: '8px 0 0' }}>Zugangscode: {i.zugangscode}</p>}
++          {i.discount && <p style={{ margin: '8px 0 0' }}><span className="st st-angenommen">Rabattcode {i.discount.code} · {i.discount.pct} %</span> <span className="muted" style={{ fontSize: 13 }}>– im Angebot als Position enthalten</span></p>}
+           {c.message && <p style={{ whiteSpace: 'pre-wrap', margin: '10px 0 0', background: '#f6f7f9', padding: 10, borderRadius: 8 }}>{c.message}</p>}
+           <p className="muted" style={{ fontSize: 13, margin: '10px 0 0' }}>Eingegangen: {fmt(i.date)}</p>
+         </div>
+diff --git a/app/admin/newsletter/page.tsx b/app/admin/newsletter/page.tsx
+new file mode 100644
+index 0000000..050b94f
+--- /dev/null
++++ b/app/admin/newsletter/page.tsx
+@@ -0,0 +1,41 @@
++import type { Metadata } from 'next';
++import AdminNav from '@/components/AdminNav';
++import { listSubscribers } from '@/lib/store';
++import { tierText } from '@/lib/newsletter';
++
++export const metadata: Metadata = { title: 'Newsletter', robots: { index: false, follow: false } };
++const d = (x?: string | null) => (x ? new Date(x).toLocaleDateString('de-DE') : '–');
++
++export default function Newsletter() {
++  const all = listSubscribers().slice().reverse();
++  const active = all.filter((s) => s.confirmed && !s.unsubscribedAt);
++  return (
++    <>
++      <AdminNav active="newsletter" />
++      <div className="list-head">
++        <h1 style={{ marginBottom: 0 }}>Newsletter</h1>
++        <a className="btn alt" href="/api/admin/newsletter" style={{ display: 'inline-grid', placeItems: 'center' }}>CSV exportieren ({active.length} aktiv)</a>
++      </div>
++      <p className="muted">Willkommensrabatt: {tierText()} · Anpassen über <code>NEWSLETTER_TIERS</code> in der .env.</p>
++      <div className="chips" style={{ margin: '0 0 14px' }}>
++        <span className="chip">Bestätigt: <b>{active.length}</b></span>
++        <span className="chip">Unbestätigt: <b>{all.filter((s) => !s.confirmed).length}</b></span>
++        <span className="chip">Abgemeldet: <b>{all.filter((s) => s.unsubscribedAt).length}</b></span>
++        <span className="chip">Codes eingelöst: <b>{all.filter((s) => s.usedAt).length}</b></span>
++      </div>
++      {!all.length ? <div className="box muted">Noch keine Anmeldungen.</div> : (
++        <div className="box" style={{ padding: 0, overflowX: 'auto' }}>
++          <table className="atable">
++            <thead><tr><th>E-Mail</th><th>Typ</th><th>Angemeldet</th><th>Status</th><th>Code</th><th>Eingelöst</th></tr></thead>
++            <tbody>{all.map((s) => (
++              <tr key={s.id}>
++                <td>{s.email}</td><td className="muted">{s.type || '–'}</td><td>{d(s.date)}</td>
++                <td>{s.unsubscribedAt ? <span className="st st-abgelehnt">abgemeldet</span> : s.confirmed ? <span className="st st-angenommen">bestätigt</span> : <span className="st st-neu">unbestätigt</span>}</td>
++                <td><code>{s.code ?? '–'}</code></td><td>{s.usedAt ? `${d(s.usedAt)} · ${s.usedIn}` : '–'}</td>
++              </tr>))}</tbody>
++          </table>
++        </div>
++      )}
++    </>
++  );
++}
+diff --git a/app/angebot/[token]/AcceptForm.tsx b/app/angebot/[token]/AcceptForm.tsx
+index 5eba64f..3f6760e 100644
+--- a/app/angebot/[token]/AcceptForm.tsx
++++ b/app/angebot/[token]/AcceptForm.tsx
+@@ -19,7 +19,7 @@ export default function AcceptForm({ token, defaultName, total }: { token: strin
+       </div>
+       <label style={{ display: 'flex', gap: 8, fontWeight: 400, marginTop: 14 }}>
+         <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} style={{ width: 'auto' }} />
+-        <span>Ich nehme das Angebot über {total} verbindlich an.</span>
++        <span>Ich nehme das Angebot über {total} verbindlich an. Die <a href="/widerruf" target="_blank" style={{ textDecoration: 'underline' }}>Widerrufsbelehrung</a> habe ich zur Kenntnis genommen. Mir ist bekannt, dass für nach meinen Vorgaben veredelte Ware kein Widerrufsrecht besteht.</span>
+       </label>
+       <button className="btn" disabled={!agree || !name.trim() || state === 'busy'}>{state === 'busy' ? 'Wird gesendet …' : 'Verbindlich annehmen'}</button>
+       {err && <p className="err">{err}</p>}
+diff --git a/app/api/admin/newsletter/route.ts b/app/api/admin/newsletter/route.ts
+new file mode 100644
+index 0000000..f97d3cf
+--- /dev/null
++++ b/app/api/admin/newsletter/route.ts
+@@ -0,0 +1,13 @@
++import { isAdmin } from '@/lib/customer';
++import { listSubscribers } from '@/lib/store';
++/** CSV-Export der bestätigten Empfänger (z. B. für Brevo/CleverReach) */
++export async function GET() {
++  if (!(await isAdmin())) return new Response('Nicht angemeldet', { status: 401 });
++  const q = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`;
++  const rows = listSubscribers().filter((s) => s.confirmed && !s.unsubscribedAt)
++    .map((s) => [s.email, s.type, s.confirmedAt, s.code, s.usedAt ? 'ja' : 'nein'].map(q).join(';'));
++  return new Response('﻿' + ['E-Mail;Typ;Bestätigt am;Rabattcode;Eingelöst', ...rows].join('\r\n'), {
++    headers: { 'Content-Type': 'text/csv; charset=utf-8', 'Content-Disposition': `attachment; filename="newsletter-${new Date().toISOString().slice(0, 10)}.csv"` },
++  });
++}
++export const dynamic = 'force-dynamic';
+diff --git a/app/api/anfrage/route.ts b/app/api/anfrage/route.ts
+index 7cbf669..8292e51 100644
+--- a/app/api/anfrage/route.ts
++++ b/app/api/anfrage/route.ts
+@@ -5,7 +5,7 @@ import { FONTS, METHODS, POSITIONS, TEXT_COLORS, decoLabel, type Deco } from '@/
+ import { esc, sendMail, shopUrl } from '@/lib/mail';
+ import { button, contactBlock, eur, h1, infoBox, itemsTable, layout, p, quote, signature, type MailLine } from '@/lib/mail-templates';
+ import { unitFor } from '@/lib/tiers';
+-import { randomId, saveInquiry, type InqLine, type Inquiry } from '@/lib/store';
++import { discountFor, randomId, saveInquiry, validCode, type InqLine, type Inquiry } from '@/lib/store';
+ 
+ const hits = new Map<string, number[]>();
+ 
+@@ -58,7 +58,9 @@ export async function POST(req: Request) {
+   const no = `A${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${randomId(3).toUpperCase()}`;
+   const via = ctx ? `${ctx.code}${ctx.name && ctx.name !== ctx.code ? ` (${ctx.name})` : ''}` : null;
+ 
+-  const inq: Inquiry = { no, date: new Date().toISOString(), zugangscode: via, customer, lines, total, status: 'neu', token: randomId(16), offer: null, history: [{ date: new Date().toISOString(), text: 'Anfrage eingegangen' }] };
++  const sub = body.code ? validCode(String(body.code)) : null;
++  const discount = sub && discountFor(total) > 0 ? { code: sub.code!, pct: discountFor(total) } : null;
++  const inq: Inquiry = { no, date: new Date().toISOString(), zugangscode: via, customer, lines, total, discount, status: 'neu', token: randomId(16), offer: null, history: [{ date: new Date().toISOString(), text: 'Anfrage eingegangen' }] };
+   saveInquiry(inq); // immer lokal sichern (auch wenn Mail ausfällt)
+ 
+   const base = shopUrl();
+@@ -66,14 +68,16 @@ export async function POST(req: Request) {
+   const mlines: MailLine[] = lines.map((l) => ({ sku: l.sku, name: l.name, color: l.color, size: l.size, qty: l.qty, price: l.price, sum: l.sum, deco: l.deco ? decoLabel(l.deco) : undefined, note: l.deco?.note || undefined, image: imgOf.get(l.id!) ?? '' }));
+   const pieces = lines.reduce((s, l) => s + l.qty, 0);
+   const hasDeco = lines.some((l) => l.deco);
+-  const totals: [string, string, boolean?][] = [[`Summe Textil netto (${pieces} Stück)`, eur(total), true]];
++  const totals: [string, string, boolean?][] = discount
++    ? [[`Summe Textil netto (${pieces} Stück)`, eur(total)], [`Willkommensrabatt ${discount.pct} %`, `−${eur(Math.round(total * discount.pct) / 100)}`], ['Richtwert netto', eur(total - Math.round(total * discount.pct) / 100), true]]
++    : [[`Summe Textil netto (${pieces} Stück)`, eur(total), true]];
+   const logos = [...new Map(lines.filter((l) => l.deco?.logoId).map((l) => [l.deco!.logoId!, l.deco!.logoName])).entries()];
+   const dateTxt = customer.date ? new Date(customer.date).toLocaleDateString('de-DE') : '';
+ 
+   const toShop = layout({
+     preheader: `${customer.company || customer.name} · ${pieces} Stück · ${eur(total)}`, title: `Neue Anfrage ${no}`,
+     body: h1(`Neue Anfrage ${no}`)
+-      + infoBox([['Kunde', esc(customer.company || customer.name)], ['Stückzahl', String(pieces)], ['Summe Textil netto', eur(total)], ...(dateTxt ? [['Wunschtermin', dateTxt] as [string, string]] : []), ...(via ? [['Zugangscode', esc(via)] as [string, string]] : [])], '#ffc21a')
++      + infoBox([['Kunde', esc(customer.company || customer.name)], ['Stückzahl', String(pieces)], ['Summe Textil netto', eur(total)], ...(dateTxt ? [['Wunschtermin', dateTxt] as [string, string]] : []), ...(via ? [['Zugangscode', esc(via)] as [string, string]] : []), ...(discount ? [['Rabattcode', `${discount.code} (${discount.pct} %)`] as [string, string]] : [])], '#ffc21a')
+       + contactBlock(customer)
+       + (customer.message ? `<div style="font-size:13px;font-weight:700;margin:0 0 6px">Nachricht</div>${quote(customer.message)}` : '')
+       + itemsTable(mlines, totals)
+diff --git a/app/api/angebot/[token]/route.ts b/app/api/angebot/[token]/route.ts
+index b5f7969..de2aa39 100644
+--- a/app/api/angebot/[token]/route.ts
++++ b/app/api/angebot/[token]/route.ts
+@@ -1,7 +1,7 @@
+ import { NextResponse } from 'next/server';
+ import { esc, sendMail, shopUrl } from '@/lib/mail';
+ import { button, eur, h1, infoBox, layout, offerTable, p, quote, signature } from '@/lib/mail-templates';
+-import { addHistory, inquiryByToken, offerTotals, saveInquiry } from '@/lib/store';
++import { addHistory, inquiryByToken, listSubscribers, offerTotals, saveInquiry, saveSubscribers } from '@/lib/store';
+ 
+ /** Kunde nimmt das Angebot an */
+ export async function POST(req: Request, { params }: { params: { token: string } }) {
+@@ -17,6 +17,12 @@ export async function POST(req: Request, { params }: { params: { token: string }
+   i.acceptedAt = new Date().toISOString();
+   addHistory(i, `Angebot angenommen von ${String(name).slice(0, 100)}${comment ? ` – „${String(comment).slice(0, 500)}“` : ''}`);
+   saveInquiry(i);
++  // Willkommensrabatt ist mit der Annahme eingelöst
++  if (i.discount?.code) {
++    const subs = listSubscribers();
++    const s = subs.find((x) => x.code === i.discount!.code);
++    if (s && !s.usedAt) { s.usedAt = new Date().toISOString(); s.usedIn = i.no; saveSubscribers(subs); }
++  }
+   const t = offerTotals(i.offer);
+   try {
+     await sendMail({ to: process.env.INQUIRY_TO ?? '', replyTo: i.customer.email, subject: `✓ Angebot ${i.no} angenommen – ${i.customer.company || i.customer.name} – ${eur(t.gross)}`,
+diff --git a/app/api/newsletter/route.ts b/app/api/newsletter/route.ts
+new file mode 100644
+index 0000000..36634c5
+--- /dev/null
++++ b/app/api/newsletter/route.ts
+@@ -0,0 +1,28 @@
++import { NextResponse } from 'next/server';
++import { sendConfirm } from '@/lib/newsletter';
++import { listSubscribers, randomId, saveSubscribers } from '@/lib/store';
++
++const hits = new Map<string, number[]>();
++
++/** Anmeldung (Double-Opt-in): speichert unbestätigt und sendet Bestätigungslink */
++export async function POST(req: Request) {
++  const ip = req.headers.get('x-forwarded-for')?.split(',')[0] ?? 'local';
++  const now = Date.now();
++  const recent = (hits.get(ip) ?? []).filter((t) => now - t < 3_600_000);
++  if (recent.length >= 5) return NextResponse.json({ error: 'Zu viele Versuche – bitte später erneut.' }, { status: 429 });
++  hits.set(ip, [...recent, now]);
++  const b = await req.json().catch(() => ({}));
++  if (b.website) return NextResponse.json({ ok: true });
++  const email = String(b.email ?? '').trim().toLowerCase().slice(0, 200);
++  if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(email)) return NextResponse.json({ error: 'Bitte eine gültige E-Mail-Adresse eingeben.' }, { status: 400 });
++  if (!b.privacy) return NextResponse.json({ error: 'Bitte der Datenschutzerklärung zustimmen.' }, { status: 400 });
++  // unbestätigte Anmeldungen nach 30 Tagen löschen (siehe Datenschutzerklärung)
++  const list = listSubscribers().filter((x) => x.confirmed || Date.now() - new Date(x.date).getTime() < 30 * 86400000);
++  let s = list.find((x) => x.email === email);
++  if (s?.confirmed && !s.unsubscribedAt) return NextResponse.json({ ok: true, already: true });
++  if (!s) { s = { id: randomId(6), email, type: String(b.type ?? '').slice(0, 40), date: new Date().toISOString(), token: randomId(16), confirmed: false }; list.push(s); }
++  else { s.token = randomId(16); s.unsubscribedAt = null; s.confirmed = false; if (b.type) s.type = String(b.type).slice(0, 40); }
++  saveSubscribers(list);
++  try { await sendConfirm(s); } catch (e) { console.error('Newsletter-Bestätigung fehlgeschlagen', e); return NextResponse.json({ error: 'Die Bestätigungs-E-Mail konnte nicht gesendet werden. Bitte später erneut versuchen.' }, { status: 500 }); }
++  return NextResponse.json({ ok: true });
++}
+diff --git a/app/api/rabatt/route.ts b/app/api/rabatt/route.ts
+new file mode 100644
+index 0000000..e42d8a8
+--- /dev/null
++++ b/app/api/rabatt/route.ts
+@@ -0,0 +1,9 @@
++import { NextResponse } from 'next/server';
++import { discountTiers, validCode } from '@/lib/store';
++/** Rabattcode prüfen (Warenkorb) */
++export async function GET(req: Request) {
++  const code = new URL(req.url).searchParams.get('code') ?? '';
++  const ok = !!validCode(code);
++  return NextResponse.json({ ok, tiers: ok ? discountTiers() : [] }, { headers: { 'Cache-Control': 'no-store' } });
++}
++export const dynamic = 'force-dynamic';
+diff --git a/app/datenschutz/page.tsx b/app/datenschutz/page.tsx
+index 7cbccbd..edec132 100644
+--- a/app/datenschutz/page.tsx
++++ b/app/datenschutz/page.tsx
+@@ -49,6 +49,16 @@ export default function Datenschutz() {
+         <p>Angebots- und Auftragsdaten speichern wir für die Dauer der Geschäftsbeziehung und darüber hinaus, soweit gesetzliche Aufbewahrungspflichten bestehen (§ 147 AO, § 257 HGB: bis zu 10 Jahre). Nicht angenommene Anfragen und hochgeladene Logos löschen wir spätestens nach 24 Monaten, sofern Sie keine längere Speicherung wünschen, etwa für Nachbestellungen.</p>
+       </S>
+ 
++      <section id="newsletter"><h2>7a. Newsletter und Willkommensrabatt</h2>
++        <p>Wenn Sie sich für unseren Newsletter anmelden, verarbeiten wir Ihre E-Mail-Adresse und, falls angegeben, die Art Ihrer Organisation, um Ihnen Angebote, Neuheiten und Ihren persönlichen Willkommensrabatt zu senden. Wir nutzen das Double-Opt-in-Verfahren: Erst nach Klick auf den Bestätigungslink in unserer E-Mail sind Sie angemeldet. Wir speichern Zeitpunkt der Anmeldung und Bestätigung als Nachweis.</p>
++        <p>Rechtsgrundlage ist Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Sie können sie jederzeit über den Abmeldelink in jeder E-Mail oder per Nachricht an uns widerrufen. Nach der Abmeldung löschen wir Ihre Adresse, soweit wir sie nicht zum Nachweis einer früheren Einwilligung kurzfristig aufbewahren müssen (Art. 6 Abs. 1 lit. f DSGVO). Unbestätigte Anmeldungen löschen wir nach 30 Tagen.</p>
++      </section>
++
++      <section id="newsletter"><h2>7a. Newsletter und Willkommensrabatt</h2>
++        <p>Wenn Sie sich für unseren Newsletter anmelden, verarbeiten wir Ihre E-Mail-Adresse und, falls angegeben, die Art Ihrer Organisation, um Ihnen Angebote, Neuheiten und Ihren persönlichen Willkommensrabatt zu senden. Wir nutzen das Double-Opt-in-Verfahren: Erst nach Klick auf den Bestätigungslink in unserer E-Mail sind Sie angemeldet. Wir speichern Zeitpunkt der Anmeldung und Bestätigung als Nachweis.</p>
++        <p>Rechtsgrundlage ist Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Sie können sie jederzeit über den Abmeldelink in jeder E-Mail oder per Nachricht an uns widerrufen. Nach der Abmeldung löschen wir Ihre Adresse, soweit wir sie nicht zum Nachweis einer früheren Einwilligung kurzfristig aufbewahren müssen (Art. 6 Abs. 1 lit. f DSGVO). Unbestätigte Anmeldungen löschen wir nach 30 Tagen.</p>
++      </section>
++
+       <S t="8. E-Mail-Versand">
+         <p>Bestätigungen, Angebote und Auftragsbestätigungen versenden wir über den E-Mail-Dienst der IONOS SE (Auftragsverarbeitung nach Art. 28 DSGVO). Wenn Sie uns per E-Mail kontaktieren, verarbeiten wir Ihre Angaben zur Bearbeitung Ihres Anliegens (Art. 6 Abs. 1 lit. b bzw. f DSGVO).</p>
+       </S>
+diff --git a/app/globals.css b/app/globals.css
+index 8192253..e438e78 100644
+--- a/app/globals.css
++++ b/app/globals.css
+@@ -492,3 +492,40 @@ footer .wrap{padding-right:84px}
+ .legal h2{font-size:18px;margin:26px 0 8px}
+ .legal p,.legal li{color:#2b313b;line-height:1.65}
+ .legal a{color:var(--brand);text-decoration:underline}
++.nl-code{font:900 30px/1 ui-monospace,Menlo,monospace;letter-spacing:3px;padding:16px;border:2px dashed var(--accent);border-radius:12px;background:#fffbea;margin:10px 0 12px}
++
++/* Newsletter-Box */
++.nl{margin-top:48px;background:linear-gradient(135deg,#fff8dc 0%,#fff 55%,#eef4ff 100%);border:1px solid #f3e3a6;border-radius:20px;padding:34px 36px;display:grid;grid-template-columns:1fr 1.25fr;gap:32px;align-items:center;box-shadow:var(--shadow)}
++.nl h2{font-size:30px;line-height:1.15;margin:0 0 18px;letter-spacing:-.5px}
++.nl-tiers{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px;font-size:16px}
++.nl-tiers li{display:flex;align-items:center;gap:10px}
++.nl-pct{display:inline-grid;place-items:center;min-width:56px;height:32px;border-radius:999px;background:#fff;border:1px solid #f0d77a;font-weight:800;color:#14181f}
++.nl-tiers li.top .nl-pct{background:var(--accent);border-color:var(--accent)}
++.nl-hot{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;background:#ff5a1f;color:#fff;border-radius:999px;padding:2px 8px}
++.nl-form{display:flex;flex-direction:column;gap:10px}
++.nl-row{display:flex;gap:0;box-shadow:0 2px 8px rgba(0,0,0,.06);border-radius:10px;overflow:hidden}
++.nl-row input{flex:1;min-width:0;border:1px solid var(--line);border-right:0;border-radius:10px 0 0 10px;padding:0 16px;height:52px;font-size:16px}
++.nl-btn{height:52px;border-radius:0 10px 10px 0;background:var(--accent);color:#14181f;font-weight:800;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
++.nl-form select{height:48px;border:1px solid var(--line);border-radius:10px;padding:0 14px;background:#fff;font-size:15px;color:#3b4250}
++.nl-priv{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:#3b4250;cursor:pointer}
++.nl-priv input{margin-top:3px}
++.nl-priv a{color:var(--brand);text-decoration:underline}
++.nl-hint{font-size:13px;margin:0;color:#3b4250}
++.nl-small{font-size:12px;font-style:italic;color:var(--muted);margin:0}
++.nl-done{background:#fff;border:1px solid #cdebd8;border-radius:14px;padding:20px}
++.nl-done strong{color:var(--ok);font-size:17px}
++.nl-done p{margin:8px 0 0}
++@media (max-width:820px){.nl{grid-template-columns:1fr;padding:24px 18px}.nl h2{font-size:24px}.nl-row{flex-direction:column;box-shadow:none}.nl-row input{border-right:1px solid var(--line);border-radius:10px}.nl-btn{border-radius:10px;margin-top:8px}}
++.code-row{display:flex;gap:8px;margin-top:14px}
++.code-row input{flex:1;min-width:0;border:1px dashed #d6b34a;background:#fffdf3;border-radius:8px;padding:0 12px;height:42px;font:600 15px ui-monospace,Menlo,monospace;letter-spacing:1px}
++.code-row .btn{height:42px}
++/* Rückgabe-Seite */
++.ret-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:20px 0 10px}
++.ret{display:flex;flex-direction:column;gap:6px}
++.ret-ico{width:44px;height:44px;border-radius:12px;background:var(--accent);color:#14181f;font-weight:900;font-size:18px;display:grid;place-items:center}
++.ret h3{margin:4px 0 0;font-size:16px}
++.ret p{margin:0;font-size:14px;color:var(--muted)}
++.legal-page .legal h3{font-size:16px;margin:18px 0 6px}
++.form-line{letter-spacing:1px;color:var(--muted)}
++@media (max-width:900px){.ret-grid{grid-template-columns:1fr 1fr}}
++@media (max-width:520px){.ret-grid{grid-template-columns:1fr}}
+diff --git a/app/layout.tsx b/app/layout.tsx
+index d832501..a848117 100644
+--- a/app/layout.tsx
++++ b/app/layout.tsx
+@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
+     description: 'T-Shirts, Polos, Hoodies, Jacken, Caps und Taschen für Druck und Stick – schnell finden, Anfrage in einer Minute.',
+     metadataBase: new URL(process.env.SHOP_URL ?? 'https://euro-trade.com'),
+     // Geschlossener Shop: nur Landingpage und Info-Seite in Suchmaschinen
+-    robots: previewMode() || (shopClosed() && !['/start', '/druck-stick', '/impressum'].includes(headers().get('x-path') ?? '')) ? { index: false, follow: false } : undefined,
++    robots: previewMode() || (shopClosed() && !['/start', '/druck-stick', '/widerruf', '/impressum'].includes(headers().get('x-path') ?? '')) ? { index: false, follow: false } : undefined,
+   };
+ }
+ export const dynamic = 'force-dynamic';
+@@ -29,7 +29,7 @@ export const dynamic = 'force-dynamic';
+ export default async function RootLayout({ children }: { children: React.ReactNode }) {
+   const gated = shopClosed();
+   const path = headers().get('x-path') ?? '/';
+-  const isPublic = ['/start', '/druck-stick', '/zugang', '/impressum', '/datenschutz', '/angebot', '/admin'].some((p) => path === p || path.startsWith(p + '/'));
++  const isPublic = ['/widerruf', '/newsletter', '/start', '/druck-stick', '/zugang', '/impressum', '/datenschutz', '/angebot', '/admin'].some((p) => path === p || path.startsWith(p + '/'));
+   const { ok, customer } = await shopAccess();
+   // Code im Admin gesperrt/gelöscht -> zurück zur Anmeldung
+   if (!ok && !isPublic) redirect('/zugang');
+@@ -60,7 +60,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
+           <main className="wrap">{children}</main>
+           <footer><div className="wrap">
+             <span>© {new Date().getFullYear()} {SHOP} · Alle Preise netto zzgl. MwSt. und Versand</span>
+-            <span>{open && <><Link href="/konto">Meine Anfragen</Link> · </>}<Link href="/druck-stick">Druck & Stick</Link> · <Link href="/impressum">Impressum</Link> · <Link href="/datenschutz">Datenschutz</Link>{gated && customer && <> · {customer.name} · <LogoutLink /></>}</span>
++            <span>{open && <><Link href="/konto">Meine Anfragen</Link> · </>}<Link href="/druck-stick">Druck & Stick</Link> · <Link href="/widerruf">Rückgabe & Widerruf</Link> · <Link href="/impressum">Impressum</Link> · <Link href="/datenschutz">Datenschutz</Link>{gated && customer && <> · {customer.name} · <LogoutLink /></>}</span>
+           </div></footer>
+           {!path.startsWith('/admin') && <Contact whatsapp={process.env.CONTACT_WHATSAPP ?? '491732648097'} phone={process.env.CONTACT_PHONE ?? '0173 2648097'} email={process.env.CONTACT_EMAIL ?? 'info@euro-trade.com'} />}
+         </WishlistProvider></CartProvider>
+diff --git a/app/newsletter/abmelden/[token]/page.tsx b/app/newsletter/abmelden/[token]/page.tsx
+new file mode 100644
+index 0000000..3437fa2
+--- /dev/null
++++ b/app/newsletter/abmelden/[token]/page.tsx
+@@ -0,0 +1,15 @@
++import type { Metadata } from 'next';
++import { unsubscribe } from '@/lib/newsletter';
++
++export const metadata: Metadata = { title: 'Abgemeldet', robots: { index: false } };
++export const dynamic = 'force-dynamic';
++
++export default function Unsubscribe({ params }: { params: { token: string } }) {
++  const s = unsubscribe(params.token);
++  return (
++    <div className="gate"><div className="gate-box">
++      <h1>{s ? 'Sie sind abgemeldet' : 'Link ungültig'}</h1>
++      <p className="muted">{s ? `${s.email} erhält keine Newsletter mehr von uns. Schade – Sie können sich jederzeit wieder anmelden.` : 'Dieser Abmeldelink ist ungültig. Schreiben Sie uns gern an info@euro-trade.com.'}</p>
++    </div></div>
++  );
++}
+diff --git a/app/newsletter/bestaetigen/[token]/page.tsx b/app/newsletter/bestaetigen/[token]/page.tsx
+new file mode 100644
+index 0000000..8780565
+--- /dev/null
++++ b/app/newsletter/bestaetigen/[token]/page.tsx
+@@ -0,0 +1,26 @@
++import Link from 'next/link';
++import type { Metadata } from 'next';
++import { confirm, tierText } from '@/lib/newsletter';
++
++export const metadata: Metadata = { title: 'Anmeldung bestätigt', robots: { index: false } };
++export const dynamic = 'force-dynamic';
++
++export default async function Confirm({ params }: { params: { token: string } }) {
++  const s = await confirm(params.token);
++  return (
++    <div className="gate"><div className="gate-box" style={{ maxWidth: 520 }}>
++      {s ? <>
++        <div className="gate-lock" style={{ background: '#e6f6ec', color: 'var(--ok)' }} aria-hidden>✓</div>
++        <h1>Anmeldung bestätigt!</h1>
++        <p className="muted">Ihr persönlicher Rabattcode für die erste Bestellung:</p>
++        <div className="nl-code">{s.code}</div>
++        <p className="muted" style={{ fontSize: 14 }}>{tierText()} – wir haben Ihnen den Code auch per E-Mail geschickt.</p>
++        <Link href="/" className="btn" style={{ display: 'inline-grid', placeItems: 'center', marginTop: 8 }}>Zum Shop</Link>
++      </> : <>
++        <h1>Link ungültig</h1>
++        <p className="muted">Dieser Bestätigungslink ist abgelaufen oder ungültig. Melden Sie sich einfach erneut auf der Startseite an.</p>
++        <Link href="/#newsletter" className="btn" style={{ display: 'inline-grid', placeItems: 'center' }}>Zur Anmeldung</Link>
++      </>}
++    </div></div>
++  );
++}
+diff --git a/app/page.tsx b/app/page.tsx
+index 196ebeb..f2f0e26 100644
+--- a/app/page.tsx
++++ b/app/page.tsx
+@@ -3,6 +3,8 @@ import ProductCard from '@/components/ProductCard';
+ import { getCategories, getCollection, getFeatured, productCount } from '@/lib/catalog';
+ import { getCustomer } from '@/lib/customer';
+ import { RecentlyViewed } from '@/components/Recent';
++import NewsletterBox from './start/NewsletterBox';
++import { discountTiers } from '@/lib/store';
+ 
+ export default async function Home() {
+   const ctx = await getCustomer();
+@@ -26,6 +28,7 @@ export default async function Home() {
+         <h2>{collection.length ? 'Weitere Artikel' : 'Beliebte Artikel'}</h2>
+         <div className="grid">{getFeatured(16, ctx).filter((p) => !collection.some((c) => c.id === p.id)).map((p) => <ProductCard key={p.id} p={p} />)}</div>
+       </>}
++      <div style={{ marginTop: 40 }}><NewsletterBox tiers={discountTiers()} /></div>
+     </>
+   );
+ }
+diff --git a/app/robots.ts b/app/robots.ts
+index 3eec397..7f4cef0 100644
+--- a/app/robots.ts
++++ b/app/robots.ts
+@@ -3,7 +3,7 @@ import { previewMode } from '@/lib/access';
+ export default function robots(): MetadataRoute.Robots {
+   const base = (process.env.SHOP_URL ?? 'https://euro-trade.com').replace(/\/$/, '');
+   if (previewMode()) return { rules: { userAgent: '*', disallow: '/' } };
+-  return { rules: { userAgent: '*', allow: ['/', '/druck-stick'], disallow: ['/admin', '/api', '/angebot', '/warenkorb', '/merkliste', '/zugang'] }, sitemap: `${base}/sitemap.xml` };
++  return { rules: { userAgent: '*', allow: ['/', '/druck-stick', '/widerruf'], disallow: ['/admin', '/api', '/angebot', '/warenkorb', '/merkliste', '/zugang'] }, sitemap: `${base}/sitemap.xml` };
+ }
+ 
+ export const dynamic = 'force-dynamic';
+diff --git a/app/sitemap.ts b/app/sitemap.ts
+index 47650d2..0ef6cc5 100644
+--- a/app/sitemap.ts
++++ b/app/sitemap.ts
+@@ -1,7 +1,7 @@
+ import type { MetadataRoute } from 'next';
+ export default function sitemap(): MetadataRoute.Sitemap {
+   const base = (process.env.SHOP_URL ?? 'https://euro-trade.com').replace(/\/$/, '');
+-  return [{ url: `${base}/`, priority: 1 }, { url: `${base}/druck-stick`, priority: 0.8 }, { url: `${base}/impressum`, priority: 0.1 }];
++  return [{ url: `${base}/`, priority: 1 }, { url: `${base}/druck-stick`, priority: 0.8 }, { url: `${base}/widerruf`, priority: 0.3 }, { url: `${base}/impressum`, priority: 0.1 }];
+ }
+ 
+ export const dynamic = 'force-dynamic';
+diff --git a/app/start/NewsletterBox.tsx b/app/start/NewsletterBox.tsx
+new file mode 100644
+index 0000000..48c746c
+--- /dev/null
++++ b/app/start/NewsletterBox.tsx
+@@ -0,0 +1,50 @@
++'use client';
++import { useState } from 'react';
++import Link from 'next/link';
++
++export default function NewsletterBox({ tiers }: { tiers: { pct: number; min: number }[] }) {
++  const [state, setState] = useState<'idle' | 'busy' | 'done' | 'already'>('idle');
++  const [err, setErr] = useState('');
++  const max = Math.max(...tiers.map((t) => t.pct));
++  async function submit(e: React.FormEvent<HTMLFormElement>) {
++    e.preventDefault(); setState('busy'); setErr('');
++    const f = Object.fromEntries(new FormData(e.currentTarget));
++    const r = await fetch('/api/newsletter', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(f) });
++    const d = await r.json().catch(() => ({}));
++    if (r.ok) setState(d.already ? 'already' : 'done'); else { setErr(d.error ?? 'Anmeldung fehlgeschlagen.'); setState('idle'); }
++  }
++  return (
++    <section id="newsletter" className="nl">
++      <div className="nl-text">
++        <h2>Bis zu {max} % Rabatt<br />auf Ihre erste Bestellung.</h2>
++        <ul className="nl-tiers">
++          {tiers.map((t, n) => <li key={t.pct} className={n === tiers.length - 1 ? 'top' : ''}><span className="nl-pct">{t.pct} %</span> ab {t.min.toLocaleString('de-DE')} € Warenwert{n === tiers.length - 1 && <span className="nl-hot">beliebt</span>}</li>)}
++        </ul>
++      </div>
++      {state === 'done' ? (
++        <div className="nl-done">
++          <strong>Fast geschafft – bitte prüfen Sie Ihr Postfach.</strong>
++          <p>Wir haben Ihnen eine E-Mail mit einem Bestätigungslink geschickt. Erst nach dem Klick erhalten Sie Ihren Rabattcode. <b>Bitte schauen Sie auch im Spam-Ordner nach.</b></p>
++        </div>
++      ) : state === 'already' ? (
++        <div className="nl-done"><strong>Sie sind bereits angemeldet.</strong><p>Ihren Rabattcode finden Sie in unserer Willkommens-E-Mail.</p></div>
++      ) : (
++        <form className="nl-form" onSubmit={submit}>
++          <div className="nl-row">
++            <input name="email" type="email" required placeholder="E-Mail eintragen" aria-label="E-Mail-Adresse" autoComplete="email" />
++            <button className="btn nl-btn" disabled={state === 'busy'}>{state === 'busy' ? 'Sende …' : 'Anmelden und sparen'}</button>
++          </div>
++          <select name="type" aria-label="Wir sind" defaultValue="">
++            <option value="" disabled>Wir sind … (optional)</option>
++            {['Verein', 'Unternehmen', 'Handwerk', 'Gastronomie / Hotel', 'Schule / Kita', 'Event / Agentur', 'Privat'].map((x) => <option key={x}>{x}</option>)}
++          </select>
++          <input className="hp" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
++          <label className="nl-priv"><input type="checkbox" name="privacy" required /> <span>Ich möchte den Newsletter mit Angeboten und Neuheiten erhalten und akzeptiere die <Link href="/datenschutz#newsletter">Datenschutzerklärung</Link>. Abmeldung jederzeit möglich.</span></label>
++          <p className="nl-hint">☝️ <b>Wichtig:</b> Im Anschluss erhalten Sie eine E-Mail mit einem Link, um Ihre Anmeldung zu bestätigen. Bitte schauen Sie auch im Spam-Ordner nach.</p>
++          {err && <p className="err" style={{ margin: 0 }}>{err}</p>}
++          <p className="nl-small">Gültig nur für Neukunden · einmalig einlösbar · auf den Netto-Warenwert der Textilien</p>
++        </form>
++      )}
++    </section>
++  );
++}
+diff --git a/app/start/page.tsx b/app/start/page.tsx
+index 6323f61..add0866 100644
+--- a/app/start/page.tsx
++++ b/app/start/page.tsx
+@@ -2,7 +2,8 @@ import Link from 'next/link';
+ import type { Metadata } from 'next';
+ import AccessForm from '../zugang/AccessForm';
+ import RequestForm from './RequestForm';
+-import { listReferences } from '@/lib/store';
++import NewsletterBox from './NewsletterBox';
++import { discountTiers, listReferences } from '@/lib/store';
+ import { getCategories } from '@/lib/catalog';
+ 
+ export const metadata: Metadata = {
+@@ -81,6 +82,8 @@ export default function Start() {
+         </section>
+       )}
+ 
++      <NewsletterBox tiers={discountTiers()} />
++
+       <section id="anfragen" className="l-section l-request">
+         <div>
+           <h2>Zugang anfragen</h2>
+diff --git a/app/warenkorb/page.tsx b/app/warenkorb/page.tsx
+index 33336b0..0bdd2da 100644
+--- a/app/warenkorb/page.tsx
++++ b/app/warenkorb/page.tsx
+@@ -17,6 +17,13 @@ export default function CartPage() {
+   const [err, setErr] = useState('');
+   const [form, setForm] = useState<Record<string, string>>({});
+   const [no, setNo] = useState('');
++  const [code, setCode] = useState('');
++  const [codeInfo, setCodeInfo] = useState<{ ok: boolean; tiers: { pct: number; min: number }[] } | null>(null);
++  async function checkCode() {
++    if (!code.trim()) { setCodeInfo(null); return; }
++    const d = await fetch(`/api/rabatt?code=${encodeURIComponent(code.trim())}`).then((r) => r.json()).catch(() => ({ ok: false, tiers: [] }));
++    setCodeInfo(d);
++  }
+ 
+   // Formular vorausfüllen: zuletzt verwendete Daten + Kundenname aus dem Code
+   useEffect(() => {
+@@ -33,6 +40,8 @@ export default function CartPage() {
+   const anyOpen = lines.some((l) => l.price == null);
+   const decos = [...new Map(lines.filter((l) => l.deco).map((l) => [JSON.stringify(l.deco), l.deco!])).values()];
+   const minDate = new Date(Date.now() + 5 * 86400000).toISOString().slice(0, 10);
++  const pct = codeInfo?.ok ? [...codeInfo.tiers].reverse().find((t) => net >= t.min)?.pct ?? 0 : 0;
++  const nextT = codeInfo?.ok ? codeInfo.tiers.find((t) => t.min > net) : undefined;
+ 
+   async function submit(e: React.FormEvent<HTMLFormElement>) {
+     e.preventDefault();
+@@ -41,7 +50,7 @@ export default function CartPage() {
+     try { localStorage.setItem(FORM_KEY, JSON.stringify(Object.fromEntries(FIELDS.map((k) => [k, f[k] ?? ''])))); } catch {}
+     const r = await fetch('/api/anfrage', {
+       method: 'POST', headers: { 'Content-Type': 'application/json' },
+-      body: JSON.stringify({ customer: f, lines: lines.map(({ id, color, size, qty, deco }) => ({ id, color, size, qty, deco })) }),
++      body: JSON.stringify({ customer: f, code: codeInfo?.ok ? code.trim() : '', lines: lines.map(({ id, color, size, qty, deco }) => ({ id, color, size, qty, deco })) }),
+     });
+     const d = await r.json().catch(() => ({}));
+     if (r.ok) { if (d.token) saveMyInquiry(d.no, d.token); setNo(d.no ?? ''); setState('done'); clear(); } else { setState('error'); setErr(d.error ?? 'Senden fehlgeschlagen.'); }
+@@ -102,7 +111,15 @@ export default function CartPage() {
+               {decos.map((d) => <button key={JSON.stringify(d)} className="btn alt" style={{ height: 36 }} onClick={() => decoToAll(d)}>{decos.length > 1 ? `„${decoLabel(d)}“ übernehmen` : 'Auf alle übertragen'}</button>)}
+             </div>
+           )}
+-          {net > 0 && <div className="tot big"><span>Summe netto (Richtwert){anyOpen ? ' *' : ''}</span><span>{eur(net)}</span></div>}
++          <div className="code-row">
++            <input value={code} onChange={(e) => { setCode(e.target.value.toUpperCase()); setCodeInfo(null); }} onBlur={checkCode} onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), checkCode())} placeholder="Rabattcode, z. B. ET-ABC123" aria-label="Rabattcode" />
++            <button type="button" className="btn alt" onClick={checkCode}>Einlösen</button>
++          </div>
++          {codeInfo && !codeInfo.ok && <div className="note err" style={{ marginTop: 6 }}>Dieser Code ist ungültig oder wurde bereits eingelöst.</div>}
++          {pct > 0 && <div className="tot"><span className="ok">Willkommensrabatt {pct} %</span><span className="ok">−{eur(Math.round(net * pct) / 100)}</span></div>}
++          {codeInfo?.ok && pct === 0 && nextT && <div className="note muted" style={{ marginTop: 6 }}>Code gültig – ab {eur(nextT.min)} Warenwert erhalten Sie {nextT.pct} % Rabatt.</div>}
++          {codeInfo?.ok && pct > 0 && nextT && <div className="note muted" style={{ marginTop: 2 }}>Noch {eur(nextT.min - net)} bis {nextT.pct} % Rabatt.</div>}
++          {net > 0 && <div className="tot big"><span>Summe netto (Richtwert){anyOpen ? ' *' : ''}</span><span>{eur(net - Math.round(net * pct) / 100)}</span></div>}
+           <p className="muted" style={{ fontSize: 13, margin: '6px 0 0' }}>Endpreis inkl. Versand und ggf. Veredelung erhalten Sie mit dem Angebot.</p>
+         </div>
+ 
+diff --git a/app/widerruf/page.tsx b/app/widerruf/page.tsx
+new file mode 100644
+index 0000000..5262c54
+--- /dev/null
++++ b/app/widerruf/page.tsx
+@@ -0,0 +1,77 @@
++import Link from 'next/link';
++import type { Metadata } from 'next';
++
++export const metadata: Metadata = {
++  title: 'Rückgabe & Widerruf',
++  description: 'Rückgabe, Umtausch und Widerrufsrecht bei euro-trade.com – einfach erklärt, inklusive Widerrufsbelehrung und Muster-Formular.',
++  alternates: { canonical: '/widerruf' },
++};
++
++export default function Widerruf() {
++  return (
++    <div className="info legal-page">
++      <div className="crumbs"><Link href="/">Start</Link> › Rückgabe & Widerruf</div>
++      <h1>Rückgabe & Widerruf</h1>
++      <p className="lead">Wir möchten, dass Sie mit Ihrer Bestellung rundum zufrieden sind. Hier finden Sie alles zu Rückgabe, Umtausch und Reklamation, kurz erklärt und darunter in der gesetzlich vorgeschriebenen Form.</p>
++
++      <div className="ret-grid">
++        <div className="box ret"><div className="ret-ico">14</div><h3>14 Tage Widerrufsrecht</h3><p>Unveredelte Ware können Verbraucher innerhalb von 14 Tagen nach Erhalt ohne Angabe von Gründen zurückgeben.</p></div>
++        <div className="box ret"><div className="ret-ico">✦</div><h3>Veredelte Ware</h3><p>Bedruckte oder bestickte Artikel werden nur für Sie gefertigt und sind daher vom Umtausch und Widerruf ausgeschlossen, außer bei Mängeln.</p></div>
++        <div className="box ret"><div className="ret-ico">✓</div><h3>Freigabe vor Produktion</h3><p>Vor jeder Veredelung erhalten Sie eine Vorschau. Erst nach Ihrer Freigabe produzieren wir. So vermeiden wir Fehler von Anfang an.</p></div>
++        <div className="box ret"><div className="ret-ico">!</div><h3>Reklamation</h3><p>Etwas stimmt nicht? Melden Sie sich innerhalb von 7 Tagen mit Fotos. Bei Mängeln oder Fehlern unsererseits ersetzen wir kostenlos.</p></div>
++      </div>
++
++      <h2>So funktioniert die Rückgabe</h2>
++      <ol className="l-steps">
++        <li><b>Kurz melden</b><span>Schreiben Sie an <a href="mailto:info@euro-trade.com" className="alink">info@euro-trade.com</a> mit Ihrer Auftragsnummer und den Artikeln, die Sie zurückgeben möchten.</span></li>
++        <li><b>Rücksendeinfos erhalten</b><span>Sie bekommen von uns die Rücksendeadresse und alle Hinweise.</span></li>
++        <li><b>Ware zurückschicken</b><span>Ungetragen, ungewaschen, ohne Gebrauchsspuren und möglichst in der Originalverpackung.</span></li>
++        <li><b>Erstattung</b><span>Nach Eingang und Prüfung erstatten wir den Betrag innerhalb von 14 Tagen auf dem ursprünglichen Zahlungsweg.</span></li>
++      </ol>
++
++      <h2>Gut zu wissen</h2>
++      <div className="faq">
++        <details className="box" open><summary>Gilt das Widerrufsrecht auch für Firmen und Vereine?</summary><p>Das gesetzliche Widerrufsrecht gilt nur für Verbraucher, also Privatpersonen. Bei Bestellungen von Unternehmen, Vereinen oder Behörden besteht kein gesetzliches Widerrufsrecht. Sprechen Sie uns trotzdem an, bei unveredelter Ware finden wir in der Regel eine Lösung.</p></details>
++        <details className="box"><summary>Kann ich Größen umtauschen?</summary><p>Unveredelte Artikel tauschen wir gern innerhalb von 14 Tagen in eine andere Größe oder Farbe um, solange verfügbar. Bei veredelten Artikeln ist ein Umtausch nicht möglich. Nutzen Sie deshalb vor der Bestellung die Größentabelle am Artikel. Gern schicken wir Ihnen auch vorab unveredelte Musterteile zur Anprobe.</p></details>
++        <details className="box"><summary>Was ist, wenn der Druck oder Stick fehlerhaft ist?</summary><p>Weicht die Veredelung von der freigegebenen Vorschau ab oder ist die Ware mangelhaft, fertigen wir kostenlos neu oder erstatten den Betrag. Ihre gesetzlichen Gewährleistungsrechte bleiben unberührt.</p></details>
++        <details className="box"><summary>Wer trägt die Kosten der Rücksendung?</summary><p>Bei einem Widerruf tragen Sie die unmittelbaren Kosten der Rücksendung. Bei Mängeln oder falsch gelieferter Ware übernehmen wir die Kosten vollständig.</p></details>
++      </div>
++
++      <h2 id="widerrufsbelehrung">Widerrufsbelehrung</h2>
++      <div className="box legal">
++        <p><em>Die folgende Belehrung gilt für Verbraucher im Sinne von § 13 BGB.</em></p>
++        <h3>Widerrufsrecht</h3>
++        <p>Sie haben das Recht, binnen vierzehn Tagen ohne Angabe von Gründen diesen Vertrag zu widerrufen. Die Widerrufsfrist beträgt vierzehn Tage ab dem Tag, an dem Sie oder ein von Ihnen benannter Dritter, der nicht der Beförderer ist, die Waren in Besitz genommen haben bzw. hat. Bei mehreren Waren, die getrennt geliefert werden, beginnt die Frist mit dem Tag, an dem Sie oder ein von Ihnen benannter Dritter die letzte Ware in Besitz genommen haben bzw. hat.</p>
++        <p>Um Ihr Widerrufsrecht auszuüben, müssen Sie uns (Sebastian Hosbach, Euro-Trade, Seehan 28, 44263 Dortmund, Telefon: 0173 2648097, E-Mail: info@euro-trade.com) mittels einer eindeutigen Erklärung (z. B. ein mit der Post versandter Brief oder eine E-Mail) über Ihren Entschluss, diesen Vertrag zu widerrufen, informieren. Sie können dafür das beigefügte Muster-Widerrufsformular verwenden, das jedoch nicht vorgeschrieben ist.</p>
++        <p>Zur Wahrung der Widerrufsfrist reicht es aus, dass Sie die Mitteilung über die Ausübung des Widerrufsrechts vor Ablauf der Widerrufsfrist absenden.</p>
++        <h3>Folgen des Widerrufs</h3>
++        <p>Wenn Sie diesen Vertrag widerrufen, haben wir Ihnen alle Zahlungen, die wir von Ihnen erhalten haben, einschließlich der Lieferkosten (mit Ausnahme der zusätzlichen Kosten, die sich daraus ergeben, dass Sie eine andere Art der Lieferung als die von uns angebotene, günstigste Standardlieferung gewählt haben), unverzüglich und spätestens binnen vierzehn Tagen ab dem Tag zurückzuzahlen, an dem die Mitteilung über Ihren Widerruf dieses Vertrags bei uns eingegangen ist. Für diese Rückzahlung verwenden wir dasselbe Zahlungsmittel, das Sie bei der ursprünglichen Transaktion eingesetzt haben, es sei denn, mit Ihnen wurde ausdrücklich etwas anderes vereinbart; in keinem Fall werden Ihnen wegen dieser Rückzahlung Entgelte berechnet.</p>
++        <p>Wir können die Rückzahlung verweigern, bis wir die Waren wieder zurückerhalten haben oder bis Sie den Nachweis erbracht haben, dass Sie die Waren zurückgesandt haben, je nachdem, welches der frühere Zeitpunkt ist.</p>
++        <p>Sie haben die Waren unverzüglich und in jedem Fall spätestens binnen vierzehn Tagen ab dem Tag, an dem Sie uns über den Widerruf dieses Vertrags unterrichten, an uns zurückzusenden oder zu übergeben. Die Frist ist gewahrt, wenn Sie die Waren vor Ablauf der Frist von vierzehn Tagen absenden.</p>
++        <p>Sie tragen die unmittelbaren Kosten der Rücksendung der Waren.</p>
++        <p>Sie müssen für einen etwaigen Wertverlust der Waren nur aufkommen, wenn dieser Wertverlust auf einen zur Prüfung der Beschaffenheit, Eigenschaften und Funktionsweise der Waren nicht notwendigen Umgang mit ihnen zurückzuführen ist.</p>
++        <h3>Ausschluss des Widerrufsrechts</h3>
++        <p>Das Widerrufsrecht besteht nicht bei Verträgen zur Lieferung von Waren, die nicht vorgefertigt sind und für deren Herstellung eine individuelle Auswahl oder Bestimmung durch den Verbraucher maßgeblich ist oder die eindeutig auf die persönlichen Bedürfnisse des Verbrauchers zugeschnitten sind (§ 312g Abs. 2 Nr. 1 BGB). Dies betrifft insbesondere <strong>Textilien, die nach Ihren Vorgaben bedruckt, bestickt oder anderweitig veredelt werden</strong> (z. B. mit Logo, Text, Namen oder Nummern).</p>
++      </div>
++
++      <h2 id="formular">Muster-Widerrufsformular</h2>
++      <div className="box legal">
++        <p><em>Wenn Sie den Vertrag widerrufen wollen, dann füllen Sie bitte dieses Formular aus und senden Sie es zurück.</em></p>
++        <p>An: Sebastian Hosbach, Euro-Trade, Seehan 28, 44263 Dortmund, E-Mail: info@euro-trade.com</p>
++        <p>Hiermit widerrufe(n) ich/wir (*) den von mir/uns (*) abgeschlossenen Vertrag über den Kauf der folgenden Waren (*)/die Erbringung der folgenden Dienstleistung (*)</p>
++        <p className="form-line">_____________________________________________</p>
++        <p>Bestellt am (*)/erhalten am (*): ______________________</p>
++        <p>Name des/der Verbraucher(s): ______________________</p>
++        <p>Anschrift des/der Verbraucher(s): ______________________</p>
++        <p>Unterschrift des/der Verbraucher(s) (nur bei Mitteilung auf Papier): ______________________</p>
++        <p>Datum: ______________________</p>
++        <p className="muted">(*) Unzutreffendes streichen.</p>
++      </div>
++
++      <div className="box l-cta-box">
++        <div><h2 style={{ margin: 0 }}>Fragen zu Ihrer Bestellung?</h2><p className="muted" style={{ margin: '4px 0 0' }}>Wir helfen schnell und unkompliziert.</p></div>
++        <a href="mailto:info@euro-trade.com" className="btn" style={{ display: 'inline-grid', placeItems: 'center' }}>info@euro-trade.com</a>
++      </div>
++    </div>
++  );
++}
+diff --git a/components/AdminNav.tsx b/components/AdminNav.tsx
+index 14f8721..a1186c3 100644
+--- a/components/AdminNav.tsx
++++ b/components/AdminNav.tsx
+@@ -1,11 +1,12 @@
+ import Link from 'next/link';
+ import AdminLogout from './AdminLogout';
+-export default function AdminNav({ active }: { active: 'anfragen' | 'kunden' | 'referenzen' }) {
++export default function AdminNav({ active }: { active: 'anfragen' | 'kunden' | 'referenzen' | 'newsletter' }) {
+   return (
+     <div className="admin-nav">
+       <Link href="/admin" className={active === 'anfragen' ? 'on' : ''}>Anfragen & Angebote</Link>
+       <Link href="/admin/kunden" className={active === 'kunden' ? 'on' : ''}>Kunden & Codes</Link>
+       <Link href="/admin/referenzen" className={active === 'referenzen' ? 'on' : ''}>Referenzen</Link>
++      <Link href="/admin/newsletter" className={active === 'newsletter' ? 'on' : ''}>Newsletter</Link>
+       <span style={{ flex: 1 }} />
+       <Link href="/">Zum Shop</Link>
+       <AdminLogout />
+diff --git a/lib/mail-templates.ts b/lib/mail-templates.ts
+index 63853bd..ca55baa 100644
+--- a/lib/mail-templates.ts
++++ b/lib/mail-templates.ts
+@@ -29,7 +29,7 @@ export function layout(opts: { preheader: string; title: string; body: string; f
+     <tr><td style="background:#ffffff;border-top:1px solid ${C.line};border-radius:0 0 14px 14px;padding:18px 28px 22px;${F};font-size:12px;line-height:1.6;color:${C.muted}">
+       ${opts.footerNote ? `<p style="margin:0 0 10px">${opts.footerNote}</p>` : ''}
+       ${sender().map(esc).join('<br>')}<br>
+-      <a href="${shopUrl()}" style="color:${C.brand};text-decoration:none">${esc(shopUrl().replace(/^https?:\/\//, ''))}</a> · <a href="${shopUrl()}/impressum" style="color:${C.muted}">Impressum</a> · <a href="${shopUrl()}/datenschutz" style="color:${C.muted}">Datenschutz</a>
++      <a href="${shopUrl()}" style="color:${C.brand};text-decoration:none">${esc(shopUrl().replace(/^https?:\/\//, ''))}</a> · <a href="${shopUrl()}/widerruf" style="color:${C.muted}">Rückgabe & Widerruf</a> · <a href="${shopUrl()}/impressum" style="color:${C.muted}">Impressum</a> · <a href="${shopUrl()}/datenschutz" style="color:${C.muted}">Datenschutz</a>
+     </td></tr>
+   </table>
+ </td></tr></table></body></html>`;
+diff --git a/lib/newsletter.ts b/lib/newsletter.ts
+new file mode 100644
+index 0000000..559781a
+--- /dev/null
++++ b/lib/newsletter.ts
+@@ -0,0 +1,65 @@
++import 'server-only';
++import crypto from 'node:crypto';
++import { esc, sendMail, shopUrl } from './mail';
++import { button, h1, infoBox, layout, p, signature } from './mail-templates';
++import { discountTiers, listSubscribers, saveSubscribers, type Subscriber } from './store';
++
++const eurShort = (n: number) => `${n.toLocaleString('de-DE')} €`;
++export const tierText = () => discountTiers().map((t) => `${t.pct} % ab ${eurShort(t.min)}`).join(' · ');
++const newCode = () => 'ET-' + Array.from(crypto.randomBytes(6), (b) => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[b % 32]).join('');
++
++export async function sendConfirm(s: Subscriber) {
++  const link = `${shopUrl()}/newsletter/bestaetigen/${s.token}`;
++  await sendMail({
++    to: s.email, subject: 'Bitte bestätigen: Ihr Willkommensrabatt bei euro-trade.com',
++    html: layout({
++      preheader: 'Nur noch ein Klick – dann erhalten Sie Ihren persönlichen Rabattcode.', title: 'Anmeldung bestätigen',
++      body: h1('Fast geschafft!')
++        + p('Bitte bestätigen Sie Ihre Anmeldung zu unserem Newsletter. Direkt danach erhalten Sie Ihren persönlichen Rabattcode für Ihre erste Bestellung:')
++        + infoBox(discountTiers().map((t) => [`${t.pct} % Rabatt`, `ab ${eurShort(t.min)} Warenwert`]), '#ffc21a')
++        + button(link, 'Anmeldung bestätigen', '#1d7a3e')
++        + p('Sie haben sich nicht angemeldet? Dann ignorieren Sie diese E-Mail einfach – ohne Bestätigung senden wir Ihnen nichts.', true)
++        + signature(),
++    }),
++  });
++}
++
++/** Bestätigung: Code vergeben und Willkommens-Mail senden (nur beim ersten Mal) */
++export async function confirm(token: string): Promise<Subscriber | null> {
++  if (!/^[a-f0-9]{32}$/.test(token)) return null;
++  const list = listSubscribers();
++  const s = list.find((x) => x.token === token);
++  if (!s) return null;
++  if (s.confirmed && !s.unsubscribedAt) return s;
++  s.confirmed = true; s.confirmedAt = new Date().toISOString(); s.unsubscribedAt = null;
++  s.code ??= newCode();
++  saveSubscribers(list);
++  try {
++    await sendMail({
++      to: s.email, subject: `Ihr Willkommensrabatt: ${s.code}`,
++      html: layout({
++        preheader: `Ihr persönlicher Code ${s.code} – bis zu ${Math.max(...discountTiers().map((t) => t.pct))} % auf Ihre erste Bestellung.`, title: 'Ihr Rabattcode',
++        body: h1('Willkommen bei euro-trade.com!')
++          + p('Vielen Dank für Ihre Anmeldung. Hier ist Ihr persönlicher Rabattcode für Ihre erste Bestellung:')
++          + `<div style="margin:6px 0 18px;padding:18px;border:2px dashed #ffc21a;border-radius:12px;text-align:center;background:#fffbea"><div style="font-size:12px;color:#5d6675;text-transform:uppercase;letter-spacing:1.4px">Ihr Code</div><div style="font-size:30px;font-weight:900;letter-spacing:3px;color:#14181f;font-family:Menlo,Consolas,monospace">${esc(s.code)}</div></div>`
++          + infoBox(discountTiers().map((t) => [`${t.pct} % Rabatt`, `ab ${eurShort(t.min)} Warenwert`]), '#ffc21a')
++          + p('So geht’s: Artikel in den Warenkorb legen, den Code im Feld „Rabattcode“ eingeben und Angebot anfordern – der Rabatt wird im Angebot automatisch abgezogen.')
++          + button(`${shopUrl()}/`, 'Jetzt stöbern')
++          + p('Gültig für Neukunden, einmalig einlösbar, auf den Netto-Warenwert der Textilien (ohne Veredelung und Versand).', true)
++          + signature(),
++        footerNote: `Sie erhalten diese E-Mail, weil Sie sich für unseren Newsletter angemeldet haben. <a href="${shopUrl()}/newsletter/abmelden/${s.token}" style="color:#5d6675">Abmelden</a>`,
++      }),
++    });
++  } catch (e) { console.error('Willkommens-Mail fehlgeschlagen', e); }
++  return s;
++}
++
++export function unsubscribe(token: string) {
++  if (!/^[a-f0-9]{32}$/.test(token)) return null;
++  const list = listSubscribers();
++  const s = list.find((x) => x.token === token);
++  if (!s) return null;
++  s.unsubscribedAt ??= new Date().toISOString();
++  saveSubscribers(list);
++  return s;
++}
+diff --git a/lib/store.ts b/lib/store.ts
+index cb3e43c..656044d 100644
+--- a/lib/store.ts
++++ b/lib/store.ts
+@@ -68,6 +68,8 @@ export type Inquiry = {
+   status?: Status; token?: string; offer?: Offer | null;
+   history?: { date: string; text: string }[];
+   acceptedAt?: string | null;
++  /** Willkommensrabatt aus dem Newsletter */
++  discount?: { code: string; pct: number } | null;
+ };
+ 
+ export function listInquiries(): Inquiry[] {
+@@ -106,6 +108,10 @@ export function draftOffer(i: Inquiry): Offer {
+     e.qty += l.qty; decos.set(k, e);
+   }
+   for (const { d, qty } of decos.values()) lines.push({ text: `Veredelung: ${d.method}`, detail: [d.positions.join(', '), d.logoName ? `Logo: ${d.logoName}` : '', decoText(d)].filter(Boolean).join(' · '), qty, price: 0 });
++  if (i.discount?.pct) {
++    const textil = i.lines.reduce((s, l) => s + l.sum, 0);
++    lines.push({ text: `Willkommensrabatt ${i.discount.pct} %`, detail: `Code ${i.discount.code} · auf Textilien`, qty: 1, price: -Math.round(textil * i.discount.pct) / 100 });
++  }
+   return { lines, shipping: 0, note: '', validDays: 14, createdAt: new Date().toISOString(), vat: Number(process.env.MWST_PERCENT ?? 19) };
+ }
+ 
+@@ -120,3 +126,26 @@ export type AccessRequest = { id: string; date: string; name: string; company: s
+ const AREQ = path.join(DATA, 'zugangsanfragen.json');
+ export const listAccessRequests = () => readJSON<AccessRequest[]>(AREQ, []);
+ export const saveAccessRequests = (r: AccessRequest[]) => writeJSON(AREQ, r.slice(-1000));
++
++/* ---------- Newsletter (Double-Opt-in) + Willkommensrabatt ---------- */
++export type Subscriber = {
++  id: string; email: string; type: string; date: string; token: string;
++  confirmed: boolean; confirmedAt?: string | null; unsubscribedAt?: string | null;
++  /** persönlicher Rabattcode – erst nach Bestätigung */
++  code?: string | null; usedAt?: string | null; usedIn?: string | null;
++};
++const NL = path.join(DATA, 'newsletter.json');
++export const listSubscribers = () => readJSON<Subscriber[]>(NL, []);
++export const saveSubscribers = (l: Subscriber[]) => writeJSON(NL, l);
++/** Rabattstufen: NEWSLETTER_TIERS="10:45,20:90,30:155" (Prozent:ab Netto-Warenwert) */
++export function discountTiers(): { pct: number; min: number }[] {
++  return (process.env.NEWSLETTER_TIERS ?? '10:45,20:90,30:155').split(',').map((x) => x.split(':').map(Number))
++    .filter(([p, m]) => p > 0 && p < 90 && m >= 0).map(([pct, min]) => ({ pct, min })).sort((a, b) => a.min - b.min);
++}
++export const discountFor = (net: number) => [...discountTiers()].reverse().find((t) => net >= t.min)?.pct ?? 0;
++/** gültiger, noch nicht eingelöster Code? */
++export function validCode(code: string) {
++  const c = String(code ?? '').trim().toUpperCase();
++  if (!/^ET-[A-Z0-9]{6}$/.test(c)) return null;
++  return listSubscribers().find((s) => s.code === c && s.confirmed && !s.unsubscribedAt && !s.usedAt) ?? null;
++}
+diff --git a/middleware.ts b/middleware.ts
+index 9ae87bc..4d373d2 100644
+--- a/middleware.ts
++++ b/middleware.ts
+@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
+ import { ACCESS_COOKIE, ADMIN_COOKIE, isAdminToken, previewMode, shopClosed, verifyCodeToken } from '@/lib/access';
+ 
+ // Immer erreichbar: Zugang, Pflichtseiten, Angebots-Links aus der E-Mail, Admin-Login
+-const PUBLIC = ['/start', '/druck-stick', '/api/zugang-anfrage', '/api/bild', '/sitemap.xml', '/zugang', '/api/zugang', '/impressum', '/datenschutz', '/angebot', '/api/angebot', '/admin/login', '/api/admin/login', '/icon.svg', '/favicon.ico', '/robots.txt'];
++const PUBLIC = ['/widerruf', '/newsletter', '/api/newsletter', '/start', '/druck-stick', '/api/zugang-anfrage', '/api/bild', '/sitemap.xml', '/zugang', '/api/zugang', '/impressum', '/datenschutz', '/angebot', '/api/angebot', '/admin/login', '/api/admin/login', '/icon.svg', '/favicon.ico', '/robots.txt'];
+ const match = (path: string, list: string[]) => list.some((p) => path === p || path.startsWith(p + '/'));
+ 
+ export async function middleware(req: NextRequest) {
+-- 
+2.43.0
+

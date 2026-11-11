@@ -1,0 +1,253 @@
+From cda8f7522ed91a5407157a719b6c8bfee09a7e2e Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Wed, 11 Nov 2026 01:01:26 +0100
+Subject: [PATCH] =?UTF-8?q?Veredelung=20mit=20Text:=20Logo,=20Text=20oder?=
+ =?UTF-8?q?=20beides=20=E2=80=93=20Schriftart,=20Farbe,=20Vorschau?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01AW9Go5bwJWAYsfGemt2b6Z
+---
+ app/api/anfrage/route.ts       | 11 +++++--
+ app/globals.css                |  8 ++++++
+ app/produkt/[id]/AddToCart.tsx | 52 +++++++++++++++++++++++++++-------
+ lib/deco.ts                    | 28 ++++++++++++++++--
+ lib/store.ts                   |  4 +--
+ 5 files changed, 87 insertions(+), 16 deletions(-)
+
+diff --git a/app/api/anfrage/route.ts b/app/api/anfrage/route.ts
+index c706c8a..cea4659 100644
+--- a/app/api/anfrage/route.ts
++++ b/app/api/anfrage/route.ts
+@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
+ import { getProduct } from '@/lib/catalog';
+ import { eur } from '@/lib/format';
+ import { getCustomer } from '@/lib/customer';
+-import { METHODS, POSITIONS, decoLabel, type Deco } from '@/lib/deco';
++import { FONTS, METHODS, POSITIONS, TEXT_COLORS, decoLabel, type Deco } from '@/lib/deco';
+ import { esc, sendMail, shopUrl } from '@/lib/mail';
+ import { unitFor } from '@/lib/tiers';
+ import { randomId, saveInquiry, type InqLine, type Inquiry } from '@/lib/store';
+@@ -15,7 +15,14 @@ function cleanDeco(d: any): Deco | null {
+   const method = METHODS.includes(d.method) ? d.method : METHODS[0];
+   if (!positions.length) return null;
+   const logoId = /^[a-f0-9]{24}$/.test(String(d.logoId ?? '')) ? String(d.logoId) : null;
+-  return { method, positions, logoId, logoName: logoId ? String(d.logoName ?? '').slice(0, 120) : null, note: String(d.note ?? '').slice(0, 1000) };
++  const text = String(d.text ?? '').replace(/\r/g, '').trim().slice(0, 120) || null;
++  return {
++    method, positions, motif: ['logo', 'text', 'beides'].includes(d.motif) ? d.motif : 'logo',
++    logoId, logoName: logoId ? String(d.logoName ?? '').slice(0, 120) : null,
++    text, font: text ? (FONTS.some((f) => f.id === d.font) ? d.font : FONTS[0].id) : null,
++    textColor: text ? (TEXT_COLORS.some((c) => c.id === d.textColor) ? d.textColor : 'Schwarz') : null,
++    note: String(d.note ?? '').slice(0, 1000),
++  };
+ }
+ 
+ export async function POST(req: Request) {
+diff --git a/app/globals.css b/app/globals.css
+index 611acbf..b31f8bf 100644
+--- a/app/globals.css
++++ b/app/globals.css
+@@ -338,3 +338,11 @@ footer .wrap{display:flex;gap:20px;flex-wrap:wrap;justify-content:space-between}
+ }
+ @media (max-width:520px){.l-feats,.l-steps,.m-cols{grid-template-columns:1fr}}
+ .landing{padding-top:6px}
++/* Textveredelung */
++.deco-text{width:100%;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:16px;resize:vertical}
++.sw.tc{width:28px;height:28px}
++.text-sample{margin-top:10px;border-radius:10px;padding:18px 14px;text-align:center;border:1px solid var(--line);font-size:28px;line-height:1.15;white-space:pre-wrap;word-break:break-word}
++.deco-prev{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none}
++.deco-prev img{width:100%;max-height:120px;object-fit:contain;mix-blend-mode:multiply;filter:drop-shadow(0 1px 1px rgba(0,0,0,.25))}
++.text-prev{line-height:1.05;text-align:center;white-space:pre-wrap;font-weight:700;text-shadow:0 0 1px rgba(0,0,0,.25)}
++.gal .gallery{container-type:inline-size}
+diff --git a/app/produkt/[id]/AddToCart.tsx b/app/produkt/[id]/AddToCart.tsx
+index 31cf12c..5448446 100644
+--- a/app/produkt/[id]/AddToCart.tsx
++++ b/app/produkt/[id]/AddToCart.tsx
+@@ -6,7 +6,7 @@ import Gallery from '@/components/Gallery';
+ import { useCart } from '@/components/CartContext';
+ import { swatchBg } from '@/lib/colors';
+ import { WishButton } from '@/components/Wishlist';
+-import { METHODS, POSITIONS, PREVIEW, isImage, type Deco } from '@/lib/deco';
++import { FONTS, METHODS, MOTIFS, POSITIONS, PREVIEW, TEXT_COLORS, colorHex, fontCss, isImage, type Deco, type Motif } from '@/lib/deco';
+ import { nextTier, unitFor } from '@/lib/tiers';
+ 
+ type Logo = { id: string; name: string };
+@@ -26,6 +26,11 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
+   const [uploading, setUploading] = useState(false);
+   const [upErr, setUpErr] = useState('');
+   const [note, setNote] = useState('');
++  const [motif, setMotif] = useState<Motif>('logo');
++  const [text, setText] = useState('');
++  const [font, setFont] = useState(FONTS[0].id);
++  const [tColor, setTColor] = useState('Weiß');
++  const useLogo = motif !== 'text', useText = motif !== 'logo';
+ 
+   const sizes = p.sizes.length ? p.sizes : [''];
+   const cname = color?.name ?? '';
+@@ -40,7 +45,7 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
+   }, [qty]); // eslint-disable-line react-hooks/exhaustive-deps
+ 
+   const togglePos = (x: string) => setPositions((ps) => (ps.includes(x) ? ps.filter((y) => y !== x) : [...ps, x]));
+-  const decoOk = !decoOn || (positions.length > 0 && (method === 'Beratung gewünscht' || !!logo));
++  const decoOk = !decoOn || (positions.length > 0 && (!useText || !!text.trim()) && (!useLogo || method === 'Beratung gewünscht' || !!logo));
+ 
+   async function upload(file?: File | null) {
+     if (!file) return;
+@@ -54,7 +59,7 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
+   }
+ 
+   const onAdd = () => {
+-    const deco: Deco | null = decoOn ? { method, positions, logoId: logo?.id ?? null, logoName: logo?.name ?? null, note: note.trim() } : null;
++    const deco: Deco | null = decoOn ? { method, positions, motif, logoId: useLogo ? logo?.id ?? null : null, logoName: useLogo ? logo?.name ?? null : null, text: useText ? text.trim() : null, font: useText ? font : null, textColor: useText ? tColor : null, note: note.trim() } : null;
+     const items = entries.map(([key, n]) => {
+       const [c, s] = key.split('|');
+       const col = p.colors.find((x) => x.name === c);
+@@ -65,15 +70,24 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
+     setQty({});
+   };
+   const specs = Object.entries(p.specs ?? {}).filter(([, v]) => v && v !== 'Keine Angabe');
+-  const showPreview = decoOn && logo && isImage(logo.name);
++  const showLogo = decoOn && useLogo && logo && isImage(logo.name);
++  const showText = decoOn && useText && !!text.trim();
++  const showPreview = showLogo || showText;
++  const prevPos = positions.filter((x) => PREVIEW[x]);
++  const textStyle = { fontFamily: fontCss(font), color: colorHex(tColor) };
+ 
+   return (
+     <div className="pd">
+       <div>
+         <Gallery p={p} hex={color?.hex} overlay={showPreview ? <>
+-          {positions.filter((x) => PREVIEW[x]).map((x) => {
++          {prevPos.map((x) => {
+             const [l, t, w] = PREVIEW[x];
+-            return <img key={x} className="logo-prev" src={`/api/upload/${logo!.id}`} alt="" style={{ left: `${l}%`, top: `${t}%`, width: `${w}%` }} />;
++            return (
++              <div key={x} className="deco-prev" style={{ left: `${l}%`, top: `${t}%`, width: `${w}%` }}>
++                {showLogo && <img src={`/api/upload/${logo!.id}`} alt="" />}
++                {showText && <span className="text-prev" style={{ ...textStyle, fontSize: `${w * 0.16}cqw` }}>{text}</span>}
++              </div>
++            );
+           })}
+           <div className="prev-note">Vorschau · Position und Größe unverbindlich</div>
+         </> : null} />
+@@ -124,7 +138,7 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
+         {/* Veredelung */}
+         <label className="deco-toggle">
+           <input type="checkbox" checked={decoOn} onChange={(e) => setDecoOn(e.target.checked)} />
+-          <span><strong>Mit Logo veredeln</strong> <span className="muted">– Druck oder Stick</span></span>
++          <span><strong>Veredeln mit Logo oder Text</strong> <span className="muted">– Druck oder Stick</span></span>
+         </label>
+         {decoOn && (
+           <div className="deco">
+@@ -136,7 +150,24 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
+             <div className="deco-row">
+               {POSITIONS.map((x) => <button key={x} type="button" className={`size ${positions.includes(x) ? 'on' : ''}`} onClick={() => togglePos(x)}>{x}</button>)}
+             </div>
+-            <div className="opt" style={{ marginTop: 14 }}>Logo</div>
++            <div className="opt" style={{ marginTop: 14 }}>Motiv</div>
++            <div className="deco-row">
++              {MOTIFS.map((m) => <button key={m.id} type="button" className={`size ${m.id === motif ? 'on' : ''}`} onClick={() => setMotif(m.id)}>{m.label}</button>)}
++            </div>
++            {useText && <>
++              <div className="opt" style={{ marginTop: 14 }}>Text</div>
++              <textarea className="deco-text" rows={2} maxLength={120} value={text} onChange={(e) => setText(e.target.value)} placeholder={'z. B. Vereinsname, Slogan oder Webadresse\n(zweite Zeile möglich)'} />
++              <div className="deco-row" style={{ marginTop: 8 }}>
++                {FONTS.map((f) => <button key={f.id} type="button" className={`size ${f.id === font ? 'on' : ''}`} style={{ fontFamily: f.css }} onClick={() => setFont(f.id)}>{f.id}</button>)}
++              </div>
++              <div className="deco-row" style={{ marginTop: 8 }}>
++                {TEXT_COLORS.map((c) => <button key={c.id} type="button" title={c.id} aria-label={`Textfarbe ${c.id}`} className={`sw tc ${c.id === tColor ? 'on' : ''}`} style={{ background: c.hex }} onClick={() => setTColor(c.id)} />)}
++                <span className="muted" style={{ fontSize: 13 }}>{tColor}</span>
++              </div>
++              {text.trim() && <div className="text-sample" style={{ background: color?.hex ?? '#e5e7eb' }}><span style={textStyle}>{text}</span></div>}
++              <p className="hint">Unterschiedliche Namen oder Nummern je Teil? Einfach unten im Hinweisfeld auflisten, z. B. „M: Lisa 7, L: Tom 10“.</p>
++            </>}
++            {useLogo && <><div className="opt" style={{ marginTop: 14 }}>Logo</div>
+             {logo ? (
+               <div className="logo-file">
+                 {isImage(logo.name) ? <img src={`/api/upload/${logo.id}`} alt="" /> : <span className="file-ico">{logo.name.split('.').pop()?.toUpperCase()}</span>}
+@@ -154,13 +185,14 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
+             )}
+             {upErr && <p className="err" style={{ margin: '6px 0 0', fontSize: 14 }}>{upErr}</p>}
+             <p className="hint">PNG, JPG, SVG, PDF, AI oder EPS bis 15 MB. Vektordateien liefern das beste Ergebnis.</p>
+-            <textarea className="deco-note" placeholder="Hinweise, z. B. Logogröße ca. 8 cm, Farben, Text/Namen auf dem Rücken …" value={note} onChange={(e) => setNote(e.target.value)} />
++            </>}
++            <textarea className="deco-note" placeholder="Hinweise, z. B. Größe ca. 8 cm, Pantone-Farben, Namen/Nummern je Größe …" value={note} onChange={(e) => setNote(e.target.value)} />
+           </div>
+         )}
+ 
+         <div className="qtyrow">
+           <button className="btn" disabled={!total || !decoOk} onClick={onAdd}>
+-            {!total ? 'Menge eintragen' : !decoOk ? 'Logo / Position wählen' : `${total} Stück in den Warenkorb`}
++            {!total ? 'Menge eintragen' : !decoOk ? (useText && !text.trim() ? 'Text eingeben' : 'Logo / Position wählen') : `${total} Stück in den Warenkorb`}
+           </button>
+           <WishButton id={p.id} variant="full" />
+         </div>
+diff --git a/lib/deco.ts b/lib/deco.ts
+index eb75012..8908267 100644
+--- a/lib/deco.ts
++++ b/lib/deco.ts
+@@ -1,10 +1,34 @@
+ // Veredelung – geteilt zwischen Shop (Client) und Server
+-export type Deco = { positions: string[]; method: string; logoId?: string | null; logoName?: string | null; note?: string };
++export type Motif = 'logo' | 'text' | 'beides';
++export type Deco = {
++  positions: string[]; method: string;
++  motif?: Motif;
++  logoId?: string | null; logoName?: string | null;
++  /** Textveredelung */
++  text?: string | null; font?: string | null; textColor?: string | null;
++  note?: string;
++};
+ export const METHODS = ['Druck', 'Stick', 'Beratung gewünscht'];
+ export const POSITIONS = ['Brust links', 'Brust mittig', 'Brust rechts', 'Rücken', 'Nacken', 'Ärmel links', 'Ärmel rechts'];
++export const MOTIFS: { id: Motif; label: string }[] = [{ id: 'logo', label: 'Logo' }, { id: 'text', label: 'Text' }, { id: 'beides', label: 'Logo + Text' }];
++export const FONTS: { id: string; css: string }[] = [
++  { id: 'Klassisch', css: 'Arial, Helvetica, sans-serif' },
++  { id: 'Sport', css: 'Impact, "Arial Black", "Helvetica Neue", sans-serif' },
++  { id: 'Elegant', css: 'Georgia, "Times New Roman", serif' },
++  { id: 'Schreibschrift', css: '"Brush Script MT", "Segoe Script", "Snell Roundhand", cursive' },
++  { id: 'Schreibmaschine', css: '"Courier New", Courier, monospace' },
++];
++export const TEXT_COLORS: { id: string; hex: string }[] = [
++  { id: 'Weiß', hex: '#ffffff' }, { id: 'Schwarz', hex: '#111111' }, { id: 'Rot', hex: '#c8102e' }, { id: 'Royalblau', hex: '#1d4ed8' },
++  { id: 'Navy', hex: '#0c2340' }, { id: 'Gelb', hex: '#f2c200' }, { id: 'Orange', hex: '#f26b1d' }, { id: 'Grün', hex: '#1e7b34' },
++  { id: 'Pink', hex: '#e0218a' }, { id: 'Silber', hex: '#b8bcc2' }, { id: 'Gold', hex: '#c9a227' },
++];
++export const fontCss = (id?: string | null) => FONTS.find((f) => f.id === id)?.css ?? FONTS[0].css;
++export const colorHex = (id?: string | null) => TEXT_COLORS.find((c) => c.id === id)?.hex ?? '#111111';
+ /** Vorschau-Position auf dem Frontbild (Prozent: links, oben, Breite) */
+ export const PREVIEW: Record<string, [number, number, number]> = {
+   'Brust links': [60, 30, 14], 'Brust rechts': [40, 30, 14], 'Brust mittig': [50, 34, 28],
+ };
+ export const isImage = (name?: string | null) => /\.(png|jpe?g|webp|svg)$/i.test(name ?? '');
+-export const decoLabel = (d?: Deco | null) => (d ? `${d.method}: ${d.positions.join(', ')}${d.logoName ? ` · Logo: ${d.logoName}` : ''}` : '');
++export const decoText = (d?: Deco | null) => (d?.text ? `Text „${d.text.replace(/\n/g, ' / ')}“ (${d.font ?? FONTS[0].id}, ${d.textColor ?? 'Schwarz'})` : '');
++export const decoLabel = (d?: Deco | null) => (d ? [`${d.method}: ${d.positions.join(', ')}`, d.logoName ? `Logo: ${d.logoName}` : '', decoText(d)].filter(Boolean).join(' · ') : '');
+diff --git a/lib/store.ts b/lib/store.ts
+index c0f7057..cb3e43c 100644
+--- a/lib/store.ts
++++ b/lib/store.ts
+@@ -55,7 +55,7 @@ export function allCustomers(): (Customer & { source: 'admin' | 'env' })[] {
+ export const findCustomer = (code: string) => allCustomers().find((c) => c.code === code.toUpperCase() && c.active !== false) ?? null;
+ 
+ /* ---------- Anfragen / Angebote ---------- */
+-import type { Deco } from './deco';
++import { decoText, type Deco } from './deco';
+ export type { Deco };
+ export type InqLine = { id?: string; sku: string; name: string; color: string; size: string; qty: number; price: number | null; sum: number; deco?: Deco | null };
+ export type OfferLine = { text: string; detail?: string; qty: number; price: number };
+@@ -105,7 +105,7 @@ export function draftOffer(i: Inquiry): Offer {
+     const e = decos.get(k) ?? { d: l.deco, qty: 0 };
+     e.qty += l.qty; decos.set(k, e);
+   }
+-  for (const { d, qty } of decos.values()) lines.push({ text: `Veredelung: ${d.method}`, detail: d.positions.join(', '), qty, price: 0 });
++  for (const { d, qty } of decos.values()) lines.push({ text: `Veredelung: ${d.method}`, detail: [d.positions.join(', '), d.logoName ? `Logo: ${d.logoName}` : '', decoText(d)].filter(Boolean).join(' · '), qty, price: 0 });
+   return { lines, shipping: 0, note: '', validDays: 14, createdAt: new Date().toISOString(), vat: Number(process.env.MWST_PERCENT ?? 19) };
+ }
+ 
+-- 
+2.43.0
+

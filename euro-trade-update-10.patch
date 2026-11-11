@@ -1,0 +1,585 @@
+From 0a8ef0e789793ac5ea02f34d70cce960290ab634 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Wed, 11 Nov 2026 04:41:38 +0100
+Subject: [PATCH] Verkaufstexte je Artikel (nur Fakten) + Text-Editor im Admin
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+- seed/texte.json: redaktionelle Texte für alle 14 Artikel (Überschrift, Einleitung, Highlights, Ideal für)
+- automatischer Text aus Produktdaten für neue Artikel (keine erfundenen Eigenschaften)
+- Admin „Artikeltexte“: bearbeiten mit Vorschau und Faktenliste, neu erzeugen, Vorlage laden, verwerfen
+- Produktseite: Verkaufstext oberhalb der Produktdetails, Meta-Description aus dem Text
+- Badges nur mit belegten Material-Labels (Recycelt, Bio-Baumwolle)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01AW9Go5bwJWAYsfGemt2b6Z
+---
+ app/admin/artikel/[id]/TextEditor.tsx |  46 +++++++
+ app/admin/artikel/[id]/page.tsx       |  38 ++++++
+ app/admin/artikel/page.tsx            |  32 +++++
+ app/api/admin/texte/route.ts          |  20 +++
+ app/globals.css                       |  17 +++
+ app/produkt/[id]/AddToCart.tsx        |  16 ++-
+ app/produkt/[id]/page.tsx             |   5 +-
+ components/AdminNav.tsx               |   3 +-
+ components/ProductCard.tsx            |   6 +-
+ lib/catalog.ts                        |   2 +-
+ lib/content.ts                        |  63 ++++++++++
+ seed/texte.json                       | 170 ++++++++++++++++++++++++++
+ 12 files changed, 411 insertions(+), 7 deletions(-)
+ create mode 100644 app/admin/artikel/[id]/TextEditor.tsx
+ create mode 100644 app/admin/artikel/[id]/page.tsx
+ create mode 100644 app/admin/artikel/page.tsx
+ create mode 100644 app/api/admin/texte/route.ts
+ create mode 100644 lib/content.ts
+ create mode 100644 seed/texte.json
+
+diff --git a/app/admin/artikel/[id]/TextEditor.tsx b/app/admin/artikel/[id]/TextEditor.tsx
+new file mode 100644
+index 0000000..4e76c50
+--- /dev/null
++++ b/app/admin/artikel/[id]/TextEditor.tsx
+@@ -0,0 +1,46 @@
++'use client';
++import { useState } from 'react';
++
++type T = { headline: string; intro: string; highlights: string[]; idealFor: string };
++export default function TextEditor({ id, initial, source, auto, seed }: { id: string; initial: T; source: string; auto: T; seed: T | null }) {
++  const [t, setT] = useState<T>(initial);
++  const [msg, setMsg] = useState<{ ok: boolean; m: string } | null>(null);
++  const [dirty, setDirty] = useState(false);
++  const set = (p: Partial<T>) => { setT((x) => ({ ...x, ...p })); setDirty(true); };
++  async function save(reset = false) {
++    const r = await fetch('/api/admin/texte', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, text: reset ? null : t }) });
++    const d = await r.json().catch(() => ({}));
++    if (r.ok) { setDirty(false); setMsg({ ok: true, m: reset ? 'Eigener Text entfernt – es gilt wieder die Vorlage bzw. der automatische Text.' : 'Gespeichert – sofort im Shop sichtbar.' }); if (reset) setT(seed ?? auto); }
++    else setMsg({ ok: false, m: d.error ?? 'Fehler' });
++  }
++  const len = t.intro.length;
++  return (
++    <div className="box form te">
++      <div className="muted" style={{ fontSize: 13 }}>Aktuell: {source === 'eigen' ? 'bearbeiteter Text' : source === 'vorlage' ? 'redaktionelle Vorlage' : 'automatisch aus den Produktdaten'}</div>
++      <label>Überschrift</label>
++      <input value={t.headline} maxLength={80} onChange={(e) => set({ headline: e.target.value })} />
++      <label>Einleitung <span className="muted" style={{ fontWeight: 400 }}>({len} Zeichen · ideal 300–600, Leerzeile = neuer Absatz)</span></label>
++      <textarea value={t.intro} onChange={(e) => set({ intro: e.target.value })} style={{ minHeight: 170 }} />
++      <label>Highlights <span className="muted" style={{ fontWeight: 400 }}>(eine Zeile pro Punkt, 3–5 empfohlen)</span></label>
++      <textarea value={t.highlights.join('\n')} onChange={(e) => set({ highlights: e.target.value.split('\n') })} style={{ minHeight: 120 }} />
++      <label>Ideal für <span className="muted" style={{ fontWeight: 400 }}>(mit Komma getrennt)</span></label>
++      <input value={t.idealFor} onChange={(e) => set({ idealFor: e.target.value })} />
++      <div className="admin-actions">
++        <button className="btn" disabled={!dirty} onClick={() => save()}>Speichern</button>
++        <button className="btn alt" onClick={() => { setT(auto); setDirty(true); }}>Aus Produktdaten neu erzeugen</button>
++        {seed && <button className="btn alt" onClick={() => { setT(seed); setDirty(true); }}>Redaktionelle Vorlage laden</button>}
++        {source === 'eigen' && <button className="linkbtn" onClick={() => save(true)}>Eigenen Text verwerfen</button>}
++      </div>
++      {msg && <div className={`note ${msg.ok ? 'ok' : 'err'}`}>{msg.m}</div>}
++      <div className="te-prev">
++        <div className="muted" style={{ fontSize: 12, marginBottom: 6 }}>Vorschau</div>
++        <div className="ptext" style={{ marginTop: 0, borderTop: 0, paddingTop: 0 }}>
++          <h2>{t.headline}</h2>
++          {t.intro.split(/\n\s*\n/).map((x, k) => <p key={k}>{x}</p>)}
++          <ul className="hl">{t.highlights.filter((h) => h.trim()).map((h, k) => <li key={k}>{h}</li>)}</ul>
++          {t.idealFor && <div className="ideal"><span>Ideal für:</span>{t.idealFor.split(',').filter((x) => x.trim()).map((x, k) => <b key={k}>{x.trim()}</b>)}</div>}
++        </div>
++      </div>
++    </div>
++  );
++}
+diff --git a/app/admin/artikel/[id]/page.tsx b/app/admin/artikel/[id]/page.tsx
+new file mode 100644
+index 0000000..a786f22
+--- /dev/null
++++ b/app/admin/artikel/[id]/page.tsx
+@@ -0,0 +1,38 @@
++import Link from 'next/link';
++import { notFound } from 'next/navigation';
++import type { Metadata } from 'next';
++import AdminNav from '@/components/AdminNav';
++import TextEditor from './TextEditor';
++import { getProduct } from '@/lib/catalog';
++import { generateText, getText, seedText } from '@/lib/content';
++
++export const metadata: Metadata = { title: 'Artikeltext', robots: { index: false, follow: false } };
++export default function EditText({ params }: { params: { id: string } }) {
++  const p = getProduct(params.id);
++  if (!p) notFound();
++  const { text, source } = getText(p);
++  const specs = Object.entries(p.specs ?? {}).filter(([, v]) => v && v !== 'Keine Angabe');
++  return (
++    <>
++      <AdminNav active="artikel" />
++      <div className="crumbs"><Link href="/admin/artikel">Artikeltexte</Link> › {p.name}</div>
++      <h1 style={{ marginBottom: 4 }}>{p.name}</h1>
++      <p className="muted" style={{ marginTop: 0 }}>{p.sku} · {p.brand} · <Link className="alink" href={`/produkt/${p.id}`} target="_blank">Im Shop ansehen ↗</Link></p>
++      <div className="te-grid">
++        <TextEditor id={p.id} initial={text} source={source} auto={generateText(p)} seed={seedText(p.id)} />
++        <aside className="box te-facts">
++          <strong>Fakten aus den Produktdaten</strong>
++          <p className="muted" style={{ fontSize: 12, margin: '4px 0 10px' }}>Nur diese Angaben sind belegt. Bitte im Text nichts behaupten, was hier nicht steht.</p>
++          <dl className="specs" style={{ marginTop: 0, borderTop: 0, paddingTop: 0 }}>
++            {p.material && <><dt>Material</dt><dd>{p.material}</dd></>}
++            {p.composition && <><dt>Zusammensetzung</dt><dd>{p.composition}</dd></>}
++            <dt>Größen</dt><dd>{p.sizes.join(', ') || '–'}</dd>
++            <dt>Farben</dt><dd>{p.colors.length}</dd>
++            {specs.map(([k, v]) => <><dt key={k}>{k}</dt><dd>{v}</dd></>)}
++          </dl>
++          {p.features?.length ? <><strong style={{ fontSize: 13 }}>Merkmale</strong><ul className="feat" style={{ marginTop: 6 }}>{p.features.map((f) => <li key={f}>{f}</li>)}</ul></> : null}
++        </aside>
++      </div>
++    </>
++  );
++}
+diff --git a/app/admin/artikel/page.tsx b/app/admin/artikel/page.tsx
+new file mode 100644
+index 0000000..8f08085
+--- /dev/null
++++ b/app/admin/artikel/page.tsx
+@@ -0,0 +1,32 @@
++import Link from 'next/link';
++import type { Metadata } from 'next';
++import AdminNav from '@/components/AdminNav';
++import { allProductsBrief, getProduct } from '@/lib/catalog';
++import { getText } from '@/lib/content';
++
++export const metadata: Metadata = { title: 'Artikeltexte', robots: { index: false, follow: false } };
++const LBL = { eigen: ['Bearbeitet', 'st-angenommen'], vorlage: ['Redaktionelle Vorlage', 'st-angebot'], automatisch: ['Automatisch aus Daten', 'st-neu'] } as const;
++
++export default function Artikel() {
++  const rows = allProductsBrief().map((b) => { const p = getProduct(b.id); return p ? { p, ...getText(p) } : null; }).filter(Boolean) as { p: NonNullable<ReturnType<typeof getProduct>>; source: keyof typeof LBL; text: { headline: string } }[];
++  return (
++    <>
++      <AdminNav active="artikel" />
++      <h1>Artikeltexte</h1>
++      <p className="muted" style={{ marginTop: -8 }}>Verkaufstexte je Artikel: Überschrift, Einleitung, Highlights und Einsatzbereiche. Neue Artikel erhalten automatisch einen Text aus den Produktdaten, den Sie hier verfeinern können. Bitte nur belegbare Eigenschaften nennen.</p>
++      <div className="box" style={{ padding: 0, overflowX: 'auto' }}>
++        <table className="atable">
++          <thead><tr><th></th><th>Artikel</th><th>Überschrift</th><th>Text</th><th></th></tr></thead>
++          <tbody>{rows.map(({ p, source, text }) => (
++            <tr key={p.id}>
++              <td style={{ width: 52 }}>{p.images[0] && <img src={p.images[0]} alt="" style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 6 }} />}</td>
++              <td><b>{p.name}</b><div className="muted" style={{ fontSize: 12 }}>{p.sku} · {p.brand}</div></td>
++              <td>{text.headline}</td>
++              <td><span className={`st ${LBL[source][1]}`}>{LBL[source][0]}</span></td>
++              <td><Link className="btn alt" style={{ height: 34, display: 'inline-grid', placeItems: 'center' }} href={`/admin/artikel/${p.id}`}>Bearbeiten</Link></td>
++            </tr>))}</tbody>
++        </table>
++      </div>
++    </>
++  );
++}
+diff --git a/app/api/admin/texte/route.ts b/app/api/admin/texte/route.ts
+new file mode 100644
+index 0000000..b70ec66
+--- /dev/null
++++ b/app/api/admin/texte/route.ts
+@@ -0,0 +1,20 @@
++import { NextResponse } from 'next/server';
++import { isAdmin } from '@/lib/customer';
++import { saveText } from '@/lib/content';
++import { getProduct } from '@/lib/catalog';
++
++export async function PUT(req: Request) {
++  if (!(await isAdmin())) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
++  const { id, text } = await req.json().catch(() => ({}));
++  if (!getProduct(String(id))) return NextResponse.json({ error: 'Artikel nicht gefunden.' }, { status: 404 });
++  if (text === null) { saveText(id, null); return NextResponse.json({ ok: true }); }
++  const t = {
++    headline: String(text?.headline ?? '').trim().slice(0, 80),
++    intro: String(text?.intro ?? '').replace(/\r/g, '').trim().slice(0, 2500),
++    highlights: (Array.isArray(text?.highlights) ? text.highlights : []).map((x: unknown) => String(x).trim().slice(0, 140)).filter(Boolean).slice(0, 8),
++    idealFor: String(text?.idealFor ?? '').trim().slice(0, 200),
++  };
++  if (!t.headline || !t.intro) return NextResponse.json({ error: 'Überschrift und Einleitung sind Pflicht.' }, { status: 400 });
++  saveText(id, t);
++  return NextResponse.json({ ok: true });
++}
+diff --git a/app/globals.css b/app/globals.css
+index 2d58b88..e68c4ab 100644
+--- a/app/globals.css
++++ b/app/globals.css
+@@ -607,3 +607,20 @@ footer .wrap{padding-right:84px}
+ .cat-seo p{color:#3b4250;line-height:1.65}
+ .cat-seo h2{margin-top:0}
+ @media (max-width:820px){.cat-hero{grid-template-columns:1fr;padding:20px}.cat-hero h1{font-size:28px}.cat-hero-imgs{justify-content:flex-start}.cat-seo{grid-template-columns:1fr}}
++/* Verkaufstext */
++.ptext{margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}
++.ptext h2{font-size:21px;margin:0 0 8px;letter-spacing:-.3px}
++.ptext p{margin:0 0 10px;color:#2b313b;line-height:1.65}
++.hl{list-style:none;padding:0;margin:12px 0;display:grid;gap:6px}
++.hl li{padding-left:26px;position:relative;font-size:14px}
++.hl li::before{content:"✓";position:absolute;left:0;top:0;width:18px;height:18px;border-radius:50%;background:#e3f5e9;color:var(--ok);font-size:11px;font-weight:900;display:grid;place-items:center}
++.ideal{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;margin-top:6px}
++.ideal span{color:var(--muted);margin-right:2px}
++.ideal b{background:#f3f7ff;color:var(--brand);border-radius:999px;padding:3px 10px;font-weight:600}
++.pdetails{margin-top:18px;border-top:1px solid var(--line);padding-top:12px}
++.pdetails summary{cursor:pointer;font-weight:700;font-size:15px}
++.te-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;align-items:start}
++.te-facts{position:sticky;top:90px;max-height:calc(100vh - 110px);overflow:auto;font-size:13px}
++.te-facts .specs dt{width:120px}.te-facts .specs dd{margin-left:120px}
++.te-prev{margin-top:16px;padding:16px;border:1px dashed var(--line);border-radius:10px;background:#fafbfc}
++@media (max-width:900px){.te-grid{grid-template-columns:1fr}.te-facts{position:static;max-height:none}}
+diff --git a/app/produkt/[id]/AddToCart.tsx b/app/produkt/[id]/AddToCart.tsx
+index a55491c..2d93cf1 100644
+--- a/app/produkt/[id]/AddToCart.tsx
++++ b/app/produkt/[id]/AddToCart.tsx
+@@ -13,7 +13,8 @@ import { nextTier, unitFor } from '@/lib/tiers';
+ 
+ type Logo = { id: string; name: string };
+ 
+-export default function AddToCart({ p, customerLogo, delivery }: { p: PublicProduct; customerLogo?: Logo | null; delivery?: string }) {
++type PText = { headline: string; intro: string; highlights: string[]; idealFor: string };
++export default function AddToCart({ p, customerLogo, delivery, copy }: { p: PublicProduct; customerLogo?: Logo | null; delivery?: string; copy?: PText }) {
+   const { addMany } = useCart();
+   const [color, setColor] = useState(p.colors[0]);
+   // Mengen je Farbe + Größe ("Black|M" -> 5) – mehrere Farben in einem Schritt möglich
+@@ -252,7 +253,17 @@ export default function AddToCart({ p, customerLogo, delivery }: { p: PublicProd
+         </div>
+         {msg && <div className="note ok">✓ {msg} <a href="/warenkorb" style={{ textDecoration: 'underline' }}>Zum Warenkorb</a></div>}
+ 
+-        {p.features?.length ? <ul className="feat">{p.features.map((f) => <li key={f}>{f}</li>)}</ul> : <p style={{ marginTop: 20 }}>{p.description}</p>}
++        {copy && (
++          <div className="ptext">
++            <h2>{copy.headline}</h2>
++            {copy.intro.split(/\n\s*\n/).map((x) => <p key={x}>{x}</p>)}
++            {copy.highlights.length > 0 && <ul className="hl">{copy.highlights.map((h) => <li key={h}>{h}</li>)}</ul>}
++            {copy.idealFor && <div className="ideal"><span>Ideal für:</span>{copy.idealFor.split(',').map((x) => <b key={x}>{x.trim()}</b>)}</div>}
++          </div>
++        )}
++        <details className="pdetails" open={!copy}>
++          <summary>Produktdetails & Material</summary>
++          {p.features?.length ? <ul className="feat">{p.features.map((f) => <li key={f}>{f}</li>)}</ul> : <p style={{ marginTop: 12 }}>{p.description}</p>}
+         <dl className="specs">
+           {p.material && <><dt>Material</dt><dd>{p.material}</dd></>}
+           {p.composition && <><dt>Zusammensetzung</dt><dd>{p.composition}</dd></>}
+@@ -260,6 +271,7 @@ export default function AddToCart({ p, customerLogo, delivery }: { p: PublicProd
+           {p.sizes.length > 0 && <><dt>Größen</dt><dd>{p.sizes.join(', ')}</dd></>}
+           {specs.map(([key, v]) => <Fragment key={key}><dt>{key}</dt><dd>{v}</dd></Fragment>)}
+         </dl>
++        </details>
+       </div>
+     </div>
+   );
+diff --git a/app/produkt/[id]/page.tsx b/app/produkt/[id]/page.tsx
+index 8df23c1..5168d8c 100644
+--- a/app/produkt/[id]/page.tsx
++++ b/app/produkt/[id]/page.tsx
+@@ -6,10 +6,11 @@ import { getByCategory, getProduct } from '@/lib/catalog';
+ import { getCustomer } from '@/lib/customer';
+ import { RecentTracker, RecentlyViewed } from '@/components/Recent';
+ import ProductReviews from '@/components/ProductReviews';
++import { getText } from '@/lib/content';
+ 
+ export async function generateMetadata({ params }: { params: { id: string } }) {
+   const p = getProduct(decodeURIComponent(params.id), await getCustomer());
+-  return p ? { title: p.name, description: p.description.slice(0, 155) } : {};
++  return p ? { title: p.name, description: getText(p).text.intro.slice(0, 155) } : {};
+ }
+ 
+ export default async function ProductPage({ params }: { params: { id: string } }) {
+@@ -20,7 +21,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
+   return (
+     <>
+       <div className="crumbs"><Link href="/">Start</Link> › <Link href={`/kategorie/${p.categorySlug}`}>{p.category}</Link> › {p.name}</div>
+-      <AddToCart p={p} customerLogo={ctx?.logoId ? { id: ctx.logoId, name: ctx.logoName ?? 'Ihr Logo' } : null} delivery={process.env.DELIVERY_TEXT ?? 'Lieferung ca. 3–5 Werktage · mit Veredelung ca. 7–14 Werktage nach Freigabe'} />
++      <AddToCart p={p} customerLogo={ctx?.logoId ? { id: ctx.logoId, name: ctx.logoName ?? 'Ihr Logo' } : null} copy={getText(p).text} delivery={process.env.DELIVERY_TEXT ?? 'Lieferung ca. 3–5 Werktage · mit Veredelung ca. 7–14 Werktage nach Freigabe'} />
+       <RecentTracker id={p.id} />
+       <ProductReviews productId={p.id} name={p.name} />
+       {related.length > 0 && <><h2>Ähnliche Artikel</h2><div className="grid">{related.map((r) => <ProductCard key={r.id} p={r} />)}</div></>}
+diff --git a/components/AdminNav.tsx b/components/AdminNav.tsx
+index 1ec8da2..dfef9cb 100644
+--- a/components/AdminNav.tsx
++++ b/components/AdminNav.tsx
+@@ -1,10 +1,11 @@
+ import Link from 'next/link';
+ import AdminLogout from './AdminLogout';
+-export default function AdminNav({ active }: { active: 'anfragen' | 'kunden' | 'referenzen' | 'newsletter' | 'bewertungen' }) {
++export default function AdminNav({ active }: { active: 'anfragen' | 'kunden' | 'referenzen' | 'newsletter' | 'bewertungen' | 'artikel' }) {
+   return (
+     <div className="admin-nav">
+       <Link href="/admin" className={active === 'anfragen' ? 'on' : ''}>Anfragen & Angebote</Link>
+       <Link href="/admin/kunden" className={active === 'kunden' ? 'on' : ''}>Kunden & Codes</Link>
++      <Link href="/admin/artikel" className={active === 'artikel' ? 'on' : ''}>Artikeltexte</Link>
+       <Link href="/admin/bewertungen" className={active === 'bewertungen' ? 'on' : ''}>Bewertungen</Link>
+       <Link href="/admin/referenzen" className={active === 'referenzen' ? 'on' : ''}>Referenzen</Link>
+       <Link href="/admin/newsletter" className={active === 'newsletter' ? 'on' : ''}>Newsletter</Link>
+diff --git a/components/ProductCard.tsx b/components/ProductCard.tsx
+index 18ae174..5177447 100644
+--- a/components/ProductCard.tsx
++++ b/components/ProductCard.tsx
+@@ -11,7 +11,11 @@ function badges(p: PublicProduct): { t: string; c: string }[] {
+   const b: { t: string; c: string }[] = [];
+   if (p.rating && p.rating.count >= 3 && p.rating.avg >= 4.5) b.push({ t: 'Top bewertet', c: 'b-top' });
+   if (p.price != null && p.tiers.length) b.push({ t: `bis −${Math.round((1 - p.tiers[p.tiers.length - 1].price / p.price) * 100)} % Staffel`, c: 'b-deal' });
+-  if (/bio|organic|recycl/i.test(`${p.name} ${p.material ?? ''} ${(p.features ?? []).join(' ')}`)) b.push({ t: 'Nachhaltig', c: 'b-eco' });
++  // nur belegte Material-Labels (keine pauschalen Umweltaussagen)
++  const cert = p.specs?.['Zertifizierung'] ?? '';
++  const pending = (p.features ?? []).some((x) => /in arbeit/i.test(x));
++  if (/recycel/i.test(cert)) b.push({ t: 'Recycelt', c: 'b-eco' });
++  else if (/bio/i.test(cert) && !pending) b.push({ t: 'Bio-Baumwolle', c: 'b-eco' });
+   return b.slice(0, 2);
+ }
+ const sizeRange = (s: string[]) => (s.length > 1 ? `${s[0]}–${s[s.length - 1]}` : s[0] ?? '');
+diff --git a/lib/catalog.ts b/lib/catalog.ts
+index e9a5c86..cdea664 100644
+--- a/lib/catalog.ts
++++ b/lib/catalog.ts
+@@ -83,7 +83,7 @@ export function getCollection(ctx?: Ctx): PublicProduct[] {
+   return (ctx?.skus ?? []).flatMap((k) => { const p = bySku.get(k.toUpperCase()); return p ? [toPublic(p, ctx)] : []; });
+ }
+ /** Alle Artikel (Admin: Auswahl für Kollektionen) */
+-export const allProductsBrief = () => load().products.map((p) => ({ sku: p.sku, name: p.name, brand: p.brand }));
++export const allProductsBrief = () => load().products.map((p) => ({ id: p.id, sku: p.sku, name: p.name, brand: p.brand }));
+ 
+ export function search(q: string, limit = 48, ctx?: Ctx): PublicProduct[] {
+   const s = load();
+diff --git a/lib/content.ts b/lib/content.ts
+new file mode 100644
+index 0000000..553c602
+--- /dev/null
++++ b/lib/content.ts
+@@ -0,0 +1,63 @@
++import 'server-only';
++import fs from 'node:fs';
++import path from 'node:path';
++import type { Product, PublicProduct } from './types';
++import { DATA, readJSON, writeJSON } from './store';
++
++/** Verkaufstext je Artikel: Überschrift, Einleitung, Highlights, Einsatzbereiche */
++export type ProductText = { headline: string; intro: string; highlights: string[]; idealFor: string; updatedAt?: string };
++export type TextSource = 'eigen' | 'vorlage' | 'automatisch';
++
++const EDIT = path.join(DATA, 'texte.json'); // im Admin bearbeitet (Vorrang)
++const SEED = path.join(process.cwd(), 'seed', 'texte.json'); // redaktionelle Vorlage im Repo
++let cache: { key: string; edit: Record<string, ProductText>; seed: Record<string, ProductText> } | null = null;
++function load() {
++  const m = (f: string) => (fs.existsSync(f) ? fs.statSync(f).mtimeMs : 0);
++  const key = `${m(EDIT)}|${m(SEED)}`;
++  if (!cache || cache.key !== key) cache = { key, edit: readJSON(EDIT, {}), seed: readJSON(SEED, {}) };
++  return cache;
++}
++
++const clean = (s?: string) => (s ?? '').replace(/\s+/g, ' ').trim();
++const first = (s?: string) => clean(s).split(',')[0];
++
++/** Automatischer Text – ausschließlich aus den Produktdaten, nichts dazuerfunden */
++export function generateText(p: Product | PublicProduct): ProductText {
++  const f = (p.features ?? []).filter((x) => x.length < 120 && !/möglicherweise|massenbilanz/i.test(x));
++  const sp = p.specs ?? {};
++  const gsm = clean(p.material).match(/(\d+)\s*g\/m²/)?.[1];
++  const mat = clean(p.material).replace(/,?\s*\d+\s*g\/m²/, '').trim();
++  const sizes = p.sizes.length > 1 ? `in den Größen ${p.sizes[0]} bis ${p.sizes[p.sizes.length - 1]}` : p.sizes[0] ? `in ${p.sizes[0]}` : '';
++  const colors = p.colors.length > 1 ? `${p.colors.length} Farben` : '';
++  const facts = [gsm && `${gsm} g/m²`, mat, first(p.composition)].filter(Boolean).join(', ');
++  const s1 = `${p.name} von ${p.brand}${facts ? `: ${facts}` : ''}.`;
++  const s2 = f.length ? `${f.slice(0, 3).join(', ')}.` : '';
++  const s3 = [colors && sizes ? `Erhältlich in ${colors} ${sizes}` : colors ? `Erhältlich in ${colors}` : sizes ? `Erhältlich ${sizes}` : '', sp['Zertifizierung'] && sp['Zertifizierung'] !== 'Keine Angabe' && !f.some((x) => /in arbeit/i.test(x)) ? `Zertifizierung: ${first(sp['Zertifizierung'])}` : ''].filter(Boolean).join(', ');
++  const highlights = [
++    [gsm && `${gsm} g/m²`, mat, first(p.composition)].filter(Boolean).join(' · '),
++    ...f.slice(0, 3),
++    colors && sizes ? `${colors}, ${sizes.replace('in den Größen ', 'Größen ')}` : '',
++    sp['Veredelung'] && sp['Veredelung'] !== 'Keine Angabe' ? `Geeignet für ${sp['Veredelung']}` : '',
++    sp['Pflege'] ? first(sp['Pflege']) : '',
++  ].filter(Boolean).slice(0, 5);
++  const use = (p.tags ?? []).filter((t) => /beruf|sport|arbeit|freizeit|promotion|alltag/i.test(t));
++  return {
++    headline: p.name,
++    intro: [s1, s2, s3 ? `${s3}.` : ''].filter(Boolean).join(' '),
++    highlights,
++    idealFor: use.length ? use.join(', ') : `Teamkleidung, Verein, Firma${p.category ? ` – ${p.category}` : ''}`,
++  };
++}
++
++export function getText(p: Product | PublicProduct): { text: ProductText; source: TextSource } {
++  const c = load();
++  if (c.edit[p.id]) return { text: c.edit[p.id], source: 'eigen' };
++  if (c.seed[p.id]) return { text: c.seed[p.id], source: 'vorlage' };
++  return { text: generateText(p), source: 'automatisch' };
++}
++export function saveText(id: string, t: ProductText | null) {
++  const all = readJSON<Record<string, ProductText>>(EDIT, {});
++  if (t) all[id] = { ...t, updatedAt: new Date().toISOString() }; else delete all[id];
++  writeJSON(EDIT, all);
++}
++export const seedText = (id: string) => load().seed[id] ?? null;
+diff --git a/seed/texte.json b/seed/texte.json
+new file mode 100644
+index 0000000..7c41e19
+--- /dev/null
++++ b/seed/texte.json
+@@ -0,0 +1,170 @@
++{
++  "aq010": {
++    "headline": "Das Polo, das immer passt",
++    "intro": "Das Classic Fit Polo von Asquith & Fox ist ein echter Klassiker: festes Piqué mit 200 g/m² aus ringgesponnener, gekämmter Baumwolle und ein angenehm weiches Finish. Der normale Schnitt mit Seitenschlitzen sitzt bequem, ohne zu weit zu sein. Mit 38 Farben in den Größen S bis 5XL findet jedes Team seinen Ton, für Logos auf der Brust ist es wie gemacht.",
++    "highlights": [
++      "Festes Piqué, 200 g/m², 100 % gekämmte Baumwolle (Uni-Farben)",
++      "38 Farben, Größen S bis 5XL",
++      "OEKO-TEX® STANDARD 100",
++      "Ideal für Stick, Siebdruck und Transferdruck",
++      "Bei 30 °C waschbar, Bügeln erlaubt"
++    ],
++    "idealFor": "Teamkleidung, Empfang & Service, Messe, Vereinspolo"
++  },
++  "arb931": {
++    "headline": "Weich gestrickt, liebevoll verschenkt",
++    "intro": "Die Babiezz® Soft Knitted Blanket von ARTG ist eine kompakte Strickdecke im Format 80 × 100 cm. Das atmungsaktive Acrylgarn mit 250 g/m² fühlt sich sanft an und lässt sich bei 40 °C waschen. Als Geschenk zur Geburt, für Kita oder Kinderzimmer ist sie eine schöne Aufmerksamkeit, in vier ruhigen Farben.",
++    "highlights": [
++      "Strick mit 250 g/m², 100 % Polyacryl",
++      "Format 80 × 100 cm",
++      "Atmungsaktives Garn mit sanfter Haptik",
++      "4 Farben",
++      "Bei 40 °C waschbar"
++    ],
++    "idealFor": "Geschenk zur Geburt, Kita, Kundenpräsent"
++  },
++  "ars1745": {
++    "headline": "Kuschelfaktor de luxe",
++    "intro": "Außen glatt, innen flauschig: Die Originalzz® Sherpa Fleece Blanket DeLuxe kombiniert eine besonders glatte Vorderseite aus Micro-Mink-Polyester mit superweichem Sherpa-Futter. Im großzügigen Format 127 × 152 cm wärmt sie auf dem Sofa ebenso wie auf der Tribüne. Die Vorderseite lässt sich vollflächig per Sublimationsdruck gestalten, alternativ ist Stick möglich.",
++    "highlights": [
++      "Glatte Micro-Mink-Vorderseite, Sherpa-Rückseite",
++      "Großes Format 127 × 152 cm",
++      "Vollflächiger Sublimationsdruck möglich",
++      "Auch bestickbar",
++      "Trocknergeeignet"
++    ],
++    "idealFor": "Fan-Artikel, Kundengeschenk, Vereinsmerch, Weihnachtspräsent"
++  },
++  "bcwu620": {
++    "headline": "Der Hoodie für jeden Tag",
++    "intro": "Der Hooded Sweat von B&C ist ein robuster Allrounder mit 280 g/m² aus ringgesponnener, gekämmter Baumwolle und recyceltem Polyester. Die gefütterte Kapuze mit Kordelzug und Metallösen, Bündchen aus 1×1 Ripp mit Elasthan und eine Kängurutasche mit verstärkten Nähten sorgen für Komfort und Langlebigkeit. Flatlock-Nähte an Schultern und Armausschnitten runden den zeitgemäßen Schnitt ab.",
++    "highlights": [
++      "280 g/m², 80 % Baumwolle / 20 % Polyester (recycelt)",
++      "Gefütterte Kapuze mit Metallösen",
++      "Kängurutasche mit verstärkten Nähten",
++      "Größen XXS bis 3XL, 6 Farben",
++      "Für Stick, Siebdruck, Digital- und Transferdruck"
++    ],
++    "idealFor": "Vereinshoodie, Crew-Merch, Schul- und Abschlusskleidung"
++  },
++  "cb336b": {
++    "headline": "Warme Ohren, starker Auftritt",
++    "intro": "Die Kids Deep Cuffed Tonal Patch Beanie von Beechfield ist doppellagig aus geripptem Strick gefertigt und hat eine speziell entwickelte Krone für guten Sitz. Der breite Umschlag bietet viel Fläche für Ihr Logo, ein tonfarbener Baumwoll-Twill-Aufnäher setzt einen dezenten Akzent. Das Material enthält zertifiziertes recyceltes Polyester, das Etikett lässt sich für eigenes Branding abtrennen.",
++    "highlights": [
++      "Doppellagiger Rippstrick, 100 % Polyester (recycelt)",
++      "Breiter Umschlag für Veredelung",
++      "Tonfarbener Twill-Aufnäher",
++      "Kindergröße 3–8 Jahre, 7 Farben",
++      "Abtrennbares Etikett für eigenes Branding"
++    ],
++    "idealFor": "Jugendmannschaft, Kita & Schule, Winter-Merch"
++  },
++  "hrm801": {
++    "headline": "Tailliert, schwer und richtig edel",
++    "intro": "Die Women’s Hooded Jacket von HRM überzeugt mit 320 g/m² weichem Mischgewebe: außen sehr glatt, innen angeraut. Der leicht taillierte Schnitt sitzt figurbetont, Details wie die mittig bestickte Kontrast-Kordel, je drei HRM-Metallösen, ein verstärktes Nackenband und ein hochwertiger Reißverschluss mit Metallschieber machen den Unterschied. 2×2-Rippbündchen an Saum, Taschen und Ärmeln halten die Form.",
++    "highlights": [
++      "320 g/m², außen glatt, innen angeraut",
++      "Leicht taillierter Damenschnitt",
++      "Hochwertiger Reißverschluss mit Metallschieber",
++      "14 Farben, Größen XS bis 5XL",
++      "Trocknergeeignet, 40 °C waschbar"
++    ],
++    "idealFor": "Damenteams, Firmenbekleidung mit Stil, Vereins-Zipper"
++  },
++  "jn8046": {
++    "headline": "Clevere Taschen, starke Qualität",
++    "intro": "Der Men’s Hoodie Interlock von Daiber setzt auf eine hochwertige Interlock-Qualität mit 360 g/m² aus Bio-Baumwolle, recyceltem Polyester und etwas Elasthan für Bewegungsfreiheit. Neben der Kängurutasche gibt es eine zusätzliche Reißverschlusstasche und eine Reißverschlusstasche am linken Ärmel, eingefasst mit modischem Tape. Der schmalere Schnitt wirkt modern und aufgeräumt.",
++    "highlights": [
++      "360 g/m² Interlock mit Bio-Baumwolle und Elasthan",
++      "Reißverschlusstaschen an Front und Ärmel",
++      "Schmaler Schnitt (Slim)",
++      "Größen S bis 3XL, 4 Farben",
++      "Für Stick und Transferdruck"
++    ],
++    "idealFor": "Teamwear für unterwegs, Coaches & Trainer, Firmen-Hoodie"
++  },
++  "mv470064": {
++    "headline": "Bügelfrei durch den Arbeitstag",
++    "intro": "Das Men’s Shirt Modern Fit von Marvelis ist bügelfrei und dadurch ideal für alle, die viel unterwegs sind. Der New-Kent-Kragen und die Brusttasche geben ihm einen klassischen Look, der moderne Schnitt sitzt schlank, ohne einzuengen. Je nach Farbe aus Popeline oder Chambray, 100 % Baumwolle, OEKO-TEX® STANDARD 100 zertifiziert. Weiß ist bis 60 °C waschbar.",
++    "highlights": [
++      "Bügelfrei, Modern Fit",
++      "100 % Baumwolle (Popeline bzw. Chambray)",
++      "New-Kent-Kragen und Brusttasche",
++      "Kragenweite 38 bis 48",
++      "OEKO-TEX® STANDARD 100, trocknergeeignet"
++    ],
++    "idealFor": "Büro, Empfang, Außendienst, Hotellerie"
++  },
++  "my111": {
++    "headline": "Länger geschnitten, lässig getragen",
++    "intro": "Das my mate Men’s Long Tee von Miners mate hat eine klassische, längere Passform und Raglan-Ärmel. Single Jersey aus ringgesponnener Baumwolle mit 160 g/m² ist vorgeschrumpft sowie enzym- und silikongewaschen und fühlt sich dadurch besonders weich an. Ein neutrales, seitlich versetztes Größenetikett und das entfernbare Markenlabel machen es zur perfekten Basis für Ihr eigenes Merch.",
++    "highlights": [
++      "Längere Passform mit Raglan-Ärmeln",
++      "160 g/m² Single Jersey, vorgeschrumpft",
++      "Enzym- und silikongewaschen für weichen Griff",
++      "Entfernbares Label für eigenes Branding",
++      "Größen S bis 3XL, 8 Farben"
++    ],
++    "idealFor": "Band- und Vereinsmerch, Streetwear-Look, Events"
++  },
++  "nn310": {
++    "headline": "Bewegungsfreiheit für lange Schichten",
++    "intro": "Die Invincible Women’s Onna-Stretch Tunic ist für den Arbeitsalltag in Praxis, Pflege und Beauty gemacht. Vier-Wege-Stretch sorgt für Bewegungsfreiheit und Tragekomfort den ganzen Tag, das Material ist atmungsaktiv, strapazierfähig, knitterfrei und pflegeleicht. V-Ausschnitt, zwei Vordertaschen, Abnäher am Rücken und Seitenschlitze geben eine moderne Passform. Enthält 33 % zertifiziertes recyceltes Polyester.",
++    "highlights": [
++      "Vier-Wege-Stretch, atmungsaktiv",
++      "Knitterfrei und pflegeleicht, bis 60 °C waschbar",
++      "V-Ausschnitt mit zwei Vordertaschen",
++      "Größen XS bis 5XL, 7 Farben",
++      "33 % recyceltes Polyester"
++    ],
++    "idealFor": "Praxis & Pflege, Kosmetik, Wellness, Service"
++  },
++  "p04": {
++    "headline": "Essential, aber alles andere als basic",
++    "intro": "Der Essential Hoodie von Mantis verbindet 280 g/m² gebürstetes Fleece mit durchdachten Details: doppellagige Kapuze, runde Kordeln mit Metallenden, Metallösen, Fischgrät-Nackenband und Ripp-Strick an Saum und Bündchen. Ein bedruckbarer Einsatz im Nacken und das abreißbare Etikett machen ihn zur idealen Basis für eigenes Branding. Das Pflegeetikett mit QR-Code macht die Lieferkette nachvollziehbar; die Bio-Zertifizierung der Baumwolle ist laut Hersteller in Arbeit.",
++    "highlights": [
++      "280 g/m² gebürstetes Fleece, 81 % Baumwolle / 19 % Polyester",
++      "Doppellagige Kapuze, Metallösen",
++      "Bedruckbarer Nackeneinsatz, abreißbares Etikett",
++      "Unisex, Größen XS bis 3XL, 7 Farben",
++      "Für Stick, Siebdruck, Digital- und Transferdruck"
++    ],
++    "idealFor": "Merch & Brand-Kollektionen, Vereinshoodie, Team-Outfit"
++  },
++  "rt234j": {
++    "headline": "Warm, wind- und wetterfest für kleine Helden",
++    "intro": "Der Junior Soft Padded Bodywarmer von Result Core ist wasserabweisend und winddicht, die 160-g/m²-Polyesterfüllung hält warm, ohne einzuengen. Reflektierende Details seitlich im Hüftbereich sorgen für mehr Sichtbarkeit, Reißverschlusstaschen halten Kleinigkeiten sicher. Praktisch für die Veredelung: Ein Zugang mit Reißverschluss innen auf der linken Brustseite und ein neutrales Etikett im Kragen.",
++    "highlights": [
++      "Wasserabweisend und winddicht",
++      "Wattierung 160 g/m²",
++      "Reflektierende Details",
++      "Veredelungszugang innen links",
++      "Kindergrößen 2/3 bis 9/10 Jahre"
++    ],
++    "idealFor": "Jugendmannschaft, Kita & Schule, Outdoor-Events"
++  },
++  "tj9120": {
++    "headline": "Gebaut für draußen",
++    "intro": "Die Mountain Fleece von Tee Jays kombiniert Antipilling-Fleece mit 344 g/m² und Ripstop-Einsätzen an beanspruchten Stellen. Zwei Fronttaschen und eine Brusttasche mit SBS-Reißverschlüssen, elastische Ärmelabschlüsse, ein verstellbarer Saum mit Kordelstopper und ein längeres Rückenteil machen sie zur zuverlässigen Begleiterin bei Wind und Wetter. OEKO-TEX® STANDARD 100 zertifiziert.",
++    "highlights": [
++      "344 g/m² Antipilling-Fleece mit Ripstop-Verstärkungen",
++      "SBS-Reißverschlüsse, drei Taschen",
++      "Verstellbarer Saum, längeres Rückenteil",
++      "Größen XS bis 5XL",
++      "OEKO-TEX® STANDARD 100, ideal für Stick"
++    ],
++    "idealFor": "Outdoor-Teams, Handwerk & Bau, Trainer und Betreuer"
++  },
++  "tr510": {
++    "headline": "Nahtlos stark beim Sport",
++    "intro": "Der Women’s Recycled Seamless ‘3D Fit’ Multi-Sport Flex Bra von TriDri® ist nahtlos gearbeitet und bietet mittlere Stützkraft. Das feuchtigkeitstransportierende Material aus recyceltem Nylon, Polyester und Elasthan sitzt figurbetont, Rippdetails an Seiten und Rücken unterstützen die Form. Mit herausnehmbaren Polstern und verstellbaren Trägern lässt er sich individuell anpassen.",
++    "highlights": [
++      "Nahtlos, mittlere Stützkraft",
++      "Feuchtigkeitstransportierend, recyceltes Nylon",
++      "Herausnehmbare Polster, verstellbare Träger",
++      "Größen XS bis XL, 6 Farben",
++      "Für Stick, Sieb- und Transferdruck"
++    ],
++    "idealFor": "Fitness- und Laufteams, Studio-Merch, Sportvereine"
++  }
++}
+\ No newline at end of file
+-- 
+2.43.0
+

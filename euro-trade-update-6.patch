@@ -1,0 +1,458 @@
+From e688cc5e7bc9140738dfe206cbedc27fc682e350 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Wed, 11 Nov 2026 01:34:20 +0100
+Subject: [PATCH] Vorbereitung L-Shop-Daten: Feed-Import (CSV/XML/JSON),
+ Bestand je Variante, Farbbilder, Staffel-EK
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+- scripts/feed-lib.mjs: gemeinsame Zuordnung für API-Sync und Datei-Feeds
+- npm run import-feed -- datei.csv|xml|json (Spalten automatisch erkannt)
+- Produktseite: Bestand je Farbe/Größe (auf Lager / nur N / nicht vorrätig), Bilder der gewählten Farbe
+- echte Staffel-EK von L-Shop haben Vorrang vor der Rabattstaffel
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01AW9Go5bwJWAYsfGemt2b6Z
+---
+ README.md                      |  10 +++
+ app/globals.css                |   7 ++
+ app/produkt/[id]/AddToCart.tsx |   8 ++-
+ lib/catalog.ts                 |   9 ++-
+ lib/types.ts                   |   8 ++-
+ package.json                   |   3 +-
+ scripts/feed-lib.mjs           | 117 +++++++++++++++++++++++++++++++++
+ scripts/import-feed.mjs        |  46 +++++++++++++
+ scripts/sync-lshop.mjs         |  89 ++-----------------------
+ 9 files changed, 206 insertions(+), 91 deletions(-)
+ create mode 100644 scripts/feed-lib.mjs
+ create mode 100644 scripts/import-feed.mjs
+
+diff --git a/README.md b/README.md
+index 18be23c..8e51204 100644
+--- a/README.md
++++ b/README.md
+@@ -15,6 +15,16 @@ npm run dev               # http://localhost:3000
+ ```
+ Ohne API-Key kommt der Katalog aus `seed/products.json`. Neue Artikel: gespeicherte L-Shop-Produktseiten (.html) in `import/` legen → `npm run import-html` → Preise optional in `seed/preise.csv` (`AQ010;6,85`).
+ 
++## Händler-Feed von L-Shop (CSV / XML / JSON)
++```bash
++npm run import-feed -- /pfad/lshop-feed.csv          # -> data/products.json (live, ohne Neustart)
++npm run import-feed -- /pfad/lshop-feed.csv --seed   # -> seed/products.json (ins Repo)
++```
++Auf dem Server: Datei nach `/opt/euro-trade-shop/data/` kopieren und
++`docker compose exec shop node scripts/import-feed.mjs data/lshop-feed.csv` ausführen.
++Erkannt werden u. a. Artikelnummer, Bezeichnung, Marke, Warengruppe, Farbe, Farbcode, Größe, EK, Preis_10/Preis_50 (Staffel-EK),
++Bestand, Bild, Farbbild. Abweichende Spaltennamen in `scripts/feed-lib.mjs` → `mapItem()` ergänzen.
++
+ ## L-Shop anbinden (sobald der API-Key da ist)
+ 1. In `.env`: `LSHOP_API_URL`, `LSHOP_API_KEY`, ggf. `LSHOP_AUTH_MODE` (header | x-api-key | query)
+ 2. `npm run sync` – schreibt `data/products.json`. Der laufende Shop lädt die neuen Daten automatisch (kein Neustart).
+diff --git a/app/globals.css b/app/globals.css
+index afb25de..3e80838 100644
+--- a/app/globals.css
++++ b/app/globals.css
+@@ -481,3 +481,10 @@ footer .wrap{display:flex;gap:20px;flex-wrap:wrap;justify-content:space-between}
+ .drawer-wrap.open .drawer{box-shadow:-12px 0 40px rgba(0,0,0,.2);visibility:visible;transition:transform .25s ease}
+ footer .wrap{padding-right:84px}
+ .pd>div,.gal,.gal-main{min-width:0}.gal-thumbs{max-width:100%}
++/* Bestand */
++.stock{font-size:11px;font-weight:600;line-height:1.2;text-align:center}
++.stock.ok{color:var(--ok)}
++.stock.low{color:#b45309}
++.stock.no{color:var(--err)}
++.sz.out{background:#fafafa}
++.sz.out .sz-l{color:#9aa1ab;text-decoration:line-through}
+diff --git a/app/produkt/[id]/AddToCart.tsx b/app/produkt/[id]/AddToCart.tsx
+index a0f8392..0ad190f 100644
+--- a/app/produkt/[id]/AddToCart.tsx
++++ b/app/produkt/[id]/AddToCart.tsx
+@@ -80,7 +80,7 @@ export default function AddToCart({ p, customerLogo, delivery }: { p: PublicProd
+   return (
+     <div className="pd">
+       <div>
+-        <Gallery p={p} hex={color?.hex} overlay={showPreview ? <>
++        <Gallery key={cname} p={color?.images?.length ? { ...p, images: color.images } : p} hex={color?.hex} overlay={showPreview ? <>
+           {prevPos.map((x) => {
+             const [l, t, w] = PREVIEW[x];
+             return (
+@@ -131,14 +131,18 @@ export default function AddToCart({ p, customerLogo, delivery }: { p: PublicProd
+         <div className={`szgrid ${sizes.length === 1 ? 'single' : ''}`}>
+           {sizes.map((s) => {
+             const v = qty[k(cname, s)] || 0;
++            const st = p.stockBy ? p.stockBy[`${cname}|${s}`] : undefined;
++            const out = st === 0;
+             return (
+-              <div key={s} className={`sz ${v ? 'on' : ''}`}>
++              <div key={s} className={`sz ${v ? 'on' : ''} ${out ? 'out' : ''}`}>
+                 {s && <span className="sz-l">{s}</span>}
+                 <div className="step">
+                   <button type="button" onClick={() => setQ(s, v - 1)} disabled={!v} aria-label={`${s} weniger`}>−</button>
+                   <input type="number" inputMode="numeric" min={0} placeholder="0" value={v || ''} onChange={(e) => setQ(s, Number(e.target.value))} onFocus={(e) => e.target.select()} aria-label={`Menge ${s}`} />
+                   <button type="button" onClick={() => setQ(s, v + 1)} aria-label={`${s} mehr`}>+</button>
+                 </div>
++                {st != null && <span className={`stock ${out ? 'no' : st < 10 ? 'low' : 'ok'}`}>{out ? 'nicht vorrätig' : st < 10 ? `nur ${st} Stk.` : 'auf Lager'}</span>}
++                {st != null && v > st && <span className="stock low">{out ? 'längere Lieferzeit' : `nur ${st} sofort`}</span>}
+               </div>
+             );
+           })}
+diff --git a/lib/catalog.ts b/lib/catalog.ts
+index 0f6c983..a3fca48 100644
+--- a/lib/catalog.ts
++++ b/lib/catalog.ts
+@@ -41,9 +41,14 @@ function load(): State {
+ export type Ctx = { markup?: number | null; skus?: string[]; exclusive?: boolean; tiers?: string | null } | null | undefined;
+ 
+ export function toPublic(p: Product, ctx?: Ctx): PublicProduct {
+-  const { basePrice, ...rest } = p;
++  const { basePrice, baseTiers, ...rest } = p;
+   const price = basePrice != null && basePrice > 0 ? sellPrice(basePrice, p.categorySlug, ctx?.markup) : null;
+-  return { ...rest, colors: sortColors(p.colors), price, priceGross: price != null ? gross(price) : null, tiers: price != null ? priceTiers(price, ctx?.tiers) : [] };
++  // Echte Staffel-EK von L-Shop haben Vorrang – sonst Rabattstaffel auf den Verkaufspreis
++  const tiers = price == null ? []
++    : baseTiers?.length && !ctx?.tiers
++      ? baseTiers.filter((t) => t.min > 1 && t.price > 0).sort((a, b) => a.min - b.min).map((t) => ({ min: t.min, price: sellPrice(t.price, p.categorySlug, ctx?.markup) })).filter((t) => t.price < price)
++      : priceTiers(price, ctx?.tiers);
++  return { ...rest, colors: sortColors(p.colors), price, priceGross: price != null ? gross(price) : null, tiers };
+ }
+ 
+ const skuSet = (ctx: Ctx) => new Set((ctx?.skus ?? []).map((x) => x.toUpperCase()));
+diff --git a/lib/types.ts b/lib/types.ts
+index 3258c68..1d973d3 100644
+--- a/lib/types.ts
++++ b/lib/types.ts
+@@ -1,4 +1,4 @@
+-export type Color = { name: string; hex?: string; image?: string; /** Stoffmuster (data-URI) für melierte Farben */ swatch?: string };
++export type Color = { name: string; hex?: string; image?: string; /** Produktbilder in dieser Farbe (aus Feed/API) */ images?: string[]; /** Stoffmuster (data-URI) für melierte Farben */ swatch?: string };
+ 
+ /** Einheitliches Produktformat – der L-Shop-Sync schreibt genau dieses Format nach data/products.json */
+ export type Product = {
+@@ -22,10 +22,14 @@ export type Product = {
+   colors: Color[];
+   sizes: string[];
+   stock?: number;
++  /** Bestand je Variante: "Farbe|Größe" -> Stück (aus Feed/API) */
++  stockBy?: Record<string, number>;
++  /** Staffel-Einkaufspreise von L-Shop: ab Menge -> EK netto */
++  baseTiers?: { min: number; price: number }[];
+   tags?: string[];
+ };
+ 
+ /** Was der Browser sieht: Verkaufspreis statt Einkaufspreis */
+-export type PublicProduct = Omit<Product, 'basePrice'> & { price: number | null; priceGross: number | null; /** Staffelpreise netto (ab Menge) */ tiers: { min: number; price: number }[] };
++export type PublicProduct = Omit<Product, 'basePrice' | 'baseTiers'> & { price: number | null; priceGross: number | null; /** Staffelpreise netto (ab Menge) */ tiers: { min: number; price: number }[] };
+ 
+ export type Category = { name: string; slug: string; count: number };
+diff --git a/package.json b/package.json
+index de2cd7a..6250ab3 100644
+--- a/package.json
++++ b/package.json
+@@ -7,7 +7,8 @@
+     "build": "next build",
+     "start": "next start -p ${PORT:-3000}",
+     "sync": "node scripts/sync-lshop.mjs",
+-    "import-html": "node scripts/import-html.mjs"
++    "import-html": "node scripts/import-html.mjs",
++    "import-feed": "node scripts/import-feed.mjs"
+   },
+   "dependencies": {
+     "minisearch": "7.2.0",
+diff --git a/scripts/feed-lib.mjs b/scripts/feed-lib.mjs
+new file mode 100644
+index 0000000..cdd226f
+--- /dev/null
++++ b/scripts/feed-lib.mjs
+@@ -0,0 +1,117 @@
++// Gemeinsame Logik für L-Shop-API (sync-lshop.mjs) und Datei-Feeds (import-feed.mjs)
++// Eine Zeile/ein Datensatz = eine Variante (Farbe + Größe). Wird zu Produkten zusammengefasst.
++import fs from 'node:fs';
++import path from 'node:path';
++
++export function loadEnv() {
++  const envFile = path.join(process.cwd(), '.env');
++  if (!fs.existsSync(envFile)) return;
++  for (const line of fs.readFileSync(envFile, 'utf8').split('\n')) {
++    const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
++    if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, '');
++  }
++}
++
++export const slug = (s) => String(s).toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
++export const num = (v) => {
++  if (v == null || v === '') return undefined;
++  if (typeof v === 'number') return v;
++  let s = String(v).replace(/[^\d,.-]/g, '');
++  if (s.includes(',') && s.includes('.')) s = s.lastIndexOf(',') > s.lastIndexOf('.') ? s.replace(/\./g, '').replace(',', '.') : s.replace(/,/g, '');
++  else s = s.replace(',', '.');
++  const n = Number(s);
++  return Number.isFinite(n) ? n : undefined;
++};
++
++/** Feldnamen vereinheitlichen: "Artikel-Nr." -> "artikelnr" */
++const nk = (k) => String(k).toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss').replace(/[^a-z0-9.]/g, '');
++function get(o, keys) {
++  for (const k of keys) {
++    const v = k.includes('.') ? k.split('.').reduce((x, p) => (x == null ? x : x[p]), o) : o[k] ?? o.__norm?.[nk(k)];
++    if (v != null && v !== '') return v;
++  }
++}
++
++// ---------- Feldzuordnung: bei abweichenden Namen hier ergänzen ----------
++export function mapItem(raw) {
++  raw.__norm ??= Object.fromEntries(Object.entries(raw).map(([k, v]) => [nk(k), v]));
++  const parent = get(raw, ['articleNumber', 'artikelnummer', 'artikelnr', 'article_no', 'parentSku', 'model', 'modell', 'styleCode', 'stylenr', 'herstellernummer', 'sku', 'id']);
++  const list = (v) => (Array.isArray(v) ? v : typeof v === 'string' && v.includes('|') ? v.split('|') : typeof v === 'string' && /^https?:/.test(v) && v.includes(',') ? v.split(',') : v ? [v] : []);
++  // Staffelpreise: Felder wie "preis_10", "price_ab_50", "staffelpreis100"
++  const tiers = [];
++  for (const [k, v] of Object.entries(raw.__norm)) {
++    const m = k.match(/^(?:ek|preis|price|staffelpreis|staffel|netprice)(?:ab)?(\d{1,5})$/);
++    const n = num(v);
++    if (m && n) tiers.push({ min: Number(m[1]), price: n });
++  }
++  return {
++    parent: String(parent ?? '').trim(),
++    name: get(raw, ['name', 'title', 'bezeichnung', 'artikelbezeichnung', 'productName', 'kurzbeschreibung']),
++    brand: get(raw, ['brand', 'marke', 'manufacturer', 'hersteller', 'brand.name']) ?? '',
++    category: get(raw, ['category', 'kategorie', 'productGroup', 'warengruppe', 'produkt', 'produktart', 'category.name']) ?? 'Sonstiges',
++    description: get(raw, ['description', 'beschreibung', 'longDescription', 'langtext', 'text']) ?? '',
++    material: get(raw, ['material', 'materialzusammensetzung', 'composition', 'zusammensetzung']),
++    gender: get(raw, ['gender', 'geschlecht', 'zielgruppe', 'target']),
++    price: num(get(raw, ['ek', 'ekpreis', 'einkaufspreis', 'purchasePrice', 'netPrice', 'nettopreis', 'price', 'preis', 'preis1', 'prices.0.price'])),
++    tiers,
++    images: list(get(raw, ['images', 'bilder', 'image', 'imageUrl', 'bild', 'bildurl', 'picture'])).map((i) => (typeof i === 'string' ? i.trim() : i?.url)).filter(Boolean),
++    color: get(raw, ['color', 'farbe', 'farbname', 'colorName', 'color.name']),
++    colorHex: get(raw, ['colorHex', 'hex', 'farbcode', 'color.hex']),
++    colorImages: list(get(raw, ['colorImage', 'colorImages', 'variantImage', 'variantenbild', 'farbbild'])).map((i) => (typeof i === 'string' ? i.trim() : i?.url)).filter(Boolean),
++    size: get(raw, ['size', 'groesse', 'größe', 'sizeName']),
++    stock: num(get(raw, ['stock', 'bestand', 'lagerbestand', 'verfuegbar', 'availability', 'qty', 'menge'])),
++    sizeChart: get(raw, ['sizeChart', 'groessentabelle', 'masstabelle']),
++  };
++}
++// -------------------------------------------------------------------------
++
++const CAT = { 'Poloshirts': 'Poloshirts', 'T-Shirts': 'T-Shirts', 'Hemden': 'Hemden & Blusen', 'Blusen': 'Hemden & Blusen', 'Sweatshirts & -jacken': 'Sweatshirts', 'Pullover': 'Sweatshirts', 'Jacken': 'Jacken', 'Westen & Bodywarmer': 'Jacken', 'Caps': 'Caps & Mützen', 'Mützen': 'Caps & Mützen', 'Taschen': 'Taschen', 'Handtücher': 'Handtücher', 'Schürzen': 'Arbeitskleidung', 'Kittel & Kasacks': 'Arbeitskleidung', 'Hosen': 'Hosen' };
++const SIZE_ORDER = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL', '4XL', '5XL', '6XL'];
++const sizeRank = (s) => { const i = SIZE_ORDER.indexOf(String(s).toUpperCase()); return i >= 0 ? i : 100 + (parseFloat(s) || 0); };
++
++/** Varianten -> Produkte (Bestand je Farbe/Größe, Farbbilder, Staffel-EK) */
++export function toProducts(raws) {
++  const groups = new Map();
++  for (const raw of raws) {
++    const m = mapItem(raw);
++    if (!m.parent) continue;
++    const g = groups.get(m.parent) ?? { ...m, colorsMap: new Map(), sizesSet: new Set(), prices: [], tierMap: new Map(), imgs: new Set(), stockBy: {}, stockSum: 0 };
++    if (m.name && !g.name) g.name = m.name;
++    if (m.price != null) g.prices.push(m.price);
++    for (const t of m.tiers) if (t.min > 1) g.tierMap.set(t.min, Math.min(g.tierMap.get(t.min) ?? Infinity, t.price));
++    m.images.forEach((i) => g.imgs.add(i));
++    if (m.color) {
++      const c = g.colorsMap.get(m.color) ?? { name: String(m.color).trim(), hex: m.colorHex ? `#${String(m.colorHex).replace('#', '').toLowerCase()}` : undefined, images: [] };
++      for (const i of [...m.colorImages, ...m.images]) if (!c.images.includes(i)) c.images.push(i);
++      g.colorsMap.set(m.color, c);
++    }
++    if (m.size) g.sizesSet.add(String(m.size).trim());
++    if (m.stock != null) { g.stockBy[`${m.color ?? ''}|${m.size ?? ''}`] = m.stock; g.stockSum += m.stock; }
++    if (m.sizeChart) g.sizeChart = m.sizeChart;
++    groups.set(m.parent, g);
++  }
++  return [...groups.values()].filter((g) => g.prices.length).map((g) => {
++    const category = CAT[String(g.category).trim()] ?? String(g.category).trim();
++    const name = String(g.name ?? g.parent).trim();
++    const colors = [...g.colorsMap.values()].map((c) => ({ ...c, images: c.images.length ? c.images.slice(0, 8) : undefined, hex: c.hex || undefined }));
++    return {
++      id: slug(g.parent), sku: g.parent, name, brand: String(g.brand).trim(), category, categorySlug: slug(category),
++      description: String(g.description).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
++      material: g.material, gender: g.gender ?? (/women|ladies|damen/i.test(name) ? 'Damen' : /kids|kinder|junior|baby/i.test(name) ? 'Kinder' : /men´s|men's|herren/i.test(name) ? 'Herren' : 'Unisex'),
++      basePrice: Math.max(...g.prices), // vorsichtig: teuerste Variante (z. B. Farbe statt Weiß) – Angebot wird ohnehin geprüft
++      baseTiers: [...g.tierMap.entries()].map(([min, price]) => ({ min, price })).sort((a, b) => a.min - b.min),
++      images: [...g.imgs].slice(0, 12),
++      ...(g.sizeChart ? { sizeChart: g.sizeChart } : {}),
++      colors, sizes: [...g.sizesSet].sort((a, b) => sizeRank(a) - sizeRank(b)),
++      stock: g.stockSum || undefined, stockBy: Object.keys(g.stockBy).length ? g.stockBy : undefined,
++      tags: [category],
++    };
++  });
++}
++
++/** Ergebnis schreiben: data/products.json (live, Shop lädt automatisch neu) */
++export function writeProducts(products, target = path.join(process.cwd(), 'data', 'products.json')) {
++  fs.mkdirSync(path.dirname(target), { recursive: true });
++  fs.writeFileSync(target + '.tmp', JSON.stringify(products));
++  fs.renameSync(target + '.tmp', target);
++}
+diff --git a/scripts/import-feed.mjs b/scripts/import-feed.mjs
+new file mode 100644
+index 0000000..587be42
+--- /dev/null
++++ b/scripts/import-feed.mjs
+@@ -0,0 +1,46 @@
++// Händler-Feed von L-Shop (CSV, XML oder JSON) -> data/products.json
++// Aufruf:  npm run import-feed -- pfad/zur/datei.csv   [--seed]   (--seed schreibt nach seed/products.json)
++// Spalten werden automatisch erkannt (Artikelnummer, Farbe, Größe, EK, Bestand, Bilder, preis_10/preis_50 …).
++import fs from 'node:fs';
++import path from 'node:path';
++import { loadEnv, toProducts, writeProducts } from './feed-lib.mjs';
++
++loadEnv();
++const file = process.argv.find((a, i) => i > 1 && !a.startsWith('--'));
++if (!file || !fs.existsSync(file)) { console.error('Datei angeben: npm run import-feed -- feed.csv'); process.exit(1); }
++const text = fs.readFileSync(file, 'utf8').replace(/^﻿/, '');
++
++function parseCSV(t) {
++  const first = t.split(/\r?\n/, 1)[0];
++  const d = [';', '\t', ',', '|'].sort((a, b) => first.split(b).length - first.split(a).length)[0];
++  const rows = []; let row = [], cell = '', q = false;
++  for (let i = 0; i < t.length; i++) {
++    const c = t[i];
++    if (q) { if (c === '"' && t[i + 1] === '"') { cell += '"'; i++; } else if (c === '"') q = false; else cell += c; continue; }
++    if (c === '"') q = true; else if (c === d) { row.push(cell); cell = ''; } else if (c === '\n' || c === '\r') { if (c === '\r' && t[i + 1] === '\n') i++; row.push(cell); rows.push(row); row = []; cell = ''; } else cell += c;
++  }
++  if (cell || row.length) { row.push(cell); rows.push(row); }
++  const [head, ...body] = rows.filter((r) => r.some((x) => x.trim()));
++  return body.map((r) => Object.fromEntries(head.map((h, i) => [h.trim(), (r[i] ?? '').trim()])));
++}
++function parseXML(t) {
++  // einfache Variante: wiederkehrende Elemente mit Kind-Tags als Datensätze
++  const tag = ['item', 'product', 'article', 'artikel', 'variant', 'row', 'offer'].find((n) => new RegExp(`<${n}[\\s>]`, 'i').test(t));
++  if (!tag) throw new Error('XML: keine <item>/<product>/<article>-Elemente gefunden');
++  const dec = (s) => s.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').trim();
++  return [...t.matchAll(new RegExp(`<${tag}[\\s>][\\s\\S]*?</${tag}>`, 'gi'))].map((m) => {
++    const o = {};
++    for (const f of m[0].replace(/^<[^>]+>/, '').replace(/<\/[^>]+>\s*$/, '').matchAll(/<([\w:-]+)[^>]*>([\s\S]*?)<\/\1>/g)) if (f[1].toLowerCase() !== tag) o[f[1]] = o[f[1]] ? `${o[f[1]]}|${dec(f[2])}` : dec(f[2]);
++    return o;
++  });
++}
++
++const ext = path.extname(file).toLowerCase();
++const raws = ext === '.json' ? [].concat(JSON.parse(text).products ?? JSON.parse(text).items ?? JSON.parse(text)) : ext === '.xml' || text.trimStart().startsWith('<') ? parseXML(text) : parseCSV(text);
++console.log(`${raws.length} Datensätze gelesen. Erkannte Spalten: ${Object.keys(raws[0] ?? {}).slice(0, 25).join(', ')}`);
++const products = toProducts(raws);
++if (!products.length) { console.error('0 Produkte – Spaltennamen in scripts/feed-lib.mjs (mapItem) ergänzen. Beispiel:', JSON.stringify(raws[0], null, 1).slice(0, 1500)); process.exit(1); }
++const target = process.argv.includes('--seed') ? path.join(process.cwd(), 'seed', 'products.json') : undefined;
++writeProducts(products, target);
++const withStock = products.filter((p) => p.stockBy).length, withTiers = products.filter((p) => p.baseTiers.length).length;
++console.log(`✓ ${products.length} Produkte gespeichert${target ? ' (seed)' : ''} · ${withStock} mit Bestand · ${withTiers} mit Staffel-EK · ${products.filter((p) => p.colors.some((c) => c.images)).length} mit Farbbildern`);
+diff --git a/scripts/sync-lshop.mjs b/scripts/sync-lshop.mjs
+index 6460c07..c1a43d3 100644
+--- a/scripts/sync-lshop.mjs
++++ b/scripts/sync-lshop.mjs
+@@ -3,17 +3,9 @@
+ //
+ // Sobald der API-Key + die Doku von L-Shop da sind, muss i. d. R. nur mapItem() unten
+ // angepasst werden. Alles andere (Suche, Preise, Shop) bleibt unverändert.
+-import fs from 'node:fs';
+-import path from 'node:path';
+ 
+-// .env laden (ohne extra Abhängigkeit)
+-const envFile = path.join(process.cwd(), '.env');
+-if (fs.existsSync(envFile)) {
+-  for (const line of fs.readFileSync(envFile, 'utf8').split('\n')) {
+-    const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
+-    if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, '');
+-  }
+-}
++import { loadEnv, toProducts, writeProducts } from './feed-lib.mjs';
++loadEnv();
+ 
+ const { LSHOP_API_URL, LSHOP_API_KEY, LSHOP_AUTH_MODE = 'header' } = process.env;
+ if (!LSHOP_API_URL || !LSHOP_API_KEY) {
+@@ -21,42 +13,7 @@ if (!LSHOP_API_URL || !LSHOP_API_KEY) {
+   process.exit(1);
+ }
+ 
+-const slug = (s) => String(s).toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+-const num = (v) => (v == null || v === '' ? undefined : Number(String(v).replace(/\./g, (m, i, s) => (s.includes(',') ? '' : m)).replace(',', '.')));
+-
+-/** Erstes vorhandenes Feld aus einer Liste möglicher Feldnamen (auch verschachtelt "a.b") */
+-function get(o, keys) {
+-  for (const k of keys) {
+-    const v = k.split('.').reduce((x, p) => (x == null ? x : x[p]), o);
+-    if (v != null && v !== '') return v;
+-  }
+-}
+-
+-// ---------- HIER AN DIE L-SHOP-DOKU ANPASSEN ----------
+-function mapItem(raw) {
+-  const parent = get(raw, ['articleNumber', 'artikelnummer', 'article_no', 'parentSku', 'model', 'styleCode', 'sku', 'id']);
+-  return {
+-    parent: String(parent),
+-    sku: String(get(raw, ['sku', 'variantSku', 'ean', 'artikelnummer', 'id']) ?? parent),
+-    name: get(raw, ['name', 'title', 'bezeichnung', 'productName', 'description_short']) ?? String(parent),
+-    brand: get(raw, ['brand', 'marke', 'manufacturer', 'hersteller', 'brand.name']) ?? '',
+-    category: get(raw, ['category', 'kategorie', 'productGroup', 'warengruppe', 'category.name']) ?? 'Sonstiges',
+-    description: get(raw, ['description', 'beschreibung', 'longDescription', 'text']) ?? '',
+-    material: get(raw, ['material', 'composition', 'zusammensetzung']),
+-    gender: get(raw, ['gender', 'geschlecht', 'target']),
+-    price: num(get(raw, ['price', 'preis', 'netPrice', 'ekPreis', 'purchasePrice', 'prices.0.price'])),
+-    image: get(raw, ['image', 'imageUrl', 'bild', 'images.0', 'images.0.url', 'picture']),
+-    images: get(raw, ['images']),
+-    color: get(raw, ['color', 'farbe', 'colorName', 'color.name']),
+-    colorHex: get(raw, ['colorHex', 'hex', 'color.hex', 'rgb']),
+-    colorImage: get(raw, ['colorImage', 'variantImage']),
+-    size: get(raw, ['size', 'groesse', 'größe', 'sizeName']),
+-    sizes: get(raw, ['sizes', 'groessen']),
+-    colors: get(raw, ['colors', 'farben']),
+-    stock: num(get(raw, ['stock', 'bestand', 'lagerbestand', 'availability', 'qty'])),
+-  };
+-}
+-// ------------------------------------------------------
++// Feldzuordnung: scripts/feed-lib.mjs → mapItem()
+ 
+ async function fetchPage(page) {
+   const url = new URL(LSHOP_API_URL);
+@@ -82,41 +39,7 @@ for (let page = 1; page < 1000; page++) {
+ }
+ console.log();
+ 
+-// Varianten (Farbe/Größe je Zeile) zu einem Produkt zusammenfassen
+-const groups = new Map();
+-for (const raw of raws) {
+-  const m = mapItem(raw);
+-  const g = groups.get(m.parent) ?? { ...m, colorsMap: new Map(), sizesSet: new Set(), prices: [], imgs: new Set(), stockSum: 0 };
+-  if (m.price != null && !Number.isNaN(m.price)) g.prices.push(m.price);
+-  if (m.image) g.imgs.add(typeof m.image === 'string' ? m.image : m.image.url);
+-  if (Array.isArray(m.images)) m.images.forEach((i) => g.imgs.add(typeof i === 'string' ? i : i.url));
+-  if (m.color) g.colorsMap.set(m.color, { name: m.color, hex: m.colorHex, image: m.colorImage });
+-  if (Array.isArray(m.colors)) m.colors.forEach((c) => typeof c === 'string' ? g.colorsMap.set(c, { name: c }) : g.colorsMap.set(c.name, { name: c.name, hex: c.hex, image: c.image }));
+-  if (m.size) g.sizesSet.add(String(m.size));
+-  if (Array.isArray(m.sizes)) m.sizes.forEach((s) => g.sizesSet.add(String(typeof s === 'string' ? s : s.name)));
+-  if (m.stock) g.stockSum += m.stock;
+-  groups.set(m.parent, g);
+-}
+-
+-const products = [...groups.values()]
+-  .filter((g) => g.prices.length)
+-  .map((g) => ({
+-    id: slug(g.parent),
+-    sku: g.parent,
+-    name: String(g.name).trim(),
+-    brand: String(g.brand).trim(),
+-    category: String(g.category).trim(),
+-    categorySlug: slug(g.category),
+-    description: String(g.description).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
+-    material: g.material,
+-    gender: g.gender,
+-    basePrice: Math.min(...g.prices), // "ab"-Preis
+-    images: [...g.imgs].filter(Boolean),
+-    colors: [...g.colorsMap.values()],
+-    sizes: [...g.sizesSet],
+-    stock: g.stockSum || undefined,
+-    tags: [],
+-  }));
++const products = toProducts(raws);
+ 
+ if (products.length === 0) {
+   console.error('0 Produkte gemappt – Feldnamen in mapItem() prüfen. Beispiel-Datensatz:');
+@@ -124,7 +47,5 @@ if (products.length === 0) {
+   process.exit(1);
+ }
+ 
+-const out = path.join(process.cwd(), 'data', 'products.json');
+-fs.writeFileSync(out + '.tmp', JSON.stringify(products));
+-fs.renameSync(out + '.tmp', out); // atomar – Shop lädt automatisch neu
++writeProducts(products); // atomar – Shop lädt automatisch neu
+ console.log(`${products.length} Produkte gespeichert (${raws.length} Varianten).`);
+-- 
+2.43.0
+

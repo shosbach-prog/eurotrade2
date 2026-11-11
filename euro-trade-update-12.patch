@@ -1,0 +1,433 @@
+From ab353c0186d058b7fce45e4e1ccdbed18af9ae18 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Wed, 11 Nov 2026 05:03:43 +0100
+Subject: [PATCH] Bewertungen ohne Fake: Vertrauensblock statt leerer Bereiche,
+ Erfassen per Mail/Telefon, Kennzeichnung Testprodukt; Garantie-Siegel
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+- Produktseite ohne Bewertungen: „Darauf können Sie sich verlassen“ + Ansprechpartner
+- Admin: Bewertung zu echtem Auftrag mit Kundenzustimmung erfassen, Quelle sichtbar
+- Kennzeichnung „Kostenloses/Vergünstigtes Testprodukt erhalten“, Hinweistext nach § 5b UWG erweitert
+- Siegel „100 % Zufriedenheitsgarantie“ unten links, verlinkt auf /garantie mit Garantiebedingungen (§ 479 BGB)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01AW9Go5bwJWAYsfGemt2b6Z
+---
+ app/admin/bewertungen/Moderation.tsx | 41 +++++++++++++++++++++++++++-
+ app/admin/bewertungen/page.tsx       |  4 +--
+ app/api/admin/bewertungen/route.ts   | 27 ++++++++++++++++--
+ app/garantie/page.tsx                | 40 +++++++++++++++++++++++++++
+ app/globals.css                      | 15 ++++++++++
+ app/layout.tsx                       |  8 ++++--
+ app/robots.ts                        |  2 +-
+ app/sitemap.ts                       |  2 +-
+ components/ProductReviews.tsx        | 24 ++++++++++++----
+ components/ReviewList.tsx            |  6 ++--
+ components/TrustBadge.tsx            | 22 +++++++++++++++
+ lib/store.ts                         |  4 +++
+ middleware.ts                        |  2 +-
+ 13 files changed, 178 insertions(+), 19 deletions(-)
+ create mode 100644 app/garantie/page.tsx
+ create mode 100644 components/TrustBadge.tsx
+
+diff --git a/app/admin/bewertungen/Moderation.tsx b/app/admin/bewertungen/Moderation.tsx
+index 6b2a280..9d2f866 100644
+--- a/app/admin/bewertungen/Moderation.tsx
++++ b/app/admin/bewertungen/Moderation.tsx
+@@ -3,7 +3,8 @@ import { useState } from 'react';
+ import type { Review } from '@/lib/store';
+ 
+ const LBL = { pending: 'Wartet auf Freigabe', approved: 'Veröffentlicht', rejected: 'Abgelehnt' } as const;
+-export default function Moderation({ initial }: { initial: Review[] }) {
++type Order = { no: string; who: string; name: string; company: string; products: [string, string][] };
++export default function Moderation({ initial, orders }: { initial: Review[]; orders: Order[] }) {
+   const [list, setList] = useState(initial);
+   const [tab, setTab] = useState<'pending' | 'approved' | 'rejected'>('pending');
+   async function patch(id: string, data: Partial<Review>) {
+@@ -11,8 +12,43 @@ export default function Moderation({ initial }: { initial: Review[] }) {
+     if (r.ok) setList((l) => l.map((x) => (x.id === id ? { ...x, ...data } : x)));
+   }
+   const shown = list.filter((r) => r.status === tab);
++  const [form, setForm] = useState<{ open: boolean; inquiryNo: string; productId: string; rating: number; title: string; text: string; name: string; company: string; source: string; incentive: string; consent: boolean; err: string }>({ open: false, inquiryNo: '', productId: '', rating: 5, title: '', text: '', name: '', company: '', source: 'email', incentive: '', consent: false, err: '' });
++  const ord = orders.find((o) => o.no === form.inquiryNo);
++  async function create() {
++    const r = await fetch('/api/admin/bewertungen', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
++    const d = await r.json().catch(() => ({}));
++    if (!r.ok) { setForm((f) => ({ ...f, err: d.error ?? 'Fehler' })); return; }
++    setList((l) => [d.review, ...l]); setTab('approved'); setForm((f) => ({ ...f, open: false, title: '', text: '', consent: false, err: '' }));
++  }
+   return (
+     <>
++      <div className="admin-actions" style={{ marginTop: 0 }}>
++        <button className="btn alt" onClick={() => setForm((f) => ({ ...f, open: !f.open }))}>+ Bewertung erfassen (per E-Mail/Telefon erhalten)</button>
++      </div>
++      {form.open && (
++        <div className="box form" style={{ marginBottom: 16 }}>
++          {!orders.length ? <p className="muted">Noch keine angenommenen oder gelieferten Aufträge – Bewertungen können nur zu echten Aufträgen erfasst werden.</p> : <>
++            <div className="two">
++              <div><label>Auftrag *</label><select className="sel" value={form.inquiryNo} onChange={(e) => { const o = orders.find((x) => x.no === e.target.value); setForm((f) => ({ ...f, inquiryNo: e.target.value, productId: '', name: o ? o.name.split(' ')[0] + (o.name.split(' ')[1] ? ` ${o.name.split(' ').pop()![0]}.` : '') : '', company: o?.company ?? '' })); }}><option value="">– wählen –</option>{orders.map((o) => <option key={o.no} value={o.no}>{o.no} · {o.who}</option>)}</select></div>
++              <div><label>Bewertet wird</label><select className="sel" value={form.productId} onChange={(e) => setForm((f) => ({ ...f, productId: e.target.value }))}><option value="">Shop / Service</option>{ord?.products.map(([id, n]) => <option key={id} value={id}>{n}</option>)}</select></div>
++            </div>
++            <label>Sterne *</label>
++            <div className="deco-row">{[1, 2, 3, 4, 5].map((n) => <button key={n} type="button" className={`size ${form.rating === n ? 'on' : ''}`} onClick={() => setForm((f) => ({ ...f, rating: n }))}>{'★'.repeat(n)}</button>)}</div>
++            <label>Überschrift</label><input value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} />
++            <label>Text (Wortlaut des Kunden)</label><textarea value={form.text} onChange={(e) => setForm((f) => ({ ...f, text: e.target.value }))} />
++            <div className="two">
++              <div><label>Anzeigename</label><input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} /></div>
++              <div><label>Firma / Verein (optional)</label><input value={form.company} onChange={(e) => setForm((f) => ({ ...f, company: e.target.value }))} /></div>
++            </div>
++            <div className="two">
++              <div><label>Erhalten</label><select className="sel" value={form.source} onChange={(e) => setForm((f) => ({ ...f, source: e.target.value }))}><option value="email">per E-Mail</option><option value="telefon">telefonisch</option><option value="persoenlich">persönlich</option></select></div>
++              <div><label>Gegenleistung (wird öffentlich angezeigt)</label><select className="sel" value={form.incentive} onChange={(e) => setForm((f) => ({ ...f, incentive: e.target.value }))}><option value="">keine</option><option>Kostenloses Testprodukt erhalten</option><option>Vergünstigtes Testprodukt erhalten</option></select></div>
++            </div>
++            <label style={{ display: 'flex', gap: 8, fontWeight: 400 }}><input type="checkbox" style={{ width: 'auto' }} checked={form.consent} onChange={(e) => setForm((f) => ({ ...f, consent: e.target.checked }))} /> Der Kunde hat der Veröffentlichung zugestimmt, und der Text gibt seine Aussage unverändert wieder.</label>
++            <div className="admin-actions"><button className="btn" disabled={!form.inquiryNo || !form.consent} onClick={create}>Bewertung veröffentlichen</button>{form.err && <span className="err">{form.err}</span>}</div>
++          </>}
++        </div>
++      )}
+       <div className="chips" style={{ margin: '0 0 14px' }}>
+         {(Object.keys(LBL) as (keyof typeof LBL)[]).map((k) => <button key={k} className={`chip ${tab === k ? 'chip-on' : ''}`} onClick={() => setTab(k)}>{LBL[k]} ({list.filter((r) => r.status === k).length})</button>)}
+       </div>
+@@ -26,6 +62,9 @@ export default function Moderation({ initial }: { initial: Review[] }) {
+             {r.title && <p style={{ margin: '8px 0 0', fontWeight: 700 }}>{r.title}</p>}
+             {r.text && <p style={{ margin: '4px 0 0', whiteSpace: 'pre-wrap' }}>{r.text}</p>}
+             <div className="form" style={{ marginTop: 10 }}>
++              <select className="sel" style={{ marginBottom: 8 }} value={r.incentive ?? ''} onChange={(e) => patch(r.id, { incentive: e.target.value || null })}>
++                <option value="">Keine Gegenleistung</option><option>Kostenloses Testprodukt erhalten</option><option>Vergünstigtes Testprodukt erhalten</option>
++              </select>
+               <textarea placeholder="Öffentliche Antwort (optional)" defaultValue={r.reply ?? ''} onBlur={(e) => e.target.value !== (r.reply ?? '') && patch(r.id, { reply: e.target.value })} style={{ minHeight: 60 }} />
+             </div>
+             <div className="admin-actions" style={{ marginBottom: 0 }}>
+diff --git a/app/admin/bewertungen/page.tsx b/app/admin/bewertungen/page.tsx
+index bd0442f..7466ef9 100644
+--- a/app/admin/bewertungen/page.tsx
++++ b/app/admin/bewertungen/page.tsx
+@@ -1,7 +1,7 @@
+ import type { Metadata } from 'next';
+ import AdminNav from '@/components/AdminNav';
+ import Moderation from './Moderation';
+-import { listReviews } from '@/lib/store';
++import { listInquiries, listReviews } from '@/lib/store';
+ 
+ export const metadata: Metadata = { title: 'Bewertungen', robots: { index: false, follow: false } };
+ export default function Bewertungen() {
+@@ -11,7 +11,7 @@ export default function Bewertungen() {
+       <AdminNav active="bewertungen" />
+       <h1>Bewertungen</h1>
+       <p className="muted" style={{ marginTop: -8 }}>Nur Kunden mit abgeschlossenem Auftrag können bewerten. Bitte negative Bewertungen nicht zurückhalten, nur weil sie negativ sind (UWG). Ablehnen nur bei Beleidigungen, persönlichen Daten oder fehlendem Bezug. Antworten sind öffentlich sichtbar.</p>
+-      <Moderation initial={all} />
++      <Moderation initial={all} orders={listInquiries().filter((i) => ['angenommen', 'bestellt', 'geliefert'].includes(i.status ?? '')).map((i) => ({ no: i.no, who: i.customer.company || i.customer.name, name: i.customer.name, company: i.customer.company ?? '', products: [...new Map(i.lines.filter((l) => l.id).map((l) => [l.id!, l.name])).entries()] }))} />
+     </>
+   );
+ }
+diff --git a/app/api/admin/bewertungen/route.ts b/app/api/admin/bewertungen/route.ts
+index 6b99beb..38eecfb 100644
+--- a/app/api/admin/bewertungen/route.ts
++++ b/app/api/admin/bewertungen/route.ts
+@@ -1,16 +1,39 @@
+ import { NextResponse } from 'next/server';
+ import { isAdmin } from '@/lib/customer';
+-import { listReviews, saveReviews } from '@/lib/store';
++import { getInquiry, listReviews, randomId, saveReviews, type Review } from '@/lib/store';
+ 
+ /** Bewertung freigeben/ablehnen/beantworten – Inhalte der Kunden werden nicht verändert */
+ export async function PATCH(req: Request) {
+   if (!(await isAdmin())) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
+-  const { id, status, reply } = await req.json().catch(() => ({}));
++  const { id, status, reply, incentive } = await req.json().catch(() => ({}));
+   const list = listReviews();
+   const r = list.find((x) => x.id === id);
+   if (!r) return NextResponse.json({ error: 'Nicht gefunden.' }, { status: 404 });
+   if (['pending', 'approved', 'rejected'].includes(status)) r.status = status;
+   if (typeof reply === 'string') r.reply = reply.trim().slice(0, 800) || undefined;
++  if (incentive !== undefined) r.incentive = String(incentive ?? '').trim().slice(0, 80) || null;
+   saveReviews(list);
+   return NextResponse.json({ ok: true });
+ }
++
++/** Bewertung erfassen, die per E-Mail/Telefon/persönlich kam – nur mit echtem Auftrag und Zustimmung */
++export async function POST(req: Request) {
++  if (!(await isAdmin())) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
++  const b = await req.json().catch(() => ({}));
++  const i = getInquiry(String(b.inquiryNo ?? ''));
++  if (!i || !['angenommen', 'bestellt', 'geliefert'].includes(i.status ?? '')) return NextResponse.json({ error: 'Nur zu angenommenen/gelieferten Aufträgen möglich.' }, { status: 400 });
++  if (!b.consent) return NextResponse.json({ error: 'Bitte die Zustimmung des Kunden zur Veröffentlichung bestätigen.' }, { status: 400 });
++  const rating = Math.round(Number(b.rating));
++  if (!(rating >= 1 && rating <= 5)) return NextResponse.json({ error: 'Bitte 1–5 Sterne wählen.' }, { status: 400 });
++  const line = b.productId ? i.lines.find((l) => l.id === b.productId) : null;
++  if (b.productId && !line) return NextResponse.json({ error: 'Artikel gehört nicht zu diesem Auftrag.' }, { status: 400 });
++  const r: Review = {
++    id: randomId(6), productId: line?.id ?? null, sku: line?.sku, productName: line?.name,
++    name: String(b.name ?? '').trim().slice(0, 40) || i.customer.name, company: String(b.company ?? '').trim().slice(0, 80),
++    rating, title: String(b.title ?? '').trim().slice(0, 80), text: String(b.text ?? '').trim().slice(0, 1000),
++    date: new Date().toISOString(), inquiryNo: i.no, status: 'approved',
++    source: (['email', 'telefon', 'persoenlich'].includes(b.source) ? b.source : 'email'), incentive: String(b.incentive ?? '').trim().slice(0, 80) || null,
++  };
++  saveReviews([...listReviews(), r]);
++  return NextResponse.json({ ok: true, review: r });
++}
+diff --git a/app/garantie/page.tsx b/app/garantie/page.tsx
+new file mode 100644
+index 0000000..6d46a48
+--- /dev/null
++++ b/app/garantie/page.tsx
+@@ -0,0 +1,40 @@
++import Link from 'next/link';
++import type { Metadata } from 'next';
++
++export const metadata: Metadata = {
++  title: '100 % Zufriedenheitsgarantie',
++  description: 'Die Zufriedenheitsgarantie von euro-trade.com: kostenlose Neuanfertigung bei Veredelungsfehlern, Ersatz bei Mängeln und Umtausch unveredelter Ware – die Bedingungen im Überblick.',
++  alternates: { canonical: '/garantie' },
++};
++
++export default function Garantie() {
++  return (
++    <div className="info legal-page">
++      <div className="crumbs"><Link href="/">Start</Link> › Zufriedenheitsgarantie</div>
++      <h1>100 % Zufriedenheitsgarantie</h1>
++      <p className="lead">Wir stehen für jede Bestellung gerade. Wenn etwas nicht so ist, wie wir es zugesagt haben, machen wir es richtig, ohne Diskussion. Das garantieren wir Ihnen:</p>
++
++      <div className="ret-grid" style={{ gridTemplateColumns: 'repeat(3,1fr)' }}>
++        <div className="box ret"><div className="ret-ico">✦</div><h3>Veredelung wie freigegeben</h3><p>Weicht Druck oder Stick von der von Ihnen freigegebenen Vorschau ab, fertigen wir die betroffenen Teile kostenlos neu oder erstatten den Betrag.</p></div>
++        <div className="box ret"><div className="ret-ico">✓</div><h3>Einwandfreie Ware</h3><p>Ist ein Artikel fehlerhaft oder falsch geliefert, ersetzen wir ihn kostenlos, inklusive Hin- und Rückversand.</p></div>
++        <div className="box ret"><div className="ret-ico">⇄</div><h3>Umtausch unveredelter Ware</h3><p>Unveredelte Artikel tauschen wir innerhalb von 14 Tagen nach Erhalt in eine andere Größe oder Farbe um, solange verfügbar. Das gilt auch für Firmen und Vereine.</p></div>
++      </div>
++
++      <h2>Garantiebedingungen</h2>
++      <div className="box legal">
++        <p><strong>Garantiegeber:</strong> Sebastian Hosbach, Euro-Trade, Seehan 28, 44263 Dortmund, Telefon 0173 2648097, E-Mail info@euro-trade.com.</p>
++        <p><strong>Geltungsbereich:</strong> Die Garantie gilt für alle über euro-trade.com angenommenen Angebote, für Verbraucher wie für Unternehmen, Vereine und Behörden.</p>
++        <p><strong>1. Veredelung:</strong> Maßgeblich ist die vor der Produktion von Ihnen freigegebene Vorschau. Übliche, produktionsbedingte Toleranzen bei Farbe (z. B. Druck- und Garnfarben gegenüber der Bildschirmdarstellung), Größe (± 5 mm) und Position (± 1 cm) stellen keine Abweichung dar. Nicht umfasst sind Fehler in von Ihnen gelieferten Vorlagen, Texten oder Namenslisten, die in der Vorschau erkennbar waren und freigegeben wurden.</p>
++        <p><strong>2. Mängel und Falschlieferung:</strong> Bitte melden Sie offensichtliche Mängel oder Falschlieferungen innerhalb von 7 Tagen nach Erhalt mit Fotos an info@euro-trade.com.</p>
++        <p><strong>3. Umtausch:</strong> Der Umtausch gilt für ungetragene, ungewaschene Ware ohne Gebrauchsspuren in der Originalverpackung. Die Kosten der Rücksendung tragen Sie; den Versand der Ersatzware übernehmen wir. Veredelte Artikel sind vom Umtausch ausgeschlossen, da sie individuell für Sie gefertigt werden.</p>
++        <p><strong>4. Abwicklung:</strong> Schreiben Sie uns mit Ihrer Auftragsnummer. Wir melden uns innerhalb von zwei Werktagen mit einer Lösung.</p>
++        <p><strong>Ihre gesetzlichen Rechte</strong> (insbesondere Gewährleistung und, für Verbraucher, das <Link href="/widerruf" className="alink">Widerrufsrecht</Link>) bestehen unabhängig von dieser Garantie und werden durch sie nicht eingeschränkt. Die Inanspruchnahme der Garantie ist unentgeltlich.</p>
++      </div>
++
++      <div className="box l-cta-box">
++        <div><h2 style={{ margin: 0 }}>Etwas stimmt nicht?</h2><p className="muted" style={{ margin: '4px 0 0' }}>Schreiben Sie uns, wir kümmern uns sofort.</p></div>
++        <a href="mailto:info@euro-trade.com" className="btn" style={{ display: 'inline-grid', placeItems: 'center' }}>info@euro-trade.com</a>
++      </div>
++    </div>
++  );
++}
+diff --git a/app/globals.css b/app/globals.css
+index e68c4ab..691d0d6 100644
+--- a/app/globals.css
++++ b/app/globals.css
+@@ -624,3 +624,18 @@ footer .wrap{padding-right:84px}
+ .te-facts .specs dt{width:120px}.te-facts .specs dd{margin-left:120px}
+ .te-prev{margin-top:16px;padding:16px;border:1px dashed var(--line);border-radius:10px;background:#fafbfc}
+ @media (max-width:900px){.te-grid{grid-template-columns:1fr}.te-facts{position:static;max-height:none}}
++.rev-inc{align-self:flex-start;font-size:11px;font-weight:700;background:#fff4d6;color:#7a5600;border-radius:6px;padding:2px 8px}
++.trust-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
++.trust-grid .box b{font-size:15px}
++.trust-grid .box p{margin:6px 0 0;font-size:14px;color:var(--muted)}
++.contact-card{display:flex;gap:12px;align-items:flex-start}
++.avatar{width:44px;height:44px;flex:none;border-radius:50%;background:linear-gradient(135deg,#ffe45c,#ffb300);color:#0638b8;font-weight:900;display:grid;place-items:center}
++@media (max-width:900px){.trust-grid{grid-template-columns:1fr 1fr}}
++@media (max-width:520px){.trust-grid{grid-template-columns:1fr}}
++/* Garantie-Siegel unten links */
++.tbadge{position:fixed;left:18px;bottom:18px;z-index:94;border-radius:50%;filter:drop-shadow(0 6px 16px rgba(6,70,201,.35));transition:transform .2s}
++.tbadge:hover{transform:scale(1.07) rotate(-4deg)}
++.tbadge svg{display:block}
++footer .wrap{padding-left:112px}
++@media (max-width:820px){.tbadge svg{width:58px;height:58px}.tbadge{left:12px;bottom:12px}body:has(.mbar) .tbadge{bottom:80px}footer .wrap{padding-left:16px;padding-bottom:70px}}
++@media print{.tbadge,.contact{display:none}}
+diff --git a/app/layout.tsx b/app/layout.tsx
+index 275981c..89a1114 100644
+--- a/app/layout.tsx
++++ b/app/layout.tsx
+@@ -8,6 +8,7 @@ import SearchBar from '@/components/SearchBar';
+ import Logo from '@/components/Logo';
+ import LogoutLink from '@/components/LogoutLink';
+ import Contact from '@/components/Contact';
++import TrustBadge from '@/components/TrustBadge';
+ import { CartButton, CartProvider } from '@/components/CartContext';
+ import { AccountButton, WishlistButton, WishlistProvider } from '@/components/Wishlist';
+ import { getCategories } from '@/lib/catalog';
+@@ -21,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
+     description: 'T-Shirts, Polos, Hoodies, Jacken, Caps und Taschen für Druck und Stick – schnell finden, Anfrage in einer Minute.',
+     metadataBase: new URL(process.env.SHOP_URL ?? 'https://euro-trade.com'),
+     // Geschlossener Shop: nur Landingpage und Info-Seite in Suchmaschinen
+-    robots: previewMode() || (shopClosed() && !['/start', '/druck-stick', '/widerruf', '/impressum'].includes(headers().get('x-path') ?? '')) ? { index: false, follow: false } : undefined,
++    robots: previewMode() || (shopClosed() && !['/start', '/druck-stick', '/widerruf', '/garantie', '/impressum'].includes(headers().get('x-path') ?? '')) ? { index: false, follow: false } : undefined,
+   };
+ }
+ export const dynamic = 'force-dynamic';
+@@ -29,7 +30,7 @@ export const dynamic = 'force-dynamic';
+ export default async function RootLayout({ children }: { children: React.ReactNode }) {
+   const gated = shopClosed();
+   const path = headers().get('x-path') ?? '/';
+-  const isPublic = ['/bewerten', '/widerruf', '/newsletter', '/start', '/druck-stick', '/zugang', '/impressum', '/datenschutz', '/angebot', '/admin'].some((p) => path === p || path.startsWith(p + '/'));
++  const isPublic = ['/garantie', '/bewerten', '/widerruf', '/newsletter', '/start', '/druck-stick', '/zugang', '/impressum', '/datenschutz', '/angebot', '/admin'].some((p) => path === p || path.startsWith(p + '/'));
+   const { ok, customer } = await shopAccess();
+   // Code im Admin gesperrt/gelöscht -> zurück zur Anmeldung
+   if (!ok && !isPublic) redirect('/zugang');
+@@ -60,8 +61,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
+           <main className="wrap">{children}</main>
+           <footer><div className="wrap">
+             <span>© {new Date().getFullYear()} {SHOP} · Alle Preise netto zzgl. MwSt. und Versand</span>
+-            <span>{open && <><Link href="/konto">Meine Anfragen</Link> · </>}<Link href="/druck-stick">Druck & Stick</Link> · <Link href="/widerruf">Rückgabe & Widerruf</Link> · <Link href="/impressum">Impressum</Link> · <Link href="/datenschutz">Datenschutz</Link>{gated && customer && <> · {customer.name} · <LogoutLink /></>}</span>
++            <span>{open && <><Link href="/konto">Meine Anfragen</Link> · </>}<Link href="/druck-stick">Druck & Stick</Link> · <Link href="/widerruf">Rückgabe & Widerruf</Link> · <Link href="/garantie">Zufriedenheitsgarantie</Link> · <Link href="/impressum">Impressum</Link> · <Link href="/datenschutz">Datenschutz</Link>{gated && customer && <> · {customer.name} · <LogoutLink /></>}</span>
+           </div></footer>
++          {!path.startsWith('/admin') && <TrustBadge />}
+           {!path.startsWith('/admin') && <Contact whatsapp={process.env.CONTACT_WHATSAPP ?? '491732648097'} phone={process.env.CONTACT_PHONE ?? '0173 2648097'} email={process.env.CONTACT_EMAIL ?? 'info@euro-trade.com'} />}
+         </WishlistProvider></CartProvider>
+       </body>
+diff --git a/app/robots.ts b/app/robots.ts
+index 7f4cef0..8867b26 100644
+--- a/app/robots.ts
++++ b/app/robots.ts
+@@ -3,7 +3,7 @@ import { previewMode } from '@/lib/access';
+ export default function robots(): MetadataRoute.Robots {
+   const base = (process.env.SHOP_URL ?? 'https://euro-trade.com').replace(/\/$/, '');
+   if (previewMode()) return { rules: { userAgent: '*', disallow: '/' } };
+-  return { rules: { userAgent: '*', allow: ['/', '/druck-stick', '/widerruf'], disallow: ['/admin', '/api', '/angebot', '/warenkorb', '/merkliste', '/zugang'] }, sitemap: `${base}/sitemap.xml` };
++  return { rules: { userAgent: '*', allow: ['/', '/druck-stick', '/widerruf', '/garantie'], disallow: ['/admin', '/api', '/angebot', '/warenkorb', '/merkliste', '/zugang'] }, sitemap: `${base}/sitemap.xml` };
+ }
+ 
+ export const dynamic = 'force-dynamic';
+diff --git a/app/sitemap.ts b/app/sitemap.ts
+index 0ef6cc5..809e8ce 100644
+--- a/app/sitemap.ts
++++ b/app/sitemap.ts
+@@ -1,7 +1,7 @@
+ import type { MetadataRoute } from 'next';
+ export default function sitemap(): MetadataRoute.Sitemap {
+   const base = (process.env.SHOP_URL ?? 'https://euro-trade.com').replace(/\/$/, '');
+-  return [{ url: `${base}/`, priority: 1 }, { url: `${base}/druck-stick`, priority: 0.8 }, { url: `${base}/widerruf`, priority: 0.3 }, { url: `${base}/impressum`, priority: 0.1 }];
++  return [{ url: `${base}/`, priority: 1 }, { url: `${base}/druck-stick`, priority: 0.8 }, { url: `${base}/widerruf`, priority: 0.3 }, { url: `${base}/garantie`, priority: 0.4 }, { url: `${base}/impressum`, priority: 0.1 }];
+ }
+ 
+ export const dynamic = 'force-dynamic';
+diff --git a/components/ProductReviews.tsx b/components/ProductReviews.tsx
+index 2ab7fb4..25ebd5e 100644
+--- a/components/ProductReviews.tsx
++++ b/components/ProductReviews.tsx
+@@ -5,12 +5,7 @@ import { reviewsFor } from '@/lib/reviews';
+ /** Bewertungsbereich auf der Produktseite */
+ export default function ProductReviews({ productId, name }: { productId: string; name: string }) {
+   const list = reviewsFor(productId);
+-  if (!list.length) return (
+-    <section id="bewertungen" className="rev-section">
+-      <h2>Bewertungen</h2>
+-      <div className="box muted">Für diesen Artikel gibt es noch keine Bewertungen. Nach Ihrer Bestellung laden wir Sie ein, als Erste/r zu bewerten.</div>
+-    </section>
+-  );
++  if (!list.length) return <TrustBlock />;
+   const avg = list.reduce((s, r) => s + r.rating, 0) / list.length;
+   const dist = [5, 4, 3, 2, 1].map((n) => ({ n, c: list.filter((r) => r.rating === n).length }));
+   const ld = { '@context': 'https://schema.org', '@type': 'Product', name, aggregateRating: { '@type': 'AggregateRating', ratingValue: avg.toFixed(1), reviewCount: list.length }, review: list.slice(0, 5).map((r) => ({ '@type': 'Review', reviewRating: { '@type': 'Rating', ratingValue: r.rating }, author: { '@type': 'Person', name: r.name }, datePublished: r.date.slice(0, 10), reviewBody: r.text })) };
+@@ -32,6 +27,23 @@ export default function ProductReviews({ productId, name }: { productId: string;
+   );
+ }
+ 
++/** Statt leerer Bewertungen: Darauf können Sie sich verlassen */
++export function TrustBlock() {
++  const phone = process.env.CONTACT_PHONE ?? '0173 2648097';
++  const mail = process.env.CONTACT_EMAIL ?? 'info@euro-trade.com';
++  return (
++    <section className="rev-section trust">
++      <h2>Darauf können Sie sich verlassen</h2>
++      <div className="trust-grid">
++        <div className="box"><b>Vorschau vor der Produktion</b><p>Sie sehen Ihr Logo vorab und geben es frei. Erst dann wird gedruckt oder gestickt.</p></div>
++        <div className="box"><b>Markenware ab 1 Stück</b><p>Originale Markentextilien, Staffelpreise ab 10 Stück, auch für Nachbestellungen.</p></div>
++        <div className="box"><b>Angebot statt Überraschung</b><p>Sie erhalten ein verbindliches Angebot mit allen Kosten, bevor Sie sich entscheiden.</p></div>
++        <div className="box contact-card"><span className="avatar" aria-hidden>SH</span><div><b>Ihr Ansprechpartner</b><p>Sebastian Hosbach<br /><a className="alink" href={`tel:${phone.replace(/[^\d+]/g, '')}`}>{phone}</a> · <a className="alink" href={`mailto:${mail}`}>{mail}</a></p></div></div>
++      </div>
++    </section>
++  );
++}
++
+ /** Kundenstimmen (Startseite/Kategorie) */
+ export function ReviewStrip({ reviews, overall, title = 'Das sagen unsere Kunden' }: { reviews: import('@/lib/store').Review[]; overall: { avg: number; count: number } | null; title?: string }) {
+   if (!reviews.length || !overall) return null;
+diff --git a/components/ReviewList.tsx b/components/ReviewList.tsx
+index cc7dd61..1e513e9 100644
+--- a/components/ReviewList.tsx
++++ b/components/ReviewList.tsx
+@@ -1,12 +1,14 @@
+ import Stars from './Stars';
+ import type { Review } from '@/lib/store';
+ 
++const SRC = { formular: '', email: 'per E-Mail übermittelt', telefon: 'telefonisch übermittelt', persoenlich: 'persönlich übermittelt' } as const;
+ const d = (x: string) => new Date(x).toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+ 
+ export function ReviewCard({ r, showProduct }: { r: Review; showProduct?: boolean }) {
+   return (
+     <figure className="rev">
+-      <div className="rev-top"><Stars value={r.rating} size={15} /><span className="rev-ver">✓ Verifizierter Kauf</span></div>
++      <div className="rev-top"><Stars value={r.rating} size={15} /><span className="rev-ver">✓ Verifizierter Kauf{r.source && r.source !== 'formular' ? ` · ${SRC[r.source]}` : ''}</span></div>
++      {r.incentive && <span className="rev-inc">{r.incentive}</span>}
+       {r.title && <b className="rev-title">{r.title}</b>}
+       {r.text && <blockquote>{r.text}</blockquote>}
+       <figcaption>{r.name}{r.company ? ` · ${r.company}` : ''} · {d(r.date)}{showProduct && r.productName && <> · <span className="muted">{r.productName}</span></>}</figcaption>
+@@ -16,4 +18,4 @@ export function ReviewCard({ r, showProduct }: { r: Review; showProduct?: boolea
+ }
+ 
+ /** Hinweis nach § 5b Abs. 3 UWG: ob und wie die Echtheit geprüft wird */
+-export const ReviewNote = () => <p className="rev-note">Alle Bewertungen stammen von Kundinnen und Kunden, die bei uns bestellt haben. Wir laden ausschließlich nach abgeschlossenem Auftrag über einen persönlichen Link zur Bewertung ein (verifiziert über die Auftragsnummer). Bewertungen werden vor Veröffentlichung geprüft; positive wie negative werden gleichermaßen veröffentlicht, sofern sie nicht gegen gesetzliche Vorgaben verstoßen.</p>;
++export const ReviewNote = () => <p className="rev-note">Alle Bewertungen stammen von Kundinnen und Kunden, die bei uns bestellt haben. Wir laden ausschließlich nach abgeschlossenem Auftrag über einen persönlichen Link zur Bewertung ein (verifiziert über die Auftragsnummer). Per E-Mail, telefonisch oder persönlich erhaltene Bewertungen tragen wir nur mit Zustimmung der Kundin bzw. des Kunden und mit Bezug zu einem tatsächlichen Auftrag ein und kennzeichnen sie entsprechend. Bewertungen, für die eine Gegenleistung gewährt wurde (z. B. ein kostenloses Testprodukt), sind als solche gekennzeichnet. Bewertungen werden vor Veröffentlichung geprüft; positive wie negative werden gleichermaßen veröffentlicht, sofern sie nicht gegen gesetzliche Vorgaben verstoßen.</p>;
+diff --git a/components/TrustBadge.tsx b/components/TrustBadge.tsx
+new file mode 100644
+index 0000000..8a91b99
+--- /dev/null
++++ b/components/TrustBadge.tsx
+@@ -0,0 +1,22 @@
++import Link from 'next/link';
++/** Siegel unten links – verlinkt auf die Garantiebedingungen (eigene Garantie, kein fremdes Gütesiegel) */
++export default function TrustBadge() {
++  return (
++    <Link href="/garantie" className="tbadge" aria-label="100 % Zufriedenheitsgarantie – Bedingungen ansehen">
++      <svg viewBox="0 0 100 100" width="92" height="92" aria-hidden>
++        <defs>
++          <linearGradient id="tb-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#ffe45c" /><stop offset="1" stopColor="#ffb300" /></linearGradient>
++          <path id="tb-top" d="M 16 50 A 34 34 0 0 1 84 50" />
++          <path id="tb-bot" d="M 12 50 A 38 38 0 0 0 88 50" />
++        </defs>
++        <circle cx="50" cy="50" r="48" fill="#0646c9" />
++        <circle cx="50" cy="50" r="44" fill="none" stroke="url(#tb-g)" strokeWidth="2" strokeDasharray="2 3" />
++        <circle cx="50" cy="50" r="27" fill="url(#tb-g)" />
++        <text fontSize="8.2" fontWeight="800" fill="#fff" letterSpacing="1.4"><textPath href="#tb-top" startOffset="50%" textAnchor="middle">ZUFRIEDENHEIT</textPath></text>
++        <text fontSize="7.6" fontWeight="800" fill="#ffd34d" letterSpacing="1.6"><textPath href="#tb-bot" startOffset="50%" textAnchor="middle">GARANTIE</textPath></text>
++        <text x="50" y="50" textAnchor="middle" fontSize="17" fontWeight="900" fill="#0638b8" fontFamily="system-ui,Arial">100%</text>
++        <path d="M41 56l6 5 12-11" fill="none" stroke="#0638b8" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round" />
++      </svg>
++    </Link>
++  );
++}
+diff --git a/lib/store.ts b/lib/store.ts
+index a51c504..bba170d 100644
+--- a/lib/store.ts
++++ b/lib/store.ts
+@@ -157,6 +157,10 @@ export type Review = {
+   sku?: string; productName?: string;
+   name: string; company?: string; rating: number; title: string; text: string;
+   date: string; inquiryNo: string; status: 'pending' | 'approved' | 'rejected'; reply?: string;
++  /** wie die Bewertung zu uns kam (Formular = leer) */
++  source?: 'formular' | 'email' | 'telefon' | 'persoenlich';
++  /** Gegenleistung erhalten (z. B. kostenloses Testprodukt) – wird öffentlich gekennzeichnet */
++  incentive?: string | null;
+ };
+ const REV = path.join(DATA, 'bewertungen.json');
+ export const listReviews = () => readJSON<Review[]>(REV, []);
+diff --git a/middleware.ts b/middleware.ts
+index 12ef1a7..a342e1d 100644
+--- a/middleware.ts
++++ b/middleware.ts
+@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
+ import { ACCESS_COOKIE, ADMIN_COOKIE, isAdminToken, previewMode, shopClosed, verifyCodeToken } from '@/lib/access';
+ 
+ // Immer erreichbar: Zugang, Pflichtseiten, Angebots-Links aus der E-Mail, Admin-Login
+-const PUBLIC = ['/p', '/bewerten', '/api/bewerten', '/widerruf', '/newsletter', '/api/newsletter', '/start', '/druck-stick', '/api/zugang-anfrage', '/api/bild', '/sitemap.xml', '/zugang', '/api/zugang', '/impressum', '/datenschutz', '/angebot', '/api/angebot', '/admin/login', '/api/admin/login', '/icon.svg', '/favicon.ico', '/robots.txt'];
++const PUBLIC = ['/garantie', '/p', '/bewerten', '/api/bewerten', '/widerruf', '/newsletter', '/api/newsletter', '/start', '/druck-stick', '/api/zugang-anfrage', '/api/bild', '/sitemap.xml', '/zugang', '/api/zugang', '/impressum', '/datenschutz', '/angebot', '/api/angebot', '/admin/login', '/api/admin/login', '/icon.svg', '/favicon.ico', '/robots.txt'];
+ const match = (path: string, list: string[]) => list.some((p) => path === p || path.startsWith(p + '/'));
+ 
+ export async function middleware(req: NextRequest) {
+-- 
+2.43.0
+

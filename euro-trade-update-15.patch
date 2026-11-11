@@ -1,0 +1,220 @@
+From bbdc9ad315a4d9afc71364fdd99349a112b431f2 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Wed, 11 Nov 2026 05:32:07 +0100
+Subject: [PATCH] =?UTF-8?q?Hero=20mit=20Produktb=C3=BChne=20(Karussell)=20?=
+ =?UTF-8?q?auf=20Startseite=20und=20Shop-Start,=20Login=20als=20Leiste?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01AW9Go5bwJWAYsfGemt2b6Z
+---
+ app/globals.css             | 40 +++++++++++++++++++++++++++++++++
+ app/page.tsx                |  8 +++++--
+ app/start/page.tsx          | 17 +++++++-------
+ components/HeroProducts.tsx | 45 +++++++++++++++++++++++++++++++++++++
+ lib/hero.ts                 | 17 ++++++++++++++
+ 5 files changed, 116 insertions(+), 11 deletions(-)
+ create mode 100644 components/HeroProducts.tsx
+ create mode 100644 lib/hero.ts
+
+diff --git a/app/globals.css b/app/globals.css
+index 1008093..0b577df 100644
+--- a/app/globals.css
++++ b/app/globals.css
+@@ -676,3 +676,43 @@ footer .wrap{padding-left:112px}
+ .ae-new input{width:auto;flex:1 1 150px;margin:0}
+ .ae-noimg{display:block;width:44px;height:44px;border-radius:6px;background:#eef0f3}
+ @media (max-width:700px){.ae-2{grid-template-columns:1fr}.ae-color{grid-template-columns:42px 1fr;}.ae-color select{grid-column:1/-1}}
++/* Hero mit Produktbühne */
++@media (min-width:901px){.l-hero{grid-template-columns:1.1fr 1fr}}
++.hs{position:relative;z-index:1;display:flex;flex-direction:column;gap:12px;min-width:0}
++.hs-stage{position:relative;height:380px;display:grid;place-items:center}
++.hs-main{position:relative;z-index:2;width:min(330px,78%);aspect-ratio:1;background:#fff;border-radius:20px;box-shadow:0 24px 50px rgba(3,25,80,.35);overflow:hidden;display:block}
++.hs-main img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:14px;opacity:0;transform:scale(.96);transition:opacity .5s ease,transform .6s ease}
++.hs-main img.on{opacity:1;transform:none}
++.hs-badge{position:absolute;right:10px;top:10px;background:rgba(20,24,31,.72);color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px}
++.hs-side{position:absolute;width:42%;aspect-ratio:1;object-fit:contain;background:#fff;border-radius:16px;padding:10px;opacity:.55;box-shadow:0 12px 30px rgba(3,25,80,.25);transition:opacity .3s}
++.hs-l{left:0;transform:rotate(-7deg) translateY(14px)}
++.hs-r{right:0;transform:rotate(7deg) translateY(14px)}
++.hs-arr{position:absolute;z-index:3;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,255,255,.95);color:#14181f;font-size:24px;line-height:1;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.2);display:grid;place-items:center;padding-bottom:3px}
++.hs-arr:hover{background:var(--accent)}
++.hs-prev{left:4px}.hs-next{right:4px}
++.hs-info{display:flex;justify-content:space-between;align-items:center;gap:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(6px);border-radius:14px;padding:12px 16px;color:#fff;text-decoration:none}
++.hs-info:hover{background:rgba(255,255,255,.18)}
++.hs-brand{display:block;font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--accent)}
++.hs-name{display:block;font-size:16px;line-height:1.25;margin:2px 0 6px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
++.hs-sw{display:flex;gap:4px;align-items:center}
++.hs-sw i{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.85)}
++.hs-sw em{font-style:normal;font-size:12px;opacity:.85;margin-left:2px}
++.hs-price{text-align:right;font-weight:800;font-size:15px;white-space:nowrap}
++.hs-price span{display:block;font-size:12px;font-weight:600;opacity:.85;margin-top:3px}
++.hs-dots{display:flex;gap:6px;justify-content:center}
++.hs-dots button{width:8px;height:8px;border-radius:999px;border:0;padding:0;background:rgba(255,255,255,.45);cursor:pointer;transition:width .3s}
++.hs-dots button.on{width:22px;background:var(--accent)}
++.l-loginbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:16px;border-left:4px solid var(--accent)}
++.l-loginbar .gate-form{flex-direction:row;margin:0;flex:0 1 420px}
++.l-loginbar .gate-form input{height:44px;font-size:16px;flex:1;min-width:0}
++.l-loginbar .gate-form .btn{white-space:nowrap}
++.hero-shop{display:grid;grid-template-columns:1.1fr 1fr;align-items:center;gap:28px}
++.hero-shop .hs-stage{height:330px}
++.hero-shop .hs-main{width:min(290px,76%)}
++@media (max-width:900px){
++  .hero-shop{grid-template-columns:1fr}
++  .hs-stage,.hero-shop .hs-stage{height:300px}
++  .hs-main,.hero-shop .hs-main{width:min(260px,70%)}
++}
++@media (max-width:520px){.l-loginbar .gate-form{flex-direction:column;flex-basis:100%}.hs-stage,.hero-shop .hs-stage{height:260px}}
++@media (max-width:520px){.hs-info{flex-wrap:wrap}.hs-price{text-align:left;white-space:normal;display:flex;gap:10px;align-items:baseline;width:100%}.hs-price span{margin:0}}
+diff --git a/app/page.tsx b/app/page.tsx
+index deb8d0f..d2cb43e 100644
+--- a/app/page.tsx
++++ b/app/page.tsx
+@@ -7,19 +7,23 @@ import NewsletterBox from './start/NewsletterBox';
+ import { ReviewStrip } from '@/components/ProductReviews';
+ import { latestReviews, overall } from '@/lib/reviews';
+ import { discountTiers } from '@/lib/store';
++import HeroProducts from '@/components/HeroProducts';
++import { heroItems } from '@/lib/hero';
+ 
+ export default async function Home() {
+   const ctx = await getCustomer();
+   const cats = getCategories(ctx);
+   const collection = getCollection(ctx);
++  const hero = heroItems(collection.length ? [...collection, ...getFeatured(12, ctx)].filter((p, k, a) => a.findIndex((x) => x.id === p.id) === k) : getFeatured(12, ctx), { link: true });
+   return (
+     <>
+-      <section className="hero">
+-        <div>
++      <section className="hero hero-shop">
++        <div className="hero-text">
+           <h1>{ctx ? <>Willkommen, {ctx.name}</> : 'Markentextilien ab 1 Stück'}</h1>
+           <p>{productCount(ctx).toLocaleString('de-DE')} Artikel · schon ab 1 Stück · auf Wunsch mit Druck oder Stick</p>
+           <div className="chips">{cats.map((c) => <Link key={c.slug} className="chip" href={`/kategorie/${c.slug}`}>{c.name}</Link>)}</div>
+         </div>
++        {hero.length > 0 && <HeroProducts items={hero} />}
+       </section>
+       <RecentlyViewed />
+       {collection.length > 0 && <>
+diff --git a/app/start/page.tsx b/app/start/page.tsx
+index 2343de1..3192686 100644
+--- a/app/start/page.tsx
++++ b/app/start/page.tsx
+@@ -9,6 +9,8 @@ import { discountTiers, listReferences } from '@/lib/store';
+ import { getCategories, getFeatured } from '@/lib/catalog';
+ import ProductCard from '@/components/ProductCard';
+ import { previewMode } from '@/lib/access';
++import HeroProducts from '@/components/HeroProducts';
++import { heroItems } from '@/lib/hero';
+ 
+ export const metadata: Metadata = {
+   title: 'Teamwear & Firmenbekleidung mit Logo – ab 1 Stück',
+@@ -22,7 +24,7 @@ export default function Start() {
+   const refs = listReferences();
+   const cats = getCategories().slice(0, 8);
+   const showcase = getFeatured(8, { locked: true });
+-  const collage = showcase.flatMap((p) => p.images.slice(0, 1)).slice(0, 4);
++  const hero = heroItems(showcase, { link: !previewMode() });
+   return (
+     <div className="landing">
+       <section className="l-hero">
+@@ -40,16 +42,13 @@ export default function Start() {
+             <li>Logo-Vorschau direkt am Artikel</li>
+           </ul>
+         </div>
+-        <div className="l-login box">
+-          <strong>Schon Kunde?</strong>
+-          <p className="muted" style={{ margin: '4px 0 0', fontSize: 14 }}>Mit Ihrem Zugangscode direkt in Ihren Shop.</p>
+-          <AccessForm next="/" />
+-        </div>
++        {hero.length > 0 ? <HeroProducts items={hero} /> : <div />}
+       </section>
+ 
+-      {collage.length >= 3 && (
+-        <div className="l-collage" aria-hidden>{collage.map((src) => <img key={src} src={src} alt="" loading="lazy" />)}</div>
+-      )}
++      <div className="l-loginbar box">
++        <div><strong>Schon Kunde?</strong><span className="muted"> Mit Ihrem Zugangscode direkt in Ihren Shop.</span></div>
++        <AccessForm next="/" />
++      </div>
+ 
+       <section className="l-feats">
+         {[
+diff --git a/components/HeroProducts.tsx b/components/HeroProducts.tsx
+new file mode 100644
+index 0000000..ffa9451
+--- /dev/null
++++ b/components/HeroProducts.tsx
+@@ -0,0 +1,45 @@
++'use client';
++import { useEffect, useState } from 'react';
++import Link from 'next/link';
++
++export type HeroItem = { id: string; name: string; brand: string; image: string; colors: string[]; colorCount: number; label: string; href: string };
++
++/** Produktbühne im Hero: wechselt automatisch, pausiert bei Hover, Pfeile + Punkte */
++export default function HeroProducts({ items, interval = 4500 }: { items: HeroItem[]; interval?: number }) {
++  const [i, setI] = useState(0);
++  const [pause, setPause] = useState(false);
++  const n = items.length;
++  useEffect(() => {
++    if (n < 2 || pause || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
++    const t = setTimeout(() => setI((x) => (x + 1) % n), interval);
++    return () => clearTimeout(t);
++  }, [i, n, pause, interval]);
++  if (!n) return null;
++  const at = (d: number) => items[(i + d + n) % n];
++  const p = items[i];
++  return (
++    <div className="hs" onMouseEnter={() => setPause(true)} onMouseLeave={() => setPause(false)} aria-roledescription="Karussell" aria-label="Produkte">
++      <div className="hs-stage">
++        {n > 2 && <img className="hs-side hs-l" src={at(-1).image} alt="" aria-hidden />}
++        {n > 1 && <img className="hs-side hs-r" src={at(1).image} alt="" aria-hidden />}
++        <Link href={p.href} className="hs-main" aria-live="polite">
++          {items.map((x, k) => <img key={x.id} src={x.image} alt={k === i ? x.name : ''} className={k === i ? 'on' : ''} loading={k < 2 ? 'eager' : 'lazy'} />)}
++          <span className="hs-badge">{i + 1} / {n}</span>
++        </Link>
++        {n > 1 && <>
++          <button type="button" className="hs-arr hs-prev" onClick={() => setI((i - 1 + n) % n)} aria-label="Vorheriger Artikel">‹</button>
++          <button type="button" className="hs-arr hs-next" onClick={() => setI((i + 1) % n)} aria-label="Nächster Artikel">›</button>
++        </>}
++      </div>
++      <Link href={p.href} className="hs-info">
++        <div>
++          <span className="hs-brand">{p.brand}</span>
++          <b className="hs-name">{p.name}</b>
++          <span className="hs-sw">{p.colors.map((c) => <i key={c} style={{ background: c }} />)}{p.colorCount > p.colors.length && <em>+{p.colorCount - p.colors.length}</em>}</span>
++        </div>
++        <span className="hs-price">{p.label}<span>Ansehen →</span></span>
++      </Link>
++      {n > 1 && <div className="hs-dots">{items.map((x, k) => <button key={x.id} type="button" className={k === i ? 'on' : ''} onClick={() => setI(k)} aria-label={`Artikel ${k + 1}`} />)}</div>}
++    </div>
++  );
++}
+diff --git a/lib/hero.ts b/lib/hero.ts
+new file mode 100644
+index 0000000..c525100
+--- /dev/null
++++ b/lib/hero.ts
+@@ -0,0 +1,17 @@
++import 'server-only';
++import type { PublicProduct } from './types';
++import type { HeroItem } from '@/components/HeroProducts';
++import { eur } from './format';
++
++/** Artikel für die Hero-Bühne: nur mit Bild, Top-Artikel zuerst */
++export function heroItems(list: PublicProduct[], opts: { link: boolean; n?: number }): HeroItem[] {
++  return list.filter((p) => p.images[0]).slice(0, opts.n ?? 6).map((p) => {
++    const from = p.tiers.length ? Math.min(p.price ?? Infinity, ...p.tiers.map((t) => t.price)) : p.price;
++    return {
++      id: p.id, name: p.name, brand: p.brand, image: p.images[0],
++      colors: p.colors.map((c) => c.hex).filter((h): h is string => !!h).slice(0, 6), colorCount: p.colors.length,
++      label: p.locked ? '🔒 Preis nach Anmeldung' : from != null && Number.isFinite(from) ? `ab ${eur(from)}` : 'Preis auf Anfrage',
++      href: opts.link ? `/produkt/${p.id}` : '#anfragen',
++    };
++  });
++}
+-- 
+2.43.0
+

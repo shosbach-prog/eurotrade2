@@ -1,0 +1,1458 @@
+From 6d88df3ba4e7dfd2fb07e8f211df4473061a9e61 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Wed, 11 Nov 2026 01:27:34 +0100
+Subject: [PATCH] Vorschau-Modus (Standard: nur Admin), Usability-Paket
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+- SHOP_PREVIEW (Standard an): Shop nur für Admin, Kunden-Codes gesperrt, noindex/robots disallow
+- Warenkorb-Seitenleiste nach dem Hinzufügen, Warenkorb bearbeiten (Größe, Menge, Veredelung auf alle)
+- mobiler Bestellbalken, Größentabelle (PDF aus L-Shop), Lieferzeit, Info-Hinweise, Farbname beim Überfahren
+- Filter (Farbe, Größe, Schnitt, Marke, Preis) + Sortierung in Kategorie und Suche, „Meinten Sie …?“
+- Zuletzt angesehen, Meine Anfragen mit Status/Angebot/Nachbestellen, Formular vorausgefüllt + Wunschtermin
+- Kontakt-Button (WhatsApp, Telefon, E-Mail)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01AW9Go5bwJWAYsfGemt2b6Z
+---
+ .env.example                    | 11 ++++
+ app/admin/anfrage/[no]/page.tsx |  1 +
+ app/api/anfrage/route.ts        |  6 +--
+ app/api/ich/route.ts            |  9 ++++
+ app/api/meine-anfragen/route.ts | 20 +++++++
+ app/api/search/route.ts         |  7 +--
+ app/api/zugang/route.ts         |  3 +-
+ app/globals.css                 | 95 +++++++++++++++++++++++++++++++++
+ app/kategorie/[slug]/page.tsx   | 15 ++----
+ app/konto/MyInquiries.tsx       | 70 ++++++++++++++++++++++++
+ app/konto/page.tsx              |  4 ++
+ app/layout.tsx                  | 13 +++--
+ app/page.tsx                    |  2 +
+ app/produkt/[id]/AddToCart.tsx  | 18 +++++--
+ app/produkt/[id]/page.tsx       |  5 +-
+ app/robots.ts                   |  4 ++
+ app/sitemap.ts                  |  2 +
+ app/suche/page.tsx              | 20 ++++---
+ app/warenkorb/page.tsx          | 75 ++++++++++++++++++++------
+ components/CartContext.tsx      | 51 ++++++++++++++----
+ components/CartDrawer.tsx       | 62 +++++++++++++++++++++
+ components/Contact.tsx          | 22 ++++++++
+ components/FilterGrid.tsx       | 84 +++++++++++++++++++++++++++++
+ components/Info.tsx             | 12 +++++
+ components/Recent.tsx           | 25 +++++++++
+ components/SearchBar.tsx        |  5 +-
+ components/Wishlist.tsx         |  9 ++++
+ lib/access.ts                   |  5 +-
+ lib/catalog.ts                  | 30 +++++++++++
+ lib/colors.ts                   | 22 ++++++++
+ lib/customer.ts                 |  3 +-
+ lib/mine.ts                     |  7 +++
+ lib/types.ts                    |  2 +
+ middleware.ts                   |  5 +-
+ scripts/import-html.mjs         |  2 +
+ seed/products.json              | 11 ++++
+ 36 files changed, 668 insertions(+), 69 deletions(-)
+ create mode 100644 app/api/ich/route.ts
+ create mode 100644 app/api/meine-anfragen/route.ts
+ create mode 100644 app/konto/MyInquiries.tsx
+ create mode 100644 app/konto/page.tsx
+ create mode 100644 components/CartDrawer.tsx
+ create mode 100644 components/Contact.tsx
+ create mode 100644 components/FilterGrid.tsx
+ create mode 100644 components/Info.tsx
+ create mode 100644 components/Recent.tsx
+ create mode 100644 lib/mine.ts
+
+diff --git a/.env.example b/.env.example
+index eaec351..1d326d5 100644
+--- a/.env.example
++++ b/.env.example
+@@ -16,6 +16,11 @@ ADMIN_PASSWORD=
+ # Absender im Angebots-PDF (Zeilen mit | trennen)
+ # OFFER_SENDER=Euro-Trade · Sebastian Hosbach|Seehan 28 · 44263 Dortmund|Tel. 0173 2648097 · info@euro-trade.com
+ 
++# ---- Vorschau-Modus ----
++# Standard: an. Nur der Admin sieht den Shop, Kunden-Codes werden abgewiesen, nichts wird von Google indexiert.
++# Erst mit echten Preisen auf false setzen:
++SHOP_PREVIEW=true
++
+ # ---- Zugang (geschlossener Shop) ----
+ # true = Shop nur mit Code. Codes legen Sie bequem im Admin unter „Kunden & Codes“ an.
+ SHOP_CLOSED=true
+@@ -25,6 +30,12 @@ ACCESS_CODES=
+ # Langer Zufallswert (z. B. openssl rand -hex 32). Ändern = alle Freischaltungen ungültig
+ ACCESS_SECRET=
+ 
++# ---- Kontakt & Lieferzeit (Shop) ----
++CONTACT_WHATSAPP=491732648097
++CONTACT_PHONE=0173 2648097
++CONTACT_EMAIL=info@euro-trade.com
++DELIVERY_TEXT=Lieferung ca. 3–5 Werktage · mit Veredelung ca. 7–14 Werktage nach Freigabe
++
+ # ---- L-Shop API (Key folgt) ----
+ LSHOP_API_URL=
+ LSHOP_API_KEY=
+diff --git a/app/admin/anfrage/[no]/page.tsx b/app/admin/anfrage/[no]/page.tsx
+index bf1f922..da0563f 100644
+--- a/app/admin/anfrage/[no]/page.tsx
++++ b/app/admin/anfrage/[no]/page.tsx
+@@ -28,6 +28,7 @@ export default function InquiryPage({ params }: { params: { no: string } }) {
+         <div className="box">
+           <strong>Kunde</strong>
+           <p style={{ margin: '6px 0 0' }}>{c.company && <><b>{c.company}</b><br /></>}{c.name}<br /><a href={`mailto:${c.email}`} className="alink">{c.email}</a>{c.phone && <> · {c.phone}</>}{c.city && <><br />{c.city}</>}</p>
++          {c.date && <p style={{ margin: '8px 0 0' }}><b>Wunschliefertermin:</b> {new Date(c.date).toLocaleDateString('de-DE')}</p>}
+           {i.zugangscode && <p className="muted" style={{ margin: '8px 0 0' }}>Zugangscode: {i.zugangscode}</p>}
+           {c.message && <p style={{ whiteSpace: 'pre-wrap', margin: '10px 0 0', background: '#f6f7f9', padding: 10, borderRadius: 8 }}>{c.message}</p>}
+           <p className="muted" style={{ fontSize: 13, margin: '10px 0 0' }}>Eingegangen: {fmt(i.date)}</p>
+diff --git a/app/api/anfrage/route.ts b/app/api/anfrage/route.ts
+index cea4659..2603bd2 100644
+--- a/app/api/anfrage/route.ts
++++ b/app/api/anfrage/route.ts
+@@ -37,7 +37,7 @@ export async function POST(req: Request) {
+   const c = body?.customer ?? {};
+   if (c.website) return NextResponse.json({ ok: true }); // Honeypot
+   if (!c.name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(c.email ?? '')) return NextResponse.json({ error: 'Bitte Name und gültige E-Mail angeben.' }, { status: 400 });
+-  const customer = Object.fromEntries(['name', 'company', 'email', 'phone', 'city', 'message'].map((k) => [k, String(c[k] ?? '').slice(0, 2000)]));
++  const customer = Object.fromEntries(['name', 'company', 'email', 'phone', 'city', 'date', 'message'].map((k) => [k, String(c[k] ?? '').slice(0, 2000)]));
+ 
+   // Preise serverseitig neu berechnen (mit Kunden-Aufschlag) – nie dem Browser vertrauen
+   const ctx = await getCustomer();
+@@ -65,7 +65,7 @@ export async function POST(req: Request) {
+   const rows = lines.map((l) => `<tr><td>${esc(l.sku)}</td><td>${esc(l.name)}${l.deco ? `<br><small>✦ ${esc(decoLabel(l.deco))}${l.deco.note ? ` – ${esc(l.deco.note)}` : ''}</small>` : ''}</td><td>${esc(l.color)}</td><td>${esc(l.size)}</td><td align="right">${l.qty}</td><td align="right">${eur(l.price)}</td><td align="right">${l.price == null ? 'auf Anfrage' : eur(l.sum)}</td></tr>`).join('');
+   const table = `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;font:13px Arial"><tr style="background:#eee"><th>Art.-Nr.</th><th>Artikel</th><th>Farbe</th><th>Größe</th><th>Menge</th><th>Einzel</th><th>Summe</th></tr>${rows}<tr><td colspan="6" align="right"><b>Summe netto (Textil)</b></td><td align="right"><b>${eur(total)}</b></td></tr></table>`;
+   const logos = [...new Map(lines.filter((l) => l.deco?.logoId).map((l) => [l.deco!.logoId!, l.deco!.logoName])).entries()];
+-  const who = `<p><b>${esc(customer.name)}</b>${customer.company ? ` – ${esc(customer.company)}` : ''}<br>${esc(customer.email)} · ${esc(customer.phone)}<br>${esc(customer.city)}</p>${customer.message ? `<p><b>Nachricht:</b><br>${esc(customer.message).replace(/\n/g, '<br>')}</p>` : ''}${via ? `<p><b>Zugangscode:</b> ${esc(via)}</p>` : ''}`;
++  const who = `<p><b>${esc(customer.name)}</b>${customer.company ? ` – ${esc(customer.company)}` : ''}<br>${esc(customer.email)} · ${esc(customer.phone)}<br>${esc(customer.city)}${customer.date ? `<br><b>Wunschtermin:</b> ${esc(new Date(customer.date).toLocaleDateString('de-DE'))}` : ''}</p>${customer.message ? `<p><b>Nachricht:</b><br>${esc(customer.message).replace(/\n/g, '<br>')}</p>` : ''}${via ? `<p><b>Zugangscode:</b> ${esc(via)}</p>` : ''}`;
+ 
+   try {
+     await sendMail({ to: process.env.INQUIRY_TO ?? '', replyTo: customer.email, subject: `Neue Anfrage ${no} – ${customer.company || customer.name} – ${eur(total)}`,
+@@ -75,5 +75,5 @@ export async function POST(req: Request) {
+   } catch (e) {
+     console.error('Mailversand fehlgeschlagen', e); // Anfrage ist trotzdem gespeichert
+   }
+-  return NextResponse.json({ ok: true, no });
++  return NextResponse.json({ ok: true, no, token: inq.token });
+ }
+diff --git a/app/api/ich/route.ts b/app/api/ich/route.ts
+new file mode 100644
+index 0000000..30ea5c2
+--- /dev/null
++++ b/app/api/ich/route.ts
+@@ -0,0 +1,9 @@
++import { NextResponse } from 'next/server';
++import { getCustomer } from '@/lib/customer';
++/** Name des angemeldeten Kunden (für vorausgefüllte Formulare) */
++export async function GET() {
++  const c = await getCustomer();
++  return NextResponse.json({ company: c?.name ?? '' }, { headers: { 'Cache-Control': 'private, no-store' } });
++}
++
++export const dynamic = 'force-dynamic';
+diff --git a/app/api/meine-anfragen/route.ts b/app/api/meine-anfragen/route.ts
+new file mode 100644
+index 0000000..742758e
+--- /dev/null
++++ b/app/api/meine-anfragen/route.ts
+@@ -0,0 +1,20 @@
++import { NextResponse } from 'next/server';
++import { STATUS, inquiryByToken, offerTotals } from '@/lib/store';
++
++/** Status der eigenen Anfragen – nur mit dem geheimen Token, das der Browser beim Absenden erhalten hat */
++export async function POST(req: Request) {
++  const { tokens } = await req.json().catch(() => ({}));
++  const list = (Array.isArray(tokens) ? tokens : []).slice(0, 50).map(String).flatMap((t) => {
++    const i = inquiryByToken(t);
++    if (!i) return [];
++    return [{
++      no: i.no, date: i.date, status: i.status, statusLabel: STATUS[i.status ?? 'neu'],
++      pieces: i.lines.reduce((s, l) => s + l.qty, 0), total: i.total,
++      offer: i.offer?.sentAt ? { gross: offerTotals(i.offer).gross, url: `/angebot/${t}` } : null,
++      lines: i.lines.map((l) => ({ id: l.id, name: l.name, color: l.color, size: l.size, qty: l.qty, deco: l.deco ?? null })),
++    }];
++  });
++  return NextResponse.json(list, { headers: { 'Cache-Control': 'private, no-store' } });
++}
++
++export const dynamic = 'force-dynamic';
+diff --git a/app/api/search/route.ts b/app/api/search/route.ts
+index e46200e..50a56ff 100644
+--- a/app/api/search/route.ts
++++ b/app/api/search/route.ts
+@@ -1,5 +1,5 @@
+ import { NextResponse } from 'next/server';
+-import { search } from '@/lib/catalog';
++import { didYouMean, search } from '@/lib/catalog';
+ import { getCustomer } from '@/lib/customer';
+ 
+ export const dynamic = 'force-dynamic';
+@@ -8,6 +8,7 @@ export async function GET(req: Request) {
+   const u = new URL(req.url);
+   const q = (u.searchParams.get('q') ?? '').slice(0, 100);
+   const limit = Math.min(Number(u.searchParams.get('limit') ?? 8), 50);
+-  const all = search(q, 200, await getCustomer());
+-  return NextResponse.json({ total: all.length, items: all.slice(0, limit) }, { headers: { 'Cache-Control': 'private, max-age=60' } });
++  const ctx = await getCustomer();
++  const all = search(q, 200, ctx);
++  return NextResponse.json({ total: all.length, items: all.slice(0, limit), suggest: all.length ? null : didYouMean(q, ctx) }, { headers: { 'Cache-Control': 'private, max-age=60' } });
+ }
+diff --git a/app/api/zugang/route.ts b/app/api/zugang/route.ts
+index e8c5ed6..249b811 100644
+--- a/app/api/zugang/route.ts
++++ b/app/api/zugang/route.ts
+@@ -1,5 +1,5 @@
+ import { NextResponse } from 'next/server';
+-import { ACCESS_COOKIE, ACCESS_DAYS, normCode, signCode } from '@/lib/access';
++import { ACCESS_COOKIE, ACCESS_DAYS, normCode, previewMode, signCode } from '@/lib/access';
+ import { findCustomer } from '@/lib/store';
+ 
+ const tries = new Map<string, number[]>();
+@@ -12,6 +12,7 @@ export async function POST(req: Request) {
+   if (recent.length >= 10) return NextResponse.json({ error: 'Zu viele Versuche – bitte in 15 Minuten erneut.' }, { status: 429 });
+   tries.set(ip, [...recent, now]);
+ 
++  if (previewMode()) return NextResponse.json({ error: 'Unser Shop startet in Kürze – Ihr Zugang wird dann freigeschaltet. Bei Fragen: info@euro-trade.com' }, { status: 403 });
+   const body = await req.json().catch(() => ({}));
+   const c = findCustomer(normCode(body?.code));
+   if (!c) return NextResponse.json({ error: 'Dieser Code ist ungültig.' }, { status: 403 });
+diff --git a/app/globals.css b/app/globals.css
+index 02cb37a..afb25de 100644
+--- a/app/globals.css
++++ b/app/globals.css
+@@ -386,3 +386,98 @@ footer .wrap{display:flex;gap:20px;flex-wrap:wrap;justify-content:space-between}
+ .tier-prog b{color:var(--ink)}
+ @media (max-width:820px){.szgrid{grid-template-columns:repeat(auto-fill,minmax(88px,1fr))}}
+ @media (max-width:520px){.tiers{display:grid;grid-template-columns:repeat(4,1fr)}.tier{min-width:0;padding:6px 7px}.tier b{font-size:14px}}
++
++/* Warenkorb-Seitenleiste */
++.drawer-wrap{position:fixed;inset:0;z-index:150;pointer-events:none}
++.drawer-bg{position:absolute;inset:0;background:rgba(10,14,20,.45);opacity:0;transition:opacity .2s}
++.drawer{position:absolute;top:0;right:0;bottom:0;width:min(420px,100%);background:#fff;box-shadow:-12px 0 40px rgba(0,0,0,.2);transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
++.drawer-wrap.open{pointer-events:auto}
++.drawer-wrap.open .drawer-bg{opacity:1}
++.drawer-wrap.open .drawer{transform:none}
++.drawer-head{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--line)}
++.drawer-head strong{color:var(--ok)}
++.drawer-head .x{background:none;border:0;font-size:28px;line-height:1;color:var(--muted)}
++.drawer-body{flex:1;overflow:auto;padding:6px 18px}
++.dline{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
++.dline.new{background:linear-gradient(90deg,#f1f8f3,transparent);margin:0 -18px;padding:10px 18px}
++.dimg{width:56px;height:56px;flex:none;border-radius:8px;overflow:hidden;background:#f0f2f5}
++.dname{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
++.drawer-foot{padding:16px 18px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
++
++/* Produktseite: Hilfen */
++.opt-row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
++.sizechart{display:inline-flex;gap:6px;align-items:center;font-size:13px;font-weight:600;color:var(--brand);border:1px solid #cfe0f5;border-radius:999px;padding:3px 10px;background:#f5f9fe}
++.sizechart:hover{background:#e7f0fb}
++.delivery{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--ok);margin-top:10px}
++.info-i{position:relative;display:inline-block;vertical-align:middle;margin-left:4px}
++.info-i>button{width:18px;height:18px;border-radius:50%;border:1px solid #b9c4d3;background:#fff;color:var(--muted);font:700 11px/1 Georgia,serif;padding:0;cursor:help}
++.info-pop{position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);width:260px;background:#14181f;color:#fff;font-size:13px;font-weight:400;line-height:1.45;padding:10px 12px;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:40;text-transform:none;letter-spacing:0}
++.info-pop::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:#14181f}
++/* Farbname beim Überfahren */
++.sw[data-name]:hover::after,.sw[data-name]:focus-visible::after{content:attr(data-name);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#14181f;color:#fff;font-size:12px;font-weight:600;white-space:nowrap;padding:4px 8px;border-radius:6px;pointer-events:none;z-index:20}
++/* mobiler Bestellbalken */
++.mbar{display:none}
++@media (max-width:820px){
++  .mbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:90;background:#fff;border-top:1px solid var(--line);box-shadow:0 -6px 20px rgba(0,0,0,.08);padding:10px 16px calc(10px + env(safe-area-inset-bottom));gap:12px;align-items:center}
++  .mbar .btn{flex:none;height:46px;padding:0 18px}
++  .mbar-info{flex:1;font-size:14px;min-width:0}
++  body:has(.mbar) footer{padding-bottom:90px}
++  .info-pop{left:auto;right:-10px;transform:none}
++  .info-pop::after{left:auto;right:12px;transform:none}
++}
++.preview-bar{background:#b3261e;color:#fff;font-size:13px;font-weight:600;text-align:center;padding:6px 16px}
++.preview-bar code{background:rgba(255,255,255,.18);padding:1px 6px;border-radius:4px}
++
++/* Filter */
++.fg{display:grid;grid-template-columns:230px 1fr;gap:22px;align-items:start}
++.filters{background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:14px 16px;position:sticky;top:90px;max-height:calc(100vh - 110px);overflow:auto}
++.f-head{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-bottom:4px}
++.f-head .linkbtn{font-size:13px;color:var(--muted)}
++.f-close,.f-apply,.f-open{display:none}
++.f-group{border-top:1px solid var(--line);padding:12px 0 6px;font-size:14px}
++.f-group>b{display:block;margin-bottom:8px;font-size:13px}
++.f-fams{display:flex;flex-wrap:wrap;gap:6px}
++.f-fam{display:flex;align-items:center;gap:6px;font-size:12px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:3px 9px 3px 4px}
++.f-fam span{width:16px;height:16px;border-radius:50%;border:1px solid rgba(0,0,0,.15)}
++.f-fam.on{border-color:var(--brand);background:#eef4fc;color:var(--brand);font-weight:600}
++.f-sizes{display:flex;flex-wrap:wrap;gap:6px}
++.f-sizes .size{min-width:44px;padding:5px 8px;font-size:13px}
++.f-check{display:flex;align-items:center;gap:8px;padding:3px 0;cursor:pointer}
++.f-check span{margin-left:auto;color:var(--muted);font-size:12px}
++.f-group input[type=range]{width:100%}
++.fg-bar{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
++.fg-sort{margin-left:auto;display:flex;gap:8px;align-items:center;font-size:14px}
++.fg-sort select{border:1px solid var(--line);border-radius:8px;padding:7px 10px;background:#fff}
++@media (max-width:820px){
++  .fg{grid-template-columns:1fr}
++  .f-open{display:inline-grid;place-items:center;height:40px}
++  .filters{position:fixed;inset:0;top:auto;max-height:85vh;border-radius:16px 16px 0 0;z-index:160;transform:translateY(100%);transition:transform .25s;padding-bottom:20px}
++  .filters.open{transform:none;box-shadow:0 -12px 40px rgba(0,0,0,.25)}
++  .f-close{display:block;background:none;border:0;font-size:26px;color:var(--muted)}
++  .f-apply{display:block;width:100%;margin-top:12px}
++}
++.cline{grid-template-columns:64px 1fr auto auto}
++.cl-meta{font-size:13px;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin-top:2px}
++.cl-meta select{border:1px solid var(--line);border-radius:6px;padding:2px 6px;font-size:13px;background:#fff}
++.deco-tag .linkbtn{font-size:12px;color:var(--muted);margin-left:6px}
++.deco-all{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;background:#f5f9fe;border:1px dashed var(--brand);border-radius:10px;padding:10px 12px;margin:10px 0;font-size:14px}
++@media (max-width:600px){.cline{grid-template-columns:56px 1fr;row-gap:8px}.cline .step{grid-column:2}.cline>div:last-child{grid-column:2;justify-content:space-between!important}}
++.my-list{display:flex;flex-direction:column;gap:12px}
++.my-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
++.my-lines{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0;font-size:13px}
++.my-lines span{background:#f3f5f8;border-radius:6px;padding:3px 8px}
++.my-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
++@media (max-width:1100px){.hide-md{display:none}}
++/* Kontakt */
++.contact{position:fixed;right:18px;bottom:18px;z-index:95;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
++.contact-btn{width:56px;height:56px;border-radius:50%;border:0;background:var(--brand);color:#fff;font-size:28px;display:grid;place-items:center;box-shadow:0 8px 24px rgba(11,78,162,.4)}
++.contact-btn:hover{filter:brightness(1.1)}
++.contact-menu{background:#fff;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.2);padding:14px;display:flex;flex-direction:column;gap:6px;min-width:240px;font-size:14px}
++.contact-menu a{display:flex;gap:10px;align-items:center;padding:9px 10px;border-radius:8px;border:1px solid var(--line)}
++.contact-menu a:hover{background:#f5f9fe;border-color:#cfe0f5}
++.contact-menu .c-wa{color:#128c4b;font-weight:600}
++@media (max-width:820px){body:has(.mbar) .contact{bottom:84px}.contact-btn{width:50px;height:50px}}
++.drawer{box-shadow:none;visibility:hidden;transition:transform .25s ease,visibility 0s .25s}
++.drawer-wrap.open .drawer{box-shadow:-12px 0 40px rgba(0,0,0,.2);visibility:visible;transition:transform .25s ease}
++footer .wrap{padding-right:84px}
++.pd>div,.gal,.gal-main{min-width:0}.gal-thumbs{max-width:100%}
+diff --git a/app/kategorie/[slug]/page.tsx b/app/kategorie/[slug]/page.tsx
+index 61b2b39..c6eb175 100644
+--- a/app/kategorie/[slug]/page.tsx
++++ b/app/kategorie/[slug]/page.tsx
+@@ -1,6 +1,6 @@
+ import Link from 'next/link';
+ import { notFound } from 'next/navigation';
+-import ProductCard from '@/components/ProductCard';
++import FilterGrid from '@/components/FilterGrid';
+ import { getByCategory, getCategories } from '@/lib/catalog';
+ import { getCustomer } from '@/lib/customer';
+ 
+@@ -9,24 +9,15 @@ export async function generateMetadata({ params }: { params: { slug: string } })
+   return { title: c?.name ?? 'Kategorie' };
+ }
+ 
+-export default async function CategoryPage({ params, searchParams }: { params: { slug: string }; searchParams: { sort?: string } }) {
++export default async function CategoryPage({ params }: { params: { slug: string } }) {
+   const ctx = await getCustomer();
+   const cat = getCategories(ctx).find((x) => x.slug === params.slug);
+   if (!cat) notFound();
+-  let items = getByCategory(params.slug, ctx);
+-  if (searchParams.sort === 'preis') items = [...items].sort((a, b) => (a.price ?? 1e9) - (b.price ?? 1e9));
+-  if (searchParams.sort === 'preis-ab') items = [...items].sort((a, b) => (b.price ?? -1) - (a.price ?? -1));
+   return (
+     <>
+       <div className="crumbs"><Link href="/">Start</Link> › {cat.name}</div>
+       <h1>{cat.name}</h1>
+-      <div className="chips" style={{ margin: '0 0 16px' }}>
+-        <span className="muted" style={{ alignSelf: 'center' }}>{items.length} Artikel · Sortieren:</span>
+-        <Link className="chip" href={`?`}>Empfohlen</Link>
+-        <Link className="chip" href={`?sort=preis`}>Preis ↑</Link>
+-        <Link className="chip" href={`?sort=preis-ab`}>Preis ↓</Link>
+-      </div>
+-      <div className="grid">{items.map((p) => <ProductCard key={p.id} p={p} />)}</div>
++      <FilterGrid items={getByCategory(params.slug, ctx)} />
+     </>
+   );
+ }
+diff --git a/app/konto/MyInquiries.tsx b/app/konto/MyInquiries.tsx
+new file mode 100644
+index 0000000..4e01650
+--- /dev/null
++++ b/app/konto/MyInquiries.tsx
+@@ -0,0 +1,70 @@
++'use client';
++import { useEffect, useState } from 'react';
++import Link from 'next/link';
++import { myInquiries } from '@/lib/mine';
++import { eur } from '@/lib/format';
++import { useCart } from '@/components/CartContext';
++import type { PublicProduct } from '@/lib/types';
++import type { Deco } from '@/lib/deco';
++
++type L = { id?: string; name: string; color: string; size: string; qty: number; deco: Deco | null };
++type Row = { no: string; date: string; status: string; statusLabel: string; pieces: number; total: number; offer: { gross: number; url: string } | null; lines: L[] };
++
++export default function MyInquiries() {
++  const [rows, setRows] = useState<Row[] | null>(null);
++  const [msg, setMsg] = useState('');
++  const { addMany } = useCart();
++
++  useEffect(() => {
++    const mine = myInquiries();
++    if (!mine.length) { setRows([]); return; }
++    fetch('/api/meine-anfragen', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tokens: mine.map((m) => m.token) }) })
++      .then((r) => r.json()).then(setRows).catch(() => setRows([]));
++  }, []);
++
++  async function reorder(r: Row) {
++    const ids = [...new Set(r.lines.map((l) => l.id).filter(Boolean))] as string[];
++    const prods: PublicProduct[] = await fetch(`/api/produkte?ids=${encodeURIComponent(ids.join(','))}`).then((x) => x.json()).catch(() => []);
++    const items = r.lines.flatMap((l) => {
++      const p = prods.find((x) => x.id === l.id);
++      if (!p) return [];
++      const col = p.colors.find((c) => c.name === l.color);
++      return [{ id: p.id, sku: p.sku, name: p.name, color: l.color || undefined, hex: col?.hex, size: l.size || undefined, qty: l.qty, price: p.price, category: p.category, image: p.images[0], deco: l.deco, tiers: p.tiers, sizes: p.sizes }];
++    });
++    if (!items.length) { setMsg('Die Artikel dieser Anfrage sind nicht mehr verfügbar.'); return; }
++    addMany(items);
++    setMsg(items.length < r.lines.length ? 'Einige Artikel sind nicht mehr verfügbar und wurden übersprungen.' : '');
++  }
++
++  if (rows === null) return <h1>Meine Anfragen</h1>;
++  return (
++    <>
++      <h1>Meine Anfragen</h1>
++      <p className="muted" style={{ marginTop: -8 }}>Anfragen, die Sie auf diesem Gerät gesendet haben – mit Status, Angebot und Nachbestellung.</p>
++      {msg && <div className="note">{msg}</div>}
++      {!rows.length ? (
++        <div className="box" style={{ textAlign: 'center' }}>
++          <p>Hier erscheinen Ihre Anfragen, sobald Sie eine gesendet haben.</p>
++          <Link className="btn" href="/" style={{ display: 'inline-grid', placeItems: 'center' }}>Artikel entdecken</Link>
++        </div>
++      ) : (
++        <div className="my-list">
++          {rows.map((r) => (
++            <div key={r.no} className="box my-row">
++              <div className="my-top">
++                <div><b>Anfrage {r.no}</b> <span className="muted">· {new Date(r.date).toLocaleDateString('de-DE')} · {r.pieces} Stück</span></div>
++                <span className={`st st-${r.status}`}>{r.statusLabel}</span>
++              </div>
++              <div className="my-lines">{r.lines.slice(0, 6).map((l, k) => <span key={k}>{l.qty}× {l.name}{l.color && ` · ${l.color}`}{l.size && ` · ${l.size}`}{l.deco && ' ✦'}</span>)}{r.lines.length > 6 && <span>… und {r.lines.length - 6} weitere</span>}</div>
++              <div className="my-actions">
++                {r.offer ? <a className="btn" href={r.offer.url} style={{ display: 'inline-grid', placeItems: 'center' }}>Angebot ansehen · {eur(r.offer.gross)}</a>
++                  : <span className="muted" style={{ fontSize: 14 }}>Ihr Angebot ist in Arbeit.</span>}
++                <button className="btn alt" onClick={() => reorder(r)}>Erneut in den Warenkorb</button>
++              </div>
++            </div>
++          ))}
++        </div>
++      )}
++    </>
++  );
++}
+diff --git a/app/konto/page.tsx b/app/konto/page.tsx
+new file mode 100644
+index 0000000..b43dce0
+--- /dev/null
++++ b/app/konto/page.tsx
+@@ -0,0 +1,4 @@
++import type { Metadata } from 'next';
++import MyInquiries from './MyInquiries';
++export const metadata: Metadata = { title: 'Meine Anfragen', robots: { index: false } };
++export default function Konto() { return <MyInquiries />; }
+diff --git a/app/layout.tsx b/app/layout.tsx
+index 11680e6..ace7bce 100644
+--- a/app/layout.tsx
++++ b/app/layout.tsx
+@@ -7,10 +7,11 @@ import type { Metadata } from 'next';
+ import SearchBar from '@/components/SearchBar';
+ import Logo from '@/components/Logo';
+ import LogoutLink from '@/components/LogoutLink';
++import Contact from '@/components/Contact';
+ import { CartButton, CartProvider } from '@/components/CartContext';
+-import { WishlistButton, WishlistProvider } from '@/components/Wishlist';
++import { AccountButton, WishlistButton, WishlistProvider } from '@/components/Wishlist';
+ import { getCategories } from '@/lib/catalog';
+-import { shopClosed } from '@/lib/access';
++import { previewMode, shopClosed } from '@/lib/access';
+ import { shopAccess } from '@/lib/customer';
+ 
+ const SHOP = process.env.SHOP_NAME ?? 'Euro-Trade';
+@@ -20,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
+     description: 'T-Shirts, Polos, Hoodies, Jacken, Caps und Taschen für Druck und Stick – schnell finden, Anfrage in einer Minute.',
+     metadataBase: new URL(process.env.SHOP_URL ?? 'https://euro-trade.com'),
+     // Geschlossener Shop: nur Landingpage und Info-Seite in Suchmaschinen
+-    robots: shopClosed() && !['/start', '/druck-stick', '/impressum'].includes(headers().get('x-path') ?? '') ? { index: false, follow: false } : undefined,
++    robots: previewMode() || (shopClosed() && !['/start', '/druck-stick', '/impressum'].includes(headers().get('x-path') ?? '')) ? { index: false, follow: false } : undefined,
+   };
+ }
+ export const dynamic = 'force-dynamic';
+@@ -38,12 +39,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
+     <html lang="de">
+       <body>
+         <CartProvider><WishlistProvider>
++          {previewMode() && ok && !path.startsWith('/start') && <div className="preview-bar">Vorschau-Modus – nur für Sie sichtbar. Preise sind Platzhalter. Kunden-Codes sind gesperrt, bis Sie <code>SHOP_PREVIEW=false</code> setzen.</div>}
+           <header className="hdr">
+             <div className="wrap hdr-row">
+               <Link href="/" className="logo" aria-label={`${SHOP} – Startseite`}><Logo name={SHOP} /></Link>
+               {open ? <>
+                 <Suspense fallback={<div className="search" />}><SearchBar /></Suspense>
+-                <div className="hdr-actions"><WishlistButton /><CartButton /></div>
++                <div className="hdr-actions"><AccountButton /><WishlistButton /><CartButton /></div>
+               </> : !path.startsWith('/admin') && <nav className="pub-nav">
+                 <Link href="/druck-stick" className="hide-sm">Druck & Stick</Link>
+                 <Link href="/#ablauf" className="hide-sm">So funktioniert’s</Link>
+@@ -58,8 +60,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
+           <main className="wrap">{children}</main>
+           <footer><div className="wrap">
+             <span>© {new Date().getFullYear()} {SHOP} · Alle Preise netto zzgl. MwSt. und Versand</span>
+-            <span><Link href="/druck-stick">Druck & Stick</Link> · <Link href="/impressum">Impressum</Link> · <Link href="/datenschutz">Datenschutz</Link>{gated && customer && <> · {customer.name} · <LogoutLink /></>}</span>
++            <span>{open && <><Link href="/konto">Meine Anfragen</Link> · </>}<Link href="/druck-stick">Druck & Stick</Link> · <Link href="/impressum">Impressum</Link> · <Link href="/datenschutz">Datenschutz</Link>{gated && customer && <> · {customer.name} · <LogoutLink /></>}</span>
+           </div></footer>
++          {!path.startsWith('/admin') && <Contact whatsapp={process.env.CONTACT_WHATSAPP ?? '491732648097'} phone={process.env.CONTACT_PHONE ?? '0173 2648097'} email={process.env.CONTACT_EMAIL ?? 'info@euro-trade.com'} />}
+         </WishlistProvider></CartProvider>
+       </body>
+     </html>
+diff --git a/app/page.tsx b/app/page.tsx
+index 9441280..196ebeb 100644
+--- a/app/page.tsx
++++ b/app/page.tsx
+@@ -2,6 +2,7 @@ import Link from 'next/link';
+ import ProductCard from '@/components/ProductCard';
+ import { getCategories, getCollection, getFeatured, productCount } from '@/lib/catalog';
+ import { getCustomer } from '@/lib/customer';
++import { RecentlyViewed } from '@/components/Recent';
+ 
+ export default async function Home() {
+   const ctx = await getCustomer();
+@@ -16,6 +17,7 @@ export default async function Home() {
+           <div className="chips">{cats.map((c) => <Link key={c.slug} className="chip" href={`/kategorie/${c.slug}`}>{c.name}</Link>)}</div>
+         </div>
+       </section>
++      <RecentlyViewed />
+       {collection.length > 0 && <>
+         <h2>Ihre Kollektion</h2>
+         <div className="grid">{collection.map((p) => <ProductCard key={p.id} p={p} />)}</div>
+diff --git a/app/produkt/[id]/AddToCart.tsx b/app/produkt/[id]/AddToCart.tsx
+index a9828ac..a0f8392 100644
+--- a/app/produkt/[id]/AddToCart.tsx
++++ b/app/produkt/[id]/AddToCart.tsx
+@@ -6,12 +6,13 @@ import Gallery from '@/components/Gallery';
+ import { useCart } from '@/components/CartContext';
+ import { swatchBg } from '@/lib/colors';
+ import { WishButton } from '@/components/Wishlist';
++import Info from '@/components/Info';
+ import { FONTS, METHODS, MOTIFS, POSITIONS, PREVIEW, TEXT_COLORS, colorHex, fontCss, isImage, type Deco, type Motif } from '@/lib/deco';
+ import { nextTier, unitFor } from '@/lib/tiers';
+ 
+ type Logo = { id: string; name: string };
+ 
+-export default function AddToCart({ p, customerLogo }: { p: PublicProduct; customerLogo?: Logo | null }) {
++export default function AddToCart({ p, customerLogo, delivery }: { p: PublicProduct; customerLogo?: Logo | null; delivery?: string }) {
+   const { addMany } = useCart();
+   const [color, setColor] = useState(p.colors[0]);
+   // Mengen je Farbe + Größe ("Black|M" -> 5) – mehrere Farben in einem Schritt möglich
+@@ -63,7 +64,7 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
+     const items = entries.map(([key, n]) => {
+       const [c, s] = key.split('|');
+       const col = p.colors.find((x) => x.name === c);
+-      return { id: p.id, sku: p.sku, name: p.name, color: c || undefined, hex: col?.hex, size: s || undefined, qty: n, price: p.price, category: p.category, image: p.images[0], deco, tiers: p.tiers };
++      return { id: p.id, sku: p.sku, name: p.name, color: c || undefined, hex: col?.hex, size: s || undefined, qty: n, price: p.price, category: p.category, image: p.images[0], deco, tiers: p.tiers, sizes: p.sizes };
+     });
+     addMany(items);
+     setMsg(`${total} Stück von ${p.name} im Warenkorb${deco ? ' (mit Veredelung)' : ''}.`);
+@@ -98,6 +99,8 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
+         {p.price != null ? <>
+           <div className="price">{eur(p.price)} <span style={{ fontSize: 15, fontWeight: 500 }} className="muted">/ Stück</span></div>
+           <div className="vat">netto zzgl. MwSt. ({eur(p.priceGross)} brutto) · schon ab 1 Stück{decoOn ? ' · Veredelung wird im Angebot kalkuliert' : ''}</div>
++          {delivery && <div className="delivery"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M1 4h14v12H1zM15 9h4l3 3v4h-7z" /><circle cx="6" cy="18" r="2" /><circle cx="18" cy="18" r="2" /></svg>{delivery}</div>}
++          {p.tiers.length > 0 && <div className="opt" style={{ marginTop: 14, marginBottom: 6 }}>Mengenrabatt <Info>Der Staffelpreis gilt für die Gesamtmenge dieses Artikels – alle Farben und Größen zusammen. Beispiel: 6× Schwarz M + 6× Rot L = 12 Stück.</Info></div>}
+           {p.tiers.length > 0 && (
+             <div className="tiers">
+               <div className={`tier ${total < p.tiers[0].min ? 'on' : ''}`}><span>1–{p.tiers[0].min - 1} Stk.</span><b>{eur(p.price)}</b></div>
+@@ -117,14 +120,14 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
+           <div className="opt">Farbe: <span className="muted">{cname}</span> <span className="muted" style={{ fontWeight: 400 }}>({p.colors.length} Farben)</span></div>
+           <div className="swatches">
+             {p.colors.map((c) => (
+-              <button key={c.name} title={c.name} aria-label={c.name} className={`sw ${c.name === cname ? 'on' : ''}`} style={{ background: swatchBg(c) }} onClick={() => setColor(c)}>
++              <button key={c.name} data-name={c.name} aria-label={c.name} className={`sw ${c.name === cname ? 'on' : ''}`} style={{ background: swatchBg(c) }} onClick={() => setColor(c)}>
+                 {colorTotals[c.name] ? <span className="sw-n">{colorTotals[c.name]}</span> : null}
+               </button>
+             ))}
+           </div>
+         </>}
+ 
+-        <div className="opt">{sizes.length > 1 ? <>Größen & Mengen{p.colors.length > 0 && <span className="muted" style={{ fontWeight: 400 }}> für <span className="dot-inline" style={{ background: color ? swatchBg(color) : '#ddd' }} />{cname}</span>}</> : 'Menge'}</div>
++        <div className="opt opt-row"><span>{sizes.length > 1 ? <>Größen & Mengen{p.colors.length > 0 && <span className="muted" style={{ fontWeight: 400 }}> für <span className="dot-inline" style={{ background: color ? swatchBg(color) : '#ddd' }} />{cname}</span>}</> : 'Menge'}</span>{p.sizeChart && <a href={p.sizeChart} target="_blank" rel="noreferrer" className="sizechart"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><path d="M2 8h20v8H2zM6 8v3M10 8v4M14 8v3M18 8v4" /></svg>Größentabelle</a>}</div>
+         <div className={`szgrid ${sizes.length === 1 ? 'single' : ''}`}>
+           {sizes.map((s) => {
+             const v = qty[k(cname, s)] || 0;
+@@ -146,6 +149,7 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
+         <label className="deco-toggle">
+           <input type="checkbox" checked={decoOn} onChange={(e) => setDecoOn(e.target.checked)} />
+           <span><strong>Veredeln mit Logo oder Text</strong> <span className="muted">– Druck oder Stick</span></span>
++          <Info>Wir drucken oder besticken Ihr Logo bzw. Ihren Text. Die Kosten stehen als eigene Position im Angebot – vor der Produktion erhalten Sie eine Vorschau zur Freigabe.</Info>
+         </label>
+         {decoOn && (
+           <div className="deco">
+@@ -234,6 +238,12 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
+           </button>
+           <WishButton id={p.id} variant="full" />
+         </div>
++        <div className={`mbar ${total ? 'has' : ''}`}>
++          <div className="mbar-info">{total ? <><b>{total} Stk.</b>{p.price != null && <span> · {eur(unitFor(p.tiers, total, p.price)! * total)} netto</span>}</> : <span className="muted">{p.price != null ? `ab ${eur(p.tiers.length ? p.tiers[p.tiers.length - 1].price : p.price)}` : 'Preis auf Anfrage'}</span>}</div>
++          <button className="btn" disabled={!!total && !decoOk} onClick={() => (total ? onAdd() : document.querySelector('.szgrid')?.scrollIntoView({ behavior: 'smooth', block: 'center' }))}>
++            {!total ? 'Größe wählen' : !decoOk ? 'Veredelung prüfen' : 'In den Warenkorb'}
++          </button>
++        </div>
+         {msg && <div className="note ok">✓ {msg} <a href="/warenkorb" style={{ textDecoration: 'underline' }}>Zum Warenkorb</a></div>}
+ 
+         {p.features?.length ? <ul className="feat">{p.features.map((f) => <li key={f}>{f}</li>)}</ul> : <p style={{ marginTop: 20 }}>{p.description}</p>}
+diff --git a/app/produkt/[id]/page.tsx b/app/produkt/[id]/page.tsx
+index 1e8943c..77b05e9 100644
+--- a/app/produkt/[id]/page.tsx
++++ b/app/produkt/[id]/page.tsx
+@@ -4,6 +4,7 @@ import AddToCart from './AddToCart';
+ import ProductCard from '@/components/ProductCard';
+ import { getByCategory, getProduct } from '@/lib/catalog';
+ import { getCustomer } from '@/lib/customer';
++import { RecentTracker, RecentlyViewed } from '@/components/Recent';
+ 
+ export async function generateMetadata({ params }: { params: { id: string } }) {
+   const p = getProduct(decodeURIComponent(params.id), await getCustomer());
+@@ -18,8 +19,10 @@ export default async function ProductPage({ params }: { params: { id: string } }
+   return (
+     <>
+       <div className="crumbs"><Link href="/">Start</Link> › <Link href={`/kategorie/${p.categorySlug}`}>{p.category}</Link> › {p.name}</div>
+-      <AddToCart p={p} customerLogo={ctx?.logoId ? { id: ctx.logoId, name: ctx.logoName ?? 'Ihr Logo' } : null} />
++      <AddToCart p={p} customerLogo={ctx?.logoId ? { id: ctx.logoId, name: ctx.logoName ?? 'Ihr Logo' } : null} delivery={process.env.DELIVERY_TEXT ?? 'Lieferung ca. 3–5 Werktage · mit Veredelung ca. 7–14 Werktage nach Freigabe'} />
++      <RecentTracker id={p.id} />
+       {related.length > 0 && <><h2>Ähnliche Artikel</h2><div className="grid">{related.map((r) => <ProductCard key={r.id} p={r} />)}</div></>}
++      <RecentlyViewed exclude={p.id} />
+     </>
+   );
+ }
+diff --git a/app/robots.ts b/app/robots.ts
+index 762c6e7..3eec397 100644
+--- a/app/robots.ts
++++ b/app/robots.ts
+@@ -1,5 +1,9 @@
+ import type { MetadataRoute } from 'next';
++import { previewMode } from '@/lib/access';
+ export default function robots(): MetadataRoute.Robots {
+   const base = (process.env.SHOP_URL ?? 'https://euro-trade.com').replace(/\/$/, '');
++  if (previewMode()) return { rules: { userAgent: '*', disallow: '/' } };
+   return { rules: { userAgent: '*', allow: ['/', '/druck-stick'], disallow: ['/admin', '/api', '/angebot', '/warenkorb', '/merkliste', '/zugang'] }, sitemap: `${base}/sitemap.xml` };
+ }
++
++export const dynamic = 'force-dynamic';
+diff --git a/app/sitemap.ts b/app/sitemap.ts
+index e7b290a..47650d2 100644
+--- a/app/sitemap.ts
++++ b/app/sitemap.ts
+@@ -3,3 +3,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
+   const base = (process.env.SHOP_URL ?? 'https://euro-trade.com').replace(/\/$/, '');
+   return [{ url: `${base}/`, priority: 1 }, { url: `${base}/druck-stick`, priority: 0.8 }, { url: `${base}/impressum`, priority: 0.1 }];
+ }
++
++export const dynamic = 'force-dynamic';
+diff --git a/app/suche/page.tsx b/app/suche/page.tsx
+index 30f6284..453987b 100644
+--- a/app/suche/page.tsx
++++ b/app/suche/page.tsx
+@@ -1,5 +1,6 @@
+-import ProductCard from '@/components/ProductCard';
+-import { search } from '@/lib/catalog';
++import Link from 'next/link';
++import FilterGrid from '@/components/FilterGrid';
++import { didYouMean, getCategories, search } from '@/lib/catalog';
+ import { getCustomer } from '@/lib/customer';
+ 
+ export function generateMetadata({ searchParams }: { searchParams: { q?: string } }) {
+@@ -7,14 +8,21 @@ export function generateMetadata({ searchParams }: { searchParams: { q?: string
+ }
+ 
+ export default async function SearchPage({ searchParams }: { searchParams: { q?: string } }) {
++  const ctx = await getCustomer();
+   const q = (searchParams.q ?? '').trim();
+-  const res = q ? search(q, 200, await getCustomer()) : [];
++  const res = q ? search(q, 200, ctx) : [];
++  const sug = q && !res.length ? didYouMean(q, ctx) : null;
+   return (
+     <>
+       <h1>{q ? <>Ergebnisse für „{q}“</> : 'Suche'}</h1>
+-      <p className="muted">{res.length} Treffer</p>
+-      {res.length ? <div className="grid">{res.map((p) => <ProductCard key={p.id} p={p} />)}</div>
+-        : q && <p>Nichts gefunden. Probieren Sie einen allgemeineren Begriff, z. B. „Shirt“, „Hoodie“ oder „Tasche“.</p>}
++      {res.length ? <FilterGrid items={res} /> : q && (
++        <div className="box">
++          {sug ? <p style={{ marginTop: 0, fontSize: 17 }}>Meinten Sie <Link className="alink" href={`/suche?q=${encodeURIComponent(sug)}`}>„{sug}“</Link>?</p>
++            : <p style={{ marginTop: 0 }}>Leider nichts gefunden.</p>}
++          <p className="muted">Probieren Sie einen allgemeineren Begriff oder stöbern Sie in den Kategorien:</p>
++          <div className="chips">{getCategories(ctx).map((c) => <Link key={c.slug} className="chip" href={`/kategorie/${c.slug}`}>{c.name}</Link>)}</div>
++        </div>
++      )}
+     </>
+   );
+ }
+diff --git a/app/warenkorb/page.tsx b/app/warenkorb/page.tsx
+index 0ae4130..33336b0 100644
+--- a/app/warenkorb/page.tsx
++++ b/app/warenkorb/page.tsx
+@@ -1,39 +1,60 @@
+ 'use client';
+-import { useState } from 'react';
++import { useEffect, useState } from 'react';
+ import Link from 'next/link';
+ import { useCart } from '@/components/CartContext';
+ import ProductImage from '@/components/ProductImage';
+ import { eur } from '@/lib/format';
+ import { decoLabel } from '@/lib/deco';
+ import { unitFor } from '@/lib/tiers';
++import { saveMyInquiry } from '@/lib/mine';
++
++const FORM_KEY = 'et-form-v1';
++const FIELDS = ['name', 'company', 'email', 'phone', 'city'] as const;
+ 
+ export default function CartPage() {
+-  const { lines, setQty, remove, clear } = useCart();
++  const { lines, setQty, update, remove, clear, decoToAll } = useCart();
+   const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle');
+   const [err, setErr] = useState('');
++  const [form, setForm] = useState<Record<string, string>>({});
++  const [no, setNo] = useState('');
++
++  // Formular vorausfüllen: zuletzt verwendete Daten + Kundenname aus dem Code
++  useEffect(() => {
++    let saved: Record<string, string> = {};
++    try { saved = JSON.parse(localStorage.getItem(FORM_KEY) || '{}'); } catch {}
++    setForm(saved);
++    fetch('/api/ich').then((r) => r.json()).then((d) => { if (d.company) setForm((f) => ({ ...f, company: f.company || d.company })); }).catch(() => {});
++  }, []);
++
+   // Staffelpreis gilt für die Gesamtmenge je Artikel (alle Farben/Größen)
+   const perProduct = lines.reduce<Record<string, number>>((m, l) => ({ ...m, [l.id]: (m[l.id] ?? 0) + l.qty }), {});
+   const unit = (l: (typeof lines)[number]) => unitFor(l.tiers, perProduct[l.id], l.price);
+   const net = lines.reduce((s, l) => s + (unit(l) ?? 0) * l.qty, 0);
+   const anyOpen = lines.some((l) => l.price == null);
++  const decos = [...new Map(lines.filter((l) => l.deco).map((l) => [JSON.stringify(l.deco), l.deco!])).values()];
++  const minDate = new Date(Date.now() + 5 * 86400000).toISOString().slice(0, 10);
+ 
+   async function submit(e: React.FormEvent<HTMLFormElement>) {
+     e.preventDefault();
+     setState('sending');
+     const f = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
++    try { localStorage.setItem(FORM_KEY, JSON.stringify(Object.fromEntries(FIELDS.map((k) => [k, f[k] ?? ''])))); } catch {}
+     const r = await fetch('/api/anfrage', {
+       method: 'POST', headers: { 'Content-Type': 'application/json' },
+       body: JSON.stringify({ customer: f, lines: lines.map(({ id, color, size, qty, deco }) => ({ id, color, size, qty, deco })) }),
+     });
+     const d = await r.json().catch(() => ({}));
+-    if (r.ok) { setState('done'); clear(); } else { setState('error'); setErr(d.error ?? 'Senden fehlgeschlagen.'); }
++    if (r.ok) { if (d.token) saveMyInquiry(d.no, d.token); setNo(d.no ?? ''); setState('done'); clear(); } else { setState('error'); setErr(d.error ?? 'Senden fehlgeschlagen.'); }
+   }
+ 
+   if (state === 'done') return (
+     <div className="box" style={{ maxWidth: 640, margin: '20px auto', textAlign: 'center' }}>
+       <h1>Vielen Dank für Ihre Anfrage!</h1>
+-      <p>Wir melden uns innerhalb von 24 Stunden mit Ihrem Angebot. Eine Bestätigung ist per E-Mail unterwegs.</p>
+-      <Link className="btn" href="/" style={{ display: 'inline-grid', placeItems: 'center' }}>Weiter stöbern</Link>
++      <p>Ihre Anfrage {no && <b>{no}</b>} ist eingegangen. Wir melden uns innerhalb von 24 Stunden mit Ihrem Angebot – eine Bestätigung ist per E-Mail unterwegs.</p>
++      <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
++        <Link className="btn" href="/konto" style={{ display: 'inline-grid', placeItems: 'center' }}>Meine Anfragen</Link>
++        <Link className="btn alt" href="/" style={{ display: 'inline-grid', placeItems: 'center' }}>Weiter stöbern</Link>
++      </div>
+     </div>
+   );
+ 
+@@ -41,6 +62,7 @@ export default function CartPage() {
+     <div className="box" style={{ maxWidth: 640, margin: '20px auto', textAlign: 'center' }}>
+       <h1>Ihr Warenkorb ist leer</h1>
+       <p className="muted">Nutzen Sie die Suche oben – Tippfehler sind kein Problem.</p>
++      <Link className="alink" href="/konto">Meine bisherigen Anfragen</Link>
+     </div>
+   );
+ 
+@@ -50,20 +72,36 @@ export default function CartPage() {
+       <div className="cart">
+         <div className="box">
+           {lines.map((l) => (
+-            <div className="line" key={l.key}>
++            <div className="line cline" key={l.key}>
+               <div style={{ width: 64, height: 64 }}><ProductImage p={{ name: l.name, images: l.image ? [l.image] : [], colors: [{ name: l.color ?? '', hex: l.hex }], category: l.category }} /></div>
+-              <div>
++              <div style={{ minWidth: 0 }}>
+                 <Link href={`/produkt/${encodeURIComponent(l.id)}`} style={{ fontWeight: 600 }}>{l.name}</Link>
+-                <div className="muted" style={{ fontSize: 13 }}>{[l.color, l.size, l.sku].filter(Boolean).join(' · ')}{l.price != null && <> · {eur(unit(l))}/Stk.{unit(l)! < l.price && <span className="ok"> (Staffel)</span>}</>}</div>
+-                {l.deco && <div className="deco-tag">✦ {decoLabel(l.deco)}</div>}
++                <div className="muted cl-meta">
++                  {l.color && <span>{l.color}</span>}
++                  {l.sizes && l.sizes.length > 1
++                    ? <select value={l.size ?? ''} onChange={(e) => update(l.key, { size: e.target.value })} aria-label="Größe ändern">{l.sizes.map((s) => <option key={s}>{s}</option>)}</select>
++                    : l.size && <span>{l.size}</span>}
++                  {l.price != null && <span>{eur(unit(l))}/Stk.{unit(l)! < l.price && <span className="ok"> (Staffel)</span>}</span>}
++                </div>
++                {l.deco && <div className="deco-tag">✦ {decoLabel(l.deco)} <button className="linkbtn" onClick={() => update(l.key, { deco: null })}>entfernen</button></div>}
+               </div>
+-              <input className="qty" style={{ width: 80, height: 40 }} type="number" min={1} value={l.qty} onChange={(e) => setQty(l.key, Number(e.target.value) || 1)} aria-label="Menge" />
+-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
++              <div className="step" style={{ width: 112 }}>
++                <button type="button" onClick={() => (l.qty > 1 ? setQty(l.key, l.qty - 1) : remove(l.key))} aria-label="weniger">−</button>
++                <input type="number" min={1} value={l.qty} onFocus={(e) => e.target.select()} onChange={(e) => setQty(l.key, Number(e.target.value) || 1)} aria-label="Menge" />
++                <button type="button" onClick={() => setQty(l.key, l.qty + 1)} aria-label="mehr">+</button>
++              </div>
++              <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-end' }}>
+                 <strong>{l.price != null ? eur(unit(l)! * l.qty) : '—'}</strong>
+                 <button className="x" onClick={() => remove(l.key)} aria-label="Entfernen">×</button>
+               </div>
+             </div>
+           ))}
++          {decos.length > 0 && lines.some((l) => !l.deco || decos.length > 1) && (
++            <div className="deco-all">
++              <span>✦ Gleiche Veredelung für alle Positionen?</span>
++              {decos.map((d) => <button key={JSON.stringify(d)} className="btn alt" style={{ height: 36 }} onClick={() => decoToAll(d)}>{decos.length > 1 ? `„${decoLabel(d)}“ übernehmen` : 'Auf alle übertragen'}</button>)}
++            </div>
++          )}
+           {net > 0 && <div className="tot big"><span>Summe netto (Richtwert){anyOpen ? ' *' : ''}</span><span>{eur(net)}</span></div>}
+           <p className="muted" style={{ fontSize: 13, margin: '6px 0 0' }}>Endpreis inkl. Versand und ggf. Veredelung erhalten Sie mit dem Angebot.</p>
+         </div>
+@@ -71,16 +109,19 @@ export default function CartPage() {
+         <form className="box form" onSubmit={submit}>
+           <strong style={{ fontSize: 17 }}>Unverbindliches Angebot anfordern</strong>
+           <div className="two">
+-            <div><label>Name *</label><input name="name" required /></div>
+-            <div><label>Firma</label><input name="company" /></div>
++            <div><label>Name *</label><input name="name" required defaultValue={form.name} key={`n${form.name}`} autoComplete="name" /></div>
++            <div><label>Firma / Verein</label><input name="company" defaultValue={form.company} key={`c${form.company}`} autoComplete="organization" /></div>
++          </div>
++          <div className="two">
++            <div><label>E-Mail *</label><input name="email" type="email" required defaultValue={form.email} key={`e${form.email}`} autoComplete="email" /></div>
++            <div><label>Telefon</label><input name="phone" type="tel" defaultValue={form.phone} key={`p${form.phone}`} autoComplete="tel" /></div>
+           </div>
+           <div className="two">
+-            <div><label>E-Mail *</label><input name="email" type="email" required /></div>
+-            <div><label>Telefon</label><input name="phone" type="tel" /></div>
++            <div><label>PLZ / Ort</label><input name="city" defaultValue={form.city} key={`o${form.city}`} autoComplete="address-level2" /></div>
++            <div><label>Wunschliefertermin</label><input name="date" type="date" min={minDate} /></div>
+           </div>
+-          <label>PLZ / Ort</label><input name="city" />
+           <label>Nachricht</label>
+-          <textarea name="message" placeholder="Optional: Liefertermin, Lieferadresse, Fragen …" />
++          <textarea name="message" placeholder="Optional: Lieferadresse, Fragen, Namen/Nummern …" />
+           <input className="hp" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
+           <label style={{ display: 'flex', gap: 8, fontWeight: 400 }}>
+             <input type="checkbox" name="privacy" required style={{ width: 'auto' }} />
+diff --git a/components/CartContext.tsx b/components/CartContext.tsx
+index 6789405..7e1d630 100644
+--- a/components/CartContext.tsx
++++ b/components/CartContext.tsx
+@@ -1,37 +1,66 @@
+ 'use client';
+ import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+ import type { Deco } from '@/lib/deco';
++import CartDrawer from './CartDrawer';
+ 
+-export type CartLine = { key: string; id: string; sku: string; name: string; color?: string; size?: string; qty: number; price: number | null; hex?: string; category: string; image?: string; deco?: Deco | null; tiers?: { min: number; price: number }[] };
+-type Ctx = { lines: CartLine[]; add: (l: Omit<CartLine, 'key'>) => void; addMany: (ls: Omit<CartLine, 'key'>[]) => void; setQty: (key: string, qty: number) => void; remove: (key: string) => void; clear: () => void; count: number };
++export type CartLine = {
++  key: string; id: string; sku: string; name: string; color?: string; size?: string; qty: number; price: number | null;
++  hex?: string; category: string; image?: string; deco?: Deco | null; tiers?: { min: number; price: number }[];
++  /** verfügbare Größen – für die Bearbeitung im Warenkorb */
++  sizes?: string[];
++};
++type NewLine = Omit<CartLine, 'key'>;
++type Ctx = {
++  lines: CartLine[]; count: number;
++  add: (l: NewLine) => void; addMany: (ls: NewLine[]) => void;
++  setQty: (key: string, qty: number) => void; update: (key: string, patch: Partial<NewLine>) => void;
++  remove: (key: string) => void; clear: () => void; decoToAll: (deco: Deco | null) => void;
++  drawer: boolean; openDrawer: () => void; closeDrawer: () => void; lastAdded: string[];
++};
+ 
+ const CartCtx = createContext<Ctx | null>(null);
+-const KEY = 'et-cart-v2'; // v1 enthielt Demo-Artikel
++const KEY = 'et-cart-v2';
++const keyOf = (l: NewLine) => `${l.id}|${l.color ?? ''}|${l.size ?? ''}|${l.deco ? JSON.stringify(l.deco) : ''}`;
+ 
+ export function CartProvider({ children }: { children: ReactNode }) {
+   const [lines, setLines] = useState<CartLine[]>([]);
++  const [drawer, setDrawer] = useState(false);
++  const [lastAdded, setLastAdded] = useState<string[]>([]);
+   useEffect(() => { try { setLines(JSON.parse(localStorage.getItem(KEY) || '[]')); } catch {} }, []);
+   const save = (next: CartLine[]) => { setLines(next); try { localStorage.setItem(KEY, JSON.stringify(next)); } catch {} };
+ 
+-  const merge = (base: CartLine[], l: Omit<CartLine, 'key'>) => {
+-    const key = `${l.id}|${l.color ?? ''}|${l.size ?? ''}|${l.deco ? JSON.stringify(l.deco) : ''}`;
++  /** gleiche Position (Artikel, Farbe, Größe, Veredelung) wird zusammengefasst */
++  const merge = (base: CartLine[], l: NewLine) => {
++    const key = keyOf(l);
+     const ex = base.find((x) => x.key === key);
+     return ex ? base.map((x) => (x.key === key ? { ...x, qty: x.qty + l.qty } : x)) : [...base, { ...l, key }];
+   };
+-  const add: Ctx['add'] = (l) => save(merge(lines, l));
+-  const addMany: Ctx['addMany'] = (ls) => save(ls.reduce(merge, lines));
+-  const setQty = (key: string, qty: number) => save(lines.map((x) => (x.key === key ? { ...x, qty: Math.max(1, qty) } : x)));
++  const addMany: Ctx['addMany'] = (ls) => { save(ls.reduce(merge, lines)); setLastAdded(ls.map(keyOf)); setDrawer(true); };
++  const add: Ctx['add'] = (l) => addMany([l]);
++  const setQty = (key: string, qty: number) => save(lines.map((x) => (x.key === key ? { ...x, qty: Math.max(1, Math.floor(qty) || 1) } : x)));
++  const update: Ctx['update'] = (key, patch) => {
++    const cur = lines.find((x) => x.key === key);
++    if (!cur) return;
++    const { key: _k, ...rest } = cur;
++    save(merge(lines.filter((x) => x.key !== key), { ...rest, ...patch }));
++  };
++  const decoToAll = (deco: Deco | null) => save(lines.reduce<CartLine[]>((acc, { key: _k, ...l }) => merge(acc, { ...l, deco }), []));
+   const remove = (key: string) => save(lines.filter((x) => x.key !== key));
+   const clear = () => save([]);
+   const count = lines.reduce((s, l) => s + l.qty, 0);
+-  return <CartCtx.Provider value={{ lines, add, addMany, setQty, remove, clear, count }}>{children}</CartCtx.Provider>;
++  return (
++    <CartCtx.Provider value={{ lines, count, add, addMany, setQty, update, remove, clear, decoToAll, drawer, openDrawer: () => setDrawer(true), closeDrawer: () => setDrawer(false), lastAdded }}>
++      {children}
++      <CartDrawer />
++    </CartCtx.Provider>
++  );
+ }
+ export const useCart = () => useContext(CartCtx)!;
+ 
+ export function CartButton() {
+-  const { count } = useCart();
++  const { count, openDrawer } = useCart();
+   return (
+-    <a href="/warenkorb" className="cart-btn" aria-label="Warenkorb">
++    <a href="/warenkorb" className="cart-btn" aria-label="Warenkorb" onClick={(e) => { if (count > 0 && !e.metaKey && !e.ctrlKey) { e.preventDefault(); openDrawer(); } }}>
+       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 3h2l2.4 12.2a2 2 0 0 0 2 1.8h8.7a2 2 0 0 0 2-1.6L21 7H6" /><circle cx="9" cy="21" r="1" /><circle cx="18" cy="21" r="1" /></svg>
+       <span className="hide-sm">Warenkorb</span>
+       {count > 0 && <span className="badge">{count}</span>}
+diff --git a/components/CartDrawer.tsx b/components/CartDrawer.tsx
+new file mode 100644
+index 0000000..309013c
+--- /dev/null
++++ b/components/CartDrawer.tsx
+@@ -0,0 +1,62 @@
++'use client';
++import { useEffect } from 'react';
++import { usePathname } from 'next/navigation';
++import { useCart } from './CartContext';
++import ProductImage from './ProductImage';
++import { eur } from '@/lib/format';
++import { decoLabel } from '@/lib/deco';
++import { unitFor } from '@/lib/tiers';
++
++/** Seitenleiste: öffnet sich nach „In den Warenkorb“ */
++export default function CartDrawer() {
++  const { lines, drawer, closeDrawer, remove, lastAdded, count } = useCart();
++  const path = usePathname();
++  useEffect(() => { closeDrawer(); }, [path]); // eslint-disable-line react-hooks/exhaustive-deps
++  useEffect(() => {
++    if (!drawer) return;
++    const k = (e: KeyboardEvent) => e.key === 'Escape' && closeDrawer();
++    window.addEventListener('keydown', k);
++    return () => window.removeEventListener('keydown', k);
++  }, [drawer]); // eslint-disable-line react-hooks/exhaustive-deps
++
++  const perProduct = lines.reduce<Record<string, number>>((m, l) => ({ ...m, [l.id]: (m[l.id] ?? 0) + l.qty }), {});
++  const unit = (l: (typeof lines)[number]) => unitFor(l.tiers, perProduct[l.id], l.price);
++  const net = lines.reduce((s, l) => s + (unit(l) ?? 0) * l.qty, 0);
++  const added = lines.filter((l) => lastAdded.includes(l.key));
++
++  return (
++    <div className={`drawer-wrap ${drawer ? 'open' : ''}`} aria-hidden={!drawer}>
++      <div className="drawer-bg" onClick={closeDrawer} />
++      <aside className="drawer" role="dialog" aria-label="Warenkorb">
++        <div className="drawer-head">
++          <strong>{added.length ? '✓ Zum Warenkorb hinzugefügt' : 'Warenkorb'}</strong>
++          <button className="x" onClick={closeDrawer} aria-label="Schließen">×</button>
++        </div>
++        <div className="drawer-body">
++          {!lines.length && <p className="muted">Ihr Warenkorb ist leer.</p>}
++          {lines.map((l) => (
++            <div key={l.key} className={`dline ${lastAdded.includes(l.key) ? 'new' : ''}`}>
++              <div className="dimg"><ProductImage p={{ name: l.name, images: l.image ? [l.image] : [], colors: [{ name: l.color ?? '', hex: l.hex }], category: l.category }} /></div>
++              <div style={{ flex: 1, minWidth: 0 }}>
++                <div className="dname">{l.name}</div>
++                <div className="muted" style={{ fontSize: 12 }}>{[l.color, l.size].filter(Boolean).join(' · ')} · {l.qty} Stk.</div>
++                {l.deco && <div className="deco-tag">✦ {decoLabel(l.deco)}</div>}
++              </div>
++              <div style={{ textAlign: 'right' }}>
++                <div style={{ fontWeight: 700, fontSize: 14 }}>{l.price != null ? eur(unit(l)! * l.qty) : '–'}</div>
++                <button className="linkbtn muted" style={{ fontSize: 12 }} onClick={() => remove(l.key)}>entfernen</button>
++              </div>
++            </div>
++          ))}
++        </div>
++        {lines.length > 0 && (
++          <div className="drawer-foot">
++            <div className="tot big" style={{ marginTop: 0, borderTop: 0, paddingTop: 0 }}><span>{count} Stück · netto</span><span>{eur(net)}</span></div>
++            <a className="btn" href="/warenkorb" style={{ display: 'grid', placeItems: 'center' }}>Zum Warenkorb & Angebot anfordern</a>
++            <button className="btn alt" onClick={closeDrawer}>Weiter einkaufen</button>
++          </div>
++        )}
++      </aside>
++    </div>
++  );
++}
+diff --git a/components/Contact.tsx b/components/Contact.tsx
+new file mode 100644
+index 0000000..b88649e
+--- /dev/null
++++ b/components/Contact.tsx
+@@ -0,0 +1,22 @@
++'use client';
++import { useState } from 'react';
++/** schwebender Kontakt-Button: WhatsApp, Anruf, E-Mail */
++export default function Contact({ whatsapp, phone, email }: { whatsapp: string; phone: string; email: string }) {
++  const [open, setOpen] = useState(false);
++  const wa = `https://wa.me/${whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent('Hallo Euro-Trade, ich habe eine Frage zu: ' + (typeof window !== 'undefined' ? window.location.href : ''))}`;
++  return (
++    <div className={`contact ${open ? 'open' : ''}`}>
++      {open && (
++        <div className="contact-menu" role="menu">
++          <strong>Fragen? Wir helfen gern.</strong>
++          {whatsapp && <a href={wa} target="_blank" rel="noreferrer" className="c-wa"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.9-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z" /></svg>WhatsApp</a>}
++          {phone && <a href={`tel:${phone.replace(/[^\d+]/g, '')}`}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z" /></svg>{phone}</a>}
++          {email && <a href={`mailto:${email}`}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 6-10 7L2 6" /></svg>{email}</a>}
++        </div>
++      )}
++      <button className="contact-btn" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label="Kontakt">
++        {open ? '×' : <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.8-.9L3 20l1.1-4.2a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 8.4-8.5h.5A8.5 8.5 0 0 1 21 11v.5z" /></svg>}
++      </button>
++    </div>
++  );
++}
+diff --git a/components/FilterGrid.tsx b/components/FilterGrid.tsx
+new file mode 100644
+index 0000000..b1b1ee7
+--- /dev/null
++++ b/components/FilterGrid.tsx
+@@ -0,0 +1,84 @@
++'use client';
++import { useMemo, useState } from 'react';
++import ProductCard from './ProductCard';
++import type { PublicProduct } from '@/lib/types';
++import { FAMILY_HEX, colorFamily } from '@/lib/colors';
++import { eur } from '@/lib/format';
++
++const SIZE_ORDER = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '6XL'];
++const sizeRank = (s: string) => { const i = SIZE_ORDER.indexOf(s); return i >= 0 ? i : 100 + (parseFloat(s) || 0); };
++const minPrice = (p: PublicProduct) => (p.price == null ? null : p.tiers.length ? p.tiers[p.tiers.length - 1].price : p.price);
++
++type Sort = 'empfohlen' | 'preis' | 'preis-ab' | 'name';
++
++/** Produktliste mit Filtern: Marke, Farbe, Größe, Schnitt, Preis + Sortierung */
++export default function FilterGrid({ items }: { items: PublicProduct[] }) {
++  const [brands, setBrands] = useState<string[]>([]);
++  const [fams, setFams] = useState<string[]>([]);
++  const [sizes, setSizes] = useState<string[]>([]);
++  const [genders, setGenders] = useState<string[]>([]);
++  const [maxP, setMaxP] = useState<number | null>(null);
++  const [sort, setSort] = useState<Sort>('empfohlen');
++  const [open, setOpen] = useState(false);
++
++  const facets = useMemo(() => {
++    const count = (vals: string[][]) => { const m = new Map<string, number>(); vals.forEach((v) => new Set(v).forEach((x) => m.set(x, (m.get(x) ?? 0) + 1))); return m; };
++    const prices = items.map(minPrice).filter((x): x is number => x != null);
++    return {
++      brand: [...count(items.map((p) => [p.brand])).entries()].sort((a, b) => a[0].localeCompare(b[0])),
++      fam: [...count(items.map((p) => p.colors.map(colorFamily))).entries()].sort((a, b) => Object.keys(FAMILY_HEX).indexOf(a[0]) - Object.keys(FAMILY_HEX).indexOf(b[0])),
++      size: [...count(items.map((p) => p.sizes)).entries()].filter(([s]) => s.length <= 6).sort((a, b) => sizeRank(a[0]) - sizeRank(b[0])),
++      gender: [...count(items.map((p) => [p.gender ?? 'Unisex'])).entries()],
++      max: prices.length ? Math.ceil(Math.max(...prices)) : 0, min: prices.length ? Math.floor(Math.min(...prices)) : 0,
++    };
++  }, [items]);
++
++  const shown = useMemo(() => {
++    let r = items.filter((p) =>
++      (!brands.length || brands.includes(p.brand)) &&
++      (!fams.length || p.colors.some((c) => fams.includes(colorFamily(c)))) &&
++      (!sizes.length || sizes.some((s) => p.sizes.includes(s))) &&
++      (!genders.length || genders.includes(p.gender ?? 'Unisex')) &&
++      (maxP == null || (minPrice(p) ?? 0) <= maxP));
++    if (sort === 'preis') r = [...r].sort((a, b) => (minPrice(a) ?? 1e9) - (minPrice(b) ?? 1e9));
++    if (sort === 'preis-ab') r = [...r].sort((a, b) => (minPrice(b) ?? -1) - (minPrice(a) ?? -1));
++    if (sort === 'name') r = [...r].sort((a, b) => a.name.localeCompare(b.name));
++    return r;
++  }, [items, brands, fams, sizes, genders, maxP, sort]);
++
++  const tog = (set: (f: (x: string[]) => string[]) => void, v: string) => set((x) => (x.includes(v) ? x.filter((y) => y !== v) : [...x, v]));
++  const active = brands.length + fams.length + sizes.length + genders.length + (maxP != null ? 1 : 0);
++  const reset = () => { setBrands([]); setFams([]); setSizes([]); setGenders([]); setMaxP(null); };
++
++  const panel = (
++    <aside className={`filters ${open ? 'open' : ''}`}>
++      <div className="f-head"><strong>Filter</strong>{active > 0 && <button className="linkbtn" onClick={reset}>zurücksetzen</button>}<button className="x f-close" onClick={() => setOpen(false)} aria-label="Filter schließen">×</button></div>
++      {facets.fam.length > 1 && <div className="f-group"><b>Farbe</b><div className="f-fams">{facets.fam.map(([f, n]) => (
++        <button key={f} className={`f-fam ${fams.includes(f) ? 'on' : ''}`} onClick={() => tog(setFams, f)} title={`${f} (${n})`}><span style={{ background: FAMILY_HEX[f] }} />{f}</button>))}</div></div>}
++      {facets.size.length > 1 && <div className="f-group"><b>Größe</b><div className="f-sizes">{facets.size.map(([s]) => <button key={s} className={`size ${sizes.includes(s) ? 'on' : ''}`} onClick={() => tog(setSizes, s)}>{s}</button>)}</div></div>}
++      {facets.gender.length > 1 && <div className="f-group"><b>Schnitt</b>{facets.gender.map(([g, n]) => <label key={g} className="f-check"><input type="checkbox" checked={genders.includes(g)} onChange={() => tog(setGenders, g)} />{g}<span>{n}</span></label>)}</div>}
++      {facets.brand.length > 1 && <div className="f-group"><b>Marke</b>{facets.brand.map(([b, n]) => <label key={b} className="f-check"><input type="checkbox" checked={brands.includes(b)} onChange={() => tog(setBrands, b)} />{b}<span>{n}</span></label>)}</div>}
++      {facets.max > facets.min && <div className="f-group"><b>Preis bis {eur(maxP ?? facets.max)}</b><input type="range" min={facets.min} max={facets.max} step={1} value={maxP ?? facets.max} onChange={(e) => setMaxP(Number(e.target.value) >= facets.max ? null : Number(e.target.value))} /></div>}
++      <button className="btn f-apply" onClick={() => setOpen(false)}>{shown.length} Artikel anzeigen</button>
++    </aside>
++  );
++
++  return (
++    <div className="fg">
++      {panel}
++      <div style={{ minWidth: 0 }}>
++        <div className="fg-bar">
++          <button className="btn alt f-open" onClick={() => setOpen(true)}>Filter{active ? ` (${active})` : ''}</button>
++          <span className="muted">{shown.length} Artikel</span>
++          <label className="muted fg-sort">Sortieren
++            <select value={sort} onChange={(e) => setSort(e.target.value as Sort)}>
++              <option value="empfohlen">Empfohlen</option><option value="preis">Preis aufsteigend</option><option value="preis-ab">Preis absteigend</option><option value="name">Name A–Z</option>
++            </select>
++          </label>
++        </div>
++        {shown.length ? <div className="grid">{shown.map((p) => <ProductCard key={p.id} p={p} />)}</div>
++          : <div className="box muted">Keine Artikel mit diesen Filtern. <button className="linkbtn" onClick={reset}>Filter zurücksetzen</button></div>}
++      </div>
++    </div>
++  );
++}
+diff --git a/components/Info.tsx b/components/Info.tsx
+new file mode 100644
+index 0000000..29c0d31
+--- /dev/null
++++ b/components/Info.tsx
+@@ -0,0 +1,12 @@
++'use client';
++import { useState } from 'react';
++/** kleines (i) mit Erklärung – Hover am Desktop, Tippen am Handy */
++export default function Info({ children }: { children: React.ReactNode }) {
++  const [open, setOpen] = useState(false);
++  return (
++    <span className={`info-i ${open ? 'open' : ''}`} onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
++      <button type="button" aria-label="Info" onClick={(e) => { e.preventDefault(); setOpen((o) => !o); }}>i</button>
++      {open && <span className="info-pop" role="tooltip">{children}</span>}
++    </span>
++  );
++}
+diff --git a/components/Recent.tsx b/components/Recent.tsx
+new file mode 100644
+index 0000000..f8da484
+--- /dev/null
++++ b/components/Recent.tsx
+@@ -0,0 +1,25 @@
++'use client';
++import { useEffect, useState } from 'react';
++import ProductCard from './ProductCard';
++import type { PublicProduct } from '@/lib/types';
++
++const KEY = 'et-recent-v1';
++const read = (): string[] => { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; } };
++
++/** merkt sich den aufgerufenen Artikel */
++export function RecentTracker({ id }: { id: string }) {
++  useEffect(() => { try { localStorage.setItem(KEY, JSON.stringify([id, ...read().filter((x) => x !== id)].slice(0, 16))); } catch {} }, [id]);
++  return null;
++}
++
++/** „Zuletzt angesehen“ – ohne aktuellen Artikel */
++export function RecentlyViewed({ exclude, title = 'Zuletzt angesehen' }: { exclude?: string; title?: string }) {
++  const [items, setItems] = useState<PublicProduct[]>([]);
++  useEffect(() => {
++    const ids = read().filter((x) => x !== exclude).slice(0, 8);
++    if (!ids.length) return;
++    fetch(`/api/produkte?ids=${encodeURIComponent(ids.join(','))}`).then((r) => r.json()).then(setItems).catch(() => {});
++  }, [exclude]);
++  if (!items.length) return null;
++  return <><h2>{title}</h2><div className="grid recent">{items.map((p) => <ProductCard key={p.id} p={p} />)}</div></>;
++}
+diff --git a/components/SearchBar.tsx b/components/SearchBar.tsx
+index e74d238..9f80abc 100644
+--- a/components/SearchBar.tsx
++++ b/components/SearchBar.tsx
+@@ -11,6 +11,7 @@ export default function SearchBar() {
+   const [q, setQ] = useState(params.get('q') ?? '');
+   const [items, setItems] = useState<PublicProduct[]>([]);
+   const [total, setTotal] = useState(0);
++  const [suggest, setSuggest] = useState<string | null>(null);
+   const [open, setOpen] = useState(false);
+   const [active, setActive] = useState(-1);
+   const box = useRef<HTMLDivElement>(null);
+@@ -23,7 +24,7 @@ export default function SearchBar() {
+     const t = setTimeout(async () => {
+       const r = await fetch(`/api/search?limit=7&q=${encodeURIComponent(term)}`);
+       const d = await r.json();
+-      if (id === reqId.current) { setItems(d.items); setTotal(d.total); setActive(-1); }
++      if (id === reqId.current) { setItems(d.items); setTotal(d.total); setSuggest(d.suggest ?? null); setActive(-1); }
+     }, 120);
+     return () => clearTimeout(t);
+   }, [q]);
+@@ -59,7 +60,7 @@ export default function SearchBar() {
+       </button>
+       {open && q.trim().length >= 2 && (
+         <div className="sugg">
+-          {items.length === 0 ? <div className="empty">Keine Treffer für „{q}“</div> : items.map((p, i) => (
++          {items.length === 0 ? <div className="empty">Keine Treffer für „{q}“{suggest && <> – meinten Sie <button type="button" className="linkbtn alink" onMouseDown={(e) => { e.preventDefault(); setQ(suggest); }}>„{suggest}“</button>?</>}</div> : items.map((p, i) => (
+             <a key={p.id} href={`/produkt/${encodeURIComponent(p.id)}`} className={i === active ? 'on' : ''} onMouseEnter={() => setActive(i)}>
+               <div className="thumb"><ProductImage p={p} /></div>
+               <div><div className="t">{p.name}</div><div className="s">{p.brand} · {p.category} · {p.sku}</div></div>
+diff --git a/components/Wishlist.tsx b/components/Wishlist.tsx
+index ff9e945..63f4a84 100644
+--- a/components/Wishlist.tsx
++++ b/components/Wishlist.tsx
+@@ -39,6 +39,15 @@ export function WishButton({ id, variant = 'card' }: { id: string; variant?: 'ca
+   );
+ }
+ 
++export function AccountButton() {
++  return (
++    <a href="/konto" className="cart-btn" aria-label="Meine Anfragen" title="Meine Anfragen">
++      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><path d="M9 4h6l1 2h3a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h3z" /><path d="M8 12h8M8 16h5" /></svg>
++      <span className="hide-sm hide-md">Anfragen</span>
++    </a>
++  );
++}
++
+ export function WishlistButton() {
+   const { ids } = useWishlist();
+   return (
+diff --git a/lib/access.ts b/lib/access.ts
+index d12e4ad..2a710e6 100644
+--- a/lib/access.ts
++++ b/lib/access.ts
+@@ -14,8 +14,11 @@ export async function hmac(msg: string, key = secret()): Promise<string> {
+ 
+ export const normCode = (c: string) => String(c ?? '').trim().toUpperCase();
+ 
++/** Vorschau-Modus (Standard!): Shop nur für Admin sichtbar, Kunden-Codes gesperrt – erst SHOP_PREVIEW=false gibt frei */
++export const previewMode = () => process.env.SHOP_PREVIEW !== 'false';
++
+ /** Shop geschlossen? – SHOP_CLOSED=true oder Codes in ACCESS_CODES */
+-export const shopClosed = () => process.env.SHOP_CLOSED === 'true' || !!(process.env.ACCESS_CODES ?? '').trim();
++export const shopClosed = () => previewMode() || process.env.SHOP_CLOSED === 'true' || !!(process.env.ACCESS_CODES ?? '').trim();
+ 
+ /** Cookie-Wert: CODE.signatur */
+ export async function signCode(code: string) { const c = normCode(code); return `${encodeURIComponent(c)}.${await hmac('code|' + c)}`; }
+diff --git a/lib/catalog.ts b/lib/catalog.ts
+index acb3d4b..0f6c983 100644
+--- a/lib/catalog.ts
++++ b/lib/catalog.ts
+@@ -84,3 +84,33 @@ export function search(q: string, limit = 48, ctx?: Ctx): PublicProduct[] {
+   const ok = visible(ctx);
+   return runSearch(s.index, q, limit * 2, s.skus).map((id) => s.byId.get(id)!).filter(ok).slice(0, limit).map((p) => toPublic(p, ctx));
+ }
++
++/* ---------- „Meinten Sie …?“ bei 0 Treffern ---------- */
++let vocab: { mtime: number; words: string[] } | null = null;
++const norm = (w: string) => w.toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss').replace(/[^a-z0-9]/g, '');
++function lev(a: string, b: string) {
++  const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
++  for (let j = 1; j <= b.length; j++) d[0][j] = j;
++  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++)
++    d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
++  return d[a.length][b.length];
++}
++export function didYouMean(q: string, ctx?: Ctx): string | null {
++  const s = load();
++  if (!vocab || vocab.mtime !== s.mtime) {
++    const set = new Set<string>();
++    for (const p of s.products) for (const w of `${p.name} ${p.brand} ${p.category} ${(p.tags ?? []).join(' ')} ${p.colors.map((c) => c.name).join(' ')}`.split(/[\s/,·()-]+/)) if (w.length > 2) set.add(w);
++    vocab = { mtime: s.mtime, words: [...set] };
++  }
++  const words = q.trim().split(/\s+/).filter(Boolean);
++  if (!words.length) return null;
++  const fixed = words.map((w) => {
++    const n = norm(w);
++    if (n.length < 3) return w;
++    let best = w, bd = Math.max(1, Math.floor(n.length / 4)) + 1;
++    for (const v of vocab!.words) { const d = lev(n, norm(v)); if (d < bd) { bd = d; best = v; } }
++    return best;
++  });
++  const sug = fixed.join(' ');
++  return sug.toLowerCase() !== q.trim().toLowerCase() && search(sug, 1, ctx).length ? sug : null;
++}
+diff --git a/lib/colors.ts b/lib/colors.ts
+index 4d18924..db288f1 100644
+--- a/lib/colors.ts
++++ b/lib/colors.ts
+@@ -31,3 +31,25 @@ export function sortColors(colors: Color[]): Color[] {
+ 
+ /** Hintergrund für Farbpunkte: Stoffmuster (meliert) oder Vollfarbe */
+ export const swatchBg = (c: Color) => (c.swatch ? `url("${c.swatch}") center/cover` : c.hex ?? '#ddd');
++
++/** Farbfamilie für Filter (aus HEX bzw. Name) */
++export function colorFamily(c: Color): string {
++  const n = c.name.toLowerCase();
++  if (/melange|heather|grey|gray|grau|charcoal|anthra|slate|silver/.test(n) && !c.hex) return 'Grau';
++  const v = hsl(c.hex);
++  if (!v) return /black|schwarz/.test(n) ? 'Schwarz' : /white|weiß|natural/.test(n) ? 'Weiß' : 'Sonstige';
++  if (v.l > 0.9 || (v.s < 0.12 && v.l > 0.82)) return 'Weiß';
++  if (v.l < 0.13) return 'Schwarz';
++  if (v.s < 0.15) return 'Grau';
++  const h = v.h;
++  if (h >= 15 && h < 50 && v.l < 0.45 && v.s < 0.6) return 'Braun & Beige';
++  if (h >= 20 && h < 55 && v.l > 0.6 && v.s < 0.6) return 'Braun & Beige';
++  if (h < 15 || h >= 345) return 'Rot';
++  if (h < 40) return 'Orange';
++  if (h < 65) return 'Gelb';
++  if (h < 170) return 'Grün';
++  if (h < 255) return 'Blau';
++  if (h < 300) return 'Lila';
++  return 'Pink';
++}
++export const FAMILY_HEX: Record<string, string> = { Weiß: '#ffffff', Grau: '#9aa1ab', Schwarz: '#111', Rot: '#c8102e', Orange: '#f26b1d', Gelb: '#f2c200', Grün: '#1e7b34', Blau: '#1d4ed8', Lila: '#6b21a8', Pink: '#e0218a', 'Braun & Beige': '#a47148', Sonstige: '#ddd' };
+diff --git a/lib/customer.ts b/lib/customer.ts
+index 819b410..2d485ad 100644
+--- a/lib/customer.ts
++++ b/lib/customer.ts
+@@ -1,10 +1,11 @@
+ import 'server-only';
+ import { cookies } from 'next/headers';
+-import { ACCESS_COOKIE, ADMIN_COOKIE, isAdminToken, shopClosed, verifyCodeToken } from './access';
++import { ACCESS_COOKIE, ADMIN_COOKIE, isAdminToken, previewMode, shopClosed, verifyCodeToken } from './access';
+ import { findCustomer, type Customer } from './store';
+ 
+ /** Angemeldeter Kunde (aus signiertem Cookie) – null, wenn kein/ungültiger/gesperrter Code */
+ export async function getCustomer(): Promise<Customer | null> {
++  if (previewMode()) return null; // Vorschau: nur Admin
+   const code = await verifyCodeToken(cookies().get(ACCESS_COOKIE)?.value);
+   return code ? findCustomer(code) : null;
+ }
+diff --git a/lib/mine.ts b/lib/mine.ts
+new file mode 100644
+index 0000000..d51f259
+--- /dev/null
++++ b/lib/mine.ts
+@@ -0,0 +1,7 @@
++// „Meine Anfragen“ – pro Gerät/Browser gemerkt (Codes werden oft von mehreren Personen geteilt)
++const KEY = 'et-mine-v1';
++export type Mine = { no: string; token: string };
++export function myInquiries(): Mine[] { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; } }
++export function saveMyInquiry(no: string, token: string) {
++  try { localStorage.setItem(KEY, JSON.stringify([{ no, token }, ...myInquiries().filter((x) => x.no !== no)].slice(0, 50))); } catch {}
++}
+diff --git a/lib/types.ts b/lib/types.ts
+index 0d21569..3258c68 100644
+--- a/lib/types.ts
++++ b/lib/types.ts
+@@ -17,6 +17,8 @@ export type Product = {
+   composition?: string;
+   specs?: Record<string, string>;
+   images: string[];
++  /** Link zur Größentabelle (PDF des Herstellers) */
++  sizeChart?: string;
+   colors: Color[];
+   sizes: string[];
+   stock?: number;
+diff --git a/middleware.ts b/middleware.ts
+index 35e6150..9ae87bc 100644
+--- a/middleware.ts
++++ b/middleware.ts
+@@ -1,5 +1,5 @@
+ import { NextResponse, type NextRequest } from 'next/server';
+-import { ACCESS_COOKIE, ADMIN_COOKIE, isAdminToken, shopClosed, verifyCodeToken } from '@/lib/access';
++import { ACCESS_COOKIE, ADMIN_COOKIE, isAdminToken, previewMode, shopClosed, verifyCodeToken } from '@/lib/access';
+ 
+ // Immer erreichbar: Zugang, Pflichtseiten, Angebots-Links aus der E-Mail, Admin-Login
+ const PUBLIC = ['/start', '/druck-stick', '/api/zugang-anfrage', '/api/bild', '/sitemap.xml', '/zugang', '/api/zugang', '/impressum', '/datenschutz', '/angebot', '/api/angebot', '/admin/login', '/api/admin/login', '/icon.svg', '/favicon.ico', '/robots.txt'];
+@@ -23,7 +23,8 @@ export async function middleware(req: NextRequest) {
+   if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) return admin ? pass() : deny('/admin/login');
+   if (!shopClosed() || admin) return pass();
+   // Signatur prüfen – ob der Code noch aktiv ist, prüft der Server (Codes können im Admin gesperrt werden)
+-  if (await verifyCodeToken(req.cookies.get(ACCESS_COOKIE)?.value)) return pass();
++  // Vorschau-Modus: Kunden-Codes zählen noch nicht
++  if (!previewMode() && (await verifyCodeToken(req.cookies.get(ACCESS_COOKIE)?.value))) return pass();
+   // Startseite ohne Code: öffentliche Landingpage (URL bleibt euro-trade.com/)
+   if (pathname === '/') {
+     headers.set('x-path', '/start');
+diff --git a/scripts/import-html.mjs b/scripts/import-html.mjs
+index f0196d5..98e0dc5 100644
+--- a/scripts/import-html.mjs
++++ b/scripts/import-html.mjs
+@@ -71,6 +71,7 @@ function parse(file) {
+   if (!images.length) // Artikel mit nur einem Bild: Originalbild verwenden
+     images = [...new Set([...raw.matchAll(/class="cloud-zoom-gallery" href="(https:\/\/shop\.l-shop-team\.de\/out\/pictures\/master\/product\/[^"]+\.jpg)"/g)].map((m) => m[1]))];
+ 
++  const sizeChart = (raw.match(/href="(https:\/\/shop\.l-shop-team\.de\/out\/media\/[^"]+\.pdf)"[^>]*>\s*Größentabelle/) || [])[1];
+   const typ = (specs['Produkt'] || [])[0] || 'Sonstiges';
+   const category = CAT[typ] || typ;
+   const gender = /women|ladies|damen/i.test(name) ? 'Damen' : /kids|kinder|baby|junior/i.test(name) ? 'Kinder' : /men´s|men's|mens|herren/i.test(name) ? 'Herren' : 'Unisex';
+@@ -85,6 +86,7 @@ function parse(file) {
+     gender,
+     basePrice: null,
+     images,
++    ...(sizeChart ? { sizeChart } : {}),
+     colors,
+     sizes: (() => {
+       const s = sp('Größenlauf').split(/,\s*/).filter(Boolean);
+diff --git a/seed/products.json b/seed/products.json
+index 0171fd9..236312f 100644
+--- a/seed/products.json
++++ b/seed/products.json
+@@ -26,6 +26,7 @@
+    "https://shop.l-shop-team.de/out/pictures/generated/product/6/665_665_75/2595120.jpg",
+    "https://shop.l-shop-team.de/out/pictures/generated/product/7/665_665_75/2595121.jpg"
+   ],
++  "sizeChart": "https://shop.l-shop-team.de/out/media/AQ010_G202412%20(1).pdf",
+   "colors": [
+    {
+     "name": "Burgundy",
+@@ -337,6 +338,7 @@
+    "https://shop.l-shop-team.de/out/pictures/generated/product/1/665_665_75/2432139.jpg",
+    "https://shop.l-shop-team.de/out/pictures/generated/product/2/665_665_75/1815791.jpg"
+   ],
++  "sizeChart": "https://shop.l-shop-team.de/out/media/BCWU620_202504_WU620.pdf",
+   "colors": [
+    {
+     "name": "Royal Blue",
+@@ -490,6 +492,7 @@
+    "https://shop.l-shop-team.de/out/pictures/generated/product/6/665_665_75/1749850.jpg",
+    "https://shop.l-shop-team.de/out/pictures/generated/product/7/665_665_75/1749851.jpg"
+   ],
++  "sizeChart": "https://shop.l-shop-team.de/out/media/HRM801_G202503%20(2).pdf",
+   "colors": [
+    {
+     "name": "Black",
+@@ -600,6 +603,7 @@
+    "https://shop.l-shop-team.de/out/pictures/generated/product/4/665_665_75/2513494.jpg",
+    "https://shop.l-shop-team.de/out/pictures/generated/product/5/665_665_75/2513495.jpg"
+   ],
++  "sizeChart": "https://shop.l-shop-team.de/out/media/JN8046_G202505.pdf",
+   "colors": [
+    {
+     "name": "Black",
+@@ -667,6 +671,7 @@
+    "https://shop.l-shop-team.de/out/pictures/generated/product/3/665_665_75/2499795.jpg",
+    "https://shop.l-shop-team.de/out/pictures/generated/product/4/665_665_75/2499796.jpg"
+   ],
++  "sizeChart": "https://shop.l-shop-team.de/out/media/MV470064_G202501.pdf",
+   "colors": [
+    {
+     "name": "Anthracite",
+@@ -744,6 +749,7 @@
+    "https://shop.l-shop-team.de/out/pictures/generated/product/3/665_665_75/1881209.jpg",
+    "https://shop.l-shop-team.de/out/pictures/generated/product/4/665_665_75/1881210.jpg"
+   ],
++  "sizeChart": "https://shop.l-shop-team.de/out/media/MY111_G202505.pdf",
+   "colors": [
+    {
+     "name": "White/White",
+@@ -832,6 +838,7 @@
+    "https://shop.l-shop-team.de/out/pictures/generated/product/3/665_665_75/2384982.jpg",
+    "https://shop.l-shop-team.de/out/pictures/generated/product/4/665_665_75/2384983.jpg"
+   ],
++  "sizeChart": "https://shop.l-shop-team.de/out/media/NN310_G202407_NEU_09_2024%20(2).pdf",
+   "colors": [
+    {
+     "name": "Action Navy",
+@@ -923,6 +930,7 @@
+    "https://shop.l-shop-team.de/out/pictures/generated/product/4/665_665_75/2874344.jpg",
+    "https://shop.l-shop-team.de/out/pictures/generated/product/5/665_665_75/2874345.jpg"
+   ],
++  "sizeChart": "https://shop.l-shop-team.de/out/media/P04_G202505.pdf",
+   "colors": [
+    {
+     "name": "Black",
+@@ -1008,6 +1016,7 @@
+    "https://shop.l-shop-team.de/out/pictures/generated/product/4/665_665_75/1879211.jpg",
+    "https://shop.l-shop-team.de/out/pictures/generated/product/5/665_665_75/2488050.jpg"
+   ],
++  "sizeChart": "https://shop.l-shop-team.de/out/media/RT234J_G202504.pdf",
+   "colors": [
+    {
+     "name": "Black/Orange",
+@@ -1076,6 +1085,7 @@
+    "https://shop.l-shop-team.de/out/pictures/generated/product/4/665_665_75/2221352.jpg",
+    "https://shop.l-shop-team.de/out/pictures/generated/product/5/665_665_75/2221353.jpg"
+   ],
++  "sizeChart": "https://shop.l-shop-team.de/out/media/TJ9120_G202504.pdf",
+   "colors": [
+    {
+     "name": "Deep Green/Black",
+@@ -1145,6 +1155,7 @@
+    "https://shop.l-shop-team.de/out/pictures/generated/product/3/665_665_75/2517464.jpg",
+    "https://shop.l-shop-team.de/out/pictures/generated/product/4/665_665_75/2517465.jpg"
+   ],
++  "sizeChart": "https://shop.l-shop-team.de/out/media/TR510_G202609%20(1).pdf",
+   "colors": [
+    {
+     "name": "Black",
+-- 
+2.43.0
+
