@@ -1356,11 +1356,11 @@
  {
   "id": "bcbg001",
   "sku": "BCBG001",
-  "name": "B&C BCBG001",
+  "name": "Jogginghose Unisex (BCBG001)",
   "brand": "B&C BE INSPIRED",
-  "category": "Sonstiges",
-  "categorySlug": "sonstiges",
-  "description": "",
+  "category": "Hosen",
+  "categorySlug": "hosen",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -1404,22 +1404,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Jogginghose",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcbk001",
   "sku": "BCBK001",
-  "name": "B&C BCBK001",
+  "name": "Jogginghose Kinder (BCBK001)",
   "brand": "B&C BE INSPIRED",
-  "category": "Sonstiges",
-  "categorySlug": "sonstiges",
-  "description": "",
+  "category": "Hosen",
+  "categorySlug": "hosen",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -1455,22 +1465,30 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "3/4",
+   "5/6",
+   "7/8",
+   "9/11",
+   "12/14"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Jogginghose",
+   "Kinder",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcfg001",
   "sku": "BCFG001",
-  "name": "B&C BCFG001",
+  "name": "Fleecejacke Unisex (BCFG001)",
   "brand": "B&C BE INSPIRED",
-  "category": "Sonstiges",
-  "categorySlug": "sonstiges",
-  "description": "",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -1522,22 +1540,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Fleecejacke",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcjg001",
   "sku": "BCJG001",
-  "name": "B&C BCJG001",
+  "name": "Jacke Unisex (BCJG001)",
   "brand": "B&C BE INSPIRED",
   "category": "Jacken",
   "categorySlug": "jacken",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -1581,22 +1609,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Jacke",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcjg002",
   "sku": "BCJG002",
-  "name": "B&C BCJG002",
+  "name": "Jacke Unisex (BCJG002)",
   "brand": "B&C BE INSPIRED",
   "category": "Jacken",
   "categorySlug": "jacken",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -1640,22 +1678,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Jacke",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcjg003",
   "sku": "BCJG003",
-  "name": "B&C BCJG003",
+  "name": "Jacke Unisex (BCJG003)",
   "brand": "B&C BE INSPIRED",
   "category": "Jacken",
   "categorySlug": "jacken",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -1747,22 +1795,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Jacke",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcjg004",
   "sku": "BCJG004",
-  "name": "B&C BCJG004",
+  "name": "Jacke Unisex (BCJG004)",
   "brand": "B&C BE INSPIRED",
   "category": "Jacken",
   "categorySlug": "jacken",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -1822,22 +1880,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Jacke",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcjg005",
   "sku": "BCJG005",
-  "name": "B&C BCJG005",
+  "name": "Jacke Unisex (BCJG005)",
   "brand": "B&C BE INSPIRED",
   "category": "Jacken",
   "categorySlug": "jacken",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -1873,22 +1941,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Jacke",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcjg006",
   "sku": "BCJG006",
-  "name": "B&C BCJG006",
+  "name": "Jacke Unisex (BCJG006)",
   "brand": "B&C BE INSPIRED",
   "category": "Jacken",
   "categorySlug": "jacken",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -1932,22 +2010,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Jacke",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcjk001",
   "sku": "BCJK001",
-  "name": "B&C BCJK001",
+  "name": "Jacke Kinder (BCJK001)",
   "brand": "B&C BE INSPIRED",
   "category": "Jacken",
   "categorySlug": "jacken",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -2039,22 +2127,30 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "3/4",
+   "5/6",
+   "7/8",
+   "9/11",
+   "12/14"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Jacke",
+   "Kinder",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcpg001",
   "sku": "BCPG001",
-  "name": "B&C BCPG001",
+  "name": "Poloshirt Unisex (BCPG001)",
   "brand": "B&C BE INSPIRED",
   "category": "Poloshirts",
   "categorySlug": "poloshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -2098,22 +2194,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Poloshirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcpk001",
   "sku": "BCPK001",
-  "name": "B&C BCPK001",
+  "name": "Poloshirt Kinder (BCPK001)",
   "brand": "B&C BE INSPIRED",
   "category": "Poloshirts",
   "categorySlug": "poloshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -2245,22 +2351,30 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "3/4",
+   "5/6",
+   "7/8",
+   "9/11",
+   "12/14"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Poloshirt",
+   "Kinder",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcpm430",
   "sku": "BCPM430",
-  "name": "B&C BCPM430",
+  "name": "Poloshirt Herren (BCPM430)",
   "brand": "B&C BE INSPIRED",
   "category": "Poloshirts",
   "categorySlug": "poloshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -2440,22 +2554,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Poloshirt",
+   "Herren",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcpu424",
   "sku": "BCPU424",
-  "name": "B&C BCPU424",
+  "name": "Poloshirt Unisex (BCPU424)",
   "brand": "B&C BE INSPIRED",
   "category": "Poloshirts",
   "categorySlug": "poloshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -2715,22 +2838,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Poloshirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcpu425",
   "sku": "BCPU425",
-  "name": "B&C BCPU425",
+  "name": "Poloshirt Unisex (BCPU425)",
   "brand": "B&C BE INSPIRED",
   "category": "Poloshirts",
   "categorySlug": "poloshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -2870,22 +3003,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Poloshirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcpu426",
   "sku": "BCPU426",
-  "name": "B&C BCPU426",
+  "name": "Poloshirt Unisex (BCPU426)",
   "brand": "B&C BE INSPIRED",
   "category": "Poloshirts",
   "categorySlug": "poloshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -3145,22 +3288,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Poloshirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcpu427",
   "sku": "BCPU427",
-  "name": "B&C BCPU427",
+  "name": "Poloshirt Unisex (BCPU427)",
   "brand": "B&C BE INSPIRED",
   "category": "Poloshirts",
   "categorySlug": "poloshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -3300,22 +3453,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Poloshirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcpu428",
   "sku": "BCPU428",
-  "name": "B&C BCPU428",
+  "name": "Poloshirt Unisex (BCPU428)",
   "brand": "B&C BE INSPIRED",
   "category": "Poloshirts",
   "categorySlug": "poloshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -3495,22 +3658,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Poloshirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcpuc10",
   "sku": "BCPUC10",
-  "name": "B&C BCPUC10",
+  "name": "Poloshirt Unisex (BCPUC10)",
   "brand": "B&C BE INSPIRED",
   "category": "Poloshirts",
   "categorySlug": "poloshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -3545,22 +3718,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Poloshirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcpuc11",
   "sku": "BCPUC11",
-  "name": "B&C BCPUC11",
+  "name": "Poloshirt Unisex (BCPUC11)",
   "brand": "B&C BE INSPIRED",
   "category": "Poloshirts",
   "categorySlug": "poloshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -3595,22 +3778,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Poloshirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcpui10",
   "sku": "BCPUI10",
-  "name": "B&C BCPUI10",
+  "name": "Poloshirt Unisex (BCPUI10)",
   "brand": "B&C BE INSPIRED",
   "category": "Poloshirts",
   "categorySlug": "poloshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -3781,22 +3974,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Poloshirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcpui12",
   "sku": "BCPUI12",
-  "name": "B&C BCPUI12",
+  "name": "Poloshirt Unisex (BCPUI12)",
   "brand": "B&C BE INSPIRED",
   "category": "Poloshirts",
   "categorySlug": "poloshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -3872,22 +4075,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Poloshirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcpw440",
   "sku": "BCPW440",
-  "name": "B&C BCPW440",
+  "name": "Poloshirt Damen (BCPW440)",
   "brand": "B&C BE INSPIRED",
   "category": "Poloshirts",
   "categorySlug": "poloshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -4067,22 +4280,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Poloshirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcpw461",
   "sku": "BCPW461",
-  "name": "B&C BCPW461",
+  "name": "Poloshirt Damen (BCPW461)",
   "brand": "B&C BE INSPIRED",
   "category": "Poloshirts",
   "categorySlug": "poloshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -4342,22 +4564,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Poloshirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcpw462",
   "sku": "BCPW462",
-  "name": "B&C BCPW462",
+  "name": "Poloshirt Damen (BCPW462)",
   "brand": "B&C BE INSPIRED",
   "category": "Poloshirts",
   "categorySlug": "poloshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -4497,22 +4728,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Poloshirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcpw463",
   "sku": "BCPW463",
-  "name": "B&C BCPW463",
+  "name": "Poloshirt Damen (BCPW463)",
   "brand": "B&C BE INSPIRED",
   "category": "Poloshirts",
   "categorySlug": "poloshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -4772,22 +5012,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Poloshirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcpw464",
   "sku": "BCPW464",
-  "name": "B&C BCPW464",
+  "name": "Poloshirt Damen (BCPW464)",
   "brand": "B&C BE INSPIRED",
   "category": "Poloshirts",
   "categorySlug": "poloshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -4935,22 +5184,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Poloshirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcpw465",
   "sku": "BCPW465",
-  "name": "B&C BCPW465",
+  "name": "Poloshirt Damen (BCPW465)",
   "brand": "B&C BE INSPIRED",
   "category": "Poloshirts",
   "categorySlug": "poloshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -5130,22 +5388,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Poloshirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcpwi11",
   "sku": "BCPWI11",
-  "name": "B&C BCPWI11",
+  "name": "Poloshirt Damen (BCPWI11)",
   "brand": "B&C BE INSPIRED",
   "category": "Poloshirts",
   "categorySlug": "poloshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -5316,22 +5583,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Poloshirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcpwi13",
   "sku": "BCPWI13",
-  "name": "B&C BCPWI13",
+  "name": "Poloshirt Damen (BCPWI13)",
   "brand": "B&C BE INSPIRED",
   "category": "Poloshirts",
   "categorySlug": "poloshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -5415,22 +5691,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Poloshirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctg001",
   "sku": "BCTG001",
-  "name": "B&C BCTG001",
+  "name": "T-Shirt Unisex (BCTG001)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -5474,22 +5759,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctg002",
   "sku": "BCTG002",
-  "name": "B&C BCTG002",
+  "name": "T-Shirt Unisex (BCTG002)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -5581,22 +5876,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctg003",
   "sku": "BCTG003",
-  "name": "B&C BCTG003",
+  "name": "T-Shirt Unisex (BCTG003)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -5672,22 +5977,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctk001",
   "sku": "BCTK001",
-  "name": "B&C BCTK001",
+  "name": "T-Shirt Kinder (BCTK001)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -5859,22 +6174,30 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "3/4",
+   "5/6",
+   "7/8",
+   "9/11",
+   "12/14"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Kinder",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctk002",
   "sku": "BCTK002",
-  "name": "B&C BCTK002",
+  "name": "T-Shirt Kinder (BCTK002)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -5982,22 +6305,30 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "3/4",
+   "5/6",
+   "7/8",
+   "9/11",
+   "12/14"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Kinder",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctk003",
   "sku": "BCTK003",
-  "name": "B&C BCTK003",
+  "name": "T-Shirt Kinder (BCTK003)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -6049,22 +6380,30 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "3/4",
+   "5/6",
+   "7/8",
+   "9/11",
+   "12/14"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Kinder",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctk004",
   "sku": "BCTK004",
-  "name": "B&C BCTK004",
+  "name": "T-Shirt Kinder (BCTK004)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -6140,22 +6479,30 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "3/4",
+   "5/6",
+   "7/8",
+   "9/11",
+   "12/14"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Kinder",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctk300",
   "sku": "BCTK300",
-  "name": "B&C BCTK300",
+  "name": "T-Shirt Kinder (BCTK300)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -6326,22 +6673,30 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "3/4",
+   "5/6",
+   "7/8",
+   "9/11",
+   "12/14"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Kinder",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctk301",
   "sku": "BCTK301",
-  "name": "B&C BCTK301",
+  "name": "T-Shirt Kinder (BCTK301)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -6472,22 +6827,30 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "3/4",
+   "5/6",
+   "7/8",
+   "9/11",
+   "12/14"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Kinder",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctk350",
   "sku": "BCTK350",
-  "name": "B&C BCTK350",
+  "name": "T-Shirt Kinder (BCTK350)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -6514,22 +6877,30 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "3/4",
+   "5/6",
+   "7/8",
+   "9/11",
+   "12/14"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Kinder",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctm042",
   "sku": "BCTM042",
-  "name": "B&C BCTM042",
+  "name": "T-Shirt Herren (BCTM042)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -6685,22 +7056,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Herren",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctm044",
   "sku": "BCTM044",
-  "name": "B&C BCTM044",
+  "name": "T-Shirt Herren (BCTM044)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -6759,22 +7139,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Herren",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctm048",
   "sku": "BCTM048",
-  "name": "B&C BCTM048",
+  "name": "T-Shirt Herren (BCTM048)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -6858,22 +7247,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Herren",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctm055",
   "sku": "BCTM055",
-  "name": "B&C BCTM055",
+  "name": "T-Shirt Herren (BCTM055)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -6965,22 +7363,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Herren",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctm057",
   "sku": "BCTM057",
-  "name": "B&C BCTM057",
+  "name": "T-Shirt Herren (BCTM057)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -7040,22 +7447,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Herren",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctm062",
   "sku": "BCTM062",
-  "name": "B&C BCTM062",
+  "name": "T-Shirt Herren (BCTM062)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -7074,22 +7490,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Herren",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctm070",
   "sku": "BCTM070",
-  "name": "B&C BCTM070",
+  "name": "T-Shirt Herren (BCTM070)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -7157,22 +7582,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Herren",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctm072",
   "sku": "BCTM072",
-  "name": "B&C BCTM072",
+  "name": "T-Shirt Herren (BCTM072)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -7224,22 +7658,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Herren",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctm200",
   "sku": "BCTM200",
-  "name": "B&C BCTM200",
+  "name": "T-Shirt Herren (BCTM200)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -7298,22 +7741,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Herren",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctm201",
   "sku": "BCTM201",
-  "name": "B&C BCTM201",
+  "name": "T-Shirt Herren (BCTM201)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -7364,22 +7816,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Herren",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctm202",
   "sku": "BCTM202",
-  "name": "B&C BCTM202",
+  "name": "T-Shirt Herren (BCTM202)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -7422,22 +7883,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Herren",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctu006",
   "sku": "BCTU006",
-  "name": "B&C BCTU006",
+  "name": "T-Shirt Unisex (BCTU006)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -7504,22 +7974,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctu008",
   "sku": "BCTU008",
-  "name": "B&C BCTU008",
+  "name": "T-Shirt Unisex (BCTU008)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -7587,22 +8067,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctu01b",
   "sku": "BCTU01B",
-  "name": "B&C BCTU01B",
+  "name": "T-Shirt Unisex (BCTU01B)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -7782,22 +8272,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctu01t",
   "sku": "BCTU01T",
-  "name": "B&C BCTU01T",
+  "name": "T-Shirt Unisex (BCTU01T)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -8145,22 +8645,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctu020",
   "sku": "BCTU020",
-  "name": "B&C BCTU020",
+  "name": "T-Shirt Unisex (BCTU020)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -8187,22 +8697,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctu03t",
   "sku": "BCTU03T",
-  "name": "B&C BCTU03T",
+  "name": "T-Shirt Unisex (BCTU03T)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -8542,22 +9062,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctu05t",
   "sku": "BCTU05T",
-  "name": "B&C BCTU05T",
+  "name": "T-Shirt Unisex (BCTU05T)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -8673,22 +9203,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctu07t",
   "sku": "BCTU07T",
-  "name": "B&C BCTU07T",
+  "name": "T-Shirt Unisex (BCTU07T)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -8780,22 +9320,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctuc01",
   "sku": "BCTUC01",
-  "name": "B&C BCTUC01",
+  "name": "T-Shirt Unisex (BCTUC01)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -8846,22 +9396,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctw001",
   "sku": "BCTW001",
-  "name": "B&C BCTW001",
+  "name": "T-Shirt Damen (BCTW001)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -8929,22 +9489,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctw02b",
   "sku": "BCTW02B",
-  "name": "B&C BCTW02B",
+  "name": "T-Shirt Damen (BCTW02B)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -9124,22 +9693,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctw02t",
   "sku": "BCTW02T",
-  "name": "B&C BCTW02T",
+  "name": "T-Shirt Damen (BCTW02T)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -9487,22 +10065,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctw043",
   "sku": "BCTW043",
-  "name": "B&C BCTW043",
+  "name": "T-Shirt Damen (BCTW043)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -9666,22 +10253,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctw045",
   "sku": "BCTW045",
-  "name": "B&C BCTW045",
+  "name": "T-Shirt Damen (BCTW045)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -9740,22 +10336,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctw049",
   "sku": "BCTW049",
-  "name": "B&C BCTW049",
+  "name": "T-Shirt Damen (BCTW049)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -9839,22 +10444,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctw04t",
   "sku": "BCTW04T",
-  "name": "B&C BCTW04T",
+  "name": "T-Shirt Damen (BCTW04T)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -10194,22 +10808,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctw056",
   "sku": "BCTW056",
-  "name": "B&C BCTW056",
+  "name": "T-Shirt Damen (BCTW056)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -10301,22 +10924,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctw058",
   "sku": "BCTW058",
-  "name": "B&C BCTW058",
+  "name": "T-Shirt Damen (BCTW058)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -10375,22 +11007,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctw063",
   "sku": "BCTW063",
-  "name": "B&C BCTW063",
+  "name": "T-Shirt Damen (BCTW063)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -10409,22 +11050,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctw06t",
   "sku": "BCTW06T",
-  "name": "B&C BCTW06T",
+  "name": "T-Shirt Damen (BCTW06T)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -10540,22 +11190,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctw071",
   "sku": "BCTW071",
-  "name": "B&C BCTW071",
+  "name": "T-Shirt Damen (BCTW071)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -10623,22 +11282,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctw073",
   "sku": "BCTW073",
-  "name": "B&C BCTW073",
+  "name": "T-Shirt Damen (BCTW073)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -10690,22 +11358,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bctw08t",
   "sku": "BCTW08T",
-  "name": "B&C BCTW08T",
+  "name": "T-Shirt Damen (BCTW08T)",
   "brand": "B&C BE INSPIRED",
   "category": "T-Shirts",
   "categorySlug": "t-shirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -10797,22 +11474,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "T-Shirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcwg001",
   "sku": "BCWG001",
-  "name": "B&C BCWG001",
+  "name": "Sweatshirt Unisex (BCWG001)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -10872,22 +11558,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcwg002",
   "sku": "BCWG002",
-  "name": "B&C BCWG002",
+  "name": "Sweatshirt Unisex (BCWG002)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -10947,22 +11643,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcwg003",
   "sku": "BCWG003",
-  "name": "B&C BCWG003",
+  "name": "Sweatshirt Unisex (BCWG003)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -10998,22 +11704,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcwg004",
   "sku": "BCWG004",
-  "name": "B&C BCWG004",
+  "name": "Sweatshirt Unisex (BCWG004)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -11169,22 +11885,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcwg005",
   "sku": "BCWG005",
-  "name": "B&C BCWG005",
+  "name": "Sweatshirt Unisex (BCWG005)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -11340,22 +12066,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcwg006",
   "sku": "BCWG006",
-  "name": "B&C BCWG006",
+  "name": "Sweatshirt Unisex (BCWG006)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -11391,22 +12127,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcwg007",
   "sku": "BCWG007",
-  "name": "B&C BCWG007",
+  "name": "Sweatshirt Unisex (BCWG007)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -11514,22 +12260,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcwg008",
   "sku": "BCWG008",
-  "name": "B&C BCWG008",
+  "name": "Sweatshirt Unisex (BCWG008)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -11637,22 +12393,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcwg009",
   "sku": "BCWG009",
-  "name": "B&C BCWG009",
+  "name": "Sweatshirt Unisex (BCWG009)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -11704,22 +12470,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcwk001",
   "sku": "BCWK001",
-  "name": "B&C BCWK001",
+  "name": "Sweatshirt Kinder (BCWK001)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -11818,22 +12594,30 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "3/4",
+   "5/6",
+   "7/8",
+   "9/11",
+   "12/14"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Kinder",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcwk002",
   "sku": "BCWK002",
-  "name": "B&C BCWK002",
+  "name": "Sweatshirt Kinder (BCWK002)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -11925,22 +12709,30 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "3/4",
+   "5/6",
+   "7/8",
+   "9/11",
+   "12/14"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Kinder",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcwk003",
   "sku": "BCWK003",
-  "name": "B&C BCWK003",
+  "name": "Sweatshirt Kinder (BCWK003)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -11976,22 +12768,30 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "3/4",
+   "5/6",
+   "7/8",
+   "9/11",
+   "12/14"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Kinder",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcwk680",
   "sku": "BCWK680",
-  "name": "B&C BCWK680",
+  "name": "Sweatshirt Kinder (BCWK680)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -12058,22 +12858,30 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "3/4",
+   "5/6",
+   "7/8",
+   "9/11",
+   "12/14"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Kinder",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcwk681",
   "sku": "BCWK681",
-  "name": "B&C BCWK681",
+  "name": "Sweatshirt Kinder (BCWK681)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -12148,22 +12956,30 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "3/4",
+   "5/6",
+   "7/8",
+   "9/11",
+   "12/14"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Kinder",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcwm646",
   "sku": "BCWM646",
-  "name": "B&C BCWM646",
+  "name": "Sweatshirt Herren (BCWM646)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -12190,22 +13006,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Herren",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcwu01k",
   "sku": "BCWU01K",
-  "name": "B&C BCWU01K",
+  "name": "Sweatshirt Unisex (BCWU01K)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -12385,22 +13210,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcwu01w",
   "sku": "BCWU01W",
-  "name": "B&C BCWU01W",
+  "name": "Sweatshirt Unisex (BCWU01W)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -12692,22 +13527,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcwu02k",
   "sku": "BCWU02K",
-  "name": "B&C BCWU02K",
+  "name": "Sweatshirt Unisex (BCWU02K)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -12887,22 +13732,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcwu03k",
   "sku": "BCWU03K",
-  "name": "B&C BCWU03K",
+  "name": "Sweatshirt Unisex (BCWU03K)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -13002,22 +13857,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcwu03w",
   "sku": "BCWU03W",
-  "name": "B&C BCWU03W",
+  "name": "Sweatshirt Unisex (BCWU03W)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -13309,22 +14174,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcwu31b",
   "sku": "BCWU31B",
-  "name": "B&C BCWU31B",
+  "name": "Sweatshirt Unisex (BCWU31B)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -13504,22 +14379,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcwu33b",
   "sku": "BCWU33B",
-  "name": "B&C BCWU33B",
+  "name": "Sweatshirt Unisex (BCWU33B)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -13699,22 +14584,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcwu35b",
   "sku": "BCWU35B",
-  "name": "B&C BCWU35B",
+  "name": "Sweatshirt Unisex (BCWU35B)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -13814,22 +14709,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcwu600",
   "sku": "BCWU600",
-  "name": "B&C BCWU600",
+  "name": "Sweatshirt Unisex (BCWU600)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -13888,22 +14793,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcwuc20",
   "sku": "BCWUC20",
-  "name": "B&C BCWUC20",
+  "name": "Sweatshirt Unisex (BCWUC20)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -13954,22 +14869,32 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Unisex",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcww01q",
   "sku": "BCWW01Q",
-  "name": "B&C BCWW01Q",
+  "name": "Sweatshirt Damen (BCWW01Q)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -14149,22 +15074,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcww02q",
   "sku": "BCWW02Q",
-  "name": "B&C BCWW02Q",
+  "name": "Sweatshirt Damen (BCWW02Q)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -14344,22 +15278,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcww02w",
   "sku": "BCWW02W",
-  "name": "B&C BCWW02W",
+  "name": "Sweatshirt Damen (BCWW02W)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -14651,22 +15594,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcww03q",
   "sku": "BCWW03Q",
-  "name": "B&C BCWW03Q",
+  "name": "Sweatshirt Damen (BCWW03Q)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -14766,22 +15718,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcww04w",
   "sku": "BCWW04W",
-  "name": "B&C BCWW04W",
+  "name": "Sweatshirt Damen (BCWW04W)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -15073,22 +16034,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcww32b",
   "sku": "BCWW32B",
-  "name": "B&C BCWW32B",
+  "name": "Sweatshirt Damen (BCWW32B)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -15268,22 +16238,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcww34b",
   "sku": "BCWW34B",
-  "name": "B&C BCWW34B",
+  "name": "Sweatshirt Damen (BCWW34B)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -15463,22 +16442,31 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  },
  {
   "id": "bcww36b",
   "sku": "BCWW36B",
-  "name": "B&C BCWW36B",
+  "name": "Sweatshirt Damen (BCWW36B)",
   "brand": "B&C BE INSPIRED",
   "category": "Sweatshirts",
   "categorySlug": "sweatshirts",
-  "description": "",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
   "features": [],
   "material": "",
   "composition": "",
@@ -15578,12 +16566,21 @@
     ]
    }
   ],
-  "sizes": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
   "specs": {},
   "tags": [
    "B&C",
-   "Entwurf"
+   "Sweatshirt",
+   "Damen",
+   "Platzhalter"
   ],
-  "hidden": true
+  "hidden": false
  }
 ]
