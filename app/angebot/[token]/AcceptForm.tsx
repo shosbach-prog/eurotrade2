@@ -1,12 +1,13 @@
 'use client';
 import { useState } from 'react';
-export default function AcceptForm({ token, defaultName, total, hasPreview }: { token: string; defaultName: string; total: string; hasPreview?: boolean }) {
+export default function AcceptForm({ token, defaultName, total, hasPreview, addr }: { token: string; defaultName: string; total: string; hasPreview?: boolean; addr?: { company: string; street: string; city: string } }) {
+  const [bill, setBill] = useState(addr ?? { company: '', street: '', city: '' });
   const [prevOk, setPrevOk] = useState(false);
   const [name, setName] = useState(defaultName); const [comment, setComment] = useState('');
   const [agree, setAgree] = useState(false); const [state, setState] = useState<'idle' | 'busy' | 'done'>('idle'); const [err, setErr] = useState('');
   async function submit(e: React.FormEvent) {
     e.preventDefault(); setState('busy'); setErr('');
-    const r = await fetch(`/api/angebot/${token}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, comment, previewOk: hasPreview ? prevOk : undefined }) });
+    const r = await fetch(`/api/angebot/${token}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, comment, previewOk: hasPreview ? prevOk : undefined, bill }) });
     const d = await r.json().catch(() => ({}));
     if (r.ok) setState('done'); else { setErr(d.error ?? 'Fehler'); setState('idle'); }
   }
@@ -18,6 +19,12 @@ export default function AcceptForm({ token, defaultName, total, hasPreview }: { 
         <div><label>Ihr Name *</label><input value={name} onChange={(e) => setName(e.target.value)} required /></div>
         <div><label>Anmerkung</label><input value={comment} onChange={(e) => setComment(e.target.value)} placeholder="z. B. Wunschliefertermin" /></div>
       </div>
+      <div className="opt" style={{ marginTop: 14 }}>Rechnungsadresse</div>
+      <div className="two">
+        <div><label>Firma / Verein</label><input value={bill.company} onChange={(e) => setBill({ ...bill, company: e.target.value })} /></div>
+        <div><label>Straße und Nr. *</label><input value={bill.street} onChange={(e) => setBill({ ...bill, street: e.target.value })} required /></div>
+      </div>
+      <div className="two"><div><label>PLZ und Ort *</label><input value={bill.city} onChange={(e) => setBill({ ...bill, city: e.target.value })} placeholder="44263 Dortmund" required /></div></div>
       <label style={{ display: 'flex', gap: 8, fontWeight: 400, marginTop: 14 }}>
         <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} style={{ width: 'auto' }} />
         <span>Ich nehme das Angebot über {total} verbindlich an. Es gelten die <a href="/agb" target="_blank" style={{ textDecoration: 'underline' }}>AGB</a>. Die <a href="/widerruf" target="_blank" style={{ textDecoration: 'underline' }}>Widerrufsbelehrung</a> habe ich zur Kenntnis genommen. Mir ist bekannt, dass für nach meinen Vorgaben veredelte Ware kein Widerrufsrecht besteht.</span>

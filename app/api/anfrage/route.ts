@@ -55,7 +55,7 @@ export async function POST(req: Request) {
   const c = body?.customer ?? {};
   if (c.website) return NextResponse.json({ ok: true }); // Honeypot
   if (!c.name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(c.email ?? '')) return NextResponse.json({ error: 'Bitte Name und gültige E-Mail angeben.' }, { status: 400 });
-  const customer = Object.fromEntries(['name', 'company', 'email', 'phone', 'city', 'date', 'message'].map((k) => [k, String(c[k] ?? '').slice(0, 2000)]));
+  const customer = Object.fromEntries(['name', 'company', 'email', 'phone', 'street', 'city', 'date', 'message'].map((k) => [k, String(c[k] ?? '').slice(0, 2000)]));
 
   // Preise serverseitig neu berechnen (mit Kunden-Aufschlag) – nie dem Browser vertrauen
   const ctx = await getCustomer();

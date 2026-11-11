@@ -1307,3 +1307,29 @@ footer.ft{margin-top:64px}
 .imp-steps{font-size:14px;padding-left:20px;margin:0 0 12px;display:flex;flex-direction:column;gap:4px}
 .imp-res{margin-top:10px;font-size:13.5px;background:#f6f7f9;border-radius:10px;padding:10px 14px}
 .imp-res ul{margin:4px 0 0;padding-left:18px;max-height:220px;overflow-y:auto}
+/* Rechnungen */
+.inv-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:10px 0 14px}
+.inv-stats>div{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 16px;display:flex;flex-direction:column;gap:2px}
+.inv-stats span{font-size:12.5px;color:var(--muted)}
+.inv-stats b{font-size:20px}
+.inv-stats .bad b{color:#c0262d}
+.inv-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.inv-bar input{height:38px;border:1px solid var(--line);border-radius:8px;padding:0 10px;min-width:220px}
+.inv-table tbody tr{cursor:pointer}
+.inv-table tbody tr:hover{background:#f6f8fc}
+.inv-set{display:grid;grid-template-columns:repeat(3,1fr);gap:4px 14px}
+.inv-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin:8px 0 14px}
+.inv-total{font-size:28px;font-weight:800;text-align:right;display:flex;flex-direction:column}
+.inv-total small{font-size:13px;font-weight:500;color:var(--muted)}
+.inv-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.inv-lines input{width:100%;height:36px;border:1px solid var(--line);border-radius:7px;padding:0 8px;font-size:14px;background:#fff}
+.inv-lines input:disabled{background:transparent;border-color:transparent;color:var(--ink)}
+.inv-lines input.sub{margin-top:4px;font-size:12.5px;height:30px;color:var(--muted)}
+.inv-lines td{vertical-align:top}
+.inv-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:16px}
+.inv-actions .btn{display:inline-grid;place-items:center}
+.inv-paid{display:inline-flex;gap:6px;align-items:center}
+.inv-paid input{height:40px;border:1px solid var(--line);border-radius:8px;padding:0 8px}
+.inv-pub .inv-amount{font-size:34px;font-weight:800;display:flex;flex-direction:column;margin-top:8px}
+.inv-pub .inv-amount small{font-size:14px;font-weight:500;color:var(--muted)}
+@media (max-width:800px){.inv-stats{grid-template-columns:1fr 1fr}.inv-grid,.inv-set{grid-template-columns:1fr}}

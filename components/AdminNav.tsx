@@ -3,8 +3,9 @@ import AdminLogout from './AdminLogout';
 import { fileCustomers, listAccessRequests } from '@/lib/store';
 import PendingBox from '@/app/admin/kunden/PendingBox';
 import { licenseInfo } from '@/lib/license';
+import { isOverdue, listInvoices } from '@/lib/invoice';
 
-export default function AdminNav({ active }: { active: 'anfragen' | 'kunden' | 'referenzen' | 'newsletter' | 'bewertungen' | 'artikel' | 'system' | 'veredelung' | 'teamshops' }) {
+export default function AdminNav({ active }: { active: 'anfragen' | 'kunden' | 'referenzen' | 'newsletter' | 'bewertungen' | 'artikel' | 'system' | 'veredelung' | 'teamshops' | 'rechnungen' }) {
   // Wartende Registrierungen + offene Zugangsanfragen – immer sichtbar im Admin
   const waiting = fileCustomers().filter((c) => c.pending && c.active === false);
   const pending = waiting.length;
@@ -13,7 +14,8 @@ export default function AdminNav({ active }: { active: 'anfragen' | 'kunden' | '
   return (
     <>
       <div className="admin-nav">
-        <Link href="/admin" className={active === 'anfragen' ? 'on' : ''}>Anfragen & Angebote</Link>
+        <Link href="/admin" className={active === 'anfragen' ? 'on' : ''}>Anfragen</Link>
+        {(() => { const od = listInvoices().filter(isOverdue).length; return <Link href="/admin/rechnungen" className={active === 'rechnungen' ? 'on' : ''}>Rechnungen{od > 0 && <span className="nav-badge" title="überfällig">{od}</span>}</Link>; })()}
         <Link href="/admin/kunden" className={active === 'kunden' ? 'on' : ''}>Kunden{todo > 0 && <span className="nav-badge">{todo}</span>}</Link>
         <Link href="/admin/artikel" className={active === 'artikel' ? 'on' : ''}>Artikel</Link>
         <Link href="/admin/teamshops" className={active === 'teamshops' ? 'on' : ''}>Team-Shops</Link>

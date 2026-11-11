@@ -4,6 +4,8 @@ import type { Metadata } from 'next';
 import AdminNav from '@/components/AdminNav';
 import OfferEditor from './OfferEditor';
 import ProofSender from './ProofSender';
+import CreateInvoice from './CreateInvoice';
+import { INV_STATUS, invoiceTotals, listInvoices } from '@/lib/invoice';
 import { getTeamShop } from '@/lib/teamshop';
 import { eur } from '@/lib/format';
 import { decoLabel, teamLabel } from '@/lib/deco';
@@ -66,6 +68,14 @@ export default function InquiryPage({ params }: { params: { no: string } }) {
       </div>
 
       {i.lines.some((l) => l.deco) && <><h2>Freigabe</h2><ProofSender no={i.no} proof={i.proof ?? null} previews={[...new Map(i.lines.flatMap((l) => (l.deco?.previews ?? []).map((id, k) => [id, `${l.color || l.name}${k ? ' hinten' : ''}`] as const))).entries()].map(([id, label]) => ({ id, label }))} /></>}
+      {(() => {
+        const invs = listInvoices().filter((x) => x.inquiryNo === i.no);
+        if (!i.offer && !invs.length) return null;
+        return <><h2>Rechnung</h2><div className="box">
+          {invs.map((x) => <p key={x.id} style={{ margin: '0 0 8px' }}><Link className="alink" href={`/admin/rechnungen/${x.id}`}><b>{x.no ?? 'Entwurf'}</b></Link>{x.kind === 'storno' ? ' (Storno)' : ''} · {eur(invoiceTotals(x).gross)} · <span className={`st st-${x.status === 'bezahlt' ? 'angenommen' : x.status === 'offen' ? 'angebot' : x.status === 'storniert' ? 'abgelehnt' : 'neu'}`}>{INV_STATUS[x.status]}</span></p>)}
+          {!invs.some((x) => x.kind === 'rechnung' && x.status !== 'storniert') && <><CreateInvoice no={i.no} label="Rechnung aus Angebot erstellen" /> <span className="muted" style={{ fontSize: 13 }}>übernimmt Positionen, Preise und Kundendaten – vor dem Festschreiben noch änderbar</span></>}
+        </div></>;
+      })()}
       <h2>Angebot</h2>
       <OfferEditor no={i.no} initial={i.offer ?? draftOffer(i)} saved={!!i.offer} status={i.status!} statuses={STATUS} mail={mailEnabled()} acceptUrl={i.token ? `${shopUrl()}/angebot/${i.token}` : ''} sentAt={i.offer?.sentAt ?? null} />
     </>

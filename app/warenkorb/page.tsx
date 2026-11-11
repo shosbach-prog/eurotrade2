@@ -10,7 +10,7 @@ import { saveMyInquiry } from '@/lib/mine';
 import { fmtDate, leadCheck } from '@/lib/leadtime';
 
 const FORM_KEY = 'et-form-v1';
-const FIELDS = ['name', 'company', 'email', 'phone', 'city'] as const;
+const FIELDS = ['name', 'company', 'email', 'phone', 'street', 'city'] as const;
 
 export default function CartPage() {
   const { lines, setQty, update, remove, clear, decoToAll } = useCart();
@@ -138,6 +138,8 @@ export default function CartPage() {
             <div><label>E-Mail *</label><input name="email" type="email" required defaultValue={form.email} key={`e${form.email}`} autoComplete="email" /></div>
             <div><label>Telefon</label><input name="phone" type="tel" defaultValue={form.phone} key={`p${form.phone}`} autoComplete="tel" /></div>
           </div>
+          <label>Straße und Nr. <span className="muted" style={{ fontWeight: 400 }}>(für Lieferung und Rechnung)</span></label>
+          <input name="street" defaultValue={form.street} key={`s${form.street}`} autoComplete="street-address" />
           <div className="two">
             <div><label>PLZ / Ort</label><input name="city" defaultValue={form.city} key={`o${form.city}`} autoComplete="address-level2" /></div>
             <div><label>Wunschliefertermin</label><input name="date" type="date" min={minDate} value={wish} onChange={(e) => setWish(e.target.value)} /></div>

@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import AcceptForm from './AcceptForm';
 import ProofBox from './ProofBox';
 import { teamLabel } from '@/lib/deco';
+import { invoiceTotals, listInvoices } from '@/lib/invoice';
 import { eur } from '@/lib/format';
 import { inquiryByToken, offerTotals } from '@/lib/store';
 
@@ -52,11 +53,15 @@ export default function OfferPage({ params }: { params: { token: string } }) {
           {teams.map((l, k) => <p key={k} style={{ fontSize: 14 }}><b>{l.name} {l.color} {l.size}</b> – {l.deco!.team!.pos}: {teamLabel(l.deco!.team!.rows)}</p>)}
         </div>;
       })()}
+      {listInvoices().filter((x) => x.inquiryNo === i.no && x.no).map((x) => <div key={x.id} className="box" style={{ marginTop: 16, display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+        <div style={{ flex: 1 }}><b>{x.kind === 'storno' ? 'Rechnungskorrektur' : 'Rechnung'} {x.no}</b><div className="muted" style={{ fontSize: 14 }}>{eur(invoiceTotals(x).gross)} · {x.status === 'bezahlt' ? '✓ bezahlt' : x.status === 'storniert' ? 'storniert' : 'offen'}</div></div>
+        <a className="btn alt" href={`/rechnung/${x.token}`} style={{ display: 'inline-grid', placeItems: 'center' }}>Rechnung ansehen</a>
+      </div>)}
       {i.proof?.sentAt && <ProofBox token={params.token} proof={i.proof} name={i.customer.name} />}
       <div className="box" style={{ marginTop: 16 }}>
         {accepted ? <p className="ok" style={{ margin: 0, fontWeight: 600 }}>✓ Sie haben dieses Angebot angenommen. Vielen Dank – wir melden uns mit der Druckfreigabe bzw. dem Liefertermin.</p>
           : expired ? <p className="err" style={{ margin: 0 }}>Dieses Angebot ist abgelaufen. Antworten Sie gern auf unsere E-Mail – wir erstellen Ihnen ein neues.</p>
-          : <AcceptForm token={params.token} defaultName={i.customer.name} total={eur(t.gross)} hasPreview={i.lines.some((l) => l.deco?.previews?.length)} />}
+          : <AcceptForm token={params.token} defaultName={i.customer.name} total={eur(t.gross)} hasPreview={i.lines.some((l) => l.deco?.previews?.length)} addr={{ company: i.customer.company ?? '', street: i.customer.street ?? '', city: i.customer.city ?? '' }} />}
       </div>
     </div>
   );
