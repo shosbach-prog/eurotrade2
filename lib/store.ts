@@ -70,6 +70,7 @@ export type Inquiry = {
   acceptedAt?: string | null;
   /** Willkommensrabatt aus dem Newsletter */
   discount?: { code: string; pct: number } | null;
+  reviewRequestedAt?: string | null;
 };
 
 export function listInquiries(): Inquiry[] {
@@ -149,3 +150,14 @@ export function validCode(code: string) {
   if (!/^ET-[A-Z0-9]{6}$/.test(c)) return null;
   return listSubscribers().find((s) => s.code === c && s.confirmed && !s.unsubscribedAt && !s.usedAt) ?? null;
 }
+
+/* ---------- Bewertungen (nur verifizierte Käufer) ---------- */
+export type Review = {
+  id: string; productId: string | null; /** null = Bewertung des Shops/Services */
+  sku?: string; productName?: string;
+  name: string; company?: string; rating: number; title: string; text: string;
+  date: string; inquiryNo: string; status: 'pending' | 'approved' | 'rejected'; reply?: string;
+};
+const REV = path.join(DATA, 'bewertungen.json');
+export const listReviews = () => readJSON<Review[]>(REV, []);
+export const saveReviews = (r: Review[]) => writeJSON(REV, r);

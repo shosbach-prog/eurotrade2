@@ -59,6 +59,10 @@ export default function Datenschutz() {
         <p>Rechtsgrundlage ist Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Sie können sie jederzeit über den Abmeldelink in jeder E-Mail oder per Nachricht an uns widerrufen. Nach der Abmeldung löschen wir Ihre Adresse, soweit wir sie nicht zum Nachweis einer früheren Einwilligung kurzfristig aufbewahren müssen (Art. 6 Abs. 1 lit. f DSGVO). Unbestätigte Anmeldungen löschen wir nach 30 Tagen.</p>
       </section>
 
+      <S t="7b. Bewertungen">
+        <p>Nach Abschluss eines Auftrags laden wir Sie per E-Mail ein, Ihre Bestellung zu bewerten (Art. 6 Abs. 1 lit. f DSGVO, berechtigtes Interesse an Kundenfeedback; Sie können dem jederzeit widersprechen). Wenn Sie eine Bewertung abgeben, veröffentlichen wir Sternebewertung, Überschrift, Text, den von Ihnen gewählten Anzeigenamen, optional Ihre Firma bzw. Ihren Verein sowie Monat und Jahr. Ihre E-Mail-Adresse wird nicht veröffentlicht. Rechtsgrundlage für die Veröffentlichung ist Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO), die Sie jederzeit per E-Mail widerrufen können. Die Bewertung wird dann gelöscht.</p>
+      </S>
+
       <S t="8. E-Mail-Versand">
         <p>Bestätigungen, Angebote und Auftragsbestätigungen versenden wir über den E-Mail-Dienst der IONOS SE (Auftragsverarbeitung nach Art. 28 DSGVO). Wenn Sie uns per E-Mail kontaktieren, verarbeiten wir Ihre Angaben zur Bearbeitung Ihres Anliegens (Art. 6 Abs. 1 lit. b bzw. f DSGVO).</p>
       </S>

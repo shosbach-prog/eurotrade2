@@ -6,6 +6,7 @@ import type { Category, Product, PublicProduct } from './types';
 import { buildIndex, buildSkuMap, runSearch, type SearchDoc } from './search';
 import { gross, priceTiers, sellPrice } from './pricing';
 import { sortColors } from './colors';
+import { ratingFor } from './reviews';
 
 const LIVE = path.join(process.cwd(), 'data', 'products.json');
 const SEED = path.join(process.cwd(), 'seed', 'products.json');
@@ -48,7 +49,7 @@ export function toPublic(p: Product, ctx?: Ctx): PublicProduct {
     : baseTiers?.length && !ctx?.tiers
       ? baseTiers.filter((t) => t.min > 1 && t.price > 0).sort((a, b) => a.min - b.min).map((t) => ({ min: t.min, price: sellPrice(t.price, p.categorySlug, ctx?.markup) })).filter((t) => t.price < price)
       : priceTiers(price, ctx?.tiers);
-  return { ...rest, colors: sortColors(p.colors), price, priceGross: price != null ? gross(price) : null, tiers };
+  return { ...rest, colors: sortColors(p.colors), price, priceGross: price != null ? gross(price) : null, tiers, rating: ratingFor(p.id) };
 }
 
 const skuSet = (ctx: Ctx) => new Set((ctx?.skus ?? []).map((x) => x.toUpperCase()));

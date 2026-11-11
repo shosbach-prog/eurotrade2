@@ -7,6 +7,7 @@ import { useCart } from '@/components/CartContext';
 import { swatchBg } from '@/lib/colors';
 import { WishButton } from '@/components/Wishlist';
 import Info from '@/components/Info';
+import Stars from '@/components/Stars';
 import { FONTS, METHODS, MOTIFS, POSITIONS, PREVIEW, TEXT_COLORS, colorHex, fontCss, isImage, type Deco, type Motif } from '@/lib/deco';
 import { nextTier, unitFor } from '@/lib/tiers';
 
@@ -96,6 +97,7 @@ export default function AddToCart({ p, customerLogo, delivery }: { p: PublicProd
       <div>
         <div className="muted" style={{ textTransform: 'uppercase', fontSize: 13, letterSpacing: '.4px' }}>{p.brand} · Art.-Nr. {p.sku}</div>
         <h1 style={{ margin: '4px 0 0' }}>{p.name}</h1>
+        {p.rating && <a href="#bewertungen" className="pd-rating"><Stars value={p.rating.avg} size={16} showValue count={p.rating.count} /></a>}
         {p.price != null ? <>
           <div className="price">{eur(p.price)} <span style={{ fontSize: 15, fontWeight: 500 }} className="muted">/ Stück</span></div>
           <div className="vat">netto zzgl. MwSt. ({eur(p.priceGross)} brutto) · schon ab 1 Stück{decoOn ? ' · Veredelung wird im Angebot kalkuliert' : ''}</div>

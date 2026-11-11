@@ -3,6 +3,8 @@ import type { Metadata } from 'next';
 import AccessForm from '../zugang/AccessForm';
 import RequestForm from './RequestForm';
 import NewsletterBox from './NewsletterBox';
+import { ReviewStrip } from '@/components/ProductReviews';
+import { latestReviews, overall } from '@/lib/reviews';
 import { discountTiers, listReferences } from '@/lib/store';
 import { getCategories } from '@/lib/catalog';
 
@@ -81,6 +83,8 @@ export default function Start() {
           </div>
         </section>
       )}
+
+      <ReviewStrip reviews={latestReviews(6)} overall={overall()} />
 
       <NewsletterBox tiers={discountTiers()} />
 

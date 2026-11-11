@@ -29,7 +29,7 @@ export const dynamic = 'force-dynamic';
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const gated = shopClosed();
   const path = headers().get('x-path') ?? '/';
-  const isPublic = ['/widerruf', '/newsletter', '/start', '/druck-stick', '/zugang', '/impressum', '/datenschutz', '/angebot', '/admin'].some((p) => path === p || path.startsWith(p + '/'));
+  const isPublic = ['/bewerten', '/widerruf', '/newsletter', '/start', '/druck-stick', '/zugang', '/impressum', '/datenschutz', '/angebot', '/admin'].some((p) => path === p || path.startsWith(p + '/'));
   const { ok, customer } = await shopAccess();
   // Code im Admin gesperrt/gelöscht -> zurück zur Anmeldung
   if (!ok && !isPublic) redirect('/zugang');

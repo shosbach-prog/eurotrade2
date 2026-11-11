@@ -3,6 +3,7 @@ import { isAdmin } from '@/lib/customer';
 import { esc, sendMail, shopUrl } from '@/lib/mail';
 import { button, h1, infoBox, layout, offerTable, p, quote, signature } from '@/lib/mail-templates';
 import { offerPdf } from '@/lib/pdf';
+import { sendReviewRequest } from '@/lib/review-mail';
 import { STATUS, addHistory, getInquiry, offerTotals, randomId, saveInquiry, type Offer, type Status } from '@/lib/store';
 
 const eur = (n: number) => n.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
@@ -33,8 +34,23 @@ export async function POST(req: Request, { params }: { params: { no: string } })
   if (body.action === 'status') {
     const s = body.status as Status;
     if (!STATUS[s]) return NextResponse.json({ error: 'Unbekannter Status.' }, { status: 400 });
-    if (s !== i.status) { i.status = s; addHistory(i, `Status: ${STATUS[s]}`); saveInquiry(i); }
-    return NextResponse.json({ ok: true, status: s, message: `Status: ${STATUS[s]}` });
+    let extra = '';
+    if (s !== i.status) {
+      i.status = s; addHistory(i, `Status: ${STATUS[s]}`);
+      // nach Lieferung automatisch um eine Bewertung bitten (einmalig)
+      if (s === 'geliefert' && !i.reviewRequestedAt) {
+        try { if (await sendReviewRequest(i)) { i.reviewRequestedAt = new Date().toISOString(); addHistory(i, 'Bewertungseinladung gesendet'); extra = ' · Bewertungseinladung gesendet'; } }
+        catch (e) { console.error('Bewertungseinladung fehlgeschlagen', e); }
+      }
+      saveInquiry(i);
+    }
+    return NextResponse.json({ ok: true, status: s, message: `Status: ${STATUS[s]}${extra}` });
+  }
+
+  if (body.action === 'review') {
+    try { await sendReviewRequest(i); } catch { return NextResponse.json({ error: 'E-Mail konnte nicht gesendet werden.' }, { status: 500 }); }
+    i.reviewRequestedAt = new Date().toISOString(); addHistory(i, 'Bewertungseinladung gesendet'); saveInquiry(i);
+    return NextResponse.json({ ok: true, message: `Bewertungseinladung an ${i.customer.email} gesendet.` });
   }
 
   const first = !i.offer;

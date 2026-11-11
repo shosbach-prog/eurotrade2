@@ -28,7 +28,7 @@ export default function OfferEditor({ no, initial, saved, status: st0, statuses,
   const net = o.lines.reduce((s, l) => s + l.qty * l.price, 0) + (o.shipping || 0);
   const vat = Math.round(net * o.vat) / 100;
 
-  async function call(action: 'save' | 'send' | 'status', extra: Record<string, unknown> = {}) {
+  async function call(action: 'save' | 'send' | 'status' | 'review', extra: Record<string, unknown> = {}) {
     setBusy(action); setMsg(null);
     const r = await fetch(`/api/admin/anfrage/${no}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, offer: o, status, ...extra }) });
     const d = await r.json().catch(() => ({}));
@@ -95,6 +95,13 @@ export default function OfferEditor({ no, initial, saved, status: st0, statuses,
           </select>
         </label>
       </div>
+      {['angenommen', 'bestellt', 'geliefert'].includes(status) && (
+        <div className="admin-actions" style={{ marginTop: 0 }}>
+          <button className="btn alt" disabled={!!busy} onClick={() => call('review')}>★ Bewertungseinladung senden</button>
+          <button type="button" className="linkbtn" onClick={() => navigator.clipboard.writeText(acceptUrl.replace('/angebot/', '/bewerten/'))}>Bewertungslink kopieren</button>
+          <span className="muted" style={{ fontSize: 13 }}>Wird beim Status „Geliefert“ automatisch gesendet.</span>
+        </div>
+      )}
       {msg && <div className={`note ${msg.ok ? 'ok' : 'err'}`}>{msg.ok ? '✓ ' : ''}{msg.t}</div>}
       {acceptUrl && isSaved && (
         <p className="muted" style={{ fontSize: 13 }}>

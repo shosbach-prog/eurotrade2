@@ -4,6 +4,8 @@ import { getCategories, getCollection, getFeatured, productCount } from '@/lib/c
 import { getCustomer } from '@/lib/customer';
 import { RecentlyViewed } from '@/components/Recent';
 import NewsletterBox from './start/NewsletterBox';
+import { ReviewStrip } from '@/components/ProductReviews';
+import { latestReviews, overall } from '@/lib/reviews';
 import { discountTiers } from '@/lib/store';
 
 export default async function Home() {
@@ -28,6 +30,7 @@ export default async function Home() {
         <h2>{collection.length ? 'Weitere Artikel' : 'Beliebte Artikel'}</h2>
         <div className="grid">{getFeatured(16, ctx).filter((p) => !collection.some((c) => c.id === p.id)).map((p) => <ProductCard key={p.id} p={p} />)}</div>
       </>}
+      <ReviewStrip reviews={latestReviews(6)} overall={overall()} />
       <div style={{ marginTop: 40 }}><NewsletterBox tiers={discountTiers()} /></div>
     </>
   );
