@@ -17,6 +17,8 @@ export type Product = {
   composition?: string;
   specs?: Record<string, string>;
   images: string[];
+  /** Link zur Größentabelle (PDF des Herstellers) */
+  sizeChart?: string;
   colors: Color[];
   sizes: string[];
   stock?: number;

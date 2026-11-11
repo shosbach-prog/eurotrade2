@@ -39,6 +39,15 @@ export function WishButton({ id, variant = 'card' }: { id: string; variant?: 'ca
   );
 }
 
+export function AccountButton() {
+  return (
+    <a href="/konto" className="cart-btn" aria-label="Meine Anfragen" title="Meine Anfragen">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><path d="M9 4h6l1 2h3a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h3z" /><path d="M8 12h8M8 16h5" /></svg>
+      <span className="hide-sm hide-md">Anfragen</span>
+    </a>
+  );
+}
+
 export function WishlistButton() {
   const { ids } = useWishlist();
   return (

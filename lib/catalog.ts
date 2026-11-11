@@ -84,3 +84,33 @@ export function search(q: string, limit = 48, ctx?: Ctx): PublicProduct[] {
   const ok = visible(ctx);
   return runSearch(s.index, q, limit * 2, s.skus).map((id) => s.byId.get(id)!).filter(ok).slice(0, limit).map((p) => toPublic(p, ctx));
 }
+
+/* ---------- „Meinten Sie …?“ bei 0 Treffern ---------- */
+let vocab: { mtime: number; words: string[] } | null = null;
+const norm = (w: string) => w.toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss').replace(/[^a-z0-9]/g, '');
+function lev(a: string, b: string) {
+  const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
+  for (let j = 1; j <= b.length; j++) d[0][j] = j;
+  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++)
+    d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+  return d[a.length][b.length];
+}
+export function didYouMean(q: string, ctx?: Ctx): string | null {
+  const s = load();
+  if (!vocab || vocab.mtime !== s.mtime) {
+    const set = new Set<string>();
+    for (const p of s.products) for (const w of `${p.name} ${p.brand} ${p.category} ${(p.tags ?? []).join(' ')} ${p.colors.map((c) => c.name).join(' ')}`.split(/[\s/,·()-]+/)) if (w.length > 2) set.add(w);
+    vocab = { mtime: s.mtime, words: [...set] };
+  }
+  const words = q.trim().split(/\s+/).filter(Boolean);
+  if (!words.length) return null;
+  const fixed = words.map((w) => {
+    const n = norm(w);
+    if (n.length < 3) return w;
+    let best = w, bd = Math.max(1, Math.floor(n.length / 4)) + 1;
+    for (const v of vocab!.words) { const d = lev(n, norm(v)); if (d < bd) { bd = d; best = v; } }
+    return best;
+  });
+  const sug = fixed.join(' ');
+  return sug.toLowerCase() !== q.trim().toLowerCase() && search(sug, 1, ctx).length ? sug : null;
+}

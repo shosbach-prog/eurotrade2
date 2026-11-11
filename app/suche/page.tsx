@@ -1,5 +1,6 @@
-import ProductCard from '@/components/ProductCard';
-import { search } from '@/lib/catalog';
+import Link from 'next/link';
+import FilterGrid from '@/components/FilterGrid';
+import { didYouMean, getCategories, search } from '@/lib/catalog';
 import { getCustomer } from '@/lib/customer';
 
 export function generateMetadata({ searchParams }: { searchParams: { q?: string } }) {
@@ -7,14 +8,21 @@ export function generateMetadata({ searchParams }: { searchParams: { q?: string 
 }
 
 export default async function SearchPage({ searchParams }: { searchParams: { q?: string } }) {
+  const ctx = await getCustomer();
   const q = (searchParams.q ?? '').trim();
-  const res = q ? search(q, 200, await getCustomer()) : [];
+  const res = q ? search(q, 200, ctx) : [];
+  const sug = q && !res.length ? didYouMean(q, ctx) : null;
   return (
     <>
       <h1>{q ? <>Ergebnisse für „{q}“</> : 'Suche'}</h1>
-      <p className="muted">{res.length} Treffer</p>
-      {res.length ? <div className="grid">{res.map((p) => <ProductCard key={p.id} p={p} />)}</div>
-        : q && <p>Nichts gefunden. Probieren Sie einen allgemeineren Begriff, z. B. „Shirt“, „Hoodie“ oder „Tasche“.</p>}
+      {res.length ? <FilterGrid items={res} /> : q && (
+        <div className="box">
+          {sug ? <p style={{ marginTop: 0, fontSize: 17 }}>Meinten Sie <Link className="alink" href={`/suche?q=${encodeURIComponent(sug)}`}>„{sug}“</Link>?</p>
+            : <p style={{ marginTop: 0 }}>Leider nichts gefunden.</p>}
+          <p className="muted">Probieren Sie einen allgemeineren Begriff oder stöbern Sie in den Kategorien:</p>
+          <div className="chips">{getCategories(ctx).map((c) => <Link key={c.slug} className="chip" href={`/kategorie/${c.slug}`}>{c.name}</Link>)}</div>
+        </div>
+      )}
     </>
   );
 }

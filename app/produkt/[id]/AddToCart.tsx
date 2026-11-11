@@ -6,12 +6,13 @@ import Gallery from '@/components/Gallery';
 import { useCart } from '@/components/CartContext';
 import { swatchBg } from '@/lib/colors';
 import { WishButton } from '@/components/Wishlist';
+import Info from '@/components/Info';
 import { FONTS, METHODS, MOTIFS, POSITIONS, PREVIEW, TEXT_COLORS, colorHex, fontCss, isImage, type Deco, type Motif } from '@/lib/deco';
 import { nextTier, unitFor } from '@/lib/tiers';
 
 type Logo = { id: string; name: string };
 
-export default function AddToCart({ p, customerLogo }: { p: PublicProduct; customerLogo?: Logo | null }) {
+export default function AddToCart({ p, customerLogo, delivery }: { p: PublicProduct; customerLogo?: Logo | null; delivery?: string }) {
   const { addMany } = useCart();
   const [color, setColor] = useState(p.colors[0]);
   // Mengen je Farbe + Größe ("Black|M" -> 5) – mehrere Farben in einem Schritt möglich
@@ -63,7 +64,7 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
     const items = entries.map(([key, n]) => {
       const [c, s] = key.split('|');
       const col = p.colors.find((x) => x.name === c);
-      return { id: p.id, sku: p.sku, name: p.name, color: c || undefined, hex: col?.hex, size: s || undefined, qty: n, price: p.price, category: p.category, image: p.images[0], deco, tiers: p.tiers };
+      return { id: p.id, sku: p.sku, name: p.name, color: c || undefined, hex: col?.hex, size: s || undefined, qty: n, price: p.price, category: p.category, image: p.images[0], deco, tiers: p.tiers, sizes: p.sizes };
     });
     addMany(items);
     setMsg(`${total} Stück von ${p.name} im Warenkorb${deco ? ' (mit Veredelung)' : ''}.`);
@@ -98,6 +99,8 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
         {p.price != null ? <>
           <div className="price">{eur(p.price)} <span style={{ fontSize: 15, fontWeight: 500 }} className="muted">/ Stück</span></div>
           <div className="vat">netto zzgl. MwSt. ({eur(p.priceGross)} brutto) · schon ab 1 Stück{decoOn ? ' · Veredelung wird im Angebot kalkuliert' : ''}</div>
+          {delivery && <div className="delivery"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M1 4h14v12H1zM15 9h4l3 3v4h-7z" /><circle cx="6" cy="18" r="2" /><circle cx="18" cy="18" r="2" /></svg>{delivery}</div>}
+          {p.tiers.length > 0 && <div className="opt" style={{ marginTop: 14, marginBottom: 6 }}>Mengenrabatt <Info>Der Staffelpreis gilt für die Gesamtmenge dieses Artikels – alle Farben und Größen zusammen. Beispiel: 6× Schwarz M + 6× Rot L = 12 Stück.</Info></div>}
           {p.tiers.length > 0 && (
             <div className="tiers">
               <div className={`tier ${total < p.tiers[0].min ? 'on' : ''}`}><span>1–{p.tiers[0].min - 1} Stk.</span><b>{eur(p.price)}</b></div>
@@ -117,14 +120,14 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
           <div className="opt">Farbe: <span className="muted">{cname}</span> <span className="muted" style={{ fontWeight: 400 }}>({p.colors.length} Farben)</span></div>
           <div className="swatches">
             {p.colors.map((c) => (
-              <button key={c.name} title={c.name} aria-label={c.name} className={`sw ${c.name === cname ? 'on' : ''}`} style={{ background: swatchBg(c) }} onClick={() => setColor(c)}>
+              <button key={c.name} data-name={c.name} aria-label={c.name} className={`sw ${c.name === cname ? 'on' : ''}`} style={{ background: swatchBg(c) }} onClick={() => setColor(c)}>
                 {colorTotals[c.name] ? <span className="sw-n">{colorTotals[c.name]}</span> : null}
               </button>
             ))}
           </div>
         </>}
 
-        <div className="opt">{sizes.length > 1 ? <>Größen & Mengen{p.colors.length > 0 && <span className="muted" style={{ fontWeight: 400 }}> für <span className="dot-inline" style={{ background: color ? swatchBg(color) : '#ddd' }} />{cname}</span>}</> : 'Menge'}</div>
+        <div className="opt opt-row"><span>{sizes.length > 1 ? <>Größen & Mengen{p.colors.length > 0 && <span className="muted" style={{ fontWeight: 400 }}> für <span className="dot-inline" style={{ background: color ? swatchBg(color) : '#ddd' }} />{cname}</span>}</> : 'Menge'}</span>{p.sizeChart && <a href={p.sizeChart} target="_blank" rel="noreferrer" className="sizechart"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><path d="M2 8h20v8H2zM6 8v3M10 8v4M14 8v3M18 8v4" /></svg>Größentabelle</a>}</div>
         <div className={`szgrid ${sizes.length === 1 ? 'single' : ''}`}>
           {sizes.map((s) => {
             const v = qty[k(cname, s)] || 0;
@@ -146,6 +149,7 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
         <label className="deco-toggle">
           <input type="checkbox" checked={decoOn} onChange={(e) => setDecoOn(e.target.checked)} />
           <span><strong>Veredeln mit Logo oder Text</strong> <span className="muted">– Druck oder Stick</span></span>
+          <Info>Wir drucken oder besticken Ihr Logo bzw. Ihren Text. Die Kosten stehen als eigene Position im Angebot – vor der Produktion erhalten Sie eine Vorschau zur Freigabe.</Info>
         </label>
         {decoOn && (
           <div className="deco">
@@ -233,6 +237,12 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
             {!total ? (sizes.length > 1 ? 'Größe & Menge wählen' : 'Menge wählen') : !decoOk ? (useText && !text.trim() ? 'Text eingeben' : 'Logo / Position wählen') : `${total} Stück in den Warenkorb`}
           </button>
           <WishButton id={p.id} variant="full" />
+        </div>
+        <div className={`mbar ${total ? 'has' : ''}`}>
+          <div className="mbar-info">{total ? <><b>{total} Stk.</b>{p.price != null && <span> · {eur(unitFor(p.tiers, total, p.price)! * total)} netto</span>}</> : <span className="muted">{p.price != null ? `ab ${eur(p.tiers.length ? p.tiers[p.tiers.length - 1].price : p.price)}` : 'Preis auf Anfrage'}</span>}</div>
+          <button className="btn" disabled={!!total && !decoOk} onClick={() => (total ? onAdd() : document.querySelector('.szgrid')?.scrollIntoView({ behavior: 'smooth', block: 'center' }))}>
+            {!total ? 'Größe wählen' : !decoOk ? 'Veredelung prüfen' : 'In den Warenkorb'}
+          </button>
         </div>
         {msg && <div className="note ok">✓ {msg} <a href="/warenkorb" style={{ textDecoration: 'underline' }}>Zum Warenkorb</a></div>}
 

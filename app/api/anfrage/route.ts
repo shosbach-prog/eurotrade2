@@ -37,7 +37,7 @@ export async function POST(req: Request) {
   const c = body?.customer ?? {};
   if (c.website) return NextResponse.json({ ok: true }); // Honeypot
   if (!c.name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(c.email ?? '')) return NextResponse.json({ error: 'Bitte Name und gültige E-Mail angeben.' }, { status: 400 });
-  const customer = Object.fromEntries(['name', 'company', 'email', 'phone', 'city', 'message'].map((k) => [k, String(c[k] ?? '').slice(0, 2000)]));
+  const customer = Object.fromEntries(['name', 'company', 'email', 'phone', 'city', 'date', 'message'].map((k) => [k, String(c[k] ?? '').slice(0, 2000)]));
 
   // Preise serverseitig neu berechnen (mit Kunden-Aufschlag) – nie dem Browser vertrauen
   const ctx = await getCustomer();
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
   const rows = lines.map((l) => `<tr><td>${esc(l.sku)}</td><td>${esc(l.name)}${l.deco ? `<br><small>✦ ${esc(decoLabel(l.deco))}${l.deco.note ? ` – ${esc(l.deco.note)}` : ''}</small>` : ''}</td><td>${esc(l.color)}</td><td>${esc(l.size)}</td><td align="right">${l.qty}</td><td align="right">${eur(l.price)}</td><td align="right">${l.price == null ? 'auf Anfrage' : eur(l.sum)}</td></tr>`).join('');
   const table = `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;font:13px Arial"><tr style="background:#eee"><th>Art.-Nr.</th><th>Artikel</th><th>Farbe</th><th>Größe</th><th>Menge</th><th>Einzel</th><th>Summe</th></tr>${rows}<tr><td colspan="6" align="right"><b>Summe netto (Textil)</b></td><td align="right"><b>${eur(total)}</b></td></tr></table>`;
   const logos = [...new Map(lines.filter((l) => l.deco?.logoId).map((l) => [l.deco!.logoId!, l.deco!.logoName])).entries()];
-  const who = `<p><b>${esc(customer.name)}</b>${customer.company ? ` – ${esc(customer.company)}` : ''}<br>${esc(customer.email)} · ${esc(customer.phone)}<br>${esc(customer.city)}</p>${customer.message ? `<p><b>Nachricht:</b><br>${esc(customer.message).replace(/\n/g, '<br>')}</p>` : ''}${via ? `<p><b>Zugangscode:</b> ${esc(via)}</p>` : ''}`;
+  const who = `<p><b>${esc(customer.name)}</b>${customer.company ? ` – ${esc(customer.company)}` : ''}<br>${esc(customer.email)} · ${esc(customer.phone)}<br>${esc(customer.city)}${customer.date ? `<br><b>Wunschtermin:</b> ${esc(new Date(customer.date).toLocaleDateString('de-DE'))}` : ''}</p>${customer.message ? `<p><b>Nachricht:</b><br>${esc(customer.message).replace(/\n/g, '<br>')}</p>` : ''}${via ? `<p><b>Zugangscode:</b> ${esc(via)}</p>` : ''}`;
 
   try {
     await sendMail({ to: process.env.INQUIRY_TO ?? '', replyTo: customer.email, subject: `Neue Anfrage ${no} – ${customer.company || customer.name} – ${eur(total)}`,
@@ -75,5 +75,5 @@ export async function POST(req: Request) {
   } catch (e) {
     console.error('Mailversand fehlgeschlagen', e); // Anfrage ist trotzdem gespeichert
   }
-  return NextResponse.json({ ok: true, no });
+  return NextResponse.json({ ok: true, no, token: inq.token });
 }

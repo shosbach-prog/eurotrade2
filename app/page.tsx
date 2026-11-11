@@ -2,6 +2,7 @@ import Link from 'next/link';
 import ProductCard from '@/components/ProductCard';
 import { getCategories, getCollection, getFeatured, productCount } from '@/lib/catalog';
 import { getCustomer } from '@/lib/customer';
+import { RecentlyViewed } from '@/components/Recent';
 
 export default async function Home() {
   const ctx = await getCustomer();
@@ -16,6 +17,7 @@ export default async function Home() {
           <div className="chips">{cats.map((c) => <Link key={c.slug} className="chip" href={`/kategorie/${c.slug}`}>{c.name}</Link>)}</div>
         </div>
       </section>
+      <RecentlyViewed />
       {collection.length > 0 && <>
         <h2>Ihre Kollektion</h2>
         <div className="grid">{collection.map((p) => <ProductCard key={p.id} p={p} />)}</div>

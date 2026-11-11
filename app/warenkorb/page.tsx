@@ -1,39 +1,60 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/components/CartContext';
 import ProductImage from '@/components/ProductImage';
 import { eur } from '@/lib/format';
 import { decoLabel } from '@/lib/deco';
 import { unitFor } from '@/lib/tiers';
+import { saveMyInquiry } from '@/lib/mine';
+
+const FORM_KEY = 'et-form-v1';
+const FIELDS = ['name', 'company', 'email', 'phone', 'city'] as const;
 
 export default function CartPage() {
-  const { lines, setQty, remove, clear } = useCart();
+  const { lines, setQty, update, remove, clear, decoToAll } = useCart();
   const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle');
   const [err, setErr] = useState('');
+  const [form, setForm] = useState<Record<string, string>>({});
+  const [no, setNo] = useState('');
+
+  // Formular vorausfüllen: zuletzt verwendete Daten + Kundenname aus dem Code
+  useEffect(() => {
+    let saved: Record<string, string> = {};
+    try { saved = JSON.parse(localStorage.getItem(FORM_KEY) || '{}'); } catch {}
+    setForm(saved);
+    fetch('/api/ich').then((r) => r.json()).then((d) => { if (d.company) setForm((f) => ({ ...f, company: f.company || d.company })); }).catch(() => {});
+  }, []);
+
   // Staffelpreis gilt für die Gesamtmenge je Artikel (alle Farben/Größen)
   const perProduct = lines.reduce<Record<string, number>>((m, l) => ({ ...m, [l.id]: (m[l.id] ?? 0) + l.qty }), {});
   const unit = (l: (typeof lines)[number]) => unitFor(l.tiers, perProduct[l.id], l.price);
   const net = lines.reduce((s, l) => s + (unit(l) ?? 0) * l.qty, 0);
   const anyOpen = lines.some((l) => l.price == null);
+  const decos = [...new Map(lines.filter((l) => l.deco).map((l) => [JSON.stringify(l.deco), l.deco!])).values()];
+  const minDate = new Date(Date.now() + 5 * 86400000).toISOString().slice(0, 10);
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setState('sending');
     const f = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
+    try { localStorage.setItem(FORM_KEY, JSON.stringify(Object.fromEntries(FIELDS.map((k) => [k, f[k] ?? ''])))); } catch {}
     const r = await fetch('/api/anfrage', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ customer: f, lines: lines.map(({ id, color, size, qty, deco }) => ({ id, color, size, qty, deco })) }),
     });
     const d = await r.json().catch(() => ({}));
-    if (r.ok) { setState('done'); clear(); } else { setState('error'); setErr(d.error ?? 'Senden fehlgeschlagen.'); }
+    if (r.ok) { if (d.token) saveMyInquiry(d.no, d.token); setNo(d.no ?? ''); setState('done'); clear(); } else { setState('error'); setErr(d.error ?? 'Senden fehlgeschlagen.'); }
   }
 
   if (state === 'done') return (
     <div className="box" style={{ maxWidth: 640, margin: '20px auto', textAlign: 'center' }}>
       <h1>Vielen Dank für Ihre Anfrage!</h1>
-      <p>Wir melden uns innerhalb von 24 Stunden mit Ihrem Angebot. Eine Bestätigung ist per E-Mail unterwegs.</p>
-      <Link className="btn" href="/" style={{ display: 'inline-grid', placeItems: 'center' }}>Weiter stöbern</Link>
+      <p>Ihre Anfrage {no && <b>{no}</b>} ist eingegangen. Wir melden uns innerhalb von 24 Stunden mit Ihrem Angebot – eine Bestätigung ist per E-Mail unterwegs.</p>
+      <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+        <Link className="btn" href="/konto" style={{ display: 'inline-grid', placeItems: 'center' }}>Meine Anfragen</Link>
+        <Link className="btn alt" href="/" style={{ display: 'inline-grid', placeItems: 'center' }}>Weiter stöbern</Link>
+      </div>
     </div>
   );
 
@@ -41,6 +62,7 @@ export default function CartPage() {
     <div className="box" style={{ maxWidth: 640, margin: '20px auto', textAlign: 'center' }}>
       <h1>Ihr Warenkorb ist leer</h1>
       <p className="muted">Nutzen Sie die Suche oben – Tippfehler sind kein Problem.</p>
+      <Link className="alink" href="/konto">Meine bisherigen Anfragen</Link>
     </div>
   );
 
@@ -50,20 +72,36 @@ export default function CartPage() {
       <div className="cart">
         <div className="box">
           {lines.map((l) => (
-            <div className="line" key={l.key}>
+            <div className="line cline" key={l.key}>
               <div style={{ width: 64, height: 64 }}><ProductImage p={{ name: l.name, images: l.image ? [l.image] : [], colors: [{ name: l.color ?? '', hex: l.hex }], category: l.category }} /></div>
-              <div>
+              <div style={{ minWidth: 0 }}>
                 <Link href={`/produkt/${encodeURIComponent(l.id)}`} style={{ fontWeight: 600 }}>{l.name}</Link>
-                <div className="muted" style={{ fontSize: 13 }}>{[l.color, l.size, l.sku].filter(Boolean).join(' · ')}{l.price != null && <> · {eur(unit(l))}/Stk.{unit(l)! < l.price && <span className="ok"> (Staffel)</span>}</>}</div>
-                {l.deco && <div className="deco-tag">✦ {decoLabel(l.deco)}</div>}
+                <div className="muted cl-meta">
+                  {l.color && <span>{l.color}</span>}
+                  {l.sizes && l.sizes.length > 1
+                    ? <select value={l.size ?? ''} onChange={(e) => update(l.key, { size: e.target.value })} aria-label="Größe ändern">{l.sizes.map((s) => <option key={s}>{s}</option>)}</select>
+                    : l.size && <span>{l.size}</span>}
+                  {l.price != null && <span>{eur(unit(l))}/Stk.{unit(l)! < l.price && <span className="ok"> (Staffel)</span>}</span>}
+                </div>
+                {l.deco && <div className="deco-tag">✦ {decoLabel(l.deco)} <button className="linkbtn" onClick={() => update(l.key, { deco: null })}>entfernen</button></div>}
               </div>
-              <input className="qty" style={{ width: 80, height: 40 }} type="number" min={1} value={l.qty} onChange={(e) => setQty(l.key, Number(e.target.value) || 1)} aria-label="Menge" />
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div className="step" style={{ width: 112 }}>
+                <button type="button" onClick={() => (l.qty > 1 ? setQty(l.key, l.qty - 1) : remove(l.key))} aria-label="weniger">−</button>
+                <input type="number" min={1} value={l.qty} onFocus={(e) => e.target.select()} onChange={(e) => setQty(l.key, Number(e.target.value) || 1)} aria-label="Menge" />
+                <button type="button" onClick={() => setQty(l.key, l.qty + 1)} aria-label="mehr">+</button>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-end' }}>
                 <strong>{l.price != null ? eur(unit(l)! * l.qty) : '—'}</strong>
                 <button className="x" onClick={() => remove(l.key)} aria-label="Entfernen">×</button>
               </div>
             </div>
           ))}
+          {decos.length > 0 && lines.some((l) => !l.deco || decos.length > 1) && (
+            <div className="deco-all">
+              <span>✦ Gleiche Veredelung für alle Positionen?</span>
+              {decos.map((d) => <button key={JSON.stringify(d)} className="btn alt" style={{ height: 36 }} onClick={() => decoToAll(d)}>{decos.length > 1 ? `„${decoLabel(d)}“ übernehmen` : 'Auf alle übertragen'}</button>)}
+            </div>
+          )}
           {net > 0 && <div className="tot big"><span>Summe netto (Richtwert){anyOpen ? ' *' : ''}</span><span>{eur(net)}</span></div>}
           <p className="muted" style={{ fontSize: 13, margin: '6px 0 0' }}>Endpreis inkl. Versand und ggf. Veredelung erhalten Sie mit dem Angebot.</p>
         </div>
@@ -71,16 +109,19 @@ export default function CartPage() {
         <form className="box form" onSubmit={submit}>
           <strong style={{ fontSize: 17 }}>Unverbindliches Angebot anfordern</strong>
           <div className="two">
-            <div><label>Name *</label><input name="name" required /></div>
-            <div><label>Firma</label><input name="company" /></div>
+            <div><label>Name *</label><input name="name" required defaultValue={form.name} key={`n${form.name}`} autoComplete="name" /></div>
+            <div><label>Firma / Verein</label><input name="company" defaultValue={form.company} key={`c${form.company}`} autoComplete="organization" /></div>
           </div>
           <div className="two">
-            <div><label>E-Mail *</label><input name="email" type="email" required /></div>
-            <div><label>Telefon</label><input name="phone" type="tel" /></div>
+            <div><label>E-Mail *</label><input name="email" type="email" required defaultValue={form.email} key={`e${form.email}`} autoComplete="email" /></div>
+            <div><label>Telefon</label><input name="phone" type="tel" defaultValue={form.phone} key={`p${form.phone}`} autoComplete="tel" /></div>
           </div>
-          <label>PLZ / Ort</label><input name="city" />
+          <div className="two">
+            <div><label>PLZ / Ort</label><input name="city" defaultValue={form.city} key={`o${form.city}`} autoComplete="address-level2" /></div>
+            <div><label>Wunschliefertermin</label><input name="date" type="date" min={minDate} /></div>
+          </div>
           <label>Nachricht</label>
-          <textarea name="message" placeholder="Optional: Liefertermin, Lieferadresse, Fragen …" />
+          <textarea name="message" placeholder="Optional: Lieferadresse, Fragen, Namen/Nummern …" />
           <input className="hp" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
           <label style={{ display: 'flex', gap: 8, fontWeight: 400 }}>
             <input type="checkbox" name="privacy" required style={{ width: 'auto' }} />

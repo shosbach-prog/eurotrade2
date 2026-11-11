@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { ACCESS_COOKIE, ACCESS_DAYS, normCode, signCode } from '@/lib/access';
+import { ACCESS_COOKIE, ACCESS_DAYS, normCode, previewMode, signCode } from '@/lib/access';
 import { findCustomer } from '@/lib/store';
 
 const tries = new Map<string, number[]>();
@@ -12,6 +12,7 @@ export async function POST(req: Request) {
   if (recent.length >= 10) return NextResponse.json({ error: 'Zu viele Versuche – bitte in 15 Minuten erneut.' }, { status: 429 });
   tries.set(ip, [...recent, now]);
 
+  if (previewMode()) return NextResponse.json({ error: 'Unser Shop startet in Kürze – Ihr Zugang wird dann freigeschaltet. Bei Fragen: info@euro-trade.com' }, { status: 403 });
   const body = await req.json().catch(() => ({}));
   const c = findCustomer(normCode(body?.code));
   if (!c) return NextResponse.json({ error: 'Dieser Code ist ungültig.' }, { status: 403 });

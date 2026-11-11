@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { ACCESS_COOKIE, ADMIN_COOKIE, isAdminToken, shopClosed, verifyCodeToken } from '@/lib/access';
+import { ACCESS_COOKIE, ADMIN_COOKIE, isAdminToken, previewMode, shopClosed, verifyCodeToken } from '@/lib/access';
 
 // Immer erreichbar: Zugang, Pflichtseiten, Angebots-Links aus der E-Mail, Admin-Login
 const PUBLIC = ['/start', '/druck-stick', '/api/zugang-anfrage', '/api/bild', '/sitemap.xml', '/zugang', '/api/zugang', '/impressum', '/datenschutz', '/angebot', '/api/angebot', '/admin/login', '/api/admin/login', '/icon.svg', '/favicon.ico', '/robots.txt'];
@@ -23,7 +23,8 @@ export async function middleware(req: NextRequest) {
   if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) return admin ? pass() : deny('/admin/login');
   if (!shopClosed() || admin) return pass();
   // Signatur prüfen – ob der Code noch aktiv ist, prüft der Server (Codes können im Admin gesperrt werden)
-  if (await verifyCodeToken(req.cookies.get(ACCESS_COOKIE)?.value)) return pass();
+  // Vorschau-Modus: Kunden-Codes zählen noch nicht
+  if (!previewMode() && (await verifyCodeToken(req.cookies.get(ACCESS_COOKIE)?.value))) return pass();
   // Startseite ohne Code: öffentliche Landingpage (URL bleibt euro-trade.com/)
   if (pathname === '/') {
     headers.set('x-path', '/start');

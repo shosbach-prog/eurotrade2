@@ -11,6 +11,7 @@ export default function SearchBar() {
   const [q, setQ] = useState(params.get('q') ?? '');
   const [items, setItems] = useState<PublicProduct[]>([]);
   const [total, setTotal] = useState(0);
+  const [suggest, setSuggest] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
   const box = useRef<HTMLDivElement>(null);
@@ -23,7 +24,7 @@ export default function SearchBar() {
     const t = setTimeout(async () => {
       const r = await fetch(`/api/search?limit=7&q=${encodeURIComponent(term)}`);
       const d = await r.json();
-      if (id === reqId.current) { setItems(d.items); setTotal(d.total); setActive(-1); }
+      if (id === reqId.current) { setItems(d.items); setTotal(d.total); setSuggest(d.suggest ?? null); setActive(-1); }
     }, 120);
     return () => clearTimeout(t);
   }, [q]);
@@ -59,7 +60,7 @@ export default function SearchBar() {
       </button>
       {open && q.trim().length >= 2 && (
         <div className="sugg">
-          {items.length === 0 ? <div className="empty">Keine Treffer für „{q}“</div> : items.map((p, i) => (
+          {items.length === 0 ? <div className="empty">Keine Treffer für „{q}“{suggest && <> – meinten Sie <button type="button" className="linkbtn alink" onMouseDown={(e) => { e.preventDefault(); setQ(suggest); }}>„{suggest}“</button>?</>}</div> : items.map((p, i) => (
             <a key={p.id} href={`/produkt/${encodeURIComponent(p.id)}`} className={i === active ? 'on' : ''} onMouseEnter={() => setActive(i)}>
               <div className="thumb"><ProductImage p={p} /></div>
               <div><div className="t">{p.name}</div><div className="s">{p.brand} · {p.category} · {p.sku}</div></div>

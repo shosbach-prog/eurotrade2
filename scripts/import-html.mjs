@@ -71,6 +71,7 @@ function parse(file) {
   if (!images.length) // Artikel mit nur einem Bild: Originalbild verwenden
     images = [...new Set([...raw.matchAll(/class="cloud-zoom-gallery" href="(https:\/\/shop\.l-shop-team\.de\/out\/pictures\/master\/product\/[^"]+\.jpg)"/g)].map((m) => m[1]))];
 
+  const sizeChart = (raw.match(/href="(https:\/\/shop\.l-shop-team\.de\/out\/media\/[^"]+\.pdf)"[^>]*>\s*Größentabelle/) || [])[1];
   const typ = (specs['Produkt'] || [])[0] || 'Sonstiges';
   const category = CAT[typ] || typ;
   const gender = /women|ladies|damen/i.test(name) ? 'Damen' : /kids|kinder|baby|junior/i.test(name) ? 'Kinder' : /men´s|men's|mens|herren/i.test(name) ? 'Herren' : 'Unisex';
@@ -85,6 +86,7 @@ function parse(file) {
     gender,
     basePrice: null,
     images,
+    ...(sizeChart ? { sizeChart } : {}),
     colors,
     sizes: (() => {
       const s = sp('Größenlauf').split(/,\s*/).filter(Boolean);
