@@ -5,7 +5,7 @@ import { FONTS, METHODS, POSITIONS, TEXT_COLORS, decoLabel, type Deco } from '@/
 import { esc, sendMail, shopUrl } from '@/lib/mail';
 import { button, contactBlock, eur, h1, infoBox, itemsTable, layout, p, quote, signature, type MailLine } from '@/lib/mail-templates';
 import { unitFor } from '@/lib/tiers';
-import { randomId, saveInquiry, type InqLine, type Inquiry } from '@/lib/store';
+import { discountFor, randomId, saveInquiry, validCode, type InqLine, type Inquiry } from '@/lib/store';
 
 const hits = new Map<string, number[]>();
 
@@ -58,7 +58,9 @@ export async function POST(req: Request) {
   const no = `A${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${randomId(3).toUpperCase()}`;
   const via = ctx ? `${ctx.code}${ctx.name && ctx.name !== ctx.code ? ` (${ctx.name})` : ''}` : null;
 
-  const inq: Inquiry = { no, date: new Date().toISOString(), zugangscode: via, customer, lines, total, status: 'neu', token: randomId(16), offer: null, history: [{ date: new Date().toISOString(), text: 'Anfrage eingegangen' }] };
+  const sub = body.code ? validCode(String(body.code)) : null;
+  const discount = sub && discountFor(total) > 0 ? { code: sub.code!, pct: discountFor(total) } : null;
+  const inq: Inquiry = { no, date: new Date().toISOString(), zugangscode: via, customer, lines, total, discount, status: 'neu', token: randomId(16), offer: null, history: [{ date: new Date().toISOString(), text: 'Anfrage eingegangen' }] };
   saveInquiry(inq); // immer lokal sichern (auch wenn Mail ausfällt)
 
   const base = shopUrl();
@@ -66,14 +68,16 @@ export async function POST(req: Request) {
   const mlines: MailLine[] = lines.map((l) => ({ sku: l.sku, name: l.name, color: l.color, size: l.size, qty: l.qty, price: l.price, sum: l.sum, deco: l.deco ? decoLabel(l.deco) : undefined, note: l.deco?.note || undefined, image: imgOf.get(l.id!) ?? '' }));
   const pieces = lines.reduce((s, l) => s + l.qty, 0);
   const hasDeco = lines.some((l) => l.deco);
-  const totals: [string, string, boolean?][] = [[`Summe Textil netto (${pieces} Stück)`, eur(total), true]];
+  const totals: [string, string, boolean?][] = discount
+    ? [[`Summe Textil netto (${pieces} Stück)`, eur(total)], [`Willkommensrabatt ${discount.pct} %`, `−${eur(Math.round(total * discount.pct) / 100)}`], ['Richtwert netto', eur(total - Math.round(total * discount.pct) / 100), true]]
+    : [[`Summe Textil netto (${pieces} Stück)`, eur(total), true]];
   const logos = [...new Map(lines.filter((l) => l.deco?.logoId).map((l) => [l.deco!.logoId!, l.deco!.logoName])).entries()];
   const dateTxt = customer.date ? new Date(customer.date).toLocaleDateString('de-DE') : '';
 
   const toShop = layout({
     preheader: `${customer.company || customer.name} · ${pieces} Stück · ${eur(total)}`, title: `Neue Anfrage ${no}`,
     body: h1(`Neue Anfrage ${no}`)
-      + infoBox([['Kunde', esc(customer.company || customer.name)], ['Stückzahl', String(pieces)], ['Summe Textil netto', eur(total)], ...(dateTxt ? [['Wunschtermin', dateTxt] as [string, string]] : []), ...(via ? [['Zugangscode', esc(via)] as [string, string]] : [])], '#ffc21a')
+      + infoBox([['Kunde', esc(customer.company || customer.name)], ['Stückzahl', String(pieces)], ['Summe Textil netto', eur(total)], ...(dateTxt ? [['Wunschtermin', dateTxt] as [string, string]] : []), ...(via ? [['Zugangscode', esc(via)] as [string, string]] : []), ...(discount ? [['Rabattcode', `${discount.code} (${discount.pct} %)`] as [string, string]] : [])], '#ffc21a')
       + contactBlock(customer)
       + (customer.message ? `<div style="font-size:13px;font-weight:700;margin:0 0 6px">Nachricht</div>${quote(customer.message)}` : '')
       + itemsTable(mlines, totals)

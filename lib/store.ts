@@ -68,6 +68,8 @@ export type Inquiry = {
   status?: Status; token?: string; offer?: Offer | null;
   history?: { date: string; text: string }[];
   acceptedAt?: string | null;
+  /** Willkommensrabatt aus dem Newsletter */
+  discount?: { code: string; pct: number } | null;
 };
 
 export function listInquiries(): Inquiry[] {
@@ -106,6 +108,10 @@ export function draftOffer(i: Inquiry): Offer {
     e.qty += l.qty; decos.set(k, e);
   }
   for (const { d, qty } of decos.values()) lines.push({ text: `Veredelung: ${d.method}`, detail: [d.positions.join(', '), d.logoName ? `Logo: ${d.logoName}` : '', decoText(d)].filter(Boolean).join(' · '), qty, price: 0 });
+  if (i.discount?.pct) {
+    const textil = i.lines.reduce((s, l) => s + l.sum, 0);
+    lines.push({ text: `Willkommensrabatt ${i.discount.pct} %`, detail: `Code ${i.discount.code} · auf Textilien`, qty: 1, price: -Math.round(textil * i.discount.pct) / 100 });
+  }
   return { lines, shipping: 0, note: '', validDays: 14, createdAt: new Date().toISOString(), vat: Number(process.env.MWST_PERCENT ?? 19) };
 }
 
@@ -120,3 +126,26 @@ export type AccessRequest = { id: string; date: string; name: string; company: s
 const AREQ = path.join(DATA, 'zugangsanfragen.json');
 export const listAccessRequests = () => readJSON<AccessRequest[]>(AREQ, []);
 export const saveAccessRequests = (r: AccessRequest[]) => writeJSON(AREQ, r.slice(-1000));
+
+/* ---------- Newsletter (Double-Opt-in) + Willkommensrabatt ---------- */
+export type Subscriber = {
+  id: string; email: string; type: string; date: string; token: string;
+  confirmed: boolean; confirmedAt?: string | null; unsubscribedAt?: string | null;
+  /** persönlicher Rabattcode – erst nach Bestätigung */
+  code?: string | null; usedAt?: string | null; usedIn?: string | null;
+};
+const NL = path.join(DATA, 'newsletter.json');
+export const listSubscribers = () => readJSON<Subscriber[]>(NL, []);
+export const saveSubscribers = (l: Subscriber[]) => writeJSON(NL, l);
+/** Rabattstufen: NEWSLETTER_TIERS="10:45,20:90,30:155" (Prozent:ab Netto-Warenwert) */
+export function discountTiers(): { pct: number; min: number }[] {
+  return (process.env.NEWSLETTER_TIERS ?? '10:45,20:90,30:155').split(',').map((x) => x.split(':').map(Number))
+    .filter(([p, m]) => p > 0 && p < 90 && m >= 0).map(([pct, min]) => ({ pct, min })).sort((a, b) => a.min - b.min);
+}
+export const discountFor = (net: number) => [...discountTiers()].reverse().find((t) => net >= t.min)?.pct ?? 0;
+/** gültiger, noch nicht eingelöster Code? */
+export function validCode(code: string) {
+  const c = String(code ?? '').trim().toUpperCase();
+  if (!/^ET-[A-Z0-9]{6}$/.test(c)) return null;
+  return listSubscribers().find((s) => s.code === c && s.confirmed && !s.unsubscribedAt && !s.usedAt) ?? null;
+}

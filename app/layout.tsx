@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: 'T-Shirts, Polos, Hoodies, Jacken, Caps und Taschen für Druck und Stick – schnell finden, Anfrage in einer Minute.',
     metadataBase: new URL(process.env.SHOP_URL ?? 'https://euro-trade.com'),
     // Geschlossener Shop: nur Landingpage und Info-Seite in Suchmaschinen
-    robots: previewMode() || (shopClosed() && !['/start', '/druck-stick', '/impressum'].includes(headers().get('x-path') ?? '')) ? { index: false, follow: false } : undefined,
+    robots: previewMode() || (shopClosed() && !['/start', '/druck-stick', '/widerruf', '/impressum'].includes(headers().get('x-path') ?? '')) ? { index: false, follow: false } : undefined,
   };
 }
 export const dynamic = 'force-dynamic';
@@ -29,7 +29,7 @@ export const dynamic = 'force-dynamic';
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const gated = shopClosed();
   const path = headers().get('x-path') ?? '/';
-  const isPublic = ['/start', '/druck-stick', '/zugang', '/impressum', '/datenschutz', '/angebot', '/admin'].some((p) => path === p || path.startsWith(p + '/'));
+  const isPublic = ['/widerruf', '/newsletter', '/start', '/druck-stick', '/zugang', '/impressum', '/datenschutz', '/angebot', '/admin'].some((p) => path === p || path.startsWith(p + '/'));
   const { ok, customer } = await shopAccess();
   // Code im Admin gesperrt/gelöscht -> zurück zur Anmeldung
   if (!ok && !isPublic) redirect('/zugang');
@@ -60,7 +60,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <main className="wrap">{children}</main>
           <footer><div className="wrap">
             <span>© {new Date().getFullYear()} {SHOP} · Alle Preise netto zzgl. MwSt. und Versand</span>
-            <span>{open && <><Link href="/konto">Meine Anfragen</Link> · </>}<Link href="/druck-stick">Druck & Stick</Link> · <Link href="/impressum">Impressum</Link> · <Link href="/datenschutz">Datenschutz</Link>{gated && customer && <> · {customer.name} · <LogoutLink /></>}</span>
+            <span>{open && <><Link href="/konto">Meine Anfragen</Link> · </>}<Link href="/druck-stick">Druck & Stick</Link> · <Link href="/widerruf">Rückgabe & Widerruf</Link> · <Link href="/impressum">Impressum</Link> · <Link href="/datenschutz">Datenschutz</Link>{gated && customer && <> · {customer.name} · <LogoutLink /></>}</span>
           </div></footer>
           {!path.startsWith('/admin') && <Contact whatsapp={process.env.CONTACT_WHATSAPP ?? '491732648097'} phone={process.env.CONTACT_PHONE ?? '0173 2648097'} email={process.env.CONTACT_EMAIL ?? 'info@euro-trade.com'} />}
         </WishlistProvider></CartProvider>

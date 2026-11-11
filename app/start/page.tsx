@@ -2,7 +2,8 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import AccessForm from '../zugang/AccessForm';
 import RequestForm from './RequestForm';
-import { listReferences } from '@/lib/store';
+import NewsletterBox from './NewsletterBox';
+import { discountTiers, listReferences } from '@/lib/store';
 import { getCategories } from '@/lib/catalog';
 
 export const metadata: Metadata = {
@@ -80,6 +81,8 @@ export default function Start() {
           </div>
         </section>
       )}
+
+      <NewsletterBox tiers={discountTiers()} />
 
       <section id="anfragen" className="l-section l-request">
         <div>

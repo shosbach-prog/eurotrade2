@@ -29,7 +29,7 @@ export function layout(opts: { preheader: string; title: string; body: string; f
     <tr><td style="background:#ffffff;border-top:1px solid ${C.line};border-radius:0 0 14px 14px;padding:18px 28px 22px;${F};font-size:12px;line-height:1.6;color:${C.muted}">
       ${opts.footerNote ? `<p style="margin:0 0 10px">${opts.footerNote}</p>` : ''}
       ${sender().map(esc).join('<br>')}<br>
-      <a href="${shopUrl()}" style="color:${C.brand};text-decoration:none">${esc(shopUrl().replace(/^https?:\/\//, ''))}</a> · <a href="${shopUrl()}/impressum" style="color:${C.muted}">Impressum</a> · <a href="${shopUrl()}/datenschutz" style="color:${C.muted}">Datenschutz</a>
+      <a href="${shopUrl()}" style="color:${C.brand};text-decoration:none">${esc(shopUrl().replace(/^https?:\/\//, ''))}</a> · <a href="${shopUrl()}/widerruf" style="color:${C.muted}">Rückgabe & Widerruf</a> · <a href="${shopUrl()}/impressum" style="color:${C.muted}">Impressum</a> · <a href="${shopUrl()}/datenschutz" style="color:${C.muted}">Datenschutz</a>
     </td></tr>
   </table>
 </td></tr></table></body></html>`;

@@ -30,6 +30,7 @@ export default function InquiryPage({ params }: { params: { no: string } }) {
           <p style={{ margin: '6px 0 0' }}>{c.company && <><b>{c.company}</b><br /></>}{c.name}<br /><a href={`mailto:${c.email}`} className="alink">{c.email}</a>{c.phone && <> · {c.phone}</>}{c.city && <><br />{c.city}</>}</p>
           {c.date && <p style={{ margin: '8px 0 0' }}><b>Wunschliefertermin:</b> {new Date(c.date).toLocaleDateString('de-DE')}</p>}
           {i.zugangscode && <p className="muted" style={{ margin: '8px 0 0' }}>Zugangscode: {i.zugangscode}</p>}
+          {i.discount && <p style={{ margin: '8px 0 0' }}><span className="st st-angenommen">Rabattcode {i.discount.code} · {i.discount.pct} %</span> <span className="muted" style={{ fontSize: 13 }}>– im Angebot als Position enthalten</span></p>}
           {c.message && <p style={{ whiteSpace: 'pre-wrap', margin: '10px 0 0', background: '#f6f7f9', padding: 10, borderRadius: 8 }}>{c.message}</p>}
           <p className="muted" style={{ fontSize: 13, margin: '10px 0 0' }}>Eingegangen: {fmt(i.date)}</p>
         </div>

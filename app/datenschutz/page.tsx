@@ -49,6 +49,16 @@ export default function Datenschutz() {
         <p>Angebots- und Auftragsdaten speichern wir für die Dauer der Geschäftsbeziehung und darüber hinaus, soweit gesetzliche Aufbewahrungspflichten bestehen (§ 147 AO, § 257 HGB: bis zu 10 Jahre). Nicht angenommene Anfragen und hochgeladene Logos löschen wir spätestens nach 24 Monaten, sofern Sie keine längere Speicherung wünschen, etwa für Nachbestellungen.</p>
       </S>
 
+      <section id="newsletter"><h2>7a. Newsletter und Willkommensrabatt</h2>
+        <p>Wenn Sie sich für unseren Newsletter anmelden, verarbeiten wir Ihre E-Mail-Adresse und, falls angegeben, die Art Ihrer Organisation, um Ihnen Angebote, Neuheiten und Ihren persönlichen Willkommensrabatt zu senden. Wir nutzen das Double-Opt-in-Verfahren: Erst nach Klick auf den Bestätigungslink in unserer E-Mail sind Sie angemeldet. Wir speichern Zeitpunkt der Anmeldung und Bestätigung als Nachweis.</p>
+        <p>Rechtsgrundlage ist Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Sie können sie jederzeit über den Abmeldelink in jeder E-Mail oder per Nachricht an uns widerrufen. Nach der Abmeldung löschen wir Ihre Adresse, soweit wir sie nicht zum Nachweis einer früheren Einwilligung kurzfristig aufbewahren müssen (Art. 6 Abs. 1 lit. f DSGVO). Unbestätigte Anmeldungen löschen wir nach 30 Tagen.</p>
+      </section>
+
+      <section id="newsletter"><h2>7a. Newsletter und Willkommensrabatt</h2>
+        <p>Wenn Sie sich für unseren Newsletter anmelden, verarbeiten wir Ihre E-Mail-Adresse und, falls angegeben, die Art Ihrer Organisation, um Ihnen Angebote, Neuheiten und Ihren persönlichen Willkommensrabatt zu senden. Wir nutzen das Double-Opt-in-Verfahren: Erst nach Klick auf den Bestätigungslink in unserer E-Mail sind Sie angemeldet. Wir speichern Zeitpunkt der Anmeldung und Bestätigung als Nachweis.</p>
+        <p>Rechtsgrundlage ist Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Sie können sie jederzeit über den Abmeldelink in jeder E-Mail oder per Nachricht an uns widerrufen. Nach der Abmeldung löschen wir Ihre Adresse, soweit wir sie nicht zum Nachweis einer früheren Einwilligung kurzfristig aufbewahren müssen (Art. 6 Abs. 1 lit. f DSGVO). Unbestätigte Anmeldungen löschen wir nach 30 Tagen.</p>
+      </section>
+
       <S t="8. E-Mail-Versand">
         <p>Bestätigungen, Angebote und Auftragsbestätigungen versenden wir über den E-Mail-Dienst der IONOS SE (Auftragsverarbeitung nach Art. 28 DSGVO). Wenn Sie uns per E-Mail kontaktieren, verarbeiten wir Ihre Angaben zur Bearbeitung Ihres Anliegens (Art. 6 Abs. 1 lit. b bzw. f DSGVO).</p>
       </S>

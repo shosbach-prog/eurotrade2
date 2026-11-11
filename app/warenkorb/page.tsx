@@ -17,6 +17,13 @@ export default function CartPage() {
   const [err, setErr] = useState('');
   const [form, setForm] = useState<Record<string, string>>({});
   const [no, setNo] = useState('');
+  const [code, setCode] = useState('');
+  const [codeInfo, setCodeInfo] = useState<{ ok: boolean; tiers: { pct: number; min: number }[] } | null>(null);
+  async function checkCode() {
+    if (!code.trim()) { setCodeInfo(null); return; }
+    const d = await fetch(`/api/rabatt?code=${encodeURIComponent(code.trim())}`).then((r) => r.json()).catch(() => ({ ok: false, tiers: [] }));
+    setCodeInfo(d);
+  }
 
   // Formular vorausfüllen: zuletzt verwendete Daten + Kundenname aus dem Code
   useEffect(() => {
@@ -33,6 +40,8 @@ export default function CartPage() {
   const anyOpen = lines.some((l) => l.price == null);
   const decos = [...new Map(lines.filter((l) => l.deco).map((l) => [JSON.stringify(l.deco), l.deco!])).values()];
   const minDate = new Date(Date.now() + 5 * 86400000).toISOString().slice(0, 10);
+  const pct = codeInfo?.ok ? [...codeInfo.tiers].reverse().find((t) => net >= t.min)?.pct ?? 0 : 0;
+  const nextT = codeInfo?.ok ? codeInfo.tiers.find((t) => t.min > net) : undefined;
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -41,7 +50,7 @@ export default function CartPage() {
     try { localStorage.setItem(FORM_KEY, JSON.stringify(Object.fromEntries(FIELDS.map((k) => [k, f[k] ?? ''])))); } catch {}
     const r = await fetch('/api/anfrage', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ customer: f, lines: lines.map(({ id, color, size, qty, deco }) => ({ id, color, size, qty, deco })) }),
+      body: JSON.stringify({ customer: f, code: codeInfo?.ok ? code.trim() : '', lines: lines.map(({ id, color, size, qty, deco }) => ({ id, color, size, qty, deco })) }),
     });
     const d = await r.json().catch(() => ({}));
     if (r.ok) { if (d.token) saveMyInquiry(d.no, d.token); setNo(d.no ?? ''); setState('done'); clear(); } else { setState('error'); setErr(d.error ?? 'Senden fehlgeschlagen.'); }
@@ -102,7 +111,15 @@ export default function CartPage() {
               {decos.map((d) => <button key={JSON.stringify(d)} className="btn alt" style={{ height: 36 }} onClick={() => decoToAll(d)}>{decos.length > 1 ? `„${decoLabel(d)}“ übernehmen` : 'Auf alle übertragen'}</button>)}
             </div>
           )}
-          {net > 0 && <div className="tot big"><span>Summe netto (Richtwert){anyOpen ? ' *' : ''}</span><span>{eur(net)}</span></div>}
+          <div className="code-row">
+            <input value={code} onChange={(e) => { setCode(e.target.value.toUpperCase()); setCodeInfo(null); }} onBlur={checkCode} onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), checkCode())} placeholder="Rabattcode, z. B. ET-ABC123" aria-label="Rabattcode" />
+            <button type="button" className="btn alt" onClick={checkCode}>Einlösen</button>
+          </div>
+          {codeInfo && !codeInfo.ok && <div className="note err" style={{ marginTop: 6 }}>Dieser Code ist ungültig oder wurde bereits eingelöst.</div>}
+          {pct > 0 && <div className="tot"><span className="ok">Willkommensrabatt {pct} %</span><span className="ok">−{eur(Math.round(net * pct) / 100)}</span></div>}
+          {codeInfo?.ok && pct === 0 && nextT && <div className="note muted" style={{ marginTop: 6 }}>Code gültig – ab {eur(nextT.min)} Warenwert erhalten Sie {nextT.pct} % Rabatt.</div>}
+          {codeInfo?.ok && pct > 0 && nextT && <div className="note muted" style={{ marginTop: 2 }}>Noch {eur(nextT.min - net)} bis {nextT.pct} % Rabatt.</div>}
+          {net > 0 && <div className="tot big"><span>Summe netto (Richtwert){anyOpen ? ' *' : ''}</span><span>{eur(net - Math.round(net * pct) / 100)}</span></div>}
           <p className="muted" style={{ fontSize: 13, margin: '6px 0 0' }}>Endpreis inkl. Versand und ggf. Veredelung erhalten Sie mit dem Angebot.</p>
         </div>
 

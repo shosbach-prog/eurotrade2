@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { esc, sendMail, shopUrl } from '@/lib/mail';
 import { button, eur, h1, infoBox, layout, offerTable, p, quote, signature } from '@/lib/mail-templates';
-import { addHistory, inquiryByToken, offerTotals, saveInquiry } from '@/lib/store';
+import { addHistory, inquiryByToken, listSubscribers, offerTotals, saveInquiry, saveSubscribers } from '@/lib/store';
 
 /** Kunde nimmt das Angebot an */
 export async function POST(req: Request, { params }: { params: { token: string } }) {
@@ -17,6 +17,12 @@ export async function POST(req: Request, { params }: { params: { token: string }
   i.acceptedAt = new Date().toISOString();
   addHistory(i, `Angebot angenommen von ${String(name).slice(0, 100)}${comment ? ` – „${String(comment).slice(0, 500)}“` : ''}`);
   saveInquiry(i);
+  // Willkommensrabatt ist mit der Annahme eingelöst
+  if (i.discount?.code) {
+    const subs = listSubscribers();
+    const s = subs.find((x) => x.code === i.discount!.code);
+    if (s && !s.usedAt) { s.usedAt = new Date().toISOString(); s.usedIn = i.no; saveSubscribers(subs); }
+  }
   const t = offerTotals(i.offer);
   try {
     await sendMail({ to: process.env.INQUIRY_TO ?? '', replyTo: i.customer.email, subject: `✓ Angebot ${i.no} angenommen – ${i.customer.company || i.customer.name} – ${eur(t.gross)}`,
