@@ -157,6 +157,10 @@ export type Review = {
   sku?: string; productName?: string;
   name: string; company?: string; rating: number; title: string; text: string;
   date: string; inquiryNo: string; status: 'pending' | 'approved' | 'rejected'; reply?: string;
+  /** wie die Bewertung zu uns kam (Formular = leer) */
+  source?: 'formular' | 'email' | 'telefon' | 'persoenlich';
+  /** Gegenleistung erhalten (z. B. kostenloses Testprodukt) – wird öffentlich gekennzeichnet */
+  incentive?: string | null;
 };
 const REV = path.join(DATA, 'bewertungen.json');
 export const listReviews = () => readJSON<Review[]>(REV, []);

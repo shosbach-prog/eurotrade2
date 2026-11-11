@@ -5,12 +5,7 @@ import { reviewsFor } from '@/lib/reviews';
 /** Bewertungsbereich auf der Produktseite */
 export default function ProductReviews({ productId, name }: { productId: string; name: string }) {
   const list = reviewsFor(productId);
-  if (!list.length) return (
-    <section id="bewertungen" className="rev-section">
-      <h2>Bewertungen</h2>
-      <div className="box muted">Für diesen Artikel gibt es noch keine Bewertungen. Nach Ihrer Bestellung laden wir Sie ein, als Erste/r zu bewerten.</div>
-    </section>
-  );
+  if (!list.length) return <TrustBlock />;
   const avg = list.reduce((s, r) => s + r.rating, 0) / list.length;
   const dist = [5, 4, 3, 2, 1].map((n) => ({ n, c: list.filter((r) => r.rating === n).length }));
   const ld = { '@context': 'https://schema.org', '@type': 'Product', name, aggregateRating: { '@type': 'AggregateRating', ratingValue: avg.toFixed(1), reviewCount: list.length }, review: list.slice(0, 5).map((r) => ({ '@type': 'Review', reviewRating: { '@type': 'Rating', ratingValue: r.rating }, author: { '@type': 'Person', name: r.name }, datePublished: r.date.slice(0, 10), reviewBody: r.text })) };
@@ -28,6 +23,23 @@ export default function ProductReviews({ productId, name }: { productId: string;
         <div className="rev-list">{list.slice(0, 20).map((r) => <ReviewCard key={r.id} r={r} />)}</div>
       </div>
       <ReviewNote />
+    </section>
+  );
+}
+
+/** Statt leerer Bewertungen: Darauf können Sie sich verlassen */
+export function TrustBlock() {
+  const phone = process.env.CONTACT_PHONE ?? '0173 2648097';
+  const mail = process.env.CONTACT_EMAIL ?? 'info@euro-trade.com';
+  return (
+    <section className="rev-section trust">
+      <h2>Darauf können Sie sich verlassen</h2>
+      <div className="trust-grid">
+        <div className="box"><b>Vorschau vor der Produktion</b><p>Sie sehen Ihr Logo vorab und geben es frei. Erst dann wird gedruckt oder gestickt.</p></div>
+        <div className="box"><b>Markenware ab 1 Stück</b><p>Originale Markentextilien, Staffelpreise ab 10 Stück, auch für Nachbestellungen.</p></div>
+        <div className="box"><b>Angebot statt Überraschung</b><p>Sie erhalten ein verbindliches Angebot mit allen Kosten, bevor Sie sich entscheiden.</p></div>
+        <div className="box contact-card"><span className="avatar" aria-hidden>SH</span><div><b>Ihr Ansprechpartner</b><p>Sebastian Hosbach<br /><a className="alink" href={`tel:${phone.replace(/[^\d+]/g, '')}`}>{phone}</a> · <a className="alink" href={`mailto:${mail}`}>{mail}</a></p></div></div>
+      </div>
     </section>
   );
 }
