@@ -36,7 +36,7 @@ function orgSchema() {
   return { '@context': 'https://schema.org', '@graph': [
     { '@type': 'Store', '@id': `${url}/#org`, name: 'euro-trade.com', alternateName: 'Euro-Trade', url, logo: `${url}/icon.svg`, image: `${url}/og.png`,
       description: 'Teamwear und Firmenbekleidung mit Logo – Markentextilien ab 1 Stück, bedruckt oder bestickt.',
-      email: process.env.CONTACT_EMAIL ?? 'info@euro-trade.com', telephone: '+49 173 2648097', founder: { '@type': 'Person', name: 'Sebastian Hosbach' },
+      email: process.env.CONTACT_EMAIL ?? 'info@euro-trade.com', telephone: '+49 30 40719258', founder: { '@type': 'Person', name: 'Sebastian Hosbach' },
       address: { '@type': 'PostalAddress', streetAddress: 'Seehang 28', postalCode: '44263', addressLocality: 'Dortmund', addressCountry: 'DE' },
       areaServed: ['DE', 'AT', 'CH'] },
     { '@type': 'WebSite', '@id': `${url}/#website`, url, name: 'euro-trade.com', inLanguage: 'de-DE', publisher: { '@id': `${url}/#org` } },
@@ -67,7 +67,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <Link href="/" className="logo" aria-label={`${SHOP} – Startseite`}><Logo domain={process.env.SHOP_DOMAIN ?? 'euro-trade.com'} /></Link>
                 <p>Markentextilien ab 1 Stück – bedruckt oder bestickt, aus einer Hand. Für Vereine, Unternehmen und Handwerk.</p>
                 <div className="ft-contact">
-                  <a href="tel:+491732648097"><span aria-hidden>☎</span> 0173 2648097</a>
+                  <a href="tel:+493040719258"><span aria-hidden>☎</span> Produktberatung 030 40719258</a>
                   <a href="mailto:info@euro-trade.com"><span aria-hidden>✉</span> info@euro-trade.com</a>
                   <span><span aria-hidden>⌂</span> Seehang 28 · 44263 Dortmund</span>
                 </div>
@@ -111,7 +111,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </footer>
           {!path.startsWith('/admin') && <Consent tools={{ ga: process.env.GA_ID || undefined, gads: process.env.GOOGLE_ADS_ID || undefined, meta: process.env.META_PIXEL_ID || undefined }} />}
           {!path.startsWith('/admin') && <TrustBadge />}
-          {!path.startsWith('/admin') && <Contact whatsapp={process.env.CONTACT_WHATSAPP ?? '491732648097'} phone={process.env.CONTACT_PHONE ?? '0173 2648097'} email={process.env.CONTACT_EMAIL ?? 'info@euro-trade.com'} />}
+          {!path.startsWith('/admin') && <Contact whatsapp={process.env.CONTACT_WHATSAPP ?? '491732648097'} phone={process.env.BERATUNG_TELEFON ?? '030 40719258'} email={process.env.CONTACT_EMAIL ?? 'info@euro-trade.com'} />}
         </WishlistProvider></CartProvider>
       </body>
     </html>

@@ -122,11 +122,11 @@ export default function Start() {
           <h2>Unverbindlich Preis anfragen</h2>
           <p>Sie haben noch keinen Zugangscode? Kein Problem: Beschreiben Sie kurz Ihr Vorhaben und schicken Sie Ihr Logo gleich mit. Sie erhalten innerhalb von 24 Stunden ein Angebot.</p>
           <ul><li>Kein Zugangscode nötig</li><li>Logo gleich mitschicken</li><li>Auf Wunsch vorab ein Muster</li><li>Unverbindlich und kostenlos</li></ul>
-          <p className="muted" style={{ marginTop: 16 }}>Lieber sprechen? <a className="alink" href="tel:+491732648097">0173 2648097</a></p>
+          <p className="muted" style={{ marginTop: 16 }}>Lieber sprechen? Produktberatung: <a className="alink" href="tel:+493040719258">030 40719258</a></p>
         </>} />} access={<RequestForm aside={<>
           <h2>Zugang anfragen</h2>
           <p>Unser Shop ist exklusiv für Vereine, Unternehmen und Partner. Schreiben Sie uns kurz, wer Sie sind – Sie erhalten Ihren persönlichen Zugangscode innerhalb von 24 Stunden.</p>
-          <p className="muted">Lieber direkt sprechen? <a className="alink" href="tel:+491732648097">0173 2648097</a> · <a className="alink" href="mailto:info@euro-trade.com">info@euro-trade.com</a></p>
+          <p className="muted">Lieber direkt sprechen? Produktberatung: <a className="alink" href="tel:+493040719258">030 40719258</a> · <a className="alink" href="mailto:info@euro-trade.com">info@euro-trade.com</a></p>
         </>} />} />
     </div>
   );

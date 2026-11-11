@@ -24,7 +24,7 @@ export default function UeberUns() {
             <p className="muted" style={{ margin: '2px 0 10px' }}>Inhaber · Dortmund</p>
             <p>Hinter euro-trade.com stehe ich persönlich. Mit über 20 Jahren Erfahrung im B2B-Vertrieb weiß ich, worauf es Firmen und Vereinen ankommt: verlässliche Qualität, ehrliche Beratung und Termine, die gehalten werden.</p>
             <p>Deshalb gibt es bei uns kein anonymes Ticketsystem. Sie haben einen festen Ansprechpartner, der Ihr Projekt von der ersten Anfrage bis zur Lieferung begleitet.</p>
-            <p><a className="alink" href="tel:+491732648097">0173 2648097</a> · <a className="alink" href="mailto:info@euro-trade.com">info@euro-trade.com</a></p>
+            <p><a className="alink" href="tel:+493040719258">030 40719258</a> · <a className="alink" href="mailto:info@euro-trade.com">info@euro-trade.com</a></p>
           </div>
         </div>
       </div>

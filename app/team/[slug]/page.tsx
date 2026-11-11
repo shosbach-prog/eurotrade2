@@ -45,7 +45,7 @@ export default function TeamShopPage({ params }: { params: { slug: string } }) {
         ))}
       </div>
       {!items.length && <p className="muted">Hier erscheinen bald die Artikel Ihres Vereins.</p>}
-      <p className="muted" style={{ marginTop: 24, fontSize: 14 }}>Fragen zum Team-Shop? <a className="alink" href="tel:+491732648097">0173 2648097</a> · <a className="alink" href="mailto:info@euro-trade.com">info@euro-trade.com</a>{t.contact ? <> · Ansprechpartner im Verein: {t.contact}</> : null}</p>
+      <p className="muted" style={{ marginTop: 24, fontSize: 14 }}>Fragen zum Team-Shop? Produktberatung: <a className="alink" href="tel:+493040719258">030 40719258</a> · <a className="alink" href="mailto:info@euro-trade.com">info@euro-trade.com</a>{t.contact ? <> · Ansprechpartner im Verein: {t.contact}</> : null}</p>
     </div>
   );
 }

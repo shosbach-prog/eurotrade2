@@ -5,7 +5,7 @@ import { esc, shopUrl } from './mail';
 const C = { brand: '#0a5cf0', dark: '#0638b8', accent: '#ffc21a', ink: '#14181f', muted: '#5d6675', line: '#e3e6eb', bg: '#f2f4f7', ok: '#1d7a3e' };
 const F = "font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
 const shop = () => process.env.SHOP_NAME ?? 'Euro-Trade';
-const sender = () => (process.env.OFFER_SENDER ?? 'Euro-Trade · Sebastian Hosbach|Seehang 28 · 44263 Dortmund|Tel. 0173 2648097 · info@euro-trade.com').split('|');
+const sender = () => (process.env.OFFER_SENDER ?? 'Euro-Trade · Sebastian Hosbach|Seehang 28 · 44263 Dortmund|Tel. 030 40719258 · info@euro-trade.com').split('|');
 
 export const eur = (n: number | null | undefined) => (n == null ? 'auf Anfrage' : n.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' }));
 

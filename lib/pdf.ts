@@ -13,7 +13,7 @@ const MUTED = rgb(0.36, 0.4, 0.46);
 const LINE = rgb(0.86, 0.88, 0.91);
 
 /** Absenderzeilen – überschreibbar per .env OFFER_SENDER="Zeile 1|Zeile 2|…" */
-const sender = () => (process.env.OFFER_SENDER ?? 'Euro-Trade · Sebastian Hosbach|Seehang 28 · 44263 Dortmund|Tel. 0173 2648097 · info@euro-trade.com').split('|');
+const sender = () => (process.env.OFFER_SENDER ?? 'Euro-Trade · Sebastian Hosbach|Seehang 28 · 44263 Dortmund|Tel. 030 40719258 · info@euro-trade.com').split('|');
 
 export async function offerPdf(i: Inquiry): Promise<Buffer> {
   const o = i.offer!;

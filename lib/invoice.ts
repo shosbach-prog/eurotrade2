@@ -22,10 +22,10 @@ export type InvoiceSettings = {
 const SET = path.join(DATA, 'rechnung-einstellungen.json');
 export const DEFAULT_SETTINGS: InvoiceSettings = {
   company: 'Euro-Trade', owner: 'Sebastian Hosbach', street: 'Seehang 28', zip: '44263', city: 'Dortmund', country: 'DE',
-  phone: '0173 2648097', email: 'info@euro-trade.com', web: 'euro-trade.com',
+  phone: '030 40719258', email: 'info@euro-trade.com', web: 'euro-trade.com',
   taxNo: '', vatId: '', iban: '', bic: '', bank: '', payDays: 14, prefix: 'RE-', kleinunternehmer: false, reminderDays: 7, footer: '', counter: {}, bookkeepingEmail: '', autoForward: false, lexofficeKey: '', lexofficeAuto: false,
 };
-export const invoiceSettings = (): InvoiceSettings => ({ ...DEFAULT_SETTINGS, ...readJSON<Partial<InvoiceSettings>>(SET, {}) });
+export const invoiceSettings = (): InvoiceSettings => { const s = { ...DEFAULT_SETTINGS, ...readJSON<Partial<InvoiceSettings>>(SET, {}) }; return /2648097/.test(s.phone ?? '') ? { ...s, phone: DEFAULT_SETTINGS.phone } : s; };
 export function saveInvoiceSettings(s: Partial<InvoiceSettings>) { writeJSON(SET, { ...invoiceSettings(), ...s }); }
 /** Was fehlt noch für eine gesetzeskonforme Rechnung (§ 14 UStG)? */
 export function settingsMissing(s = invoiceSettings()) {

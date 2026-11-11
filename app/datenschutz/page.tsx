@@ -11,7 +11,7 @@ export default function Datenschutz() {
       <p className="muted">Stand: November 2026</p>
 
       <S t="1. Verantwortlicher">
-        <p>Sebastian Hosbach · Euro-Trade<br />Seehang 28, 44263 Dortmund<br />Telefon: 0173 2648097 · E-Mail: <a href="mailto:info@euro-trade.com">info@euro-trade.com</a></p>
+        <p>Sebastian Hosbach · Euro-Trade<br />Seehang 28, 44263 Dortmund<br />Telefon: 030 40719258 · E-Mail: <a href="mailto:info@euro-trade.com">info@euro-trade.com</a></p>
         <p>Ein Datenschutzbeauftragter ist nicht bestellt, da die gesetzlichen Voraussetzungen hierfür nicht vorliegen.</p>
       </S>
 

@@ -43,7 +43,7 @@ export async function runFollowUps() {
             + p(`vor ein paar Tagen haben wir Ihnen unser Angebot <strong>${i.no}</strong> über <strong>${offerTotals(o).gross.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</strong> geschickt. Es ist noch bis <strong>${until}</strong> gültig.`)
             + p('Passt alles? Dann nehmen Sie es einfach mit einem Klick an. Sie möchten etwas ändern – Farbe, Menge, Veredelung oder Termin? Antworten Sie auf diese E-Mail, wir passen das Angebot gerne an.')
             + button(`${shopUrl()}/angebot/${i.token}`, 'Angebot ansehen & annehmen')
-            + p('Lieber kurz telefonieren? Wir sind unter 0173 2648097 für Sie da.', true)
+            + p('Lieber kurz telefonieren? Wir sind unter 030 40719258 für Sie da.', true)
             + signature(),
         }),
       });

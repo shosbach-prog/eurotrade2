@@ -190,7 +190,7 @@ export function refsFor(o: { sku?: string; id?: string; category?: string; categ
 /* ---------- Ansprechpartner (öffentlich im Warenkorb / Artikel) ---------- */
 export type ContactPerson = { name: string; role: string; phone: string; email: string; text: string; photoId?: string | null; hours?: string };
 const CONTACT = path.join(DATA, 'ansprechpartner.json');
-export const getContactPerson = () => readJSON<ContactPerson | null>(CONTACT, null);
+export const getContactPerson = () => { const c = readJSON<ContactPerson | null>(CONTACT, null); return c && /2648097/.test(c.phone) ? { ...c, phone: '030 40719258' } : c; };
 export const saveContactPerson = (c: ContactPerson | null) => writeJSON(CONTACT, c);
 
 /* ---------- Zugangsanfragen (von der Startseite) ---------- */
