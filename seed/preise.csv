@@ -14,3 +14,6 @@ P04;13,00
 RT234J;12,50
 TJ9120;19,00
 TR510;10,00
+# Seidensticker (direkt) – EK eintragen, dann npm run import-html bzw. Deploy
+# 01.001000-0084;0,00
+# 01.852485-0033;0,00

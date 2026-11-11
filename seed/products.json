@@ -1202,5 +1202,130 @@
    "Sport",
    "Damen"
   ]
+ },
+ {
+  "id": "sd-01-001000",
+  "sku": "01.001000-0084",
+  "name": "Regular Business Hemd Uni",
+  "brand": "Seidensticker",
+  "category": "Hemden & Blusen",
+  "categorySlug": "hemden-blusen",
+  "description": "Regular Fit · Bügelfrei · Kentkragen · Popeline, 100 % Baumwolle",
+  "features": [
+   "Regular Fit",
+   "Bügelfrei",
+   "Kentkragen",
+   "Weitenverstellbare Manschette",
+   "Aufgesetzte Brusttasche",
+   "Knopfverschluss",
+   "Webart: Popeline",
+   "Brustumfang 116 cm, Rückenlänge 82 cm (Größe 38)"
+  ],
+  "material": "Popeline",
+  "composition": "100% Baumwolle",
+  "gender": "Herren",
+  "basePrice": null,
+  "images": [
+   "/p/seidensticker/hemd-1.jpg",
+   "/p/seidensticker/hemd-2.jpg",
+   "/p/seidensticker/hemd-3.jpg",
+   "/p/seidensticker/hemd-4.jpg",
+   "/p/seidensticker/hemd-5.jpg",
+   "/p/seidensticker/hemd-6.jpg",
+   "/p/seidensticker/hemd-7.jpg",
+   "/p/seidensticker/hemd-8.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Schwarz",
+    "hex": "#121212"
+   }
+  ],
+  "sizes": [
+   "38",
+   "39",
+   "40",
+   "41",
+   "42",
+   "43",
+   "44",
+   "45",
+   "46",
+   "47",
+   "48",
+   "49",
+   "50",
+   "51",
+   "52",
+   "53",
+   "54"
+  ],
+  "specs": {
+   "Passform": "Regular",
+   "Ärmel": "Langarm (1/1)",
+   "Kragen": "Kentkragen",
+   "Veredelung": "Stick (z. B. Monogramm)",
+   "Pflege": "Schonwaschgang 40 °C, Trommeltrocknen bei niedriger Temperatur, Bügeln bei mittlerer Temperatur, nicht bleichen, nicht chemisch reinigen",
+   "Artikelnummer Hersteller": "01.001000-0084"
+  },
+  "tags": [
+   "Hemden",
+   "Business",
+   "Brusttasche",
+   "Berufsbekleidung",
+   "Herren"
+  ]
+ },
+ {
+  "id": "sd-01-852485",
+  "sku": "01.852485-0033",
+  "name": "Oversized Suit Pants Flanell",
+  "brand": "Studio Seidensticker",
+  "category": "Hosen",
+  "categorySlug": "hosen",
+  "description": "Oversized-Passform · Flanell in Twill-Webart · 100 % Schurwolle",
+  "features": [
+   "Oversized-Passform",
+   "Flanell in Twill-Webart",
+   "100 % Schurwolle",
+   "Knopfverschluss",
+   "Volle Länge"
+  ],
+  "material": "Flanell (Twill)",
+  "composition": "100% Schurwolle",
+  "gender": "Herren",
+  "basePrice": null,
+  "images": [
+   "/p/seidensticker/hose-1.jpg",
+   "/p/seidensticker/hose-2.jpg",
+   "/p/seidensticker/hose-3.jpg",
+   "/p/seidensticker/hose-4.jpg",
+   "/p/seidensticker/hose-5.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Grau",
+    "hex": "#8b8e93"
+   }
+  ],
+  "sizes": [
+   "XXS",
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL"
+  ],
+  "specs": {
+   "Passform": "Oversized",
+   "Pflege": "Nicht waschen, chemische Reinigung (Perchlorethylen, Kiloreinigung möglich), Bügeln bei geringer Temperatur, nicht im Trockner, nicht bleichen",
+   "Artikelnummer Hersteller": "01.852485-0033"
+  },
+  "tags": [
+   "Hosen",
+   "Business",
+   "Anzug",
+   "Herren"
+  ]
  }
 ]

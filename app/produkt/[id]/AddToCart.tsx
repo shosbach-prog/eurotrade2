@@ -120,7 +120,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy }: { p: Publ
         </>}
 
         {p.colors.length > 0 && <>
-          <div className="opt">Farbe: <span className="muted">{cname}</span> <span className="muted" style={{ fontWeight: 400 }}>({p.colors.length} Farben)</span></div>
+          <div className="opt">Farbe: <span className="muted">{cname}</span> <span className="muted" style={{ fontWeight: 400 }}>({p.colors.length} {p.colors.length === 1 ? 'Farbe' : 'Farben'})</span></div>
           <div className="swatches">
             {p.colors.map((c) => (
               <button key={c.name} data-name={c.name} aria-label={c.name} className={`sw ${c.name === cname ? 'on' : ''}`} style={{ background: swatchBg(c) }} onClick={() => setColor(c)}>

@@ -64,7 +64,8 @@ export async function POST(req: Request) {
   saveInquiry(inq); // immer lokal sichern (auch wenn Mail ausfällt)
 
   const base = shopUrl();
-  const imgOf = new Map(raw.map(({ p }) => [p.id, p.images[0] ?? '']));
+  const abs = (u?: string) => (u && u.startsWith('/') ? `${base}${u}` : u ?? '');
+  const imgOf = new Map(raw.map(({ p }) => [p.id, abs(p.images[0])]));
   const mlines: MailLine[] = lines.map((l) => ({ sku: l.sku, name: l.name, color: l.color, size: l.size, qty: l.qty, price: l.price, sum: l.sum, deco: l.deco ? decoLabel(l.deco) : undefined, note: l.deco?.note || undefined, image: imgOf.get(l.id!) ?? '' }));
   const pieces = lines.reduce((s, l) => s + l.qty, 0);
   const hasDeco = lines.some((l) => l.deco);
