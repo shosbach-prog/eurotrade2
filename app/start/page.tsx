@@ -10,6 +10,8 @@ import { categoryTiles, getCategories, getFeatured } from '@/lib/catalog';
 import CategoryTiles from '@/components/CategoryTiles';
 import QuoteForm from './QuoteForm';
 import StartForms from './StartForms';
+import BrandStrip from '@/components/BrandStrip';
+import { brandList } from '@/lib/brand-catalog';
 import { ZIELGRUPPEN } from '@/lib/zielgruppen';
 import ProductCard from '@/components/ProductCard';
 import { previewMode } from '@/lib/access';
@@ -21,8 +23,6 @@ export const metadata: Metadata = {
   description: 'Markentextilien für Vereine, Unternehmen und Handwerk – bedruckt oder bestickt, schon ab 1 Stück. Persönlicher Shop mit Ihren Konditionen, Angebot in 24 Stunden.',
   alternates: { canonical: '/' },
 };
-
-const BRANDS = ['Asquith & Fox', 'B&C', 'Beechfield', 'Daiber', 'HRM', 'Mantis', 'Marvelis', 'Result', 'Tee Jays', 'TriDri®', 'Onna by Premier', 'ARTG'];
 
 export default function Start() {
   const refs = listReferences();
@@ -78,7 +78,7 @@ export default function Start() {
         <section className="l-section">
           <h2>Sortiment</h2>
           <CategoryTiles tiles={tiles} link={!previewMode()} />
-          <p className="muted" style={{ marginTop: 14 }}>Marken u. a.: {BRANDS.join(' · ')}</p>
+          <div style={{ marginTop: 18 }}><BrandStrip brands={brandList()} link={!previewMode()} /></div>
         </section>
       )}
 

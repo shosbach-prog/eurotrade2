@@ -8,6 +8,8 @@ import { swatchBg } from '@/lib/colors';
 import { WishButton } from '@/components/Wishlist';
 import Info from '@/components/Info';
 import Stars from '@/components/Stars';
+import BrandLogo from '@/components/BrandLogo';
+import { brandSlug, findBrand } from '@/lib/brands';
 import { FONTS, METHODS, MOTIFS, positionsFor, TEXT_COLORS, colorHex, fontCss, isImage, type Deco, type Motif } from '@/lib/deco';
 import DecoStudio, { defaultPlace, type Place } from '@/components/DecoStudio';
 import { cmFor, spotsFor } from '@/lib/deco-layout';
@@ -17,7 +19,7 @@ import { calcDeco, type DecoPricing } from '@/lib/deco-pricing';
 type Logo = { id: string; name: string };
 
 type PText = { headline: string; intro: string; highlights: string[]; idealFor: string };
-export default function AddToCart({ p, customerLogo, delivery, copy, pricing }: { p: PublicProduct; customerLogo?: Logo | null; delivery?: string; copy?: PText; pricing?: DecoPricing | null }) {
+export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fits }: { p: PublicProduct; fits?: Record<string, [number, number, number, number, number]>; customerLogo?: Logo | null; delivery?: string; copy?: PText; pricing?: DecoPricing | null }) {
   const { addMany } = useCart();
   const [color, setColor] = useState(p.colors[0]);
   // Mengen je Farbe + Größe ("Black|M" -> 5) – mehrere Farben in einem Schritt möglich
@@ -101,7 +103,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing }: 
       <small>{total > 0 ? `bei ${total} Stück, ${est.lines.map((l) => `${l.pos} ca. ${l.cm} cm`).join(', ')} · netto · ` : 'Menge wählen – ab mehr Stück wird es günstiger · netto · '}verbindlich im Angebot</small>
     </div>
   );
-  const studioProps = { product: p, colorHex: color?.hex, photo: color?.image ?? null, positions, active: activePos, setActive: setActivePos, place, setPlace, logoSrc: useLogo && logo && isImage(logo.name) ? `/api/upload/${logo.id}` : null, text: useText ? text : '', font, textColor: tColor, method };
+  const studioProps = { product: p, colorHex: color?.hex, photo: color?.image ?? null, fit: color?.image ? fits?.[color.image] ?? null : null, positions, active: activePos, setActive: setActivePos, place, setPlace, logoSrc: useLogo && logo && isImage(logo.name) ? `/api/upload/${logo.id}` : null, text: useText ? text : '', font, textColor: tColor, method };
   const textStyle = { fontFamily: fontCss(font), color: colorHex(tColor) };
 
   return (
@@ -119,7 +121,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing }: 
         </>}
       </div>
       <div>
-        <div className="muted" style={{ textTransform: 'uppercase', fontSize: 13, letterSpacing: '.4px' }}>{p.brand} · Art.-Nr. {p.sku}</div>
+        <div className="pd-brand">{findBrand(p.brand) ? <a href={`/marken/${brandSlug(findBrand(p.brand)!)}`} title={`Alle Artikel von ${p.brand}`}><BrandLogo name={p.brand} h={30} /></a> : <span>{p.brand}</span>}<span className="muted">Art.-Nr. {p.sku}</span></div>
         <h1 style={{ margin: '4px 0 0' }}>{p.name}</h1>
         {p.rating && <a href="#bewertungen" className="pd-rating"><Stars value={p.rating.avg} size={16} showValue count={p.rating.count} /></a>}
         {p.locked ? (

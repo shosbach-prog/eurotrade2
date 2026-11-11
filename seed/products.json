@@ -2382,17 +2382,10 @@
   "basePrice": null,
   "images": [
    "/p/bc/BCPM430/front.jpg",
-   "/p/bc/BCPM430/back.jpg"
+   "/p/bc/BCPM430/back.jpg",
+   "/p/bc/BCPM430/3-side.jpg"
   ],
   "colors": [
-   {
-    "name": "3_Side",
-    "hex": "#292728",
-    "image": "/p/bc/BCPM430/3-side.jpg",
-    "images": [
-     "/p/bc/BCPM430/3-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#312f30",
@@ -2586,17 +2579,10 @@
   "basePrice": null,
   "images": [
    "/p/bc/BCPU424/front.jpg",
-   "/p/bc/BCPU424/back.jpg"
+   "/p/bc/BCPU424/back.jpg",
+   "/p/bc/BCPU424/3-side.jpg"
   ],
   "colors": [
-   {
-    "name": "3_Side",
-    "hex": "#8e8e8e",
-    "image": "/p/bc/BCPU424/3-side.jpg",
-    "images": [
-     "/p/bc/BCPU424/3-side.jpg"
-    ]
-   },
    {
     "name": "Apple Green",
     "hex": "#74b865",
@@ -2871,17 +2857,10 @@
   "basePrice": null,
   "images": [
    "/p/bc/BCPU425/front.jpg",
-   "/p/bc/BCPU425/back.jpg"
+   "/p/bc/BCPU425/back.jpg",
+   "/p/bc/BCPU425/3-side.jpg"
   ],
   "colors": [
-   {
-    "name": "3_Side",
-    "hex": "#615e51",
-    "image": "/p/bc/BCPU425/3-side.jpg",
-    "images": [
-     "/p/bc/BCPU425/3-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#242424",
@@ -3036,17 +3015,10 @@
   "basePrice": null,
   "images": [
    "/p/bc/BCPU426/front.jpg",
-   "/p/bc/BCPU426/back.jpg"
+   "/p/bc/BCPU426/back.jpg",
+   "/p/bc/BCPU426/3-side.jpg"
   ],
   "colors": [
-   {
-    "name": "3_Side",
-    "hex": "#d6805d",
-    "image": "/p/bc/BCPU426/3-side.jpg",
-    "images": [
-     "/p/bc/BCPU426/3-side.jpg"
-    ]
-   },
    {
     "name": "Amalfi Blue",
     "hex": "#93a6b4",
@@ -3321,17 +3293,10 @@
   "basePrice": null,
   "images": [
    "/p/bc/BCPU427/front.jpg",
-   "/p/bc/BCPU427/back.jpg"
+   "/p/bc/BCPU427/back.jpg",
+   "/p/bc/BCPU427/3-side.jpg"
   ],
   "colors": [
-   {
-    "name": "3_Side",
-    "hex": "#443a38",
-    "image": "/p/bc/BCPU427/3-side.jpg",
-    "images": [
-     "/p/bc/BCPU427/3-side.jpg"
-    ]
-   },
    {
     "name": "Amalfi Blue",
     "hex": "#91a4b3",
@@ -3486,17 +3451,10 @@
   "basePrice": null,
   "images": [
    "/p/bc/BCPU428/front.jpg",
-   "/p/bc/BCPU428/back.jpg"
+   "/p/bc/BCPU428/back.jpg",
+   "/p/bc/BCPU428/3-side.jpg"
   ],
   "colors": [
-   {
-    "name": "3_Side",
-    "hex": "#1d1d1d",
-    "image": "/p/bc/BCPU428/3-side.jpg",
-    "images": [
-     "/p/bc/BCPU428/3-side.jpg"
-    ]
-   },
    {
     "name": "Acid Lime",
     "hex": "#d6fb61",
@@ -4108,17 +4066,10 @@
   "basePrice": null,
   "images": [
    "/p/bc/BCPW440/front.jpg",
-   "/p/bc/BCPW440/back.jpg"
+   "/p/bc/BCPW440/back.jpg",
+   "/p/bc/BCPW440/3-side.jpg"
   ],
   "colors": [
-   {
-    "name": "3_Side",
-    "hex": "#2e2c2d",
-    "image": "/p/bc/BCPW440/3-side.jpg",
-    "images": [
-     "/p/bc/BCPW440/3-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#383637",
@@ -4312,17 +4263,10 @@
   "basePrice": null,
   "images": [
    "/p/bc/BCPW461/front.jpg",
-   "/p/bc/BCPW461/back.jpg"
+   "/p/bc/BCPW461/back.jpg",
+   "/p/bc/BCPW461/3-side.jpg"
   ],
   "colors": [
-   {
-    "name": "3_Side",
-    "hex": "#dde9e2",
-    "image": "/p/bc/BCPW461/3-side.jpg",
-    "images": [
-     "/p/bc/BCPW461/3-side.jpg"
-    ]
-   },
    {
     "name": "Apple Green",
     "hex": "#71ae60",
@@ -4596,17 +4540,10 @@
   "basePrice": null,
   "images": [
    "/p/bc/BCPW462/front.jpg",
-   "/p/bc/BCPW462/back.jpg"
+   "/p/bc/BCPW462/back.jpg",
+   "/p/bc/BCPW462/3-side.jpg"
   ],
   "colors": [
-   {
-    "name": "3_Side",
-    "hex": "#353b39",
-    "image": "/p/bc/BCPW462/3-side.jpg",
-    "images": [
-     "/p/bc/BCPW462/3-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1e1e1e",
@@ -4760,17 +4697,10 @@
   "basePrice": null,
   "images": [
    "/p/bc/BCPW463/front.jpg",
-   "/p/bc/BCPW463/back.jpg"
+   "/p/bc/BCPW463/back.jpg",
+   "/p/bc/BCPW463/3-side.jpg"
   ],
   "colors": [
-   {
-    "name": "3_Side",
-    "hex": "#95a0bc",
-    "image": "/p/bc/BCPW463/3-side.jpg",
-    "images": [
-     "/p/bc/BCPW463/3-side.jpg"
-    ]
-   },
    {
     "name": "Amalfi Blue",
     "hex": "#8fa2b0",
@@ -5044,25 +4974,11 @@
   "basePrice": null,
   "images": [
    "/p/bc/BCPW464/front.jpg",
-   "/p/bc/BCPW464/back.jpg"
+   "/p/bc/BCPW464/back.jpg",
+   "/p/bc/BCPW464/3-side.jpg",
+   "/p/bc/BCPW464/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "3_Side",
-    "hex": "#92a5b4",
-    "image": "/p/bc/BCPW464/3-side.jpg",
-    "images": [
-     "/p/bc/BCPW464/3-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#8aa7b5",
-    "image": "/p/bc/BCPW464/5-detail.jpg",
-    "images": [
-     "/p/bc/BCPW464/5-detail.jpg"
-    ]
-   },
    {
     "name": "Amalfi Blue",
     "hex": "#93a6b4",
@@ -5216,17 +5132,10 @@
   "basePrice": null,
   "images": [
    "/p/bc/BCPW465/front.jpg",
-   "/p/bc/BCPW465/back.jpg"
+   "/p/bc/BCPW465/back.jpg",
+   "/p/bc/BCPW465/3-side.jpg"
   ],
   "colors": [
-   {
-    "name": "3_Side",
-    "hex": "#b31b2f",
-    "image": "/p/bc/BCPW465/3-side.jpg",
-    "images": [
-     "/p/bc/BCPW465/3-side.jpg"
-    ]
-   },
    {
     "name": "Acid Lime",
     "hex": "#c6d256",
@@ -5615,17 +5524,10 @@
   "basePrice": null,
   "images": [
    "/p/bc/BCPWI13/front.jpg",
-   "/p/bc/BCPWI13/back.jpg"
+   "/p/bc/BCPWI13/back.jpg",
+   "/p/bc/BCPWI13/3-side.jpg"
   ],
   "colors": [
-   {
-    "name": "3_Side",
-    "hex": "#333132",
-    "image": "/p/bc/BCPWI13/3-side.jpg",
-    "images": [
-     "/p/bc/BCPWI13/3-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#393738",
@@ -7171,17 +7073,10 @@
   "basePrice": null,
   "images": [
    "/p/bc/BCTM048/front.jpg",
-   "/p/bc/BCTM048/back.jpg"
+   "/p/bc/BCTM048/back.jpg",
+   "/p/bc/BCTM048/3-side.jpg"
   ],
   "colors": [
-   {
-    "name": "3_Side",
-    "hex": "#302e2f",
-    "image": "/p/bc/BCTM048/3-side.jpg",
-    "images": [
-     "/p/bc/BCTM048/3-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#2c2a2b",
@@ -7522,17 +7417,10 @@
   "basePrice": null,
   "images": [
    "/p/bc/BCTM070/front.jpg",
-   "/p/bc/BCTM070/back.jpg"
+   "/p/bc/BCTM070/back.jpg",
+   "/p/bc/BCTM070/3-side.jpg"
   ],
   "colors": [
-   {
-    "name": "3_Side",
-    "hex": "#2e2c2d",
-    "image": "/p/bc/BCTM070/3-side.jpg",
-    "images": [
-     "/p/bc/BCTM070/3-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#2e2c2d",
@@ -8305,17 +8193,10 @@
   "basePrice": null,
   "images": [
    "/p/bc/BCTU01T/front.jpg",
-   "/p/bc/BCTU01T/back.jpg"
+   "/p/bc/BCTU01T/back.jpg",
+   "/p/bc/BCTU01T/3-side.jpg"
   ],
   "colors": [
-   {
-    "name": "3_Side",
-    "hex": "#2f2d2e",
-    "image": "/p/bc/BCTU01T/3-side.jpg",
-    "images": [
-     "/p/bc/BCTU01T/3-side.jpg"
-    ]
-   },
    {
     "name": "Apricot",
     "hex": "#f6a301",
@@ -8730,17 +8611,10 @@
   "basePrice": null,
   "images": [
    "/p/bc/BCTU03T/front.jpg",
-   "/p/bc/BCTU03T/back.jpg"
+   "/p/bc/BCTU03T/back.jpg",
+   "/p/bc/BCTU03T/3-side.jpg"
   ],
   "colors": [
-   {
-    "name": "3_Side",
-    "hex": "#0992c0",
-    "image": "/p/bc/BCTU03T/3-side.jpg",
-    "images": [
-     "/p/bc/BCTU03T/3-side.jpg"
-    ]
-   },
    {
     "name": "Apricot",
     "hex": "#f7a708",
@@ -9095,17 +8969,10 @@
   "basePrice": null,
   "images": [
    "/p/bc/BCTU05T/front.jpg",
-   "/p/bc/BCTU05T/back.jpg"
+   "/p/bc/BCTU05T/back.jpg",
+   "/p/bc/BCTU05T/3-side.jpg"
   ],
   "colors": [
-   {
-    "name": "3_Side",
-    "hex": "#56563c",
-    "image": "/p/bc/BCTU05T/3-side.jpg",
-    "images": [
-     "/p/bc/BCTU05T/3-side.jpg"
-    ]
-   },
    {
     "name": "Bear Brown",
     "hex": "#534948",
@@ -9725,17 +9592,10 @@
   "basePrice": null,
   "images": [
    "/p/bc/BCTW02T/front.jpg",
-   "/p/bc/BCTW02T/back.jpg"
+   "/p/bc/BCTW02T/back.jpg",
+   "/p/bc/BCTW02T/3-side.jpg"
   ],
   "colors": [
-   {
-    "name": "3_Side",
-    "hex": "#4a484b",
-    "image": "/p/bc/BCTW02T/3-side.jpg",
-    "images": [
-     "/p/bc/BCTW02T/3-side.jpg"
-    ]
-   },
    {
     "name": "Apricot",
     "hex": "#f6a301",
@@ -10097,17 +9957,10 @@
   "basePrice": null,
   "images": [
    "/p/bc/BCTW043/front.jpg",
-   "/p/bc/BCTW043/back.jpg"
+   "/p/bc/BCTW043/back.jpg",
+   "/p/bc/BCTW043/3-side.jpg"
   ],
   "colors": [
-   {
-    "name": "3_Side",
-    "hex": "#61645d",
-    "image": "/p/bc/BCTW043/3-side.jpg",
-    "images": [
-     "/p/bc/BCTW043/3-side.jpg"
-    ]
-   },
    {
     "name": "Atoll",
     "hex": "#0088b7",
@@ -10368,17 +10221,10 @@
   "basePrice": null,
   "images": [
    "/p/bc/BCTW049/front.jpg",
-   "/p/bc/BCTW049/back.jpg"
+   "/p/bc/BCTW049/back.jpg",
+   "/p/bc/BCTW049/3-side.jpg"
   ],
   "colors": [
-   {
-    "name": "3_Side",
-    "hex": "#4b4a50",
-    "image": "/p/bc/BCTW049/3-side.jpg",
-    "images": [
-     "/p/bc/BCTW049/3-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#373536",
@@ -10476,17 +10322,10 @@
   "basePrice": null,
   "images": [
    "/p/bc/BCTW04T/front.jpg",
-   "/p/bc/BCTW04T/back.jpg"
+   "/p/bc/BCTW04T/back.jpg",
+   "/p/bc/BCTW04T/3-side.jpg"
   ],
   "colors": [
-   {
-    "name": "3_Side",
-    "hex": "#373536",
-    "image": "/p/bc/BCTW04T/3-side.jpg",
-    "images": [
-     "/p/bc/BCTW04T/3-side.jpg"
-    ]
-   },
    {
     "name": "Apricot",
     "hex": "#f7a705",
@@ -11082,17 +10921,10 @@
   "basePrice": null,
   "images": [
    "/p/bc/BCTW06T/front.jpg",
-   "/p/bc/BCTW06T/back.jpg"
+   "/p/bc/BCTW06T/back.jpg",
+   "/p/bc/BCTW06T/3-side.jpg"
   ],
   "colors": [
-   {
-    "name": "3_Side",
-    "hex": "#d9bcae",
-    "image": "/p/bc/BCTW06T/3-side.jpg",
-    "images": [
-     "/p/bc/BCTW06T/3-side.jpg"
-    ]
-   },
    {
     "name": "Bear Brown",
     "hex": "#4e4e4e",
@@ -11222,17 +11054,10 @@
   "basePrice": null,
   "images": [
    "/p/bc/BCTW071/front.jpg",
-   "/p/bc/BCTW071/back.jpg"
+   "/p/bc/BCTW071/back.jpg",
+   "/p/bc/BCTW071/3-side.jpg"
   ],
   "colors": [
-   {
-    "name": "3_Side",
-    "hex": "#312f30",
-    "image": "/p/bc/BCTW071/3-side.jpg",
-    "images": [
-     "/p/bc/BCTW071/3-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#2f2d2e",
@@ -12502,17 +12327,10 @@
   "gender": "Kinder",
   "basePrice": null,
   "images": [
-   "/p/bc/BCWK001/front.jpg"
+   "/p/bc/BCWK001/front.jpg",
+   "/p/bc/BCWK001/2-bacl.jpg"
   ],
   "colors": [
-   {
-    "name": "2_Bacl",
-    "hex": "#bbb9ba",
-    "image": "/p/bc/BCWK001/2-bacl.jpg",
-    "images": [
-     "/p/bc/BCWK001/2-bacl.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#282627",
@@ -12798,17 +12616,10 @@
   "gender": "Kinder",
   "basePrice": null,
   "images": [
-   "/p/bc/BCWK680/front.jpg"
+   "/p/bc/BCWK680/front.jpg",
+   "/p/bc/BCWK680/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "5_Detail",
-    "hex": "#30629e",
-    "image": "/p/bc/BCWK680/5-detail.jpg",
-    "images": [
-     "/p/bc/BCWK680/5-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#181816",
@@ -17749,17 +17560,10 @@
   "images": [
    "/p/bc/BCJM951/front.jpg",
    "/p/bc/BCJM951/back.jpg",
-   "/p/bc/BCJM951/side.jpg"
+   "/p/bc/BCJM951/side.jpg",
+   "/p/bc/BCJM951/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "5_Detail",
-    "hex": "#232937",
-    "image": "/p/bc/BCJM951/5-detail.jpg",
-    "images": [
-     "/p/bc/BCJM951/5-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#2c2a2b",
@@ -19322,17 +19126,10 @@
   "images": [
    "/p/bc/BCJW938/front.jpg",
    "/p/bc/BCJW938/back.jpg",
-   "/p/bc/BCJW938/side.jpg"
+   "/p/bc/BCJW938/side.jpg",
+   "/p/bc/BCJW938/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "5_Detail",
-    "hex": "#efeeec",
-    "image": "/p/bc/BCJW938/5-detail.jpg",
-    "images": [
-     "/p/bc/BCJW938/5-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#292b2a",
@@ -19895,17 +19692,10 @@
   "basePrice": null,
   "images": [
    "/p/byb/BY003/front.jpg",
-   "/p/byb/BY003/back.jpg"
+   "/p/byb/BY003/back.jpg",
+   "/p/byb/BY003/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "5_Detail",
-    "hex": "#b8b8b8",
-    "image": "/p/byb/BY003/5-detail.jpg",
-    "images": [
-     "/p/byb/BY003/5-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1d1d1d",
@@ -19973,33 +19763,12 @@
   "images": [
    "/p/byb/BY004/front.jpg",
    "/p/byb/BY004/back.jpg",
-   "/p/byb/BY004/side.jpg"
+   "/p/byb/BY004/side.jpg",
+   "/p/byb/BY004/4-side.jpg",
+   "/p/byb/BY004/5-detail.jpg",
+   "/p/byb/BY004/6-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#871725",
-    "image": "/p/byb/BY004/4-side.jpg",
-    "images": [
-     "/p/byb/BY004/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#a6223b",
-    "image": "/p/byb/BY004/5-detail.jpg",
-    "images": [
-     "/p/byb/BY004/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "6_Detail",
-    "hex": "#a9273f",
-    "image": "/p/byb/BY004/6-detail.jpg",
-    "images": [
-     "/p/byb/BY004/6-detail.jpg"
-    ]
-   },
    {
     "name": "Baltic Blue",
     "hex": "#8ac9e3",
@@ -20355,17 +20124,10 @@
   "images": [
    "/p/byb/BY007/front.jpg",
    "/p/byb/BY007/back.jpg",
-   "/p/byb/BY007/side.jpg"
+   "/p/byb/BY007/side.jpg",
+   "/p/byb/BY007/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#222220",
-    "image": "/p/byb/BY007/4-side.jpg",
-    "images": [
-     "/p/byb/BY007/4-side.jpg"
-    ]
-   },
    {
     "name": "Black_Charcoal (Heather)",
     "hex": "#292928",
@@ -20425,17 +20187,10 @@
   "images": [
    "/p/byb/BY008/front.jpg",
    "/p/byb/BY008/back.jpg",
-   "/p/byb/BY008/side.jpg"
+   "/p/byb/BY008/side.jpg",
+   "/p/byb/BY008/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "5_Detail",
-    "hex": "#aeaeae",
-    "image": "/p/byb/BY008/5-detail.jpg",
-    "images": [
-     "/p/byb/BY008/5-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#222222",
@@ -20494,17 +20249,10 @@
   "basePrice": null,
   "images": [
    "/p/byb/BY009/front.jpg",
-   "/p/byb/BY009/back.jpg"
+   "/p/byb/BY009/back.jpg",
+   "/p/byb/BY009/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "5_Detail",
-    "hex": "#202020",
-    "image": "/p/byb/BY009/5-detail.jpg",
-    "images": [
-     "/p/byb/BY009/5-detail.jpg"
-    ]
-   },
    {
     "name": "Black_White",
     "hex": "#212121",
@@ -20556,25 +20304,11 @@
   "images": [
    "/p/byb/BY010/front.jpg",
    "/p/byb/BY010/back.jpg",
-   "/p/byb/BY010/side.jpg"
+   "/p/byb/BY010/side.jpg",
+   "/p/byb/BY010/4-side.jpg",
+   "/p/byb/BY010/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#9b9d9b",
-    "image": "/p/byb/BY010/4-side.jpg",
-    "images": [
-     "/p/byb/BY010/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#a3a3a3",
-    "image": "/p/byb/BY010/5-detail.jpg",
-    "images": [
-     "/p/byb/BY010/5-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#212121",
@@ -20617,25 +20351,11 @@
   "basePrice": null,
   "images": [
    "/p/byb/BY011/front.jpg",
-   "/p/byb/BY011/back.jpg"
+   "/p/byb/BY011/back.jpg",
+   "/p/byb/BY011/4-side.jpg",
+   "/p/byb/BY011/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#3b3b3b",
-    "image": "/p/byb/BY011/4-side.jpg",
-    "images": [
-     "/p/byb/BY011/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#373737",
-    "image": "/p/byb/BY011/5-detail.jpg",
-    "images": [
-     "/p/byb/BY011/5-detail.jpg"
-    ]
-   },
    {
     "name": "Bark",
     "hex": "#865142",
@@ -20919,33 +20639,12 @@
   "images": [
    "/p/byb/BY012/front.jpg",
    "/p/byb/BY012/back.jpg",
-   "/p/byb/BY012/side.jpg"
+   "/p/byb/BY012/side.jpg",
+   "/p/byb/BY012/4-side.jpg",
+   "/p/byb/BY012/5-detail.jpg",
+   "/p/byb/BY012/6-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#3b3b3b",
-    "image": "/p/byb/BY012/4-side.jpg",
-    "images": [
-     "/p/byb/BY012/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#383838",
-    "image": "/p/byb/BY012/5-detail.jpg",
-    "images": [
-     "/p/byb/BY012/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "6_Detail",
-    "hex": "#393736",
-    "image": "/p/byb/BY012/6-detail.jpg",
-    "images": [
-     "/p/byb/BY012/6-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1f1f1f",
@@ -21069,18 +20768,10 @@
   "images": [
    "/p/byb/BY013/front.jpg",
    "/p/byb/BY013/back.jpg",
-   "/p/byb/BY013/side.jpg"
+   "/p/byb/BY013/side.jpg",
+   "/p/byb/BY013/5-detail.jpg"
   ],
-  "colors": [
-   {
-    "name": "5_Detail",
-    "hex": "#acacac",
-    "image": "/p/byb/BY013/5-detail.jpg",
-    "images": [
-     "/p/byb/BY013/5-detail.jpg"
-    ]
-   }
-  ],
+  "colors": [],
   "sizes": [
    "XS",
    "S",
@@ -21114,25 +20805,11 @@
   "basePrice": null,
   "images": [
    "/p/byb/BY014/front.jpg",
-   "/p/byb/BY014/back.jpg"
+   "/p/byb/BY014/back.jpg",
+   "/p/byb/BY014/4-side.jpg",
+   "/p/byb/BY014/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#bbb9b7",
-    "image": "/p/byb/BY014/4-side.jpg",
-    "images": [
-     "/p/byb/BY014/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#adadad",
-    "image": "/p/byb/BY014/5-detail.jpg",
-    "images": [
-     "/p/byb/BY014/5-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#141414",
@@ -21183,25 +20860,11 @@
   "basePrice": null,
   "images": [
    "/p/byb/BY015/front.jpg",
-   "/p/byb/BY015/back.jpg"
+   "/p/byb/BY015/back.jpg",
+   "/p/byb/BY015/4-side.jpg",
+   "/p/byb/BY015/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#dcdcdc",
-    "image": "/p/byb/BY015/4-side.jpg",
-    "images": [
-     "/p/byb/BY015/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#1c1c1c",
-    "image": "/p/byb/BY015/5-detail.jpg",
-    "images": [
-     "/p/byb/BY015/5-detail.jpg"
-    ]
-   },
    {
     "name": "Black_Red",
     "hex": "#1f1f1f",
@@ -21253,25 +20916,11 @@
   "images": [
    "/p/byb/BY016/front.jpg",
    "/p/byb/BY016/back.jpg",
-   "/p/byb/BY016/side.jpg"
+   "/p/byb/BY016/side.jpg",
+   "/p/byb/BY016/4-side.jpg",
+   "/p/byb/BY016/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#272727",
-    "image": "/p/byb/BY016/4-side.jpg",
-    "images": [
-     "/p/byb/BY016/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#2a2a2a",
-    "image": "/p/byb/BY016/5-detail.jpg",
-    "images": [
-     "/p/byb/BY016/5-detail.jpg"
-    ]
-   },
    {
     "name": "Black_Black",
     "hex": "#2d2d2d",
@@ -21632,17 +21281,10 @@
   "images": [
    "/p/byb/BY026/front.jpg",
    "/p/byb/BY026/back.jpg",
-   "/p/byb/BY026/side.jpg"
+   "/p/byb/BY026/side.jpg",
+   "/p/byb/BY026/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "5_Detail",
-    "hex": "#353535",
-    "image": "/p/byb/BY026/5-detail.jpg",
-    "images": [
-     "/p/byb/BY026/5-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1c1c1c",
@@ -21685,17 +21327,10 @@
   "images": [
    "/p/byb/BY027/front.jpg",
    "/p/byb/BY027/back.jpg",
-   "/p/byb/BY027/side.jpg"
+   "/p/byb/BY027/side.jpg",
+   "/p/byb/BY027/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "5_Detail",
-    "hex": "#1b1b1b",
-    "image": "/p/byb/BY027/5-detail.jpg",
-    "images": [
-     "/p/byb/BY027/5-detail.jpg"
-    ]
-   },
    {
     "name": "Black_White",
     "hex": "#1d1d1d",
@@ -21738,25 +21373,11 @@
   "images": [
    "/p/byb/BY028/front.jpg",
    "/p/byb/BY028/back.jpg",
-   "/p/byb/BY028/side.jpg"
+   "/p/byb/BY028/side.jpg",
+   "/p/byb/BY028/4-side.jpg",
+   "/p/byb/BY028/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#aca7a3",
-    "image": "/p/byb/BY028/4-side.jpg",
-    "images": [
-     "/p/byb/BY028/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#bcbcbc",
-    "image": "/p/byb/BY028/5-detail.jpg",
-    "images": [
-     "/p/byb/BY028/5-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#211d1e",
@@ -21832,17 +21453,10 @@
   "images": [
    "/p/byb/BY030/front.jpg",
    "/p/byb/BY030/back.jpg",
-   "/p/byb/BY030/side.jpg"
+   "/p/byb/BY030/side.jpg",
+   "/p/byb/BY030/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "5_Detail",
-    "hex": "#2b2b2b",
-    "image": "/p/byb/BY030/5-detail.jpg",
-    "images": [
-     "/p/byb/BY030/5-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#2f2f2f",
@@ -21886,17 +21500,10 @@
   "images": [
    "/p/byb/BY031/front.jpg",
    "/p/byb/BY031/back.jpg",
-   "/p/byb/BY031/side.jpg"
+   "/p/byb/BY031/side.jpg",
+   "/p/byb/BY031/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "5_Detail",
-    "hex": "#757575",
-    "image": "/p/byb/BY031/5-detail.jpg",
-    "images": [
-     "/p/byb/BY031/5-detail.jpg"
-    ]
-   },
    {
     "name": "Black Red",
     "hex": "#5b1a23",
@@ -21940,17 +21547,10 @@
   "images": [
    "/p/byb/BY035/front.jpg",
    "/p/byb/BY035/back.jpg",
-   "/p/byb/BY035/side.jpg"
+   "/p/byb/BY035/side.jpg",
+   "/p/byb/BY035/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#191917",
-    "image": "/p/byb/BY035/4-side.jpg",
-    "images": [
-     "/p/byb/BY035/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#191919",
@@ -21993,25 +21593,11 @@
   "images": [
    "/p/byb/BY036/front.jpg",
    "/p/byb/BY036/back.jpg",
-   "/p/byb/BY036/side.jpg"
+   "/p/byb/BY036/side.jpg",
+   "/p/byb/BY036/4-side.jpg",
+   "/p/byb/BY036/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#dfdde1",
-    "image": "/p/byb/BY036/4-side.jpg",
-    "images": [
-     "/p/byb/BY036/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#f0f0f0",
-    "image": "/p/byb/BY036/5-detail.jpg",
-    "images": [
-     "/p/byb/BY036/5-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#181818",
@@ -22118,25 +21704,11 @@
   "images": [
    "/p/byb/BY037/front.jpg",
    "/p/byb/BY037/back.jpg",
-   "/p/byb/BY037/side.jpg"
+   "/p/byb/BY037/side.jpg",
+   "/p/byb/BY037/4-side.jpg",
+   "/p/byb/BY037/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#b5b5b5",
-    "image": "/p/byb/BY037/4-side.jpg",
-    "images": [
-     "/p/byb/BY037/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#b6b6b6",
-    "image": "/p/byb/BY037/5-detail.jpg",
-    "images": [
-     "/p/byb/BY037/5-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1a1a1a",
@@ -22214,18 +21786,10 @@
   "images": [
    "/p/byb/BY039/front.jpg",
    "/p/byb/BY039/back.jpg",
-   "/p/byb/BY039/side.jpg"
+   "/p/byb/BY039/side.jpg",
+   "/p/byb/BY039/4-side.jpg"
   ],
-  "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#dddbde",
-    "image": "/p/byb/BY039/4-side.jpg",
-    "images": [
-     "/p/byb/BY039/4-side.jpg"
-    ]
-   }
-  ],
+  "colors": [],
   "sizes": [
    "XS",
    "S",
@@ -22259,26 +21823,11 @@
   "images": [
    "/p/byb/BY040/front.jpg",
    "/p/byb/BY040/back.jpg",
-   "/p/byb/BY040/side.jpg"
+   "/p/byb/BY040/side.jpg",
+   "/p/byb/BY040/4-side.jpg",
+   "/p/byb/BY040/5-detail.jpg"
   ],
-  "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#0f0f0d",
-    "image": "/p/byb/BY040/4-side.jpg",
-    "images": [
-     "/p/byb/BY040/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#141414",
-    "image": "/p/byb/BY040/5-detail.jpg",
-    "images": [
-     "/p/byb/BY040/5-detail.jpg"
-    ]
-   }
-  ],
+  "colors": [],
   "sizes": [
    "XS",
    "S",
@@ -22312,25 +21861,11 @@
   "images": [
    "/p/byb/BY042/front.jpg",
    "/p/byb/BY042/back.jpg",
-   "/p/byb/BY042/side.jpg"
+   "/p/byb/BY042/side.jpg",
+   "/p/byb/BY042/4-side.jpg",
+   "/p/byb/BY042/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#1e1e1d",
-    "image": "/p/byb/BY042/4-side.jpg",
-    "images": [
-     "/p/byb/BY042/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#0f0f0f",
-    "image": "/p/byb/BY042/5-detail.jpg",
-    "images": [
-     "/p/byb/BY042/5-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#151515",
@@ -22437,17 +21972,10 @@
   "images": [
    "/p/byb/BY044/front.jpg",
    "/p/byb/BY044/back.jpg",
-   "/p/byb/BY044/side.jpg"
+   "/p/byb/BY044/side.jpg",
+   "/p/byb/BY044/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "5_Detail",
-    "hex": "#55513d",
-    "image": "/p/byb/BY044/5-detail.jpg",
-    "images": [
-     "/p/byb/BY044/5-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#2e2e2e",
@@ -22498,25 +22026,11 @@
   "images": [
    "/p/byb/BY045/front.jpg",
    "/p/byb/BY045/back.jpg",
-   "/p/byb/BY045/side.jpg"
+   "/p/byb/BY045/side.jpg",
+   "/p/byb/BY045/4-side.jpg",
+   "/p/byb/BY045/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#252525",
-    "image": "/p/byb/BY045/4-side.jpg",
-    "images": [
-     "/p/byb/BY045/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#252525",
-    "image": "/p/byb/BY045/5-detail.jpg",
-    "images": [
-     "/p/byb/BY045/5-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#282828",
@@ -22559,25 +22073,11 @@
   "basePrice": null,
   "images": [
    "/p/byb/BY046/front.jpg",
-   "/p/byb/BY046/back.jpg"
+   "/p/byb/BY046/back.jpg",
+   "/p/byb/BY046/5-detail.jpg",
+   "/p/byb/BY046/6-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "5_Detail",
-    "hex": "#262626",
-    "image": "/p/byb/BY046/5-detail.jpg",
-    "images": [
-     "/p/byb/BY046/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "6_Detail",
-    "hex": "#2a2a2a",
-    "image": "/p/byb/BY046/6-detail.jpg",
-    "images": [
-     "/p/byb/BY046/6-detail.jpg"
-    ]
-   },
    {
     "name": "Black_Black",
     "hex": "#252525",
@@ -22621,17 +22121,10 @@
   "images": [
    "/p/byb/BY047/front.jpg",
    "/p/byb/BY047/back.jpg",
-   "/p/byb/BY047/side.jpg"
+   "/p/byb/BY047/side.jpg",
+   "/p/byb/BY047/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "5_Detail",
-    "hex": "#171717",
-    "image": "/p/byb/BY047/5-detail.jpg",
-    "images": [
-     "/p/byb/BY047/5-detail.jpg"
-    ]
-   },
    {
     "name": "Black_Black_White",
     "hex": "#161616",
@@ -22675,17 +22168,10 @@
   "images": [
    "/p/byb/BY048/front.jpg",
    "/p/byb/BY048/back.jpg",
-   "/p/byb/BY048/side.jpg"
+   "/p/byb/BY048/side.jpg",
+   "/p/byb/BY048/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "5_Detail",
-    "hex": "#131313",
-    "image": "/p/byb/BY048/5-detail.jpg",
-    "images": [
-     "/p/byb/BY048/5-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#0f0f0f",
@@ -22729,17 +22215,10 @@
   "images": [
    "/p/byb/BY050/front.jpg",
    "/p/byb/BY050/back.jpg",
-   "/p/byb/BY050/side.jpg"
+   "/p/byb/BY050/side.jpg",
+   "/p/byb/BY050/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "5_Detail",
-    "hex": "#323838",
-    "image": "/p/byb/BY050/5-detail.jpg",
-    "images": [
-     "/p/byb/BY050/5-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#222222",
@@ -22830,25 +22309,11 @@
   "images": [
    "/p/byb/BY052/front.jpg",
    "/p/byb/BY052/back.jpg",
-   "/p/byb/BY052/side.jpg"
+   "/p/byb/BY052/side.jpg",
+   "/p/byb/BY052/4-side.jpg",
+   "/p/byb/BY052/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#1e1d19",
-    "image": "/p/byb/BY052/4-side.jpg",
-    "images": [
-     "/p/byb/BY052/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#171719",
-    "image": "/p/byb/BY052/5-detail.jpg",
-    "images": [
-     "/p/byb/BY052/5-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#222023",
@@ -22907,25 +22372,11 @@
   "images": [
    "/p/byb/BY053/front.jpg",
    "/p/byb/BY053/back.jpg",
-   "/p/byb/BY053/side.jpg"
+   "/p/byb/BY053/side.jpg",
+   "/p/byb/BY053/4-side.jpg",
+   "/p/byb/BY053/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#575251",
-    "image": "/p/byb/BY053/4-side.jpg",
-    "images": [
-     "/p/byb/BY053/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#39393c",
-    "image": "/p/byb/BY053/5-detail.jpg",
-    "images": [
-     "/p/byb/BY053/5-detail.jpg"
-    ]
-   },
    {
     "name": "Asphalt",
     "hex": "#948b83",
@@ -22992,33 +22443,12 @@
   "images": [
    "/p/byb/BY054/front.jpg",
    "/p/byb/BY054/back.jpg",
-   "/p/byb/BY054/side.jpg"
+   "/p/byb/BY054/side.jpg",
+   "/p/byb/BY054/4-side.jpg",
+   "/p/byb/BY054/5-detail.jpg",
+   "/p/byb/BY054/6-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#026974",
-    "image": "/p/byb/BY054/4-side.jpg",
-    "images": [
-     "/p/byb/BY054/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#22929a",
-    "image": "/p/byb/BY054/5-detail.jpg",
-    "images": [
-     "/p/byb/BY054/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "6_Detail",
-    "hex": "#2f8a92",
-    "image": "/p/byb/BY054/6-detail.jpg",
-    "images": [
-     "/p/byb/BY054/6-detail.jpg"
-    ]
-   },
    {
     "name": "Darkgrey White",
     "hex": "#3c414c",
@@ -23061,26 +22491,11 @@
   "images": [
    "/p/byb/BY057/front.jpg",
    "/p/byb/BY057/back.jpg",
-   "/p/byb/BY057/side.jpg"
+   "/p/byb/BY057/side.jpg",
+   "/p/byb/BY057/4-side.jpg",
+   "/p/byb/BY057/5-detail.jpg"
   ],
-  "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#5e5745",
-    "image": "/p/byb/BY057/4-side.jpg",
-    "images": [
-     "/p/byb/BY057/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#60594a",
-    "image": "/p/byb/BY057/5-detail.jpg",
-    "images": [
-     "/p/byb/BY057/5-detail.jpg"
-    ]
-   }
-  ],
+  "colors": [],
   "sizes": [
    "XS",
    "S",
@@ -23114,18 +22529,10 @@
   "images": [
    "/p/byb/BY058/front.jpg",
    "/p/byb/BY058/back.jpg",
-   "/p/byb/BY058/side.jpg"
+   "/p/byb/BY058/side.jpg",
+   "/p/byb/BY058/4-side.jpg"
   ],
-  "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#232221",
-    "image": "/p/byb/BY058/4-side.jpg",
-    "images": [
-     "/p/byb/BY058/4-side.jpg"
-    ]
-   }
-  ],
+  "colors": [],
   "sizes": [
    "XS",
    "S",
@@ -23157,25 +22564,11 @@
   "gender": "Unisex",
   "basePrice": null,
   "images": [
-   "/p/byb/BY059/front.jpg"
+   "/p/byb/BY059/front.jpg",
+   "/p/byb/BY059/5-detail.jpg",
+   "/p/byb/BY059/6-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "5_Detail",
-    "hex": "#262626",
-    "image": "/p/byb/BY059/5-detail.jpg",
-    "images": [
-     "/p/byb/BY059/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "6_Detail",
-    "hex": "#373737",
-    "image": "/p/byb/BY059/6-detail.jpg",
-    "images": [
-     "/p/byb/BY059/6-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#464646",
@@ -23209,25 +22602,11 @@
   "gender": "Unisex",
   "basePrice": null,
   "images": [
-   "/p/byb/BY063/front.jpg"
+   "/p/byb/BY063/front.jpg",
+   "/p/byb/BY063/5-detail.jpg",
+   "/p/byb/BY063/6-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "5_Detail",
-    "hex": "#222323",
-    "image": "/p/byb/BY063/5-detail.jpg",
-    "images": [
-     "/p/byb/BY063/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "6_Detail",
-    "hex": "#2e2e2e",
-    "image": "/p/byb/BY063/6-detail.jpg",
-    "images": [
-     "/p/byb/BY063/6-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#ffffff",
@@ -23286,41 +22665,13 @@
   "basePrice": null,
   "images": [
    "/p/byb/BY069/front.jpg",
-   "/p/byb/BY069/back.jpg"
+   "/p/byb/BY069/back.jpg",
+   "/p/byb/BY069/4-side.jpg",
+   "/p/byb/BY069/5-detail.jpg",
+   "/p/byb/BY069/6-detail.jpg",
+   "/p/byb/BY069/7-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#181818",
-    "image": "/p/byb/BY069/4-side.jpg",
-    "images": [
-     "/p/byb/BY069/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#131413",
-    "image": "/p/byb/BY069/5-detail.jpg",
-    "images": [
-     "/p/byb/BY069/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "6_Detail",
-    "hex": "#1c1c1c",
-    "image": "/p/byb/BY069/6-detail.jpg",
-    "images": [
-     "/p/byb/BY069/6-detail.jpg"
-    ]
-   },
-   {
-    "name": "7_Detail",
-    "hex": "#181818",
-    "image": "/p/byb/BY069/7-detail.jpg",
-    "images": [
-     "/p/byb/BY069/7-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#232323",
@@ -23362,17 +22713,10 @@
   "basePrice": null,
   "images": [
    "/p/byb/BY070/front.jpg",
-   "/p/byb/BY070/back.jpg"
+   "/p/byb/BY070/back.jpg",
+   "/p/byb/BY070/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "5_Detail",
-    "hex": "#2b1821",
-    "image": "/p/byb/BY070/5-detail.jpg",
-    "images": [
-     "/p/byb/BY070/5-detail.jpg"
-    ]
-   },
    {
     "name": "Berry Black",
     "hex": "#2b1c25",
@@ -23431,41 +22775,13 @@
   "basePrice": null,
   "images": [
    "/p/byb/BY074/front.jpg",
-   "/p/byb/BY074/back.jpg"
+   "/p/byb/BY074/back.jpg",
+   "/p/byb/BY074/5-detail.jpg",
+   "/p/byb/BY074/6-detail.jpg",
+   "/p/byb/BY074/7-detail.jpg",
+   "/p/byb/BY074/8-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "5_Detail",
-    "hex": "#181818",
-    "image": "/p/byb/BY074/5-detail.jpg",
-    "images": [
-     "/p/byb/BY074/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "6_Detail",
-    "hex": "#1d1e1e",
-    "image": "/p/byb/BY074/6-detail.jpg",
-    "images": [
-     "/p/byb/BY074/6-detail.jpg"
-    ]
-   },
-   {
-    "name": "7_Detail",
-    "hex": "#131313",
-    "image": "/p/byb/BY074/7-detail.jpg",
-    "images": [
-     "/p/byb/BY074/7-detail.jpg"
-    ]
-   },
-   {
-    "name": "8_Detail",
-    "hex": "#101010",
-    "image": "/p/byb/BY074/8-detail.jpg",
-    "images": [
-     "/p/byb/BY074/8-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1f1f1f",
@@ -23509,33 +22825,12 @@
   "images": [
    "/p/byb/BY075/front.jpg",
    "/p/byb/BY075/back.jpg",
-   "/p/byb/BY075/side.jpg"
+   "/p/byb/BY075/side.jpg",
+   "/p/byb/BY075/4-side.jpg",
+   "/p/byb/BY075/5-detail.jpg",
+   "/p/byb/BY075/6-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#333430",
-    "image": "/p/byb/BY075/4-side.jpg",
-    "images": [
-     "/p/byb/BY075/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#3e3d40",
-    "image": "/p/byb/BY075/5-detail.jpg",
-    "images": [
-     "/p/byb/BY075/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "6_Detail",
-    "hex": "#3f3e41",
-    "image": "/p/byb/BY075/6-detail.jpg",
-    "images": [
-     "/p/byb/BY075/6-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#131313",
@@ -23651,34 +22946,12 @@
   "images": [
    "/p/byb/BY076/front.jpg",
    "/p/byb/BY076/back.jpg",
-   "/p/byb/BY076/side.jpg"
+   "/p/byb/BY076/side.jpg",
+   "/p/byb/BY076/4-side.jpg",
+   "/p/byb/BY076/5-detail.jpg",
+   "/p/byb/BY076/6-detail.jpg"
   ],
-  "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#1f1e1d",
-    "image": "/p/byb/BY076/4-side.jpg",
-    "images": [
-     "/p/byb/BY076/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#3b3b3c",
-    "image": "/p/byb/BY076/5-detail.jpg",
-    "images": [
-     "/p/byb/BY076/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "6_Detail",
-    "hex": "#3f3f40",
-    "image": "/p/byb/BY076/6-detail.jpg",
-    "images": [
-     "/p/byb/BY076/6-detail.jpg"
-    ]
-   }
-  ],
+  "colors": [],
   "sizes": [
    "XS",
    "S",
@@ -23712,26 +22985,11 @@
   "basePrice": null,
   "images": [
    "/p/byb/BY077/front.jpg",
-   "/p/byb/BY077/back.jpg"
+   "/p/byb/BY077/back.jpg",
+   "/p/byb/BY077/5-detail.jpg",
+   "/p/byb/BY077/6-detail.jpg"
   ],
-  "colors": [
-   {
-    "name": "5_Detail",
-    "hex": "#181818",
-    "image": "/p/byb/BY077/5-detail.jpg",
-    "images": [
-     "/p/byb/BY077/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "6_Detail",
-    "hex": "#1c1c1c",
-    "image": "/p/byb/BY077/6-detail.jpg",
-    "images": [
-     "/p/byb/BY077/6-detail.jpg"
-    ]
-   }
-  ],
+  "colors": [],
   "sizes": [
    "XS",
    "S",
@@ -23766,41 +23024,13 @@
   "images": [
    "/p/byb/BY080/front.jpg",
    "/p/byb/BY080/back.jpg",
-   "/p/byb/BY080/side.jpg"
+   "/p/byb/BY080/side.jpg",
+   "/p/byb/BY080/4-side.jpg",
+   "/p/byb/BY080/5-detail.jpg",
+   "/p/byb/BY080/7-detail.jpg",
+   "/p/byb/BY080/8-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#1b1b1b",
-    "image": "/p/byb/BY080/4-side.jpg",
-    "images": [
-     "/p/byb/BY080/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#1b1b1b",
-    "image": "/p/byb/BY080/5-detail.jpg",
-    "images": [
-     "/p/byb/BY080/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "7_Detail",
-    "hex": "#1a1a1a",
-    "image": "/p/byb/BY080/7-detail.jpg",
-    "images": [
-     "/p/byb/BY080/7-detail.jpg"
-    ]
-   },
-   {
-    "name": "8_Detail",
-    "hex": "#121212",
-    "image": "/p/byb/BY080/8-detail.jpg",
-    "images": [
-     "/p/byb/BY080/8-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#212121",
@@ -23904,17 +23134,10 @@
   "images": [
    "/p/byb/BY090/front.jpg",
    "/p/byb/BY090/back.jpg",
-   "/p/byb/BY090/side.jpg"
+   "/p/byb/BY090/side.jpg",
+   "/p/byb/BY090/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#0b0c08",
-    "image": "/p/byb/BY090/4-side.jpg",
-    "images": [
-     "/p/byb/BY090/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1b1b19",
@@ -23958,17 +23181,10 @@
   "images": [
    "/p/byb/BY091/front.jpg",
    "/p/byb/BY091/back.jpg",
-   "/p/byb/BY091/side.jpg"
+   "/p/byb/BY091/side.jpg",
+   "/p/byb/BY091/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#191918",
-    "image": "/p/byb/BY091/4-side.jpg",
-    "images": [
-     "/p/byb/BY091/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1d1d1b",
@@ -24012,17 +23228,10 @@
   "images": [
    "/p/byb/BY094/front.jpg",
    "/p/byb/BY094/back.jpg",
-   "/p/byb/BY094/side.jpg"
+   "/p/byb/BY094/side.jpg",
+   "/p/byb/BY094/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#191a16",
-    "image": "/p/byb/BY094/4-side.jpg",
-    "images": [
-     "/p/byb/BY094/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#191917",
@@ -24066,41 +23275,13 @@
   "images": [
    "/p/byb/BY096/front.jpg",
    "/p/byb/BY096/back.jpg",
-   "/p/byb/BY096/side.jpg"
+   "/p/byb/BY096/side.jpg",
+   "/p/byb/BY096/5-detail.jpg",
+   "/p/byb/BY096/6-detail.jpg",
+   "/p/byb/BY096/7-detail.jpg",
+   "/p/byb/BY096/8-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "5_Detail",
-    "hex": "#655f42",
-    "image": "/p/byb/BY096/5-detail.jpg",
-    "images": [
-     "/p/byb/BY096/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "6_Detail",
-    "hex": "#6e6644",
-    "image": "/p/byb/BY096/6-detail.jpg",
-    "images": [
-     "/p/byb/BY096/6-detail.jpg"
-    ]
-   },
-   {
-    "name": "7_Detail",
-    "hex": "#6e6643",
-    "image": "/p/byb/BY096/7-detail.jpg",
-    "images": [
-     "/p/byb/BY096/7-detail.jpg"
-    ]
-   },
-   {
-    "name": "8_Detail",
-    "hex": "#69623f",
-    "image": "/p/byb/BY096/8-detail.jpg",
-    "images": [
-     "/p/byb/BY096/8-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#32312f",
@@ -24152,25 +23333,11 @@
   "images": [
    "/p/byb/BY098/front.jpg",
    "/p/byb/BY098/back.jpg",
-   "/p/byb/BY098/side.jpg"
+   "/p/byb/BY098/side.jpg",
+   "/p/byb/BY098/4-side.jpg",
+   "/p/byb/BY098/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#1d1c1a",
-    "image": "/p/byb/BY098/4-side.jpg",
-    "images": [
-     "/p/byb/BY098/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#141412",
-    "image": "/p/byb/BY098/5-detail.jpg",
-    "images": [
-     "/p/byb/BY098/5-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1a1a18",
@@ -24222,17 +23389,10 @@
   "images": [
    "/p/byb/BY099/front.jpg",
    "/p/byb/BY099/back.jpg",
-   "/p/byb/BY099/side.jpg"
+   "/p/byb/BY099/side.jpg",
+   "/p/byb/BY099/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#ffffff",
-    "image": "/p/byb/BY099/4-side.jpg",
-    "images": [
-     "/p/byb/BY099/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#080808",
@@ -24275,17 +23435,10 @@
   "images": [
    "/p/byb/BY101/front.jpg",
    "/p/byb/BY101/back.jpg",
-   "/p/byb/BY101/side.jpg"
+   "/p/byb/BY101/side.jpg",
+   "/p/byb/BY101/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#1e1f1b",
-    "image": "/p/byb/BY101/4-side.jpg",
-    "images": [
-     "/p/byb/BY101/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1c1c1a",
@@ -24376,17 +23529,10 @@
   "images": [
    "/p/byb/BY102/front.jpg",
    "/p/byb/BY102/back.jpg",
-   "/p/byb/BY102/side.jpg"
+   "/p/byb/BY102/side.jpg",
+   "/p/byb/BY102/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#e8e8ea",
-    "image": "/p/byb/BY102/4-side.jpg",
-    "images": [
-     "/p/byb/BY102/4-side.jpg"
-    ]
-   },
    {
     "name": "Amber",
     "hex": "#e1bbae",
@@ -24782,18 +23928,10 @@
   "images": [
    "/p/byb/BY104/front.jpg",
    "/p/byb/BY104/back.jpg",
-   "/p/byb/BY104/side.jpg"
+   "/p/byb/BY104/side.jpg",
+   "/p/byb/BY104/4-side.jpg"
   ],
-  "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#353945",
-    "image": "/p/byb/BY104/4-side.jpg",
-    "images": [
-     "/p/byb/BY104/4-side.jpg"
-    ]
-   }
-  ],
+  "colors": [],
   "sizes": [
    "XS",
    "S",
@@ -24828,17 +23966,10 @@
   "images": [
    "/p/byb/BY113/front.jpg",
    "/p/byb/BY113/back.jpg",
-   "/p/byb/BY113/side.jpg"
+   "/p/byb/BY113/side.jpg",
+   "/p/byb/BY113/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#24221e",
-    "image": "/p/byb/BY113/4-side.jpg",
-    "images": [
-     "/p/byb/BY113/4-side.jpg"
-    ]
-   },
    {
     "name": "Heather Grey",
     "hex": "#c6c4c5",
@@ -24889,17 +24020,10 @@
   "images": [
    "/p/byb/BY114/front.jpg",
    "/p/byb/BY114/back.jpg",
-   "/p/byb/BY114/side.jpg"
+   "/p/byb/BY114/side.jpg",
+   "/p/byb/BY114/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#181914",
-    "image": "/p/byb/BY114/4-side.jpg",
-    "images": [
-     "/p/byb/BY114/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#2b2925",
@@ -24958,17 +24082,10 @@
   "images": [
    "/p/byb/BY115/front.jpg",
    "/p/byb/BY115/back.jpg",
-   "/p/byb/BY115/side.jpg"
+   "/p/byb/BY115/side.jpg",
+   "/p/byb/BY115/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#252520",
-    "image": "/p/byb/BY115/4-side.jpg",
-    "images": [
-     "/p/byb/BY115/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#282723",
@@ -25026,17 +24143,10 @@
   "images": [
    "/p/byb/BY116/front.jpg",
    "/p/byb/BY116/back.jpg",
-   "/p/byb/BY116/side.jpg"
+   "/p/byb/BY116/side.jpg",
+   "/p/byb/BY116/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#171913",
-    "image": "/p/byb/BY116/4-side.jpg",
-    "images": [
-     "/p/byb/BY116/4-side.jpg"
-    ]
-   },
    {
     "name": "Baltic Blue",
     "hex": "#a5cbe0",
@@ -25200,17 +24310,10 @@
   "images": [
    "/p/byb/BY117/front.jpg",
    "/p/byb/BY117/back.jpg",
-   "/p/byb/BY117/side.jpg"
+   "/p/byb/BY117/side.jpg",
+   "/p/byb/BY117/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#c8c7c7",
-    "image": "/p/byb/BY117/4-side.jpg",
-    "images": [
-     "/p/byb/BY117/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#27221e",
@@ -25316,17 +24419,10 @@
   "images": [
    "/p/byb/BY118/front.jpg",
    "/p/byb/BY118/back.jpg",
-   "/p/byb/BY118/side.jpg"
+   "/p/byb/BY118/side.jpg",
+   "/p/byb/BY118/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#232220",
-    "image": "/p/byb/BY118/4-side.jpg",
-    "images": [
-     "/p/byb/BY118/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#242221",
@@ -25370,17 +24466,10 @@
   "images": [
    "/p/byb/BY119/front.jpg",
    "/p/byb/BY119/back.jpg",
-   "/p/byb/BY119/side.jpg"
+   "/p/byb/BY119/side.jpg",
+   "/p/byb/BY119/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#201f1d",
-    "image": "/p/byb/BY119/4-side.jpg",
-    "images": [
-     "/p/byb/BY119/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#22201e",
@@ -25422,17 +24511,10 @@
   "images": [
    "/p/byb/BY120/front.jpg",
    "/p/byb/BY120/back.jpg",
-   "/p/byb/BY120/side.jpg"
+   "/p/byb/BY120/side.jpg",
+   "/p/byb/BY120/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#262423",
-    "image": "/p/byb/BY120/4-side.jpg",
-    "images": [
-     "/p/byb/BY120/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#242322",
@@ -25476,17 +24558,10 @@
   "images": [
    "/p/byb/BY122/front.jpg",
    "/p/byb/BY122/back.jpg",
-   "/p/byb/BY122/side.jpg"
+   "/p/byb/BY122/side.jpg",
+   "/p/byb/BY122/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#24231f",
-    "image": "/p/byb/BY122/4-side.jpg",
-    "images": [
-     "/p/byb/BY122/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#292728",
@@ -25538,17 +24613,10 @@
   "images": [
    "/p/byb/BY123/front.jpg",
    "/p/byb/BY123/back.jpg",
-   "/p/byb/BY123/side.jpg"
+   "/p/byb/BY123/side.jpg",
+   "/p/byb/BY123/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#1a1916",
-    "image": "/p/byb/BY123/4-side.jpg",
-    "images": [
-     "/p/byb/BY123/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#252422",
@@ -25600,17 +24668,10 @@
   "images": [
    "/p/byb/BY128/front.jpg",
    "/p/byb/BY128/back.jpg",
-   "/p/byb/BY128/side.jpg"
+   "/p/byb/BY128/side.jpg",
+   "/p/byb/BY128/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#3f3f41",
-    "image": "/p/byb/BY128/4-side.jpg",
-    "images": [
-     "/p/byb/BY128/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#424244",
@@ -25654,17 +24715,10 @@
   "images": [
    "/p/byb/BY129/front.jpg",
    "/p/byb/BY129/back.jpg",
-   "/p/byb/BY129/side.jpg"
+   "/p/byb/BY129/side.jpg",
+   "/p/byb/BY129/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#2c2925",
-    "image": "/p/byb/BY129/4-side.jpg",
-    "images": [
-     "/p/byb/BY129/4-side.jpg"
-    ]
-   },
    {
     "name": "Black_White",
     "hex": "#3e3634",
@@ -25708,17 +24762,10 @@
   "images": [
    "/p/byb/BY131/front.jpg",
    "/p/byb/BY131/back.jpg",
-   "/p/byb/BY131/side.jpg"
+   "/p/byb/BY131/side.jpg",
+   "/p/byb/BY131/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#d6d2d1",
-    "image": "/p/byb/BY131/4-side.jpg",
-    "images": [
-     "/p/byb/BY131/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#2d2c27",
@@ -25761,17 +24808,10 @@
   "images": [
    "/p/byb/BY132/front.jpg",
    "/p/byb/BY132/back.jpg",
-   "/p/byb/BY132/side.jpg"
+   "/p/byb/BY132/side.jpg",
+   "/p/byb/BY132/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#46423f",
-    "image": "/p/byb/BY132/4-side.jpg",
-    "images": [
-     "/p/byb/BY132/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#22221f",
@@ -25831,17 +24871,10 @@
   "images": [
    "/p/byb/BY134/front.jpg",
    "/p/byb/BY134/back.jpg",
-   "/p/byb/BY134/side.jpg"
+   "/p/byb/BY134/side.jpg",
+   "/p/byb/BY134/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#1e1e18",
-    "image": "/p/byb/BY134/4-side.jpg",
-    "images": [
-     "/p/byb/BY134/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#262521",
@@ -25884,17 +24917,10 @@
   "images": [
    "/p/byb/BY135/front.jpg",
    "/p/byb/BY135/back.jpg",
-   "/p/byb/BY135/side.jpg"
+   "/p/byb/BY135/side.jpg",
+   "/p/byb/BY135/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#dedada",
-    "image": "/p/byb/BY135/4-side.jpg",
-    "images": [
-     "/p/byb/BY135/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1d1e18",
@@ -25945,17 +24971,10 @@
   "images": [
    "/p/byb/BY136/front.jpg",
    "/p/byb/BY136/back.jpg",
-   "/p/byb/BY136/side.jpg"
+   "/p/byb/BY136/side.jpg",
+   "/p/byb/BY136/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#171715",
-    "image": "/p/byb/BY136/4-side.jpg",
-    "images": [
-     "/p/byb/BY136/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1a2622",
@@ -26052,17 +25071,10 @@
   "images": [
    "/p/byb/BY138/front.jpg",
    "/p/byb/BY138/back.jpg",
-   "/p/byb/BY138/side.jpg"
+   "/p/byb/BY138/side.jpg",
+   "/p/byb/BY138/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#dbd9db",
-    "image": "/p/byb/BY138/4-side.jpg",
-    "images": [
-     "/p/byb/BY138/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1a251f",
@@ -26113,18 +25125,10 @@
   "images": [
    "/p/byb/BY139/front.jpg",
    "/p/byb/BY139/back.jpg",
-   "/p/byb/BY139/side.jpg"
+   "/p/byb/BY139/side.jpg",
+   "/p/byb/BY139/4-side.jpg"
   ],
-  "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#eae8eb",
-    "image": "/p/byb/BY139/4-side.jpg",
-    "images": [
-     "/p/byb/BY139/4-side.jpg"
-    ]
-   }
-  ],
+  "colors": [],
   "sizes": [
    "XS",
    "S",
@@ -26158,18 +25162,10 @@
   "images": [
    "/p/byb/BY147/front.jpg",
    "/p/byb/BY147/back.jpg",
-   "/p/byb/BY147/side.jpg"
+   "/p/byb/BY147/side.jpg",
+   "/p/byb/BY147/4-side.jpg"
   ],
-  "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#3c3835",
-    "image": "/p/byb/BY147/4-side.jpg",
-    "images": [
-     "/p/byb/BY147/4-side.jpg"
-    ]
-   }
-  ],
+  "colors": [],
   "sizes": [
    "XS",
    "S",
@@ -26203,33 +25199,12 @@
   "images": [
    "/p/byb/BY148/front.jpg",
    "/p/byb/BY148/back.jpg",
-   "/p/byb/BY148/side.jpg"
+   "/p/byb/BY148/side.jpg",
+   "/p/byb/BY148/4-side.jpg",
+   "/p/byb/BY148/5-detail.jpg",
+   "/p/byb/BY148/6-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#2a2829",
-    "image": "/p/byb/BY148/4-side.jpg",
-    "images": [
-     "/p/byb/BY148/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#201f1b",
-    "image": "/p/byb/BY148/5-detail.jpg",
-    "images": [
-     "/p/byb/BY148/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "6_Detail",
-    "hex": "#232321",
-    "image": "/p/byb/BY148/6-detail.jpg",
-    "images": [
-     "/p/byb/BY148/6-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#2a2927",
@@ -26272,17 +25247,10 @@
   "images": [
    "/p/byb/BY149/front.jpg",
    "/p/byb/BY149/back.jpg",
-   "/p/byb/BY149/side.jpg"
+   "/p/byb/BY149/side.jpg",
+   "/p/byb/BY149/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#ecebf0",
-    "image": "/p/byb/BY149/4-side.jpg",
-    "images": [
-     "/p/byb/BY149/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#2a2a28",
@@ -26413,17 +25381,10 @@
   "images": [
    "/p/byb/BY150/front.jpg",
    "/p/byb/BY150/back.jpg",
-   "/p/byb/BY150/side.jpg"
+   "/p/byb/BY150/side.jpg",
+   "/p/byb/BY150/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#212222",
-    "image": "/p/byb/BY150/4-side.jpg",
-    "images": [
-     "/p/byb/BY150/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#242424",
@@ -26467,17 +25428,10 @@
   "images": [
    "/p/byb/BY151/front.jpg",
    "/p/byb/BY151/back.jpg",
-   "/p/byb/BY151/side.jpg"
+   "/p/byb/BY151/side.jpg",
+   "/p/byb/BY151/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#323132",
-    "image": "/p/byb/BY151/4-side.jpg",
-    "images": [
-     "/p/byb/BY151/4-side.jpg"
-    ]
-   },
    {
     "name": "Black_Black",
     "hex": "#343434",
@@ -26521,17 +25475,10 @@
   "images": [
    "/p/byb/BY152/front.jpg",
    "/p/byb/BY152/back.jpg",
-   "/p/byb/BY152/side.jpg"
+   "/p/byb/BY152/side.jpg",
+   "/p/byb/BY152/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#383838",
-    "image": "/p/byb/BY152/4-side.jpg",
-    "images": [
-     "/p/byb/BY152/4-side.jpg"
-    ]
-   },
    {
     "name": "Black Washed",
     "hex": "#39393a",
@@ -26575,17 +25522,10 @@
   "images": [
    "/p/byb/BY153/front.jpg",
    "/p/byb/BY153/back.jpg",
-   "/p/byb/BY153/side.jpg"
+   "/p/byb/BY153/side.jpg",
+   "/p/byb/BY153/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#363636",
-    "image": "/p/byb/BY153/4-side.jpg",
-    "images": [
-     "/p/byb/BY153/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#303030",
@@ -26628,25 +25568,11 @@
   "basePrice": null,
   "images": [
    "/p/byb/BY154/front.jpg",
-   "/p/byb/BY154/side.jpg"
+   "/p/byb/BY154/side.jpg",
+   "/p/byb/BY154/2-back.jpg",
+   "/p/byb/BY154/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "2_BAck",
-    "hex": "#605f65",
-    "image": "/p/byb/BY154/2-back.jpg",
-    "images": [
-     "/p/byb/BY154/2-back.jpg"
-    ]
-   },
-   {
-    "name": "4_Side",
-    "hex": "#5d5e66",
-    "image": "/p/byb/BY154/4-side.jpg",
-    "images": [
-     "/p/byb/BY154/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#242422",
@@ -26682,17 +25608,10 @@
   "images": [
    "/p/byb/BY157/front.jpg",
    "/p/byb/BY157/back.jpg",
-   "/p/byb/BY157/side.jpg"
+   "/p/byb/BY157/side.jpg",
+   "/p/byb/BY157/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#717366",
-    "image": "/p/byb/BY157/4-side.jpg",
-    "images": [
-     "/p/byb/BY157/4-side.jpg"
-    ]
-   },
    {
     "name": "Dark Olive",
     "hex": "#636558",
@@ -26736,17 +25655,10 @@
   "images": [
    "/p/byb/BY158/front.jpg",
    "/p/byb/BY158/back.jpg",
-   "/p/byb/BY158/side.jpg"
+   "/p/byb/BY158/side.jpg",
+   "/p/byb/BY158/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#aaaaaa",
-    "image": "/p/byb/BY158/4-side.jpg",
-    "images": [
-     "/p/byb/BY158/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#161817",
@@ -26870,25 +25782,11 @@
   "images": [
    "/p/byb/BY162/front.jpg",
    "/p/byb/BY162/back.jpg",
-   "/p/byb/BY162/side.jpg"
+   "/p/byb/BY162/side.jpg",
+   "/p/byb/BY162/4-side.jpg",
+   "/p/byb/BY162/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#202022",
-    "image": "/p/byb/BY162/4-side.jpg",
-    "images": [
-     "/p/byb/BY162/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#202022",
-    "image": "/p/byb/BY162/5-detail.jpg",
-    "images": [
-     "/p/byb/BY162/5-detail.jpg"
-    ]
-   },
    {
     "name": "Beryl Blue",
     "hex": "#b6e6ea",
@@ -27075,25 +25973,11 @@
   "images": [
    "/p/byb/BY163/front.jpg",
    "/p/byb/BY163/back.jpg",
-   "/p/byb/BY163/side.jpg"
+   "/p/byb/BY163/side.jpg",
+   "/p/byb/BY163/4-side.jpg",
+   "/p/byb/BY163/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#555553",
-    "image": "/p/byb/BY163/4-side.jpg",
-    "images": [
-     "/p/byb/BY163/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#1d1d1d",
-    "image": "/p/byb/BY163/5-detail.jpg",
-    "images": [
-     "/p/byb/BY163/5-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#191919",
@@ -27185,18 +26069,10 @@
   "images": [
    "/p/byb/BY174/front.jpg",
    "/p/byb/BY174/back.jpg",
-   "/p/byb/BY174/side.jpg"
+   "/p/byb/BY174/side.jpg",
+   "/p/byb/BY174/4-side.jpg"
   ],
-  "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#b4afb5",
-    "image": "/p/byb/BY174/4-side.jpg",
-    "images": [
-     "/p/byb/BY174/4-side.jpg"
-    ]
-   }
-  ],
+  "colors": [],
   "sizes": [
    "XS",
    "S",
@@ -27230,17 +26106,10 @@
   "images": [
    "/p/byb/BY181/front.jpg",
    "/p/byb/BY181/back.jpg",
-   "/p/byb/BY181/side.jpg"
+   "/p/byb/BY181/side.jpg",
+   "/p/byb/BY181/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#d2b5aa",
-    "image": "/p/byb/BY181/4-side.jpg",
-    "images": [
-     "/p/byb/BY181/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#222222",
@@ -27283,17 +26152,10 @@
   "images": [
    "/p/byb/BY183/front.jpg",
    "/p/byb/BY183/back.jpg",
-   "/p/byb/BY183/side.jpg"
+   "/p/byb/BY183/side.jpg",
+   "/p/byb/BY183/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#1f1f1d",
-    "image": "/p/byb/BY183/4-side.jpg",
-    "images": [
-     "/p/byb/BY183/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1c1c1a",
@@ -27336,17 +26198,10 @@
   "images": [
    "/p/byb/BY184/front.jpg",
    "/p/byb/BY184/back.jpg",
-   "/p/byb/BY184/side.jpg"
+   "/p/byb/BY184/side.jpg",
+   "/p/byb/BY184/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#1b1b19",
-    "image": "/p/byb/BY184/4-side.jpg",
-    "images": [
-     "/p/byb/BY184/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1a1a18",
@@ -27389,33 +26244,12 @@
   "images": [
    "/p/byb/BY185/front.jpg",
    "/p/byb/BY185/back.jpg",
-   "/p/byb/BY185/side.jpg"
+   "/p/byb/BY185/side.jpg",
+   "/p/byb/BY185/4-side.jpg",
+   "/p/byb/BY185/5-detail.jpg",
+   "/p/byb/BY185/6-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#d20222",
-    "image": "/p/byb/BY185/4-side.jpg",
-    "images": [
-     "/p/byb/BY185/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#d90422",
-    "image": "/p/byb/BY185/5-detail.jpg",
-    "images": [
-     "/p/byb/BY185/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "6_Detail",
-    "hex": "#cc051c",
-    "image": "/p/byb/BY185/6-detail.jpg",
-    "images": [
-     "/p/byb/BY185/6-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#222222",
@@ -27497,33 +26331,12 @@
   "images": [
    "/p/byb/BY186/front.jpg",
    "/p/byb/BY186/back.jpg",
-   "/p/byb/BY186/side.jpg"
+   "/p/byb/BY186/side.jpg",
+   "/p/byb/BY186/4-side.jpg",
+   "/p/byb/BY186/5-detail.jpg",
+   "/p/byb/BY186/6-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#0164c2",
-    "image": "/p/byb/BY186/4-side.jpg",
-    "images": [
-     "/p/byb/BY186/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#0868c5",
-    "image": "/p/byb/BY186/5-detail.jpg",
-    "images": [
-     "/p/byb/BY186/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "6_Detail",
-    "hex": "#0769c7",
-    "image": "/p/byb/BY186/6-detail.jpg",
-    "images": [
-     "/p/byb/BY186/6-detail.jpg"
-    ]
-   },
    {
     "name": "City Red",
     "hex": "#f4001e",
@@ -27580,17 +26393,10 @@
   "basePrice": null,
   "images": [
    "/p/byb/BY187/back.jpg",
-   "/p/byb/BY187/side.jpg"
+   "/p/byb/BY187/side.jpg",
+   "/p/byb/BY187/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#e9e9eb",
-    "image": "/p/byb/BY187/4-side.jpg",
-    "images": [
-     "/p/byb/BY187/4-side.jpg"
-    ]
-   },
    {
     "name": "Black_White",
     "hex": "#1a1a1a",
@@ -27632,33 +26438,12 @@
   "images": [
    "/p/byb/BY188/front.jpg",
    "/p/byb/BY188/back.jpg",
-   "/p/byb/BY188/side.jpg"
+   "/p/byb/BY188/side.jpg",
+   "/p/byb/BY188/4-side.jpg",
+   "/p/byb/BY188/5-detail.jpg",
+   "/p/byb/BY188/6-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#01b48c",
-    "image": "/p/byb/BY188/4-side.jpg",
-    "images": [
-     "/p/byb/BY188/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#05a67c",
-    "image": "/p/byb/BY188/5-detail.jpg",
-    "images": [
-     "/p/byb/BY188/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "6_Detail",
-    "hex": "#06ac81",
-    "image": "/p/byb/BY188/6-detail.jpg",
-    "images": [
-     "/p/byb/BY188/6-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#272727",
@@ -27724,17 +26509,10 @@
   "images": [
    "/p/byb/BY189/front.jpg",
    "/p/byb/BY189/back.jpg",
-   "/p/byb/BY189/side.jpg"
+   "/p/byb/BY189/side.jpg",
+   "/p/byb/BY189/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#868d9a",
-    "image": "/p/byb/BY189/4-side.jpg",
-    "images": [
-     "/p/byb/BY189/4-side.jpg"
-    ]
-   },
    {
     "name": "Asphalt",
     "hex": "#827b74",
@@ -27834,17 +26612,10 @@
   "images": [
    "/p/byb/BY190/front.jpg",
    "/p/byb/BY190/back.jpg",
-   "/p/byb/BY190/side.jpg"
+   "/p/byb/BY190/side.jpg",
+   "/p/byb/BY190/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#99c8dc",
-    "image": "/p/byb/BY190/4-side.jpg",
-    "images": [
-     "/p/byb/BY190/4-side.jpg"
-    ]
-   },
    {
     "name": "Asphalt",
     "hex": "#948c89",
@@ -27920,17 +26691,10 @@
   "images": [
    "/p/byb/BY191/front.jpg",
    "/p/byb/BY191/back.jpg",
-   "/p/byb/BY191/side.jpg"
+   "/p/byb/BY191/side.jpg",
+   "/p/byb/BY191/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#caa98a",
-    "image": "/p/byb/BY191/4-side.jpg",
-    "images": [
-     "/p/byb/BY191/4-side.jpg"
-    ]
-   },
    {
     "name": "Asphalt",
     "hex": "#97928e",
@@ -27989,17 +26753,10 @@
   "images": [
    "/p/byb/BY192/front.jpg",
    "/p/byb/BY192/back.jpg",
-   "/p/byb/BY192/side.jpg"
+   "/p/byb/BY192/side.jpg",
+   "/p/byb/BY192/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#b0afb5",
-    "image": "/p/byb/BY192/4-side.jpg",
-    "images": [
-     "/p/byb/BY192/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#191917",
@@ -28058,17 +26815,10 @@
   "images": [
    "/p/byb/BY193/front.jpg",
    "/p/byb/BY193/back.jpg",
-   "/p/byb/BY193/side.jpg"
+   "/p/byb/BY193/side.jpg",
+   "/p/byb/BY193/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#eae0cf",
-    "image": "/p/byb/BY193/4-side.jpg",
-    "images": [
-     "/p/byb/BY193/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#232323",
@@ -28127,17 +26877,10 @@
   "images": [
    "/p/byb/BY194/front.jpg",
    "/p/byb/BY194/back.jpg",
-   "/p/byb/BY194/side.jpg"
+   "/p/byb/BY194/side.jpg",
+   "/p/byb/BY194/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#3c3b39",
-    "image": "/p/byb/BY194/4-side.jpg",
-    "images": [
-     "/p/byb/BY194/4-side.jpg"
-    ]
-   },
    {
     "name": "Asphalt",
     "hex": "#979596",
@@ -28189,17 +26932,10 @@
   "images": [
    "/p/byb/BY198/front.jpg",
    "/p/byb/BY198/back.jpg",
-   "/p/byb/BY198/side.jpg"
+   "/p/byb/BY198/side.jpg",
+   "/p/byb/BY198/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#e1d2be",
-    "image": "/p/byb/BY198/4-side.jpg",
-    "images": [
-     "/p/byb/BY198/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1d1e19",
@@ -28258,17 +26994,10 @@
   "images": [
    "/p/byb/BY199/front.jpg",
    "/p/byb/BY199/back.jpg",
-   "/p/byb/BY199/side.jpg"
+   "/p/byb/BY199/side.jpg",
+   "/p/byb/BY199/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#1f1f1d",
-    "image": "/p/byb/BY199/4-side.jpg",
-    "images": [
-     "/p/byb/BY199/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1d1d1b",
@@ -28311,17 +27040,10 @@
   "basePrice": null,
   "images": [
    "/p/byb/BY200/front.jpg",
-   "/p/byb/BY200/back.jpg"
+   "/p/byb/BY200/back.jpg",
+   "/p/byb/BY200/6-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "6_Detail",
-    "hex": "#0f100b",
-    "image": "/p/byb/BY200/6-detail.jpg",
-    "images": [
-     "/p/byb/BY200/6-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#0f110b",
@@ -28355,33 +27077,12 @@
   "gender": "Unisex",
   "basePrice": null,
   "images": [
-   "/p/byb/BY201/front.jpg"
+   "/p/byb/BY201/front.jpg",
+   "/p/byb/BY201/5-detail.jpg",
+   "/p/byb/BY201/6-detail.jpg",
+   "/p/byb/BY201/7-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "5_Detail",
-    "hex": "#e2e1e7",
-    "image": "/p/byb/BY201/5-detail.jpg",
-    "images": [
-     "/p/byb/BY201/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "6_Detail",
-    "hex": "#dedede",
-    "image": "/p/byb/BY201/6-detail.jpg",
-    "images": [
-     "/p/byb/BY201/6-detail.jpg"
-    ]
-   },
-   {
-    "name": "7_Detail",
-    "hex": "#d4d4d4",
-    "image": "/p/byb/BY201/7-detail.jpg",
-    "images": [
-     "/p/byb/BY201/7-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1b1c1e",
@@ -28429,33 +27130,12 @@
   "images": [
    "/p/byb/BY205/front.jpg",
    "/p/byb/BY205/back.jpg",
-   "/p/byb/BY205/side.jpg"
+   "/p/byb/BY205/side.jpg",
+   "/p/byb/BY205/4-side.jpg",
+   "/p/byb/BY205/5-detail.jpg",
+   "/p/byb/BY205/6-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#bcbbc1",
-    "image": "/p/byb/BY205/4-side.jpg",
-    "images": [
-     "/p/byb/BY205/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#bbb9be",
-    "image": "/p/byb/BY205/5-detail.jpg",
-    "images": [
-     "/p/byb/BY205/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "6_Detail",
-    "hex": "#bfbcc2",
-    "image": "/p/byb/BY205/6-detail.jpg",
-    "images": [
-     "/p/byb/BY205/6-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#25242a",
@@ -28507,17 +27187,10 @@
   "images": [
    "/p/byb/BY208/front.jpg",
    "/p/byb/BY208/back.jpg",
-   "/p/byb/BY208/side.jpg"
+   "/p/byb/BY208/side.jpg",
+   "/p/byb/BY208/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#dec9da",
-    "image": "/p/byb/BY208/4-side.jpg",
-    "images": [
-     "/p/byb/BY208/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#222221",
@@ -28568,17 +27241,10 @@
   "images": [
    "/p/byb/BY209/front.jpg",
    "/p/byb/BY209/back.jpg",
-   "/p/byb/BY209/side.jpg"
+   "/p/byb/BY209/side.jpg",
+   "/p/byb/BY209/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#242422",
-    "image": "/p/byb/BY209/4-side.jpg",
-    "images": [
-     "/p/byb/BY209/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#262625",
@@ -28621,17 +27287,10 @@
   "images": [
    "/p/byb/BY211/front.jpg",
    "/p/byb/BY211/back.jpg",
-   "/p/byb/BY211/side.jpg"
+   "/p/byb/BY211/side.jpg",
+   "/p/byb/BY211/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#e2ebdd",
-    "image": "/p/byb/BY211/4-side.jpg",
-    "images": [
-     "/p/byb/BY211/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#29272b",
@@ -28754,17 +27413,10 @@
   "images": [
    "/p/byb/BY212/front.jpg",
    "/p/byb/BY212/back.jpg",
-   "/p/byb/BY212/side.jpg"
+   "/p/byb/BY212/side.jpg",
+   "/p/byb/BY212/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#b1c9ce",
-    "image": "/p/byb/BY212/4-side.jpg",
-    "images": [
-     "/p/byb/BY212/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1d1e19",
@@ -28839,18 +27491,10 @@
   "images": [
    "/p/byb/BY213/front.jpg",
    "/p/byb/BY213/back.jpg",
-   "/p/byb/BY213/side.jpg"
+   "/p/byb/BY213/side.jpg",
+   "/p/byb/BY213/4-side.jpg"
   ],
-  "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#ead9d1",
-    "image": "/p/byb/BY213/4-side.jpg",
-    "images": [
-     "/p/byb/BY213/4-side.jpg"
-    ]
-   }
-  ],
+  "colors": [],
   "sizes": [
    "XS",
    "S",
@@ -28884,17 +27528,10 @@
   "images": [
    "/p/byb/BY214/front.jpg",
    "/p/byb/BY214/back.jpg",
-   "/p/byb/BY214/side.jpg"
+   "/p/byb/BY214/side.jpg",
+   "/p/byb/BY214/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#d3d3d2",
-    "image": "/p/byb/BY214/4-side.jpg",
-    "images": [
-     "/p/byb/BY214/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#27262a",
@@ -28937,17 +27574,10 @@
   "images": [
    "/p/byb/BY215/front.jpg",
    "/p/byb/BY215/back.jpg",
-   "/p/byb/BY215/side.jpg"
+   "/p/byb/BY215/side.jpg",
+   "/p/byb/BY215/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#d3b489",
-    "image": "/p/byb/BY215/4-side.jpg",
-    "images": [
-     "/p/byb/BY215/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#252326",
@@ -28991,17 +27621,10 @@
   "images": [
    "/p/byb/BY230/front.jpg",
    "/p/byb/BY230/back.jpg",
-   "/p/byb/BY230/side.jpg"
+   "/p/byb/BY230/side.jpg",
+   "/p/byb/BY230/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#201e1f",
-    "image": "/p/byb/BY230/4-side.jpg",
-    "images": [
-     "/p/byb/BY230/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#222021",
@@ -29069,17 +27692,10 @@
   "images": [
    "/p/byb/BY235/front.jpg",
    "/p/byb/BY235/back.jpg",
-   "/p/byb/BY235/side.jpg"
+   "/p/byb/BY235/side.jpg",
+   "/p/byb/BY235/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#eae8eb",
-    "image": "/p/byb/BY235/4-side.jpg",
-    "images": [
-     "/p/byb/BY235/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#23221e",
@@ -29130,17 +27746,10 @@
   "images": [
    "/p/byb/BY237/front.jpg",
    "/p/byb/BY237/back.jpg",
-   "/p/byb/BY237/side.jpg"
+   "/p/byb/BY237/side.jpg",
+   "/p/byb/BY237/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#dfd8cd",
-    "image": "/p/byb/BY237/4-side.jpg",
-    "images": [
-     "/p/byb/BY237/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#242021",
@@ -29191,17 +27800,10 @@
   "images": [
    "/p/byb/BY242/front.jpg",
    "/p/byb/BY242/back.jpg",
-   "/p/byb/BY242/side.jpg"
+   "/p/byb/BY242/side.jpg",
+   "/p/byb/BY242/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#262425",
-    "image": "/p/byb/BY242/4-side.jpg",
-    "images": [
-     "/p/byb/BY242/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#252225",
@@ -29245,17 +27847,10 @@
   "images": [
    "/p/byb/BY245/front.jpg",
    "/p/byb/BY245/back.jpg",
-   "/p/byb/BY245/side.jpg"
+   "/p/byb/BY245/side.jpg",
+   "/p/byb/BY245/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#0370ca",
-    "image": "/p/byb/BY245/4-side.jpg",
-    "images": [
-     "/p/byb/BY245/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#211f20",
@@ -29299,18 +27894,10 @@
   "images": [
    "/p/byb/BY249/front.jpg",
    "/p/byb/BY249/back.jpg",
-   "/p/byb/BY249/side.jpg"
+   "/p/byb/BY249/side.jpg",
+   "/p/byb/BY249/4-side.jpg"
   ],
-  "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#e5e4ea",
-    "image": "/p/byb/BY249/4-side.jpg",
-    "images": [
-     "/p/byb/BY249/4-side.jpg"
-    ]
-   }
-  ],
+  "colors": [],
   "sizes": [
    "XS",
    "S",
@@ -29345,33 +27932,12 @@
   "images": [
    "/p/byb/BY251/front.jpg",
    "/p/byb/BY251/back.jpg",
-   "/p/byb/BY251/side.jpg"
+   "/p/byb/BY251/side.jpg",
+   "/p/byb/BY251/4-side.jpg",
+   "/p/byb/BY251/5-detail.jpg",
+   "/p/byb/BY251/6-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#dad1bd",
-    "image": "/p/byb/BY251/4-side.jpg",
-    "images": [
-     "/p/byb/BY251/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#d6cdbc",
-    "image": "/p/byb/BY251/5-detail.jpg",
-    "images": [
-     "/p/byb/BY251/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "6_Detail",
-    "hex": "#dad2c1",
-    "image": "/p/byb/BY251/6-detail.jpg",
-    "images": [
-     "/p/byb/BY251/6-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#262429",
@@ -29423,17 +27989,10 @@
   "images": [
    "/p/byb/BY254/front.jpg",
    "/p/byb/BY254/back.jpg",
-   "/p/byb/BY254/side.jpg"
+   "/p/byb/BY254/side.jpg",
+   "/p/byb/BY254/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#28272b",
-    "image": "/p/byb/BY254/4-side.jpg",
-    "images": [
-     "/p/byb/BY254/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#28272c",
@@ -29485,17 +28044,10 @@
   "images": [
    "/p/byb/BY256/front.jpg",
    "/p/byb/BY256/back.jpg",
-   "/p/byb/BY256/side.jpg"
+   "/p/byb/BY256/side.jpg",
+   "/p/byb/BY256/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#95c5e0",
-    "image": "/p/byb/BY256/4-side.jpg",
-    "images": [
-     "/p/byb/BY256/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1c1b1c",
@@ -29608,33 +28160,12 @@
   "images": [
    "/p/byb/BY259/front.jpg",
    "/p/byb/BY259/back.jpg",
-   "/p/byb/BY259/side.jpg"
+   "/p/byb/BY259/side.jpg",
+   "/p/byb/BY259/4-side.jpg",
+   "/p/byb/BY259/5-detail.jpg",
+   "/p/byb/BY259/7-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#322d30",
-    "image": "/p/byb/BY259/4-side.jpg",
-    "images": [
-     "/p/byb/BY259/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#242325",
-    "image": "/p/byb/BY259/5-detail.jpg",
-    "images": [
-     "/p/byb/BY259/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "7_Detail",
-    "hex": "#1e1e20",
-    "image": "/p/byb/BY259/7-detail.jpg",
-    "images": [
-     "/p/byb/BY259/7-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#302c31",
@@ -29686,17 +28217,10 @@
   "images": [
    "/p/byb/BY261/front.jpg",
    "/p/byb/BY261/back.jpg",
-   "/p/byb/BY261/side.jpg"
+   "/p/byb/BY261/side.jpg",
+   "/p/byb/BY261/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#1d1b1c",
-    "image": "/p/byb/BY261/4-side.jpg",
-    "images": [
-     "/p/byb/BY261/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#211f22",
@@ -29739,17 +28263,10 @@
   "images": [
    "/p/byb/BY264/front.jpg",
    "/p/byb/BY264/back.jpg",
-   "/p/byb/BY264/side.jpg"
+   "/p/byb/BY264/side.jpg",
+   "/p/byb/BY264/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#d6cfd2",
-    "image": "/p/byb/BY264/4-side.jpg",
-    "images": [
-     "/p/byb/BY264/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1f1e21",
@@ -29824,17 +28341,10 @@
   "images": [
    "/p/byb/BY265/front.jpg",
    "/p/byb/BY265/back.jpg",
-   "/p/byb/BY265/side.jpg"
+   "/p/byb/BY265/side.jpg",
+   "/p/byb/BY265/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#9194a8",
-    "image": "/p/byb/BY265/4-side.jpg",
-    "images": [
-     "/p/byb/BY265/4-side.jpg"
-    ]
-   },
    {
     "name": "Heather Grey",
     "hex": "#8c8fa3",
@@ -29877,17 +28387,10 @@
   "images": [
    "/p/byb/BY268/front.jpg",
    "/p/byb/BY268/back.jpg",
-   "/p/byb/BY268/side.jpg"
+   "/p/byb/BY268/side.jpg",
+   "/p/byb/BY268/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#babac6",
-    "image": "/p/byb/BY268/4-side.jpg",
-    "images": [
-     "/p/byb/BY268/4-side.jpg"
-    ]
-   },
    {
     "name": "Baltic Blue",
     "hex": "#a0c5d8",
@@ -29979,33 +28482,12 @@
   "images": [
    "/p/byb/BY269/front.jpg",
    "/p/byb/BY269/back.jpg",
-   "/p/byb/BY269/side.jpg"
+   "/p/byb/BY269/side.jpg",
+   "/p/byb/BY269/4-side.jpg",
+   "/p/byb/BY269/5-detail.jpg",
+   "/p/byb/BY269/6-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#dfdedb",
-    "image": "/p/byb/BY269/4-side.jpg",
-    "images": [
-     "/p/byb/BY269/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#2e2a2e",
-    "image": "/p/byb/BY269/5-detail.jpg",
-    "images": [
-     "/p/byb/BY269/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "6_Detail",
-    "hex": "#dbd7da",
-    "image": "/p/byb/BY269/6-detail.jpg",
-    "images": [
-     "/p/byb/BY269/6-detail.jpg"
-    ]
-   },
    {
     "name": "Black_White",
     "hex": "#1f1d1e",
@@ -30049,17 +28531,10 @@
   "images": [
    "/p/byb/BY270/front.jpg",
    "/p/byb/BY270/back.jpg",
-   "/p/byb/BY270/side.jpg"
+   "/p/byb/BY270/side.jpg",
+   "/p/byb/BY270/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#8c8278",
-    "image": "/p/byb/BY270/4-side.jpg",
-    "images": [
-     "/p/byb/BY270/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#2d2a2e",
@@ -30103,41 +28578,13 @@
   "images": [
    "/p/byb/BY274/front.jpg",
    "/p/byb/BY274/back.jpg",
-   "/p/byb/BY274/side.jpg"
+   "/p/byb/BY274/side.jpg",
+   "/p/byb/BY274/4-side.jpg",
+   "/p/byb/BY274/5-detail.jpg",
+   "/p/byb/BY274/6-detail.jpg",
+   "/p/byb/BY274/7-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#615f46",
-    "image": "/p/byb/BY274/4-side.jpg",
-    "images": [
-     "/p/byb/BY274/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#646349",
-    "image": "/p/byb/BY274/5-detail.jpg",
-    "images": [
-     "/p/byb/BY274/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "6_Detail",
-    "hex": "#5e5e46",
-    "image": "/p/byb/BY274/6-detail.jpg",
-    "images": [
-     "/p/byb/BY274/6-detail.jpg"
-    ]
-   },
-   {
-    "name": "7_Detail",
-    "hex": "#626248",
-    "image": "/p/byb/BY274/7-detail.jpg",
-    "images": [
-     "/p/byb/BY274/7-detail.jpg"
-    ]
-   },
    {
     "name": "Beige",
     "hex": "#c89a79",
@@ -30205,41 +28652,13 @@
   "images": [
    "/p/byb/BY284/front.jpg",
    "/p/byb/BY284/back.jpg",
-   "/p/byb/BY284/side.jpg"
+   "/p/byb/BY284/side.jpg",
+   "/p/byb/BY284/4-side.jpg",
+   "/p/byb/BY284/5-detail.jpg",
+   "/p/byb/BY284/6-detail.jpg",
+   "/p/byb/BY284/7-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#a9d3d8",
-    "image": "/p/byb/BY284/4-side.jpg",
-    "images": [
-     "/p/byb/BY284/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#94e1e6",
-    "image": "/p/byb/BY284/5-detail.jpg",
-    "images": [
-     "/p/byb/BY284/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "6_Detail",
-    "hex": "#96e1e4",
-    "image": "/p/byb/BY284/6-detail.jpg",
-    "images": [
-     "/p/byb/BY284/6-detail.jpg"
-    ]
-   },
-   {
-    "name": "7_Detail",
-    "hex": "#95e0e4",
-    "image": "/p/byb/BY284/7-detail.jpg",
-    "images": [
-     "/p/byb/BY284/7-detail.jpg"
-    ]
-   },
    {
     "name": "Beryl Blue",
     "hex": "#9de5e8",
@@ -30379,41 +28798,13 @@
   "images": [
    "/p/byb/BY285/front.jpg",
    "/p/byb/BY285/back.jpg",
-   "/p/byb/BY285/side.jpg"
+   "/p/byb/BY285/side.jpg",
+   "/p/byb/BY285/4-side.jpg",
+   "/p/byb/BY285/5-detail.jpg",
+   "/p/byb/BY285/6-detail.jpg",
+   "/p/byb/BY285/7-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#c9a87b",
-    "image": "/p/byb/BY285/4-side.jpg",
-    "images": [
-     "/p/byb/BY285/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#a4c2e4",
-    "image": "/p/byb/BY285/5-detail.jpg",
-    "images": [
-     "/p/byb/BY285/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "6_Detail",
-    "hex": "#a9c5e6",
-    "image": "/p/byb/BY285/6-detail.jpg",
-    "images": [
-     "/p/byb/BY285/6-detail.jpg"
-    ]
-   },
-   {
-    "name": "7_Detail",
-    "hex": "#9dbbdf",
-    "image": "/p/byb/BY285/7-detail.jpg",
-    "images": [
-     "/p/byb/BY285/7-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#19191b",
@@ -30537,25 +28928,11 @@
   "images": [
    "/p/byb/BY286/front.jpg",
    "/p/byb/BY286/back.jpg",
-   "/p/byb/BY286/side.jpg"
+   "/p/byb/BY286/side.jpg",
+   "/p/byb/BY286/4-side.jpg",
+   "/p/byb/BY286/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#f6d3df",
-    "image": "/p/byb/BY286/4-side.jpg",
-    "images": [
-     "/p/byb/BY286/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#f8d9e3",
-    "image": "/p/byb/BY286/5-detail.jpg",
-    "images": [
-     "/p/byb/BY286/5-detail.jpg"
-    ]
-   },
    {
     "name": "Beryl Blue",
     "hex": "#8fdee3",
@@ -30686,25 +29063,11 @@
   "images": [
    "/p/byb/BY288/front.jpg",
    "/p/byb/BY288/back.jpg",
-   "/p/byb/BY288/side.jpg"
+   "/p/byb/BY288/side.jpg",
+   "/p/byb/BY288/4-side.jpg",
+   "/p/byb/BY288/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#b0b2b3",
-    "image": "/p/byb/BY288/4-side.jpg",
-    "images": [
-     "/p/byb/BY288/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#9ce5e8",
-    "image": "/p/byb/BY288/5-detail.jpg",
-    "images": [
-     "/p/byb/BY288/5-detail.jpg"
-    ]
-   },
    {
     "name": "Beryl Blue",
     "hex": "#8ee0e4",
@@ -30834,33 +29197,12 @@
   "basePrice": null,
   "images": [
    "/p/byb/BY289/front.jpg",
-   "/p/byb/BY289/back.jpg"
+   "/p/byb/BY289/back.jpg",
+   "/p/byb/BY289/5-detail.jpg",
+   "/p/byb/BY289/6-detail.jpg",
+   "/p/byb/BY289/7-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "5_Detail",
-    "hex": "#8b806d",
-    "image": "/p/byb/BY289/5-detail.jpg",
-    "images": [
-     "/p/byb/BY289/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "6_Detail",
-    "hex": "#7f7a67",
-    "image": "/p/byb/BY289/6-detail.jpg",
-    "images": [
-     "/p/byb/BY289/6-detail.jpg"
-    ]
-   },
-   {
-    "name": "7_Detail",
-    "hex": "#897e6b",
-    "image": "/p/byb/BY289/7-detail.jpg",
-    "images": [
-     "/p/byb/BY289/7-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1e1e1e",
@@ -30983,41 +29325,13 @@
   "images": [
    "/p/byb/BY290/front.jpg",
    "/p/byb/BY290/back.jpg",
-   "/p/byb/BY290/side.jpg"
+   "/p/byb/BY290/side.jpg",
+   "/p/byb/BY290/4-side.jpg",
+   "/p/byb/BY290/5-detail.jpg",
+   "/p/byb/BY290/6-detail.jpg",
+   "/p/byb/BY290/7-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#4d3c47",
-    "image": "/p/byb/BY290/4-side.jpg",
-    "images": [
-     "/p/byb/BY290/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#1b1b1b",
-    "image": "/p/byb/BY290/5-detail.jpg",
-    "images": [
-     "/p/byb/BY290/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "6_Detail",
-    "hex": "#181818",
-    "image": "/p/byb/BY290/6-detail.jpg",
-    "images": [
-     "/p/byb/BY290/6-detail.jpg"
-    ]
-   },
-   {
-    "name": "7_Detail",
-    "hex": "#17181d",
-    "image": "/p/byb/BY290/7-detail.jpg",
-    "images": [
-     "/p/byb/BY290/7-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1d1d1d",
@@ -31133,17 +29447,10 @@
   "images": [
    "/p/byb/BY291/front.jpg",
    "/p/byb/BY291/back.jpg",
-   "/p/byb/BY291/side.jpg"
+   "/p/byb/BY291/side.jpg",
+   "/p/byb/BY291/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#dfdccc",
-    "image": "/p/byb/BY291/4-side.jpg",
-    "images": [
-     "/p/byb/BY291/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1c1c1c",
@@ -31258,17 +29565,10 @@
   "images": [
    "/p/byb/BY294/front.jpg",
    "/p/byb/BY294/back.jpg",
-   "/p/byb/BY294/side.jpg"
+   "/p/byb/BY294/side.jpg",
+   "/p/byb/BY294/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#504e52",
-    "image": "/p/byb/BY294/4-side.jpg",
-    "images": [
-     "/p/byb/BY294/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#2e2e2e",
@@ -31429,17 +29729,10 @@
   "images": [
    "/p/byb/BY296/front.jpg",
    "/p/byb/BY296/back.jpg",
-   "/p/byb/BY296/side.jpg"
+   "/p/byb/BY296/side.jpg",
+   "/p/byb/BY296/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#765c3d",
-    "image": "/p/byb/BY296/4-side.jpg",
-    "images": [
-     "/p/byb/BY296/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#292728",
@@ -31523,17 +29816,10 @@
   "images": [
    "/p/byb/BY297/front.jpg",
    "/p/byb/BY297/back.jpg",
-   "/p/byb/BY297/side.jpg"
+   "/p/byb/BY297/side.jpg",
+   "/p/byb/BY297/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#383739",
-    "image": "/p/byb/BY297/4-side.jpg",
-    "images": [
-     "/p/byb/BY297/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#906149",
@@ -31609,17 +29895,10 @@
   "images": [
    "/p/byb/BY298/front.jpg",
    "/p/byb/BY298/back.jpg",
-   "/p/byb/BY298/side.jpg"
+   "/p/byb/BY298/side.jpg",
+   "/p/byb/BY298/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#2a282b",
-    "image": "/p/byb/BY298/4-side.jpg",
-    "images": [
-     "/p/byb/BY298/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#383231",
@@ -31671,17 +29950,10 @@
   "images": [
    "/p/byb/BY299/front.jpg",
    "/p/byb/BY299/back.jpg",
-   "/p/byb/BY299/side.jpg"
+   "/p/byb/BY299/side.jpg",
+   "/p/byb/BY299/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#272729",
-    "image": "/p/byb/BY299/4-side.jpg",
-    "images": [
-     "/p/byb/BY299/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#353130",
@@ -31733,17 +30005,10 @@
   "images": [
    "/p/byb/BY300/front.jpg",
    "/p/byb/BY300/back.jpg",
-   "/p/byb/BY300/side.jpg"
+   "/p/byb/BY300/side.jpg",
+   "/p/byb/BY300/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#2f2d30",
-    "image": "/p/byb/BY300/4-side.jpg",
-    "images": [
-     "/p/byb/BY300/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#2b2927",
@@ -31794,17 +30059,10 @@
   "images": [
    "/p/byb/BY301/front.jpg",
    "/p/byb/BY301/back.jpg",
-   "/p/byb/BY301/side.jpg"
+   "/p/byb/BY301/side.jpg",
+   "/p/byb/BY301/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#454345",
-    "image": "/p/byb/BY301/4-side.jpg",
-    "images": [
-     "/p/byb/BY301/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#302e2e",
@@ -31916,17 +30174,10 @@
   "images": [
    "/p/byb/BY303/front.jpg",
    "/p/byb/BY303/back.jpg",
-   "/p/byb/BY303/side.jpg"
+   "/p/byb/BY303/side.jpg",
+   "/p/byb/BY303/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#5b5152",
-    "image": "/p/byb/BY303/4-side.jpg",
-    "images": [
-     "/p/byb/BY303/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#2d2827",
@@ -31977,17 +30228,10 @@
   "images": [
    "/p/byb/BY305/front.jpg",
    "/p/byb/BY305/back.jpg",
-   "/p/byb/BY305/side.jpg"
+   "/p/byb/BY305/side.jpg",
+   "/p/byb/BY305/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#584849",
-    "image": "/p/byb/BY305/4-side.jpg",
-    "images": [
-     "/p/byb/BY305/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#322c2c",
@@ -32038,17 +30282,10 @@
   "images": [
    "/p/byb/BY306/front.jpg",
    "/p/byb/BY306/back.jpg",
-   "/p/byb/BY306/side.jpg"
+   "/p/byb/BY306/side.jpg",
+   "/p/byb/BY306/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#282323",
-    "image": "/p/byb/BY306/4-side.jpg",
-    "images": [
-     "/p/byb/BY306/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#2a2324",
@@ -32100,17 +30337,10 @@
   "images": [
    "/p/byb/BY307/front.jpg",
    "/p/byb/BY307/back.jpg",
-   "/p/byb/BY307/side.jpg"
+   "/p/byb/BY307/side.jpg",
+   "/p/byb/BY307/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#645659",
-    "image": "/p/byb/BY307/4-side.jpg",
-    "images": [
-     "/p/byb/BY307/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#282325",
@@ -32162,17 +30392,10 @@
   "images": [
    "/p/byb/BY308/front.jpg",
    "/p/byb/BY308/back.jpg",
-   "/p/byb/BY308/side.jpg"
+   "/p/byb/BY308/side.jpg",
+   "/p/byb/BY308/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#e4ccb2",
-    "image": "/p/byb/BY308/4-side.jpg",
-    "images": [
-     "/p/byb/BY308/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1f1d20",
@@ -32304,57 +30527,15 @@
   "images": [
    "/p/byb/BY309/front.jpg",
    "/p/byb/BY309/back.jpg",
-   "/p/byb/BY309/side.jpg"
+   "/p/byb/BY309/side.jpg",
+   "/p/byb/BY309/4-side.jpg",
+   "/p/byb/BY309/5-detail.jpg",
+   "/p/byb/BY309/6-detail.jpg",
+   "/p/byb/BY309/7-detail.jpg",
+   "/p/byb/BY309/8-detail.jpg",
+   "/p/byb/BY309/9-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#9c927f",
-    "image": "/p/byb/BY309/4-side.jpg",
-    "images": [
-     "/p/byb/BY309/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#958975",
-    "image": "/p/byb/BY309/5-detail.jpg",
-    "images": [
-     "/p/byb/BY309/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "6_Detail",
-    "hex": "#9c907f",
-    "image": "/p/byb/BY309/6-detail.jpg",
-    "images": [
-     "/p/byb/BY309/6-detail.jpg"
-    ]
-   },
-   {
-    "name": "7_Detail",
-    "hex": "#a09583",
-    "image": "/p/byb/BY309/7-detail.jpg",
-    "images": [
-     "/p/byb/BY309/7-detail.jpg"
-    ]
-   },
-   {
-    "name": "8_Detail",
-    "hex": "#95856b",
-    "image": "/p/byb/BY309/8-detail.jpg",
-    "images": [
-     "/p/byb/BY309/8-detail.jpg"
-    ]
-   },
-   {
-    "name": "9_Detail",
-    "hex": "#807563",
-    "image": "/p/byb/BY309/9-detail.jpg",
-    "images": [
-     "/p/byb/BY309/9-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#242424",
@@ -32405,17 +30586,10 @@
   "images": [
    "/p/byb/BY310/front.jpg",
    "/p/byb/BY310/back.jpg",
-   "/p/byb/BY310/side.jpg"
+   "/p/byb/BY310/side.jpg",
+   "/p/byb/BY310/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#1c1a1d",
-    "image": "/p/byb/BY310/4-side.jpg",
-    "images": [
-     "/p/byb/BY310/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#211f22",
@@ -32466,17 +30640,10 @@
   "basePrice": null,
   "images": [
    "/p/byb/BY312/front.jpg",
-   "/p/byb/BY312/back.jpg"
+   "/p/byb/BY312/back.jpg",
+   "/p/byb/BY312/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "5_Detail",
-    "hex": "#2d3e5b",
-    "image": "/p/byb/BY312/5-detail.jpg",
-    "images": [
-     "/p/byb/BY312/5-detail.jpg"
-    ]
-   },
    {
     "name": "Black Washed",
     "hex": "#4d4d4d",
@@ -32535,17 +30702,10 @@
   "images": [
    "/p/byb/BY313/front.jpg",
    "/p/byb/BY313/back.jpg",
-   "/p/byb/BY313/side.jpg"
+   "/p/byb/BY313/side.jpg",
+   "/p/byb/BY313/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#02070b",
-    "image": "/p/byb/BY313/4-side.jpg",
-    "images": [
-     "/p/byb/BY313/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#04060a",
@@ -32588,17 +30748,10 @@
   "images": [
    "/p/byb/BY314/front.jpg",
    "/p/byb/BY314/back.jpg",
-   "/p/byb/BY314/side.jpg"
+   "/p/byb/BY314/side.jpg",
+   "/p/byb/BY314/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#0a1218",
-    "image": "/p/byb/BY314/4-side.jpg",
-    "images": [
-     "/p/byb/BY314/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#000509",
@@ -32649,17 +30802,10 @@
   "images": [
    "/p/byb/BY315/front.jpg",
    "/p/byb/BY315/back.jpg",
-   "/p/byb/BY315/side.jpg"
+   "/p/byb/BY315/side.jpg",
+   "/p/byb/BY315/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#b5b2b9",
-    "image": "/p/byb/BY315/4-side.jpg",
-    "images": [
-     "/p/byb/BY315/4-side.jpg"
-    ]
-   },
    {
     "name": "Bottle Green",
     "hex": "#394b4b",
@@ -32717,17 +30863,10 @@
   "images": [
    "/p/byb/BY316/front.jpg",
    "/p/byb/BY316/back.jpg",
-   "/p/byb/BY316/side.jpg"
+   "/p/byb/BY316/side.jpg",
+   "/p/byb/BY316/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#b0aeb3",
-    "image": "/p/byb/BY316/4-side.jpg",
-    "images": [
-     "/p/byb/BY316/4-side.jpg"
-    ]
-   },
    {
     "name": "Bottle Green",
     "hex": "#3a4c4c",
@@ -32777,17 +30916,10 @@
   "images": [
    "/p/byb/BY317/front.jpg",
    "/p/byb/BY317/back.jpg",
-   "/p/byb/BY317/side.jpg"
+   "/p/byb/BY317/side.jpg",
+   "/p/byb/BY317/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#364545",
-    "image": "/p/byb/BY317/4-side.jpg",
-    "images": [
-     "/p/byb/BY317/4-side.jpg"
-    ]
-   },
    {
     "name": "Bottle Green",
     "hex": "#354342",
@@ -32845,17 +30977,10 @@
   "images": [
    "/p/byb/BY362/front.jpg",
    "/p/byb/BY362/back.jpg",
-   "/p/byb/BY362/side.jpg"
+   "/p/byb/BY362/side.jpg",
+   "/p/byb/BY362/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#2d2c3d",
-    "image": "/p/byb/BY362/4-side.jpg",
-    "images": [
-     "/p/byb/BY362/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1a1519",
@@ -32930,25 +31055,11 @@
   "basePrice": null,
   "images": [
    "/p/byb/BY363/front.jpg",
-   "/p/byb/BY363/back.jpg"
+   "/p/byb/BY363/back.jpg",
+   "/p/byb/BY363/5-detail.jpg",
+   "/p/byb/BY363/6-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "5_Detail",
-    "hex": "#161618",
-    "image": "/p/byb/BY363/5-detail.jpg",
-    "images": [
-     "/p/byb/BY363/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "6_Detail",
-    "hex": "#171719",
-    "image": "/p/byb/BY363/6-detail.jpg",
-    "images": [
-     "/p/byb/BY363/6-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#151419",
@@ -33008,25 +31119,11 @@
   "images": [
    "/p/byb/BY364/front.jpg",
    "/p/byb/BY364/back.jpg",
-   "/p/byb/BY364/side.jpg"
+   "/p/byb/BY364/side.jpg",
+   "/p/byb/BY364/4-side.jpg",
+   "/p/byb/BY364/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#645e62",
-    "image": "/p/byb/BY364/4-side.jpg",
-    "images": [
-     "/p/byb/BY364/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#48474c",
-    "image": "/p/byb/BY364/5-detail.jpg",
-    "images": [
-     "/p/byb/BY364/5-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#19191b",
@@ -33126,17 +31223,10 @@
   "images": [
    "/p/byb/BY367/front.jpg",
    "/p/byb/BY367/back.jpg",
-   "/p/byb/BY367/side.jpg"
+   "/p/byb/BY367/side.jpg",
+   "/p/byb/BY367/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#181818",
-    "image": "/p/byb/BY367/4-side.jpg",
-    "images": [
-     "/p/byb/BY367/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#151419",
@@ -33210,25 +31300,11 @@
   "basePrice": null,
   "images": [
    "/p/byb/BY368/front.jpg",
-   "/p/byb/BY368/back.jpg"
+   "/p/byb/BY368/back.jpg",
+   "/p/byb/BY368/5-detail.jpg",
+   "/p/byb/BY368/6-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "5_Detail",
-    "hex": "#1c1c1e",
-    "image": "/p/byb/BY368/5-detail.jpg",
-    "images": [
-     "/p/byb/BY368/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "6_Detail",
-    "hex": "#1a1b1b",
-    "image": "/p/byb/BY368/6-detail.jpg",
-    "images": [
-     "/p/byb/BY368/6-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1b1a1f",
@@ -33288,17 +31364,10 @@
   "images": [
    "/p/byb/BY369/front.jpg",
    "/p/byb/BY369/back.jpg",
-   "/p/byb/BY369/side.jpg"
+   "/p/byb/BY369/side.jpg",
+   "/p/byb/BY369/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#2c2b3a",
-    "image": "/p/byb/BY369/4-side.jpg",
-    "images": [
-     "/p/byb/BY369/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1c1b1d",
@@ -33396,25 +31465,11 @@
   "basePrice": null,
   "images": [
    "/p/byb/BY382/front.jpg",
-   "/p/byb/BY382/back.jpg"
+   "/p/byb/BY382/back.jpg",
+   "/p/byb/BY382/4-side.jpg",
+   "/p/byb/BY382/5-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#a9846e",
-    "image": "/p/byb/BY382/4-side.jpg",
-    "images": [
-     "/p/byb/BY382/4-side.jpg"
-    ]
-   },
-   {
-    "name": "5_Detail",
-    "hex": "#1b191a",
-    "image": "/p/byb/BY382/5-detail.jpg",
-    "images": [
-     "/p/byb/BY382/5-detail.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#161213",
@@ -33587,17 +31642,10 @@
   "images": [
    "/p/byb/BY391/front.jpg",
    "/p/byb/BY391/back.jpg",
-   "/p/byb/BY391/side.jpg"
+   "/p/byb/BY391/side.jpg",
+   "/p/byb/BY391/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#928a7a",
-    "image": "/p/byb/BY391/4-side.jpg",
-    "images": [
-     "/p/byb/BY391/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1c1c1e",
@@ -33697,17 +31745,10 @@
   "images": [
    "/p/byb/BY406/front.jpg",
    "/p/byb/BY406/back.jpg",
-   "/p/byb/BY406/side.jpg"
+   "/p/byb/BY406/side.jpg",
+   "/p/byb/BY406/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#87816c",
-    "image": "/p/byb/BY406/4-side.jpg",
-    "images": [
-     "/p/byb/BY406/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1c191a",
@@ -33775,17 +31816,10 @@
   "images": [
    "/p/byb/BY407/front.jpg",
    "/p/byb/BY407/back.jpg",
-   "/p/byb/BY407/side.jpg"
+   "/p/byb/BY407/side.jpg",
+   "/p/byb/BY407/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#757160",
-    "image": "/p/byb/BY407/4-side.jpg",
-    "images": [
-     "/p/byb/BY407/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1f1b1a",
@@ -33853,17 +31887,10 @@
   "images": [
    "/p/byb/BY409/front.jpg",
    "/p/byb/BY409/back.jpg",
-   "/p/byb/BY409/side.jpg"
+   "/p/byb/BY409/side.jpg",
+   "/p/byb/BY409/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#473e4f",
-    "image": "/p/byb/BY409/4-side.jpg",
-    "images": [
-     "/p/byb/BY409/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#2b262a",
@@ -33947,17 +31974,10 @@
   "images": [
    "/p/byb/BY410/front.jpg",
    "/p/byb/BY410/back.jpg",
-   "/p/byb/BY410/side.jpg"
+   "/p/byb/BY410/side.jpg",
+   "/p/byb/BY410/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#dacdbb",
-    "image": "/p/byb/BY410/4-side.jpg",
-    "images": [
-     "/p/byb/BY410/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1e1c1f",
@@ -34017,17 +32037,10 @@
   "images": [
    "/p/byb/BY415/front.jpg",
    "/p/byb/BY415/back.jpg",
-   "/p/byb/BY415/side.jpg"
+   "/p/byb/BY415/side.jpg",
+   "/p/byb/BY415/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#121212",
-    "image": "/p/byb/BY415/4-side.jpg",
-    "images": [
-     "/p/byb/BY415/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#121212",
@@ -34070,17 +32083,10 @@
   "images": [
    "/p/byb/BY420/front.jpg",
    "/p/byb/BY420/back.jpg",
-   "/p/byb/BY420/side.jpg"
+   "/p/byb/BY420/side.jpg",
+   "/p/byb/BY420/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#d8dbe4",
-    "image": "/p/byb/BY420/4-side.jpg",
-    "images": [
-     "/p/byb/BY420/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1c1d1f",
@@ -34140,17 +32146,10 @@
   "images": [
    "/p/byb/BY421/front.jpg",
    "/p/byb/BY421/back.jpg",
-   "/p/byb/BY421/side.jpg"
+   "/p/byb/BY421/side.jpg",
+   "/p/byb/BY421/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#323343",
-    "image": "/p/byb/BY421/4-side.jpg",
-    "images": [
-     "/p/byb/BY421/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#262429",
@@ -34218,17 +32217,10 @@
   "images": [
    "/p/byb/BY422/front.jpg",
    "/p/byb/BY422/back.jpg",
-   "/p/byb/BY422/side.jpg"
+   "/p/byb/BY422/side.jpg",
+   "/p/byb/BY422/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#1f1d20",
-    "image": "/p/byb/BY422/4-side.jpg",
-    "images": [
-     "/p/byb/BY422/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#201e21",
@@ -34362,17 +32354,10 @@
   "images": [
    "/p/byb/BY428/front.jpg",
    "/p/byb/BY428/back.jpg",
-   "/p/byb/BY428/side.jpg"
+   "/p/byb/BY428/side.jpg",
+   "/p/byb/BY428/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#c69c72",
-    "image": "/p/byb/BY428/4-side.jpg",
-    "images": [
-     "/p/byb/BY428/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1f1b1c",
@@ -34424,17 +32409,10 @@
   "images": [
    "/p/byb/BY429/front.jpg",
    "/p/byb/BY429/back.jpg",
-   "/p/byb/BY429/side.jpg"
+   "/p/byb/BY429/side.jpg",
+   "/p/byb/BY429/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#e9adc3",
-    "image": "/p/byb/BY429/4-side.jpg",
-    "images": [
-     "/p/byb/BY429/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1f1f1f",
@@ -34493,17 +32471,10 @@
   "images": [
    "/p/byb/BY431/front.jpg",
    "/p/byb/BY431/back.jpg",
-   "/p/byb/BY431/side.jpg"
+   "/p/byb/BY431/side.jpg",
+   "/p/byb/BY431/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#19191b",
-    "image": "/p/byb/BY431/4-side.jpg",
-    "images": [
-     "/p/byb/BY431/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#161618",
@@ -34554,17 +32525,10 @@
   "images": [
    "/p/byb/BY435/front.jpg",
    "/p/byb/BY435/back.jpg",
-   "/p/byb/BY435/side.jpg"
+   "/p/byb/BY435/side.jpg",
+   "/p/byb/BY435/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#69634b",
-    "image": "/p/byb/BY435/4-side.jpg",
-    "images": [
-     "/p/byb/BY435/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#282629",
@@ -34624,17 +32588,10 @@
   "images": [
    "/p/byb/BY436/front.jpg",
    "/p/byb/BY436/back.jpg",
-   "/p/byb/BY436/side.jpg"
+   "/p/byb/BY436/side.jpg",
+   "/p/byb/BY436/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#151515",
-    "image": "/p/byb/BY436/4-side.jpg",
-    "images": [
-     "/p/byb/BY436/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#171717",
@@ -34694,17 +32651,10 @@
   "images": [
    "/p/byb/BY439/front.jpg",
    "/p/byb/BY439/back.jpg",
-   "/p/byb/BY439/side.jpg"
+   "/p/byb/BY439/side.jpg",
+   "/p/byb/BY439/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#222024",
-    "image": "/p/byb/BY439/4-side.jpg",
-    "images": [
-     "/p/byb/BY439/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#222023",
@@ -34763,17 +32713,10 @@
   "images": [
    "/p/byb/BY442/front.jpg",
    "/p/byb/BY442/back.jpg",
-   "/p/byb/BY442/side.jpg"
+   "/p/byb/BY442/side.jpg",
+   "/p/byb/BY442/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#b5b2bb",
-    "image": "/p/byb/BY442/4-side.jpg",
-    "images": [
-     "/p/byb/BY442/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#131315",
@@ -34825,17 +32768,10 @@
   "images": [
    "/p/byb/BY443/front.jpg",
    "/p/byb/BY443/back.jpg",
-   "/p/byb/BY443/side.jpg"
+   "/p/byb/BY443/side.jpg",
+   "/p/byb/BY443/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#ded3c1",
-    "image": "/p/byb/BY443/4-side.jpg",
-    "images": [
-     "/p/byb/BY443/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#211f22",
@@ -34894,17 +32830,10 @@
   "images": [
    "/p/byb/BY444/front.jpg",
    "/p/byb/BY444/back.jpg",
-   "/p/byb/BY444/side.jpg"
+   "/p/byb/BY444/side.jpg",
+   "/p/byb/BY444/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#171717",
-    "image": "/p/byb/BY444/4-side.jpg",
-    "images": [
-     "/p/byb/BY444/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#181818",
@@ -34971,17 +32900,10 @@
   "images": [
    "/p/byb/BY445/front.jpg",
    "/p/byb/BY445/back.jpg",
-   "/p/byb/BY445/side.jpg"
+   "/p/byb/BY445/side.jpg",
+   "/p/byb/BY445/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#f2ced4",
-    "image": "/p/byb/BY445/4-side.jpg",
-    "images": [
-     "/p/byb/BY445/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#181818",
@@ -35048,17 +32970,10 @@
   "images": [
    "/p/byb/BY446/front.jpg",
    "/p/byb/BY446/back.jpg",
-   "/p/byb/BY446/side.jpg"
+   "/p/byb/BY446/side.jpg",
+   "/p/byb/BY446/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#201c1b",
-    "image": "/p/byb/BY446/4-side.jpg",
-    "images": [
-     "/p/byb/BY446/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1f1b1a",
@@ -35109,17 +33024,10 @@
   "images": [
    "/p/byb/BY447/front.jpg",
    "/p/byb/BY447/back.jpg",
-   "/p/byb/BY447/side.jpg"
+   "/p/byb/BY447/side.jpg",
+   "/p/byb/BY447/4-side.jpg"
   ],
   "colors": [
-   {
-    "name": "4_Side",
-    "hex": "#8a8472",
-    "image": "/p/byb/BY447/4-side.jpg",
-    "images": [
-     "/p/byb/BY447/4-side.jpg"
-    ]
-   },
    {
     "name": "Black",
     "hex": "#1d1c20",
@@ -35177,25 +33085,11 @@
   "gender": "Unisex",
   "basePrice": null,
   "images": [
-   "/p/byb/BY450C/front.jpg"
+   "/p/byb/BY450C/front.jpg",
+   "/p/byb/BY450C/5-detail.jpg",
+   "/p/byb/BY450C/6-detail.jpg"
   ],
   "colors": [
-   {
-    "name": "5_Detail",
-    "hex": "#282828",
-    "image": "/p/byb/BY450C/5-detail.jpg",
-    "images": [
-     "/p/byb/BY450C/5-detail.jpg"
-    ]
-   },
-   {
-    "name": "6_Detail",
-    "hex": "#262626",
-    "image": "/p/byb/BY450C/6-detail.jpg",
-    "images": [
-     "/p/byb/BY450C/6-detail.jpg"
-    ]
-   },
    {
     "name": "Black_White",
     "hex": "#262626",

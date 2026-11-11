@@ -9,6 +9,8 @@ import { latestReviews, overall } from '@/lib/reviews';
 import { discountTiers } from '@/lib/store';
 import HeroProducts from '@/components/HeroProducts';
 import { heroItems } from '@/lib/hero';
+import BrandStrip from '@/components/BrandStrip';
+import { brandList } from '@/lib/brand-catalog';
 
 export default async function Home() {
   const ctx = await getCustomer();
@@ -34,6 +36,7 @@ export default async function Home() {
         <h2>{collection.length ? 'Weitere Artikel' : 'Beliebte Artikel'}</h2>
         <div className="grid">{getFeatured(16, ctx).filter((p) => !collection.some((c) => c.id === p.id)).map((p) => <ProductCard key={p.id} p={p} />)}</div>
       </>}
+      <BrandStrip brands={brandList(ctx)} />
       <ReviewStrip reviews={latestReviews(6)} overall={overall()} />
       <div style={{ marginTop: 40 }}><NewsletterBox tiers={discountTiers()} /></div>
     </>

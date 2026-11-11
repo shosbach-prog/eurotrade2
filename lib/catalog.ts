@@ -140,3 +140,8 @@ export function didYouMean(q: string, ctx?: Ctx): string | null {
   const sug = fixed.join(' ');
   return sug.toLowerCase() !== q.trim().toLowerCase() && search(sug, 1, ctx).length ? sug : null;
 }
+
+/** Alle sichtbaren Artikel einer Marke (inkl. Untermarken-Schreibweisen) */
+export const getByBrand = (pred: (brand: string) => boolean, ctx?: Ctx) => products(ctx).filter((p) => pred(p.brand)).map((p) => toPublic(p, ctx));
+/** Anzahl Artikel je Herstellername */
+export function brandCounts(ctx?: Ctx) { const m = new Map<string, number>(); for (const p of products(ctx)) m.set(p.brand, (m.get(p.brand) ?? 0) + 1); return m; }

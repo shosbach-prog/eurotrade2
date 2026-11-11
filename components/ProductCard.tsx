@@ -5,6 +5,7 @@ import ProductImage from './ProductImage';
 import { swatchBg } from '@/lib/colors';
 import { WishButton } from './Wishlist';
 import Stars from './Stars';
+import BrandLogo from './BrandLogo';
 
 /** echte Merkmale als Badges – keine erfundenen Labels */
 function badges(p: PublicProduct): { t: string; c: string }[] {
@@ -32,7 +33,7 @@ export default function ProductCard({ p }: { p: PublicProduct }) {
       <div className="b">
         {p.rating ? <div className="card-rating"><Stars value={p.rating.avg} size={13} count={p.rating.count} /></div> : null}
         <div className="name">{p.name}</div>
-        <div className="brand">{p.brand}{p.sizes.length > 0 && ` · ${sizeRange(p.sizes)}`}</div>
+        <div className="brand"><BrandLogo name={p.brand} h={16} />{p.sizes.length > 0 && <span>{sizeRange(p.sizes)}</span>}</div>
         <div className="dots">
           {p.colors.slice(0, 7).map((c) => <span key={c.name} className="dot" title={c.name} style={{ background: swatchBg(c) }} />)}
           {p.colors.length > 7 && <span className="dots-more">+{p.colors.length - 7}</span>}

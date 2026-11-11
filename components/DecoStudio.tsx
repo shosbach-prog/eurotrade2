@@ -11,7 +11,17 @@ type Props = {
   place: Place; setPlace: (p: Place) => void;
   logoSrc?: string | null; text?: string; font?: string; textColor?: string;
   method: string; compact?: boolean;
+  /** Bildanalyse des Fotos: [oben, Schulter, Schulter bei Kapuze, unten, Mittelachse] in % der Bühne */
+  fit?: [number, number, number, number, number] | null;
 };
+
+/** Bezugslinien der Skizze je Artikelart (oben/unten in %), an denen das Foto ausgerichtet wird */
+const REF: Partial<Record<string, { top: number; bottom: number; shoulder?: boolean }>> = {
+  oberteil: { top: 14, bottom: 95, shoulder: true }, hose: { top: 6, bottom: 95 }, tasche: { top: 8, bottom: 94 },
+  cap: { top: 27, bottom: 80 }, muetze: { top: 22, bottom: 80 }, schuerze: { top: 2, bottom: 95 }, unterwaesche: { top: 22, bottom: 70 },
+};
+type Tf = { s: number; ox: number; oy: number; rt: number };
+const ident: Tf = { s: 1, ox: 50, oy: 0, rt: 0 };
 
 const lum = (hex?: string) => { const m = /^#?([0-9a-f]{6})$/i.exec(hex ?? ''); if (!m) return 1; const n = parseInt(m[1], 16); return (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255; };
 
@@ -36,17 +46,30 @@ export default function DecoStudio(props: Props) {
   const known = positions.filter((p) => spots[p]);
   const cur = active && spots[active] ? active : known[0] ?? null;
   const [view, setView] = useState<View>(cur ? spots[cur].view : 'front');
-  const [photoMode, setPhotoMode] = useState(!!props.photo);
+  // Foto nur als Vorschau nutzen, wenn die Bildanalyse den Artikel sicher erkannt hat (kein Model-Foto)
+  const canPhoto = !!props.photo && !!props.fit;
+  const [photoMode, setPhotoMode] = useState(canPhoto);
   const stage = useRef<HTMLDivElement>(null);
   const drag = useRef<{ pos: string; dx: number; dy: number } | null>(null);
 
   useEffect(() => { if (cur) setView(spots[cur].view); }, [cur]); // eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(() => { setPhotoMode(!!props.photo); }, [props.photo]);
+  useEffect(() => { setPhotoMode(canPhoto); }, [props.photo, canPhoto]);
 
   const hex = props.colorHex ?? '#d9dde3';
   const light = lum(hex) > 0.62;
   const hasBack = !!shape.back || known.some((p) => spots[p].view === 'back');
   const showPhoto = photoMode && view === 'front' && !!props.photo;
+  // Ausrichtung am echten Artikel im Foto: Skizzen-Koordinaten -> Foto-Koordinaten (gleichmäßig skaliert)
+  const tf: Tf = useMemo(() => {
+    const r = REF[kind], f = props.fit;
+    if (!showPhoto || !r || !f) return ident;
+    const top = r.shoulder ? (hoodie ? f[2] : f[1]) : f[0];
+    const s = (f[3] - top) / (r.bottom - r.top);
+    if (!(s > 0.3 && s < 2)) return ident;
+    return { s, ox: f[4], oy: top, rt: r.top };
+  }, [showPhoto, kind, props.fit, hoodie]);
+  const toX = (x: number) => tf.ox + (x - 50) * tf.s, toY = (y: number) => tf.oy + (y - tf.rt) * tf.s;
+  const fromX = (x: number) => (x - tf.ox) / tf.s + 50, fromY = (y: number) => (y - tf.oy) / tf.s + tf.rt;
   const inView = known.filter((p) => spots[p].view === view);
   const lines = text.split('\n').filter((l) => l.trim());
   const longest = Math.max(1, ...lines.map((l) => l.length));
@@ -59,13 +82,13 @@ export default function DecoStudio(props: Props) {
   function down(e: React.PointerEvent, pos: string) {
     e.preventDefault(); e.stopPropagation();
     setActive(pos);
-    const p = pt(e), cur = place[pos];
+    const q = pt(e), p = { x: fromX(q.x), y: fromY(q.y) }, cur = place[pos];
     drag.current = { pos, dx: p.x - cur.x, dy: p.y - cur.y };
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
   }
   function move(e: React.PointerEvent) {
     const d = drag.current; if (!d) return;
-    const p = pt(e), s = spots[d.pos], c = place[d.pos];
+    const q = pt(e), p = { x: fromX(q.x), y: fromY(q.y) }, s = spots[d.pos], c = place[d.pos];
     const [x0, y0, x1, y1] = s.area;
     const x = Math.min(x1 - c.w / 2, Math.max(x0 + c.w / 2, p.x - d.dx));
     const y = Math.min(y1 - 2, Math.max(y0 + 2, p.y - d.dy));
@@ -97,7 +120,7 @@ export default function DecoStudio(props: Props) {
           <button type="button" className={view === 'front' ? 'on' : ''} onClick={() => setView('front')}>Vorderseite</button>
           {hasBack && <button type="button" className={view === 'back' ? 'on' : ''} onClick={() => setView('back')}>Rückseite</button>}
         </div>
-        {props.photo && view === 'front' && <div className="seg">
+        {canPhoto && view === 'front' && <div className="seg">
           <button type="button" className={photoMode ? 'on' : ''} onClick={() => setPhotoMode(true)}>Foto</button>
           <button type="button" className={!photoMode ? 'on' : ''} onClick={() => setPhotoMode(false)}>Skizze</button>
         </div>}
@@ -114,13 +137,13 @@ export default function DecoStudio(props: Props) {
           </svg>
         )}
         {/* Druckbereich der aktiven Position */}
-        {cur && spots[cur].view === view && (() => { const [x0, y0, x1, y1] = spots[cur].area; return <div className="ds-area" style={{ left: `${x0}%`, top: `${y0}%`, width: `${x1 - x0}%`, height: `${y1 - y0}%` }} />; })()}
+        {cur && spots[cur].view === view && (() => { const [x0, y0, x1, y1] = spots[cur].area; return <div className="ds-area" style={{ left: `${toX(x0)}%`, top: `${toY(y0)}%`, width: `${(x1 - x0) * tf.s}%`, height: `${(y1 - y0) * tf.s}%` }} />; })()}
         {hasMotif && inView.map((pos) => {
           const c = place[pos]; if (!c) return null;
           const on = pos === cur;
           return (
             <div key={pos} className={`ds-motif ${on ? 'on' : ''} ${method === 'Stick' ? 'stitch' : 'print'} ${light ? 'on-light' : 'on-dark'}`}
-              style={{ left: `${c.x}%`, top: `${c.y}%`, width: `${c.w}%` }} onPointerDown={(e) => down(e, pos)} title={`${pos} – ziehen zum Verschieben`}>
+              style={{ left: `${toX(c.x)}%`, top: `${toY(c.y)}%`, width: `${c.w * tf.s}%` }} onPointerDown={(e) => down(e, pos)} title={`${pos} – ziehen zum Verschieben`}>
               {logoSrc && <img src={logoSrc} alt="" draggable={false} />}
               {lines.length > 0 && <div className="ds-text" style={{ fontFamily: fontCss(font), color: colorHex(textColor), fontSize: `${Math.min(34, 150 / longest)}cqw` }}>{lines.map((l, k) => <div key={k}>{l}</div>)}</div>}
               {on && <span className="ds-size">{cmFor(kind, c.w)} cm</span>}

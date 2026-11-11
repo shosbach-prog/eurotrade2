@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import ProductCard from './ProductCard';
+import { brandLogo } from '@/lib/brands';
 import type { PublicProduct } from '@/lib/types';
 import { FAMILY_HEX, colorFamily } from '@/lib/colors';
 import { eur } from '@/lib/format';
@@ -82,7 +83,7 @@ export default function FilterGrid({ items }: { items: PublicProduct[] }) {
         <button key={f} className={`f-fam ${fams.includes(f) ? 'on' : ''}`} onClick={() => tog(setFams, f)} title={`${f} (${n})`}><span style={{ background: FAMILY_HEX[f] }} />{f}</button>))}</div>)}
       {facets.size.length > 1 && grp('size', 'Größe', sizes.length, <div className="f-sizes">{facets.size.map(([s]) => <button key={s} className={`size ${sizes.includes(s) ? 'on' : ''}`} onClick={() => tog(setSizes, s)}>{s}</button>)}</div>)}
       {facets.gender.length > 1 && grp('gender', 'Schnitt', genders.length, <>{facets.gender.map(([g, n]) => <label key={g} className="f-check"><input type="checkbox" checked={genders.includes(g)} onChange={() => tog(setGenders, g)} />{g}<span>{n}</span></label>)}</>)}
-      {facets.brand.length > 1 && grp('brand', 'Marke', brands.length, <>{facets.brand.map(([b, n]) => <label key={b} className="f-check"><input type="checkbox" checked={brands.includes(b)} onChange={() => tog(setBrands, b)} />{b}<span>{n}</span></label>)}</>)}
+      {facets.brand.length > 1 && grp('brand', 'Marke', brands.length, <>{facets.brand.map(([b, n]) => <label key={b} className="f-check"><input type="checkbox" checked={brands.includes(b)} onChange={() => tog(setBrands, b)} />{brandLogo(b) && <img className="f-blogo" src={brandLogo(b)!} alt="" loading="lazy" />}{b}<span>{n}</span></label>)}</>)}
       {facets.max > facets.min && grp('price', 'Preis', maxP != null ? 1 : 0, <><b style={{ fontSize: 13 }}>bis {eur(maxP ?? facets.max)}</b><input type="range" min={facets.min} max={facets.max} step={1} value={maxP ?? facets.max} onChange={(e) => setMaxP(Number(e.target.value) >= facets.max ? null : Number(e.target.value))} /></>)}
       <button className="btn f-apply" onClick={() => setOpen(false)}>{shown.length} Artikel anzeigen</button>
     </aside>
