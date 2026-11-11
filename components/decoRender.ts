@@ -1,10 +1,10 @@
 'use client';
 // Live-Vorschau als Bild (PNG) – wird beim Hinzufügen zum Warenkorb hochgeladen und hängt an Anfrage, Angebot und PDF
 import { colorHex, fontCss } from '@/lib/deco';
-import { ident, photoTf, shapeFor, type FitT, type Place } from './DecoStudio';
+import { anchorTf, ident, photoTf, shapeFor, type Anchor, type FitT, type Place, type Tf } from './DecoStudio';
 
 type Opts = {
-  product: { category?: string; name?: string }; colorHex?: string; photo?: string | null; fit?: FitT | null;
+  product: { category?: string; name?: string }; colorHex?: string; photo?: string | null; fit?: FitT | null; anchor?: Record<string, Anchor> | null;
   positions: string[]; place: Place; logoSrc?: string | null; text?: string; font?: string; textColor?: string; method: string;
 };
 const load = (src: string) => new Promise<HTMLImageElement>((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
@@ -19,12 +19,12 @@ async function renderView(o: Opts, view: 'front' | 'back', N = 900): Promise<Blo
   let tf = ident;
   const inset = N * 0.04, box = N * 0.92;
   let photoOk = false;
-  if (view === 'front' && o.photo && o.fit) {
+  if (view === 'front' && o.photo && (o.fit || o.anchor)) {
     try {
       const im = await load(o.photo);
       const sc = Math.min(box / im.width, box / im.height);
       g.drawImage(im, inset + (box - im.width * sc) / 2, inset + (box - im.height * sc) / 2, im.width * sc, im.height * sc);
-      tf = photoTf(kind, o.fit, hoodie); photoOk = true;
+      tf = o.fit ? photoTf(kind, o.fit, hoodie) : ident; photoOk = true;
     } catch {}
   }
   if (!photoOk) {
@@ -33,13 +33,16 @@ async function renderView(o: Opts, view: 'front' | 'back', N = 900): Promise<Blo
     if (view === 'front') for (const d of shape.detail ?? []) { g.strokeStyle = 'rgba(0,0,0,.25)'; g.lineWidth = 0.5; g.stroke(new Path2D(d)); }
     g.restore();
   }
-  const X = (x: number) => ((tf.ox + (x - 50) * tf.s) / 100) * N, Y = (y: number) => ((tf.oy + (y - tf.rt) * tf.s) / 100) * N;
+  const tfOf = (p: string): Tf => (photoOk && o.anchor?.[p] && spots[p] ? anchorTf(spots[p], o.anchor[p]) : tf);
+  let t: Tf = tf;
+  const X = (x: number) => ((t.ox + (x - 50) * t.s) / 100) * N, Y = (y: number) => ((t.oy + (y - t.rt) * t.s) / 100) * N;
   const logo = o.logoSrc ? await load(o.logoSrc).catch(() => null) : null;
   const lines = (o.text ?? '').split('\n').filter((l) => l.trim());
   const longest = Math.max(1, ...lines.map((l) => l.length));
   for (const p of pos) {
-    const pl = o.place[p];
-    const w = (pl.w * tf.s / 100) * N, cx = X(pl.x), cy = Y(pl.y);
+    const pl = o.place[p]; t = tfOf(p);
+    const w = (pl.w * t.s / 100) * N, cx = X(pl.x), cy = Y(pl.y);
+    g.save(); if (t.rot) { g.translate(cx, cy); g.rotate((t.rot * Math.PI) / 180); g.translate(-cx, -cy); }
     const lh = lines.length ? Math.min(0.34, 1.5 / longest) * w : 0;
     const lw = logo ? w : 0;
     const lhgt = logo ? lw * (logo.height / logo.width) : 0;
@@ -51,6 +54,7 @@ async function renderView(o: Opts, view: 'front' | 'back', N = 900): Promise<Blo
       g.font = `700 ${lh}px ${fontCss(o.font)}`;
       for (const l of lines) { g.fillText(l, cx, y, w); y += lh * 1.05; }
     }
+    g.restore();
   }
   // Hinweis unten
   g.fillStyle = 'rgba(20,24,31,.55)'; g.font = `500 ${N * 0.022}px Arial, sans-serif`; g.textAlign = 'left'; g.textBaseline = 'bottom';

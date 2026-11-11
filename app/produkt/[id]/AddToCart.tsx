@@ -12,7 +12,7 @@ import BrandLogo from '@/components/BrandLogo';
 import { brandSlug, findBrand } from '@/lib/brands';
 import { FONTS, positionsFor, TEXT_COLORS, TEAM_POS, colorHex, fontCss, isImage, parseTeamList, type Deco, type Motif, type TeamRow } from '@/lib/deco';
 import { uploadPreviews } from '@/components/decoRender';
-import DecoStudio, { defaultPlace, type Place } from '@/components/DecoStudio';
+import DecoStudio, { defaultPlace, type FitT, type Place } from '@/components/DecoStudio';
 import { cmFor, spotsFor } from '@/lib/deco-layout';
 import { nextTier, unitFor } from '@/lib/tiers';
 import { calcDeco, type DecoPricing } from '@/lib/deco-pricing';
@@ -25,7 +25,7 @@ type Logo = { id: string; name: string };
 export type TeamCtx = { slug: string; name: string; logoId?: string | null; logoName?: string | null; method: string; positions: string[]; personalize: 'aus' | 'name' | 'nummer' | 'beides'; deadline?: string | null; open: boolean };
 type PText = { headline: string; intro: string; highlights: string[]; idealFor: string };
 type Pic = { src: string; label: string };
-export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fits, team, pictos }: { pictos?: { features: Pic[]; care: Pic[] }; p: PublicProduct; fits?: Record<string, [number, number, number, number, number]>; team?: TeamCtx | null; customerLogo?: Logo | null; delivery?: string; copy?: PText; pricing?: DecoPricing | null }) {
+export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fits, anchors, admin, team, pictos }: { pictos?: { features: Pic[]; care: Pic[] }; p: PublicProduct; fits?: Record<string, number[]>; anchors?: Record<string, Record<string, [number, number, number, number]>>; admin?: boolean; team?: TeamCtx | null; customerLogo?: Logo | null; delivery?: string; copy?: PText; pricing?: DecoPricing | null }) {
   const { addMany } = useCart();
   const [color, setColor] = useState(p.colors[0]);
   // Mengen je Farbe + Größe ("Black|M" -> 5) – mehrere Farben in einem Schritt möglich
@@ -149,7 +149,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
       <small>{total > 0 ? `bei ${total} Stück, ${est.lines.map((l) => `${l.pos} ca. ${l.cm} cm`).join(', ')} · netto · ` : 'Menge wählen – ab mehr Stück wird es günstiger · netto · '}verbindlich im Angebot</small>
     </div>
   );
-  const studioProps = { product: p, colorHex: color?.hex, photo: color?.image ?? null, fit: color?.image ? fits?.[color.image] ?? null : null, positions, active: activePos, setActive: setActivePos, place, setPlace, logoSrc: useLogo && logo && isImage(logo.name) ? `/api/upload/${logo.id}` : null, text: useText ? text : '', font, textColor: tColor, method };
+  const studioProps = { product: p, colorHex: color?.hex, photo: color?.image ?? null, fit: color?.image ? (fits?.[color.image] as FitT | undefined) ?? null : null, anchor: color?.image ? anchors?.[color.image] ?? null : null, admin, positions, active: activePos, setActive: setActivePos, place, setPlace, logoSrc: useLogo && logo && isImage(logo.name) ? `/api/upload/${logo.id}` : null, text: useText ? text : '', font, textColor: tColor, method };
   // Galerie: Fotos der gewählten Farbe, danach Detailfotos des Artikels
   const galP = color?.images?.length ? { ...p, images: [...color.images, ...p.images.filter((x) => !color.images!.includes(x) && /detail/i.test(x))] } : p;
   const textStyle = { fontFamily: fontCss(font), color: colorHex(tColor) };

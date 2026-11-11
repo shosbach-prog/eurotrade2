@@ -1,0 +1,90 @@
+{
+ "/p/byb/BY001/black.jpg": {
+  "Front / Umschlag": [
+   55,
+   63,
+   14.67,
+   14
+  ]
+ },
+ "/p/byb/BY001/burgundy.jpg": {
+  "Front / Umschlag": [
+   56,
+   66,
+   16.0,
+   10
+  ]
+ },
+ "/p/byb/BY001/heather-grey.jpg": {
+  "Front / Umschlag": [
+   57,
+   63,
+   14.67,
+   14
+  ]
+ },
+ "/p/byb/BY001/navy.jpg": {
+  "Front / Umschlag": [
+   50,
+   63,
+   16.0,
+   12
+  ]
+ },
+ "/p/byb/BY001/front.jpg": {
+  "Front / Umschlag": [
+   56,
+   68,
+   18.67,
+   12
+  ]
+ },
+ "/p/byb/BY002/black.jpg": {
+  "Front / Umschlag": [
+   49,
+   58,
+   12.0,
+   10
+  ]
+ },
+ "/p/byb/BY002/charcoal-heather.jpg": {
+  "Front / Umschlag": [
+   51,
+   60,
+   12.0,
+   10
+  ]
+ },
+ "/p/byb/BY002/heather-grey.jpg": {
+  "Front / Umschlag": [
+   49,
+   61,
+   10.67,
+   10
+  ]
+ },
+ "/p/byb/BY002/navy.jpg": {
+  "Front / Umschlag": [
+   52,
+   60,
+   12.0,
+   14
+  ]
+ },
+ "/p/byb/BY154/black.jpg": {
+  "Front / Umschlag": [
+   50,
+   60,
+   18.0,
+   0
+  ]
+ },
+ "/p/byb/BY154/front.jpg": {
+  "Front / Umschlag": [
+   50,
+   72,
+   22.0,
+   0
+  ]
+ }
+}

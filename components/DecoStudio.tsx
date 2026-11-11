@@ -12,17 +12,27 @@ type Props = {
   logoSrc?: string | null; text?: string; font?: string; textColor?: string;
   method: string; compact?: boolean;
   /** Bildanalyse des Fotos: [oben, Schulter, Schulter bei Kapuze, unten, Mittelachse] in % der Bühne */
-  fit?: [number, number, number, number, number] | null;
+  fit?: FitT | null;
+  /** Lage-Anker je Position für dieses Foto: [x, y, Breite, Drehung] – überschreibt die automatische Ausrichtung */
+  anchor?: Record<string, Anchor> | null;
+  /** Admin: Lage für dieses Foto speichern */
+  admin?: boolean;
 };
+export type Anchor = [number, number, number, number];
 
 /** Bezugslinien der Skizze je Artikelart (oben/unten in %), an denen das Foto ausgerichtet wird */
 const REF: Partial<Record<string, { top: number; bottom: number; shoulder?: boolean }>> = {
   oberteil: { top: 14, bottom: 95, shoulder: true }, hose: { top: 6, bottom: 95 }, tasche: { top: 8, bottom: 94 },
   cap: { top: 27, bottom: 80 }, muetze: { top: 22, bottom: 80 }, schuerze: { top: 2, bottom: 95 }, unterwaesche: { top: 22, bottom: 70 },
 };
-export type Tf = { s: number; ox: number; oy: number; rt: number };
+export type Tf = { s: number; ox: number; oy: number; rt: number; rot?: number };
 export const ident: Tf = { s: 1, ox: 50, oy: 0, rt: 0 };
-export type FitT = [number, number, number, number, number];
+export type FitT = [number, number, number, number, number] | [number, number, number, number, number, number];
+/** Anker → Ausrichtung: die Standard-Lage der Position landet genau auf dem Anker */
+export function anchorTf(spot: { x: number; y: number; w: number }, a: Anchor): Tf {
+  const s = a[2] / spot.w;
+  return { s, ox: a[0] - (spot.x - 50) * s, oy: a[1], rt: spot.y, rot: a[3] };
+}
 
 /** Skizze je Artikel (Hoodie mit Kapuze, Langarm usw.) */
 export function shapeFor(product: { category?: string; name?: string }) {
@@ -61,7 +71,7 @@ export default function DecoStudio(props: Props) {
   const cur = active && spots[active] ? active : known[0] ?? null;
   const [view, setView] = useState<View>(cur ? spots[cur].view : 'front');
   // Foto nur als Vorschau nutzen, wenn die Bildanalyse den Artikel sicher erkannt hat (kein Model-Foto)
-  const canPhoto = !!props.photo && !!props.fit;
+  const canPhoto = !!props.photo && (!!props.fit || !!props.anchor);
   const [photoMode, setPhotoMode] = useState(canPhoto);
   const stage = useRef<HTMLDivElement>(null);
   const drag = useRef<{ pos: string; dx: number; dy: number } | null>(null);
@@ -75,8 +85,17 @@ export default function DecoStudio(props: Props) {
   const showPhoto = photoMode && view === 'front' && !!props.photo;
   // Ausrichtung am echten Artikel im Foto: Skizzen-Koordinaten -> Foto-Koordinaten (gleichmäßig skaliert)
   const tf: Tf = useMemo(() => (showPhoto ? photoTf(kind, props.fit, hoodie) : ident), [showPhoto, kind, props.fit, hoodie]);
-  const toX = (x: number) => tf.ox + (x - 50) * tf.s, toY = (y: number) => tf.oy + (y - tf.rt) * tf.s;
-  const fromX = (x: number) => (x - tf.ox) / tf.s + 50, fromY = (y: number) => (y - tf.oy) / tf.s + tf.rt;
+  // Admin-Feinjustage (nur zum Speichern eines Ankers)
+  const [adj, setAdj] = useState<{ s: number; rot: number } | null>(null);
+  const [saved, setSaved] = useState('');
+  const tfOf = (pos: string | null): Tf => {
+    let t = tf;
+    if (showPhoto && pos && props.anchor?.[pos] && spots[pos]) t = anchorTf(spots[pos], props.anchor[pos]);
+    if (adj && pos === cur && showPhoto) t = { ...t, s: t.s * adj.s, rot: (t.rot ?? 0) + adj.rot };
+    return t;
+  };
+  const toX = (x: number, t = tf) => t.ox + (x - 50) * t.s, toY = (y: number, t = tf) => t.oy + (y - t.rt) * t.s;
+  const fromX = (x: number, t = tf) => (x - t.ox) / t.s + 50, fromY = (y: number, t = tf) => (y - t.oy) / t.s + t.rt;
   const inView = known.filter((p) => spots[p].view === view);
   const lines = text.split('\n').filter((l) => l.trim());
   const longest = Math.max(1, ...lines.map((l) => l.length));
@@ -89,13 +108,13 @@ export default function DecoStudio(props: Props) {
   function down(e: React.PointerEvent, pos: string) {
     e.preventDefault(); e.stopPropagation();
     setActive(pos);
-    const q = pt(e), p = { x: fromX(q.x), y: fromY(q.y) }, cur = place[pos];
+    const t = tfOf(pos), q = pt(e), p = { x: fromX(q.x, t), y: fromY(q.y, t) }, cur = place[pos];
     drag.current = { pos, dx: p.x - cur.x, dy: p.y - cur.y };
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
   }
   function move(e: React.PointerEvent) {
     const d = drag.current; if (!d) return;
-    const q = pt(e), p = { x: fromX(q.x), y: fromY(q.y) }, s = spots[d.pos], c = place[d.pos];
+    const t = tfOf(d.pos), q = pt(e), p = { x: fromX(q.x, t), y: fromY(q.y, t) }, s = spots[d.pos], c = place[d.pos];
     const [x0, y0, x1, y1] = s.area;
     const x = Math.min(x1 - c.w / 2, Math.max(x0 + c.w / 2, p.x - d.dx));
     const y = Math.min(y1 - 2, Math.max(y0 + 2, p.y - d.dy));
@@ -144,13 +163,13 @@ export default function DecoStudio(props: Props) {
           </svg>
         )}
         {/* Druckbereich der aktiven Position */}
-        {cur && spots[cur].view === view && (() => { const [x0, y0, x1, y1] = spots[cur].area; return <div className="ds-area" style={{ left: `${toX(x0)}%`, top: `${toY(y0)}%`, width: `${(x1 - x0) * tf.s}%`, height: `${(y1 - y0) * tf.s}%` }} />; })()}
+        {cur && spots[cur].view === view && (() => { const t = tfOf(cur), [x0, y0, x1, y1] = spots[cur].area; return <div className="ds-area" style={{ left: `${toX(x0, t)}%`, top: `${toY(y0, t)}%`, width: `${(x1 - x0) * t.s}%`, height: `${(y1 - y0) * t.s}%`, transform: t.rot ? `rotate(${t.rot}deg)` : undefined }} />; })()}
         {hasMotif && inView.map((pos) => {
           const c = place[pos]; if (!c) return null;
-          const on = pos === cur;
+          const on = pos === cur, t = tfOf(pos);
           return (
             <div key={pos} className={`ds-motif ${on ? 'on' : ''} ${method === 'Stick' ? 'stitch' : 'print'} ${light ? 'on-light' : 'on-dark'}`}
-              style={{ left: `${toX(c.x)}%`, top: `${toY(c.y)}%`, width: `${c.w * tf.s}%` }} onPointerDown={(e) => down(e, pos)} title={`${pos} – ziehen zum Verschieben`}>
+              style={{ left: `${toX(c.x, t)}%`, top: `${toY(c.y, t)}%`, width: `${c.w * t.s}%`, transform: t.rot ? `translate(-50%,-50%) rotate(${t.rot}deg)` : undefined }} onPointerDown={(e) => down(e, pos)} title={`${pos} – ziehen zum Verschieben`}>
               {logoSrc && <img src={logoSrc} alt="" draggable={false} />}
               {lines.length > 0 && <div className="ds-text" style={{ fontFamily: fontCss(font), color: colorHex(textColor), fontSize: `${Math.min(34, 150 / longest)}cqw` }}>{lines.map((l, k) => <div key={k}>{l}</div>)}</div>}
               {on && <span className="ds-size">{cmFor(kind, c.w)} cm</span>}
@@ -170,6 +189,22 @@ export default function DecoStudio(props: Props) {
           </label>
           <button type="button" className="linkbtn" onClick={() => { const d = defaultPlace(product, cur); if (d) setPlace({ ...place, [cur]: d }); }}>Standard-Position</button>
         </>}
+      </div>}
+      {props.admin && showPhoto && cur && place[cur] && <div className="ds-admin">
+        <b>Admin: Lage für dieses Foto</b>
+        <label>Maßstab <input type="range" min={0.4} max={2.5} step={0.02} value={adj?.s ?? 1} onChange={(e) => setAdj({ s: Number(e.target.value), rot: adj?.rot ?? 0 })} /></label>
+        <label>Drehung <input type="range" min={-35} max={35} step={0.5} value={adj?.rot ?? 0} onChange={(e) => setAdj({ s: adj?.s ?? 1, rot: Number(e.target.value) })} /> {((tfOf(cur).rot ?? 0)).toFixed(1)}°</label>
+        <div className="deco-row">
+          <button type="button" className="btn sm" onClick={async () => {
+            const t = tfOf(cur), c = place[cur], sp = spots[cur];
+            const anchor: Anchor = [toX(c.x, t) + (sp.x - c.x) * t.s, toY(c.y, t) + (sp.y - c.y) * t.s, sp.w * t.s, t.rot ?? 0];
+            const r = await fetch('/api/admin/bildanker', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ src: props.photo, pos: cur, anchor }) });
+            setSaved(r.ok ? 'Gespeichert – gilt ab sofort für dieses Foto (neu laden).' : 'Fehler beim Speichern');
+          }}>Lage speichern</button>
+          {props.anchor?.[cur] && <button type="button" className="linkbtn" onClick={async () => { await fetch('/api/admin/bildanker', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ src: props.photo, pos: cur, anchor: null }) }); setSaved('Entfernt – automatische Lage (neu laden).'); }}>Anker entfernen</button>}
+          {saved && <span className="ok" style={{ fontSize: 13 }}>{saved}</span>}
+        </div>
+        <small className="muted">Motiv auf die richtige Stelle ziehen, Maßstab und Drehung anpassen, speichern. Gilt für {cur} auf diesem Foto.</small>
       </div>}
       <p className="ds-note">Vorschau zur Orientierung – Motiv ziehen zum Verschieben. Vor der Produktion erhalten Sie eine exakte Vorschau zur Freigabe.</p>
     </div>

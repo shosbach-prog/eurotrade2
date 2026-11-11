@@ -25,7 +25,7 @@ export const SPOTS: Record<Kind, Record<string, Spot>> = {
     Hinten: S('back', 50, 58, 16, [38, 48, 62, 68]),
   },
   muetze: {
-    'Front / Umschlag': S('front', 50, 69, 24, [32, 60, 68, 79]),
+    'Front / Umschlag': S('front', 50, 69, 16, [32, 60, 68, 79]),
     'Seite links': S('front', 70, 69, 10, [62, 60, 76, 79]),
     'Seite rechts': S('front', 30, 69, 10, [24, 60, 38, 79]),
   },
