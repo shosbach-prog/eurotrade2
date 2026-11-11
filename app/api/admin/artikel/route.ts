@@ -69,3 +69,24 @@ export async function DELETE(req: Request) {
   saveOverride(id, null);
   return NextResponse.json({ ok: true });
 }
+
+/** Mehrere Artikel auf einmal: sichtbar/ausblenden, Kategorie, Top */
+export async function PATCH(req: Request) {
+  if (!(await isAdmin())) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
+  const b = await req.json().catch(() => ({}));
+  const ids: string[] = (Array.isArray(b?.ids) ? b.ids : []).map(String).slice(0, 5000);
+  const patch: Override = {};
+  if (typeof b?.patch?.hidden === 'boolean') patch.hidden = b.patch.hidden;
+  if (typeof b?.patch?.top === 'boolean') patch.top = b.patch.top;
+  if (typeof b?.patch?.category === 'string' && str(b.patch.category, 60)) patch.category = str(b.patch.category, 60);
+  if (!ids.length || !Object.keys(patch).length) return NextResponse.json({ error: 'Nichts zu ändern.' }, { status: 400 });
+  const all = readOverrides();
+  let n = 0;
+  for (const id of ids) {
+    const { p } = adminProduct(id);
+    if (!p) continue;
+    saveOverride(id, { ...(all[id] ?? {}), ...patch });
+    n++;
+  }
+  return NextResponse.json({ ok: true, count: n });
+}
