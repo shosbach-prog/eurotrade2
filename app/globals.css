@@ -1453,3 +1453,20 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .share-in{border-color:var(--brand);margin-bottom:14px}
 .more-toggle{margin:10px 0 0;font-size:14px}
 .thanks{border-color:#86efac;background:#f0fdf4;margin-bottom:14px}.thanks p{margin:6px 0 0}
+
+/* Artikelseite aufgeräumt */
+.pd h1{font-size:26px;line-height:1.2}
+.tiers{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;margin-top:10px;font-size:13px;color:var(--muted)}
+.tiers-l{font-weight:600;color:var(--ink)}
+.tier{border:0;background:none;padding:2px 0;min-width:0;display:inline;font-size:13px;color:var(--muted);box-shadow:none;border-radius:0}
+.tier b{font-size:13px;color:var(--ink)}
+.tier.on{background:none;box-shadow:none;color:var(--brand)}.tier.on b{color:var(--brand)}
+@media (max-width:520px){.tiers{display:flex}.tier{padding:2px 0}.tier b{font-size:13px}}
+.picto-row{gap:4px 14px;margin:10px 0 0}
+.picto-row li{border:0;background:none;padding:0;gap:5px;font-size:12.5px;color:var(--muted)}
+.picto-row img{width:20px;height:20px}
+.opt-row{justify-content:flex-start;gap:6px 14px}
+.opt-row>span{margin-right:auto}
+.sz-link{background:none;border:0;padding:0;font-size:13px;font-weight:500;color:var(--brand);text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.opt-row .sz-link{margin-left:0}
+.sz-tools{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:center;margin-top:8px;font-size:13px}

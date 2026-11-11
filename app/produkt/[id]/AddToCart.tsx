@@ -66,6 +66,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
   const [dstep, setDstep] = useState(1);
   const [full, setFull] = useState(false);
   const [distN, setDistN] = useState('');
+  const [distOpen, setDistOpen] = useState(false);
   const s1 = !team && dstep === 1, s2 = !!team || dstep === 2, s3 = !!team || dstep === 3;
 
   const sizes = p.sizes.length ? p.sizes : [''];
@@ -187,15 +188,15 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
           <div className="price">{eur(p.price)} <span style={{ fontSize: 15, fontWeight: 500 }} className="muted">/ Stück</span></div>
           <div className="vat">netto zzgl. MwSt. ({eur(p.priceGross)} brutto) · schon ab 1 Stück{decoOn ? ' · Veredelung wird im Angebot kalkuliert' : ''}</div>
           {delivery && <div className="delivery"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M1 4h14v12H1zM15 9h4l3 3v4h-7z" /><circle cx="6" cy="18" r="2" /><circle cx="18" cy="18" r="2" /></svg>{delivery}</div>}
-          {p.tiers.length > 0 && <div className="opt" style={{ marginTop: 14, marginBottom: 6 }}>Mengenrabatt <Info>Der Staffelpreis gilt für die Gesamtmenge dieses Artikels – alle Farben und Größen zusammen. Beispiel: 6× Schwarz M + 6× Rot L = 12 Stück.</Info></div>}
           {p.tiers.length > 0 && (
-            <div className="tiers">
-              <div className={`tier ${total < p.tiers[0].min ? 'on' : ''}`}><span>1–{p.tiers[0].min - 1} Stk.</span><b>{eur(p.price)}</b></div>
+            <div className="tiers" aria-label="Staffelpreise">
+              <span className="tiers-l">Staffel</span>
               {p.tiers.map((t, n) => {
                 const to = p.tiers[n + 1]?.min;
                 const on = total >= t.min && (!to || total < to);
-                return <div key={t.min} className={`tier ${on ? 'on' : ''}`}><span>{to ? `${t.min}–${to - 1}` : `ab ${t.min}`} Stk.</span><b>{eur(t.price)}</b><small>−{Math.round((1 - t.price / p.price!) * 100)} %</small></div>;
+                return <span key={t.min} className={`tier ${on ? 'on' : ''}`} title={`−${Math.round((1 - t.price / p.price!) * 100)} %`}>ab {t.min}: <b>{eur(t.price)}</b></span>;
               })}
+              <Info>Der Staffelpreis gilt für die Gesamtmenge dieses Artikels – alle Farben und Größen zusammen. Beispiel: 6× Schwarz M + 6× Rot L = 12 Stück.</Info>
             </div>
           )}
         </> : <>
@@ -204,7 +205,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
         </>}
 
         {!!pictos?.features.length && <ul className="picto-row" aria-label="Eigenschaften">
-          {pictos.features.map((x) => <li key={x.src} title={x.label}><img src={`/picto/${x.src}.png`} alt="" width={36} height={36} loading="lazy" /><span>{x.label}</span></li>)}
+          {pictos.features.map((x) => <li key={x.src}><img src={`/picto/${x.src}.png`} alt="" width={20} height={20} />{x.label}</li>)}
         </ul>}
         {p.colors.length > 0 && <>
           <div className="opt">Farbe: <span className="muted">{cname}</span> <span className="muted" style={{ fontWeight: 400 }}>({p.colors.length} {p.colors.length === 1 ? 'Farbe' : 'Farben'})</span></div>
@@ -217,7 +218,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
           </div>
         </>}
 
-        <div className="opt opt-row"><span>{sizes.length > 1 ? <>Größen & Mengen{p.colors.length > 0 && <span className="muted" style={{ fontWeight: 400 }}> für <span className="dot-inline" style={{ background: color ? swatchBg(color) : '#ddd' }} />{cname}</span>}</> : 'Menge'}</span>{p.sizeChart && <a href={p.sizeChart} target="_blank" rel="noreferrer" className="sizechart"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><path d="M2 8h20v8H2zM6 8v3M10 8v4M14 8v3M18 8v4" /></svg>Größentabelle</a>}{!p.locked && <SizeAdvisor name={p.name} gender={p.gender} sizes={p.sizes} extra={`${p.description ?? ''} ${(p.features ?? []).join(' ')}`} chart={p.sizeChart} onPick={(s) => { setQ(s, Math.max(1, qty[k(cname, s)] || 0)); setTimeout(() => (document.querySelector(`[aria-label="Menge ${s}"]`) as HTMLInputElement | null)?.focus(), 50); }} />}</div>
+        <div className="opt opt-row"><span>{sizes.length > 1 ? <>Größen & Mengen{p.colors.length > 0 && <span className="muted" style={{ fontWeight: 400 }}> für <span className="dot-inline" style={{ background: color ? swatchBg(color) : '#ddd' }} />{cname}</span>}</> : 'Menge'}</span>{p.sizeChart && <a href={p.sizeChart} target="_blank" rel="noreferrer" className="sz-link">Größentabelle</a>}{!p.locked && <SizeAdvisor name={p.name} gender={p.gender} sizes={p.sizes} extra={`${p.description ?? ''} ${(p.features ?? []).join(' ')}`} chart={p.sizeChart} onPick={(s) => { setQ(s, Math.max(1, qty[k(cname, s)] || 0)); setTimeout(() => (document.querySelector(`[aria-label="Menge ${s}"]`) as HTMLInputElement | null)?.focus(), 50); }} />}</div>
         {p.locked ? (
           <>
             <div className="sizes-ro">{p.sizes.map((x) => <span key={x}>{x}</span>)}</div>
@@ -243,13 +244,16 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
             );
           })}
         </div>
-        {canDistribute(sizes) && <div className="distrib">
+        {(canDistribute(sizes) || p.colors.length > 1) && <div className="sz-tools">
+          {canDistribute(sizes) && !distOpen && <button type="button" className="sz-link" onClick={() => setDistOpen(true)}>Gesamtmenge auf Größen verteilen</button>}
+          {p.colors.length > 1 && total > 0 && <span className="muted">Weitere Farbe? Oben wählen – alles wird gesammelt.</span>}
+        </div>}
+        {canDistribute(sizes) && distOpen && <div className="distrib">
           <label htmlFor="dist-n">Gesamtmenge</label>
-          <input id="dist-n" type="number" inputMode="numeric" min={2} value={distN} onChange={(e) => setDistN(e.target.value)} placeholder="z. B. 50" onKeyDown={(e) => { if (e.key === 'Enter') doDistribute(); }} />
+          <input id="dist-n" type="number" inputMode="numeric" min={2} autoFocus value={distN} onChange={(e) => setDistN(e.target.value)} placeholder="z. B. 50" onKeyDown={(e) => { if (e.key === 'Enter') doDistribute(); }} />
           <button type="button" className="btn alt sm" disabled={!(Number(distN) >= 2)} onClick={doDistribute}>auf Größen verteilen</button>
           <Info>Verteilt die Menge nach einer typischen Größenverteilung für Teams und Firmen (S 12 %, M 25 %, L 28 %, XL 20 %, XXL 9 % …). Danach einfach einzelne Größen anpassen.</Info>
         </div>}
-        {p.colors.length > 1 && <p className="hint">Mehrere Farben? Oben eine andere Farbe wählen und Mengen eintragen – alles wird unten gesammelt.</p>}
 
         {/* Veredelung */}
         {team && <div className="team-banner">

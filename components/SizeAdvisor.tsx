@@ -22,9 +22,7 @@ export default function SizeAdvisor({ name, gender, sizes, extra, chart, onPick 
   const tab = women ? SIZE_TABLE.women : SIZE_TABLE.men;
   return (
     <>
-      <button type="button" className="sizechart linkbtn" onClick={() => setOpen(true)}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><circle cx="12" cy="7" r="4" /><path d="M4 21v-2a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v2" /></svg>Größenberater
-      </button>
+      <button type="button" className="sz-link" onClick={() => setOpen(true)}>Welche Größe passt?</button>
       {open && (
         <div className="modal-bg" onClick={() => setOpen(false)}>
           <div className="modal sa" role="dialog" aria-modal="true" aria-labelledby="sa-h" onClick={(e) => e.stopPropagation()}>
