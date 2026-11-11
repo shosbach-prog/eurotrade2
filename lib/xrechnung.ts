@@ -39,7 +39,7 @@ export function xrechnung(inv: Invoice, s: InvoiceSettings): string {
   </rsm:ExchangedDocumentContext>
   <rsm:ExchangedDocument>
     <ram:ID>${x(inv.no)}</ram:ID>
-    <ram:TypeCode>${inv.kind === 'storno' ? 381 : inv.kind === 'abschlag' ? 326 : 380}</ram:TypeCode>
+    <ram:TypeCode>${inv.kind === 'storno' || inv.kind === 'gutschrift' ? 381 : inv.kind === 'abschlag' ? 326 : 380}</ram:TypeCode>
     <ram:IssueDateTime><udt:DateTimeString format="102">${d(inv.date)}</udt:DateTimeString></ram:IssueDateTime>${note ? `
     <ram:IncludedNote><ram:Content>${x(note)}</ram:Content></ram:IncludedNote>` : ''}
   </rsm:ExchangedDocument>
@@ -72,7 +72,7 @@ export function xrechnung(inv: Invoice, s: InvoiceSettings): string {
       <ram:SpecifiedTradeSettlementPaymentMeans><ram:TypeCode>58</ram:TypeCode><ram:PayeePartyCreditorFinancialAccount><ram:IBANID>${x(s.iban.replace(/\s/g, ''))}</ram:IBANID><ram:AccountName>${x(s.owner || s.company)}</ram:AccountName></ram:PayeePartyCreditorFinancialAccount>${s.bic ? `<ram:PayeeSpecifiedCreditorFinancialInstitution><ram:BICID>${x(s.bic.replace(/\s/g, ''))}</ram:BICID></ram:PayeeSpecifiedCreditorFinancialInstitution>` : ''}</ram:SpecifiedTradeSettlementPaymentMeans>` : ''}
       <ram:ApplicableTradeTax><ram:CalculatedAmount>${a(t.vat)}</ram:CalculatedAmount><ram:TypeCode>VAT</ram:TypeCode>${klein ? '<ram:ExemptionReason>Kleinunternehmer gemäß § 19 UStG</ram:ExemptionReason>' : ''}<ram:BasisAmount>${a(t.net)}</ram:BasisAmount><ram:CategoryCode>${cat}</ram:CategoryCode>${klein ? '<ram:ExemptionReasonCode>VATEX-EU-O</ram:ExemptionReasonCode>' : ''}<ram:RateApplicablePercent>${t.rate}</ram:RateApplicablePercent></ram:ApplicableTradeTax>${allow.map((l) => `
       <ram:SpecifiedTradeAllowanceCharge><ram:ChargeIndicator><udt:Indicator>false</udt:Indicator></ram:ChargeIndicator><ram:ActualAmount>${a(Math.abs(l.qty * l.price))}</ram:ActualAmount><ram:Reason>${x([l.text, l.detail].filter(Boolean).join(' – '))}</ram:Reason>${tax('CategoryTradeTax')}</ram:SpecifiedTradeAllowanceCharge>`).join('')}
-      <ram:SpecifiedTradePaymentTerms><ram:Description>${x(inv.kind === 'storno' ? 'Gutschrift – Betrag wird erstattet bzw. verrechnet.' : amountDue(inv) <= 0 ? 'Bereits durch Abschlagszahlungen beglichen.' : `Zahlbar ohne Abzug bis ${due.toLocaleDateString('de-DE')}.`)}</ram:Description>${inv.kind === 'storno' ? '' : `<ram:DueDateDateTime><udt:DateTimeString format="102">${d(due)}</udt:DateTimeString></ram:DueDateDateTime>`}</ram:SpecifiedTradePaymentTerms>
+      <ram:SpecifiedTradePaymentTerms><ram:Description>${x(inv.kind === 'storno' || inv.kind === 'gutschrift' ? (inv.settleNote || 'Betrag wird erstattet bzw. verrechnet.') : amountDue(inv) <= 0 ? 'Bereits durch Abschlagszahlungen beglichen.' : `Zahlbar ohne Abzug bis ${due.toLocaleDateString('de-DE')}.`)}</ram:Description>${inv.kind === 'storno' || inv.kind === 'gutschrift' ? '' : `<ram:DueDateDateTime><udt:DateTimeString format="102">${d(due)}</udt:DateTimeString></ram:DueDateDateTime>`}</ram:SpecifiedTradePaymentTerms>
       <ram:SpecifiedTradeSettlementHeaderMonetarySummation>
         <ram:LineTotalAmount>${a(lineTotal)}</ram:LineTotalAmount>
         <ram:ChargeTotalAmount>0.00</ram:ChargeTotalAmount>

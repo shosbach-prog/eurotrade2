@@ -18,8 +18,8 @@ export default function Zahlen() {
     const q = inqs.filter((i) => i.date.startsWith(m));
     const sent = q.filter((i) => i.offer?.sentAt), won = q.filter((i) => WON.includes(i.status ?? ''));
     const margins = won.map(inquiryMargin).filter(Boolean) as NonNullable<ReturnType<typeof inquiryMargin>>[];
-    const inv = invs.filter((i) => i.date.startsWith(m) && i.kind !== 'abschlag' && !(i.kind === 'storno' && i.refNo && invs.find((x) => x.no === i.refNo)?.kind === 'abschlag')).reduce((s, i) => s + (i.kind === 'storno' ? -1 : 1) * invoiceTotals(i).net, 0);
-    const paid = invs.filter((i) => i.paidAt?.startsWith(m) && i.kind !== 'storno').reduce((s, i) => s + Math.max(0, invoiceTotals(i).gross - (i.prepaid ?? []).reduce((a, p) => a + p.gross, 0)), 0);
+    const inv = invs.filter((i) => i.date.startsWith(m) && i.kind !== 'abschlag' && !((i.kind === 'storno' || i.kind === 'gutschrift') && i.refNo && invs.find((x) => x.no === i.refNo)?.kind === 'abschlag')).reduce((s, i) => s + (i.kind === 'storno' || i.kind === 'gutschrift' ? -1 : 1) * invoiceTotals(i).net, 0);
+    const paid = invs.filter((i) => i.paidAt?.startsWith(m) && i.kind !== 'storno' && i.kind !== 'gutschrift').reduce((s, i) => s + Math.max(0, invoiceTotals(i).gross - (i.prepaid ?? []).reduce((a, p) => a + p.gross, 0) - (i.credits ?? []).reduce((a, c) => a + c.gross, 0)), 0);
     return { m, inquiries: q.length, sent: sent.length, won: won.length, rate: sent.length ? Math.round((won.length / sent.length) * 100) : null, value: won.reduce((s, i) => s + (i.offer ? offerTotals(i.offer).net : 0), 0), margin: margins.reduce((s, x) => s + x.margin, 0), revenue: margins.reduce((s, x) => s + x.revenue, 0), inv, paid };
   });
   const y = String(now.getFullYear());
@@ -28,7 +28,7 @@ export default function Zahlen() {
   const ySent = sum('sent'), yWon = sum('won'), yRev = sum('revenue'), yMargin = sum('margin');
   const max = Math.max(1, ...rows.map((r) => r.inv));
   const pipeline = inqs.filter((i) => i.status === 'angebot' && i.offer).reduce((s, i) => s + offerTotals(i.offer!).net, 0);
-  const open = invs.filter((i) => i.status === 'offen' && i.kind !== 'storno').reduce((s, i) => s + amountDue(i), 0);
+  const open = invs.filter((i) => i.status === 'offen' && i.kind !== 'storno' && i.kind !== 'gutschrift').reduce((s, i) => s + amountDue(i), 0);
   // meistverkaufte Artikel (angenommene Aufträge, laufendes Jahr)
   const top = new Map<string, { name: string; qty: number }>();
   for (const i of inqs) if (i.date.startsWith(y) && WON.includes(i.status ?? '')) for (const l of i.lines) { const e = top.get(l.sku) ?? { name: l.name, qty: 0 }; e.qty += l.qty; top.set(l.sku, e); }

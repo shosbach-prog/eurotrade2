@@ -4,10 +4,11 @@ import FilterGrid from '@/components/FilterGrid';
 import JsonLd, { crumbSchema } from '@/components/JsonLd';
 import { viewCtx } from '@/lib/customer';
 import { brandBySlug, productsOfBrand } from '@/lib/brand-catalog';
+import { brandText } from '@/lib/brand-texts';
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const b = brandBySlug(params.slug, await viewCtx());
-  return b ? { title: `${b.name} bedrucken & besticken`, description: `${b.name} Textilien mit Ihrem Logo – bedruckt oder bestickt ab 1 Stück bei Euro-Trade.`, alternates: { canonical: `/marken/${b.slug}` } } : {};
+  return b ? { title: `${b.name} bedrucken & besticken`, description: (brandText(b.name)?.t ?? `${b.name} Textilien mit Ihrem Logo – bedruckt oder bestickt ab 1 Stück bei Euro-Trade.`).slice(0, 158), alternates: { canonical: `/marken/${b.slug}` } } : {};
 }
 
 export default async function BrandPage({ params }: { params: { slug: string } }) {
@@ -23,7 +24,9 @@ export default async function BrandPage({ params }: { params: { slug: string } }
         {b.logo ? <img src={`/brands/${b.logo}`} alt={b.name} /> : null}
         <div>
           <h1>{b.name}</h1>
-          <p className="muted">{items.length ? `${items.length} Artikel – schon ab 1 Stück, auf Wunsch mit Ihrem Logo bedruckt oder bestickt.` : 'Artikel dieser Marke besorgen wir Ihnen gern auf Anfrage.'}</p>
+          {brandText(b.name) && <p className="brand-txt">{brandText(b.name)!.t}</p>}
+          {brandText(b.name) && <div className="brand-tags"><span>Ideal für</span>{brandText(b.name)!.f.map((x) => <b key={x}>{x}</b>)}</div>}
+          <p className="muted" style={{ margin: '8px 0 0' }}>{items.length ? `${items.length} Artikel – schon ab 1 Stück, auf Wunsch mit Ihrem Logo bedruckt oder bestickt.` : 'Artikel dieser Marke besorgen wir Ihnen gern auf Anfrage.'}</p>
         </div>
       </section>
       {items.length ? <FilterGrid items={items} /> : <p><Link className="btn" href={`/kontakt?marke=${encodeURIComponent(b.name)}`}>Artikel anfragen</Link></p>}

@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Invoice, InvLine } from '@/lib/invoice';
+import { isCredit, kindName } from '@/lib/invoice-kind';
 
 const eur = (n: number) => n.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
 const num = (s: string) => { const n = Number(String(s).replace(',', '.')); return Number.isFinite(n) ? n : 0; };
@@ -15,7 +16,7 @@ function Num({ v, set, disabled, style }: { v: number; set: (n: number) => void;
   return <input inputMode="decimal" disabled={disabled} style={style} value={t} onChange={(e) => { const x = e.target.value.replace(/[^0-9,.-]/g, ''); setT(x); set(num(x)); }} onBlur={() => setT(fmtN(v))} />;
 }
 
-export default function InvoiceEditor({ initial, problems, overdue, due, mail, publicUrl, acct }: { initial: Invoice; problems: string[]; overdue: boolean; due: string; total: number; mail: boolean; publicUrl: string; acct: { mail: boolean; lex: boolean } }) {
+export default function InvoiceEditor({ initial, problems, overdue, due, mail, publicUrl, acct, maxCredit, refId, creditIds }: { initial: Invoice; problems: string[]; overdue: boolean; due: string; total: number; mail: boolean; publicUrl: string; acct: { mail: boolean; lex: boolean }; maxCredit: number; refId: string | null; creditIds: { no: string; id: string }[] }) {
   const router = useRouter();
   const [inv, setInv] = useState(initial);
   const [busy, setBusy] = useState(false);
@@ -39,7 +40,7 @@ export default function InvoiceEditor({ initial, problems, overdue, due, mail, p
     setMsg({ ok: r.ok, t: d.message ?? d.error ?? (r.ok ? 'OK' : 'Fehler') });
     if (!r.ok) return;
     if (action === 'delete') return router.push('/admin/rechnungen');
-    if (action === 'storno' && d.id) return router.push(`/admin/rechnungen/${d.id}`);
+    if ((action === 'storno' || action === 'credit') && d.id) return router.push(`/admin/rechnungen/${d.id}`);
     if (d.invoice) setInv(d.invoice);
     router.refresh();
   }
@@ -48,12 +49,13 @@ export default function InvoiceEditor({ initial, problems, overdue, due, mail, p
     <div className="inv-ed">
       <div className="inv-head">
         <div>
-          <h1 style={{ margin: 0 }}>{inv.kind === 'storno' ? 'Rechnungskorrektur' : inv.kind === 'abschlag' ? 'Abschlagsrechnung' : inv.prepaid?.length ? 'Schlussrechnung' : 'Rechnung'} {inv.no ?? <span className="muted">(Entwurf)</span>}</h1>
-          <div className="muted" style={{ fontSize: 14 }}>{final ? <>Festgeschrieben {new Date(inv.finalizedAt!).toLocaleString('de-DE')}{inv.refNo && <> · zu {inv.refNo}</>}{inv.stornoNo && <> · storniert durch {inv.stornoNo}</>}</> : 'Noch änderbar – Nummer wird beim Festschreiben vergeben.'}</div>
+          <h1 style={{ margin: 0 }}>{kindName(inv)} {inv.no ?? <span className="muted">(Entwurf)</span>}</h1>
+          <div className="muted" style={{ fontSize: 14 }}>{final ? <>Festgeschrieben {new Date(inv.finalizedAt!).toLocaleString('de-DE')}{inv.refNo && <> · zu {refId ? <a className="alink" href={`/admin/rechnungen/${refId}`}>{inv.refNo}</a> : inv.refNo}</>}{creditIds.length > 0 && <> · Gutschriften: {creditIds.map((c, k) => <span key={c.no}>{k ? ', ' : ''}<a className="alink" href={`/admin/rechnungen/${c.id}`}>{c.no}</a></span>)}</>}{inv.stornoNo && <> · storniert durch {inv.stornoNo}</>}</> : 'Noch änderbar – Nummer wird beim Festschreiben vergeben.'}</div>
         </div>
-        <div className="inv-total">{eur(t.gross)}<small>{final && inv.kind !== 'storno' ? (inv.status === 'bezahlt' ? `bezahlt am ${new Date(inv.paidAt!).toLocaleDateString('de-DE')}` : inv.status === 'storniert' ? 'storniert' : `${overdue ? 'überfällig seit' : 'fällig am'} ${new Date(due).toLocaleDateString('de-DE')}`) : `netto ${eur(t.net)}`}</small></div>
+        <div className="inv-total">{eur(t.gross)}<small>{final && inv.kind === 'gutschrift' ? (inv.status === 'offen' ? `Erstattung offen: ${eur(inv.paidAmount ?? 0)}` : inv.paidAt ? `erledigt am ${new Date(inv.paidAt).toLocaleDateString('de-DE')}` : 'verrechnet') : final && !isCredit(inv) ? (inv.status === 'bezahlt' ? `bezahlt am ${new Date(inv.paidAt!).toLocaleDateString('de-DE')}` : inv.status === 'storniert' ? 'storniert' : `${overdue ? 'überfällig seit' : 'fällig am'} ${new Date(due).toLocaleDateString('de-DE')}`) : `netto ${eur(t.net)}`}</small></div>
       </div>
 
+      {!final && inv.kind === 'gutschrift' && <p className="sys-info">Gutschrift zu <b>{inv.refNo}</b>: Bei den gutzuschreibenden Positionen die <b>Menge</b> eintragen (z. B. 2 von 12 Teilen) – oder unten bei „Preisnachlass“ Menge 1 und den <b>Nettobetrag</b>. Höchstens noch {eur(maxCredit)} brutto gutschreibbar. Ist die Rechnung noch offen, wird verrechnet, sonst erstattet.</p>}
       {!final && problems.length > 0 && <p className="sys-warn">Vor dem Festschreiben ergänzen: {problems.join(' · ')}</p>}
 
       <div className="inv-grid">
@@ -89,10 +91,10 @@ export default function InvoiceEditor({ initial, problems, overdue, due, mail, p
         </table>
         {!final && <button className="btn alt sm" style={{ marginTop: 8 }} onClick={() => setInv({ ...inv, lines: [...inv.lines, { text: '', qty: 1, unit: 'Stk', price: 0 }] })}>+ Position</button>}
         <div className="offer-sum" style={{ marginLeft: 'auto', marginTop: 12 }}>
-          <div className="tot"><span>Versand netto</span><span><Num disabled={final} v={inv.shipping} set={(n) => setInv({ ...inv, shipping: n })} style={{ width: 90, textAlign: 'right' }} /></span></div>
+          {!isCredit(inv) && <div className="tot"><span>Versand netto</span><span><Num disabled={final} v={inv.shipping} set={(n) => setInv({ ...inv, shipping: n })} style={{ width: 90, textAlign: 'right' }} /></span></div>}
           <div className="tot"><span>Summe netto</span><span>{eur(t.net)}</span></div>
           <div className="tot"><span>{inv.kleinunternehmer ? 'USt. (§ 19 UStG)' : `USt. ${t.rate} %`}</span><span>{eur(t.vat)}</span></div>
-          <div className="tot big"><span>Rechnungsbetrag</span><span>{eur(t.gross)}</span></div>
+          <div className="tot big"><span>{isCredit(inv) ? 'Gutschriftsbetrag' : 'Rechnungsbetrag'}</span><span>{eur(t.gross)}</span></div>
           {inv.prepaid?.map((p) => <div key={p.no} className="tot"><span>abzgl. Abschlag {p.no}</span><span>−{eur(p.gross)}</span></div>)}
           {!!inv.prepaid?.length && <div className="tot big"><span>Restbetrag</span><span>{eur(t.gross - inv.prepaid.reduce((s, p) => s + p.gross, 0))}</span></div>}
         </div>
@@ -114,12 +116,14 @@ export default function InvoiceEditor({ initial, problems, overdue, due, mail, p
           {acct.lex && <button className="linkbtn" disabled={busy} onClick={() => act('lexoffice')}>{inv.exported?.lexoffice ? '✓ Lexware Office' : 'An Lexware Office'}</button>}
           <span style={{ flex: 1 }} />
           {mail && <button className="btn alt" disabled={busy} onClick={() => act('send')}>{inv.sentAt ? 'Erneut senden' : 'Per E-Mail senden'}</button>}
-          {inv.kind !== 'storno' && inv.status === 'offen' && <>
+          {inv.kind === 'gutschrift' && inv.status === 'offen' && <span className="inv-paid"><input type="date" value={paidDate} onChange={(e) => setPaidDate(e.target.value)} /><button className="btn" disabled={busy} onClick={() => act('paid', { date: paidDate })}>✓ Erstattet</button></span>}
+          {!isCredit(inv) && inv.status === 'offen' && <>
             {mail && <button className="btn alt" disabled={busy} onClick={() => act('remind')}>Zahlungserinnerung</button>}
             <span className="inv-paid"><input type="date" value={paidDate} onChange={(e) => setPaidDate(e.target.value)} /><button className="btn" disabled={busy} onClick={() => act('paid', { date: paidDate })}>✓ Bezahlt</button></span>
           </>}
-          {inv.status === 'bezahlt' && inv.kind !== 'storno' && <button className="linkbtn" onClick={() => act('paid', { undo: true })}>Zahlung zurücksetzen</button>}
-          {inv.kind !== 'storno' && inv.status !== 'storniert' && <button className="linkbtn err" disabled={busy} onClick={() => act('storno', { send: mail })}>Stornieren</button>}
+          {inv.status === 'bezahlt' && !isCredit(inv) && <button className="linkbtn" onClick={() => act('paid', { undo: true })}>Zahlung zurücksetzen</button>}
+          {!isCredit(inv) && inv.status !== 'storniert' && maxCredit > 0 && <button className="btn alt" disabled={busy} onClick={() => act('credit')}>Gutschrift / Teilgutschrift</button>}
+          {!isCredit(inv) && inv.status !== 'storniert' && !creditIds.length && <button className="linkbtn err" disabled={busy} onClick={() => act('storno', { send: mail })}>Stornieren</button>}
         </>}
       </div>
       {msg && <p className={msg.ok ? 'ok' : 'err'}>{msg.t}</p>}

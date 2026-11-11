@@ -11,7 +11,7 @@ const BRAND = rgb(0.039, 0.361, 0.941), INK = rgb(0.08, 0.09, 0.12), MUTED = rgb
 export async function invoicePdf(inv: Invoice, s: InvoiceSettings): Promise<Buffer> {
   const doc = await PDFDocument.create();
   const font = await doc.embedFont(StandardFonts.Helvetica), bold = await doc.embedFont(StandardFonts.HelveticaBold);
-  const storno = inv.kind === 'storno', draft = !inv.no;
+  const storno = inv.kind === 'storno' || inv.kind === 'gutschrift', draft = !inv.no;
   const title = `${kindLabel(inv)} ${inv.no ?? 'ENTWURF'}`;
   const due$ = amountDue(inv);
   doc.setTitle(title); doc.setAuthor(s.company);
@@ -51,7 +51,7 @@ export async function invoicePdf(inv: Invoice, s: InvoiceSettings): Promise<Buff
   meta.forEach(([k, v], n) => { const sz = bold.widthOfTextAtSize(clean(v), 9.5) > 120 ? 7.5 : 9.5; text(k, R - 215, y - n * 13, { size: 9, color: MUTED }); text(v, R, y - n * 13, { size: sz, f: bold, right: true }); });
   y -= Math.max(addr.length, meta.length) * 13 + 30;
   text(title, L, y, { f: bold, size: 16 }); y -= 18;
-  text(storno ? `Hiermit stornieren wir die Rechnung ${inv.refNo}. Der Betrag wird erstattet bzw. verrechnet.` : 'Vielen Dank für Ihren Auftrag. Wir berechnen Ihnen folgende Leistungen:', L, y, { size: 10, color: MUTED }); y -= 26;
+  text(inv.kind === 'gutschrift' ? `Zu unserer Rechnung ${inv.refNo} schreiben wir Ihnen folgende Beträge gut:` : storno ? `Hiermit stornieren wir die Rechnung ${inv.refNo}. Der Betrag wird erstattet bzw. verrechnet.` : 'Vielen Dank für Ihren Auftrag. Wir berechnen Ihnen folgende Leistungen:', L, y, { size: 10, color: MUTED }); y -= 26;
   // Tabelle
   const sg = storno ? -1 : 1;
   const cols = { pos: L, text: L + 28, qty: R - 175, price: R - 85, sum: R };
@@ -96,6 +96,7 @@ export async function invoicePdf(inv: Invoice, s: InvoiceSettings): Promise<Buff
   const notes = [
     inv.kleinunternehmer ? 'Gemäß § 19 UStG wird keine Umsatzsteuer berechnet (Kleinunternehmerregelung).' : '',
     storno ? '' : due$ <= 0 ? 'Der Rechnungsbetrag ist durch die Abschlagszahlungen bereits beglichen.' : `Bitte überweisen Sie ${eur(due$)} bis zum ${date(due)} ohne Abzug${s.iban ? ` auf das Konto IBAN ${s.iban}${s.bic ? ` (BIC ${s.bic})` : ''}${s.bank ? `, ${s.bank}` : ''}` : ''}. Verwendungszweck: ${inv.no ?? 'Rechnungsnummer'}.`,
+    inv.settleNote ?? '',
     inv.note,
   ].filter(Boolean);
   let qrH = 0;

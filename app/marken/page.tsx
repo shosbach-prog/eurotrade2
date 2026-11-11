@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { viewCtx } from '@/lib/customer';
 import { brandList } from '@/lib/brand-catalog';
 import JsonLd, { crumbSchema } from '@/components/JsonLd';
+import { brandText } from '@/lib/brand-texts';
 
 export const metadata: Metadata = { title: 'Marken & Hersteller', description: 'Alle Textilmarken bei Euro-Trade: B&C, Build Your Brand, Result, Russell, Fruit of the Loom, Stedman und viele mehr – bedruckt oder bestickt ab 1 Stück.', alternates: { canonical: '/marken' } };
 
@@ -15,6 +16,7 @@ export default async function Marken() {
     const inner = <>
       <span className="bt-logo">{b.logo ? <img src={`/brands/${b.logo}`} alt={b.name} loading="lazy" /> : <b>{b.name}</b>}</span>
       <span className="bt-name">{b.name}</span>
+      {brandText(b.name) && <span className="bt-txt">{brandText(b.name)!.f.join(' · ')}</span>}
       <span className="bt-n">{b.count ? `${b.count} Artikel` : 'auf Anfrage'}</span>
     </>;
     return b.count ? <Link key={b.slug} href={`/marken/${b.slug}`} className="btile">{inner}</Link>

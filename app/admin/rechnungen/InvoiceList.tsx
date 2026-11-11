@@ -2,7 +2,7 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-type Row = { id: string; no: string | null; kind: string; status: string; date: string; due: string | null; customer: string; gross: number; net: number; overdue: boolean; sent: boolean; reminders: number; inquiryNo: string | null };
+type Row = { refund: number; id: string; no: string | null; kind: string; status: string; date: string; due: string | null; customer: string; gross: number; net: number; overdue: boolean; sent: boolean; reminders: number; inquiryNo: string | null };
 const eur = (n: number) => n.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
 const d = (s: string) => new Date(s).toLocaleDateString('de-DE');
 const LABEL: Record<string, string> = { entwurf: 'Entwurf', offen: 'Offen', bezahlt: 'Bezahlt', storniert: 'Storniert' };
@@ -14,9 +14,9 @@ export default function InvoiceList({ rows }: { rows: Row[] }) {
   const [q, setQ] = useState('');
   const year = String(new Date().getFullYear());
   const stats = useMemo(() => ({
-    open: rows.filter((r) => r.status === 'offen' && r.kind !== 'storno').reduce((s, r) => s + r.gross, 0),
+    open: rows.filter((r) => r.status === 'offen' && r.kind !== 'storno' && r.kind !== 'gutschrift').reduce((s, r) => s + r.gross, 0),
     overdue: rows.filter((r) => r.overdue).reduce((s, r) => s + r.gross, 0),
-    year: rows.filter((r) => r.no && r.date.startsWith(year) && r.status !== 'storniert' && r.kind === 'rechnung').reduce((s, r) => s + r.net, 0),
+    year: rows.filter((r) => r.no && r.date.startsWith(year) && r.status !== 'storniert' && (r.kind === 'rechnung' || r.kind === 'gutschrift')).reduce((s, r) => s + r.net, 0),
     drafts: rows.filter((r) => r.status === 'entwurf').length,
   }), [rows, year]);
   const shown = rows.filter((r) => (f === 'alle' || (f === 'ueberfaellig' ? r.overdue : r.status === f)) && (!q || `${r.no} ${r.customer} ${r.inquiryNo}`.toLowerCase().includes(q.toLowerCase())));
@@ -49,10 +49,10 @@ export default function InvoiceList({ rows }: { rows: Row[] }) {
           <thead><tr><th>Nr.</th><th>Datum</th><th>Kunde</th><th>Betrag</th><th>Fällig</th><th>Status</th></tr></thead>
           <tbody>
             {shown.map((r) => <tr key={r.id} onClick={() => router.push(`/admin/rechnungen/${r.id}`)}>
-              <td><b>{r.no ?? '—'}</b>{r.kind === 'storno' && <span className="muted"> Storno</span>}{r.kind === 'abschlag' && <span className="muted"> Abschlag</span>}{r.inquiryNo && <div className="muted" style={{ fontSize: 12 }}>{r.inquiryNo}</div>}</td>
+              <td><b>{r.no ?? '—'}</b>{r.kind === 'storno' && <span className="muted"> Storno</span>}{r.kind === 'abschlag' && <span className="muted"> Abschlag</span>}{r.kind === 'gutschrift' && <span className="muted"> Gutschrift</span>}{r.inquiryNo && <div className="muted" style={{ fontSize: 12 }}>{r.inquiryNo}</div>}</td>
               <td>{d(r.date)}</td><td>{r.customer}</td><td><b>{eur(r.gross)}</b></td>
               <td>{r.due ? <span className={r.overdue ? 'err' : ''}>{d(r.due)}</span> : '–'}{r.reminders > 0 && <div className="muted" style={{ fontSize: 12 }}>{r.reminders}× erinnert</div>}</td>
-              <td><span className={`st st-${CLS[r.status]}`}>{r.kind === 'storno' ? 'Korrektur' : r.overdue ? 'Überfällig' : LABEL[r.status]}</span>{r.no && !r.sent && r.kind === 'rechnung' && <div className="muted" style={{ fontSize: 12 }}>nicht versendet</div>}</td>
+              <td><span className={`st st-${CLS[r.status]}`}>{r.kind === 'gutschrift' ? (r.status === 'offen' ? `Erstattung ${eur(r.refund)}` : 'Gutschrift') : r.kind === 'storno' ? 'Korrektur' : r.overdue ? 'Überfällig' : LABEL[r.status]}</span>{r.no && !r.sent && r.kind === 'rechnung' && <div className="muted" style={{ fontSize: 12 }}>nicht versendet</div>}</td>
             </tr>)}
             {!shown.length && <tr><td colSpan={6} className="muted" style={{ padding: 20 }}>Keine Rechnungen. Rechnungen entstehen am einfachsten aus einer angenommenen Anfrage („Rechnung erstellen“).</td></tr>}
           </tbody>

@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import AdminNav from '@/components/AdminNav';
 import InvoiceEditor from './InvoiceEditor';
-import { getInvoice, invoiceSettings, invoiceTotals, isOverdue, dueDate } from '@/lib/invoice';
+import { creditable, getInvoice, invoiceSettings, invoiceTotals, isOverdue, dueDate, listInvoices } from '@/lib/invoice';
 import { invoiceProblems } from '@/lib/invoice-actions';
 import { mailEnabled, shopUrl } from '@/lib/mail';
 
@@ -17,7 +17,7 @@ export default function InvoicePage({ params }: { params: { id: string } }) {
     <>
       <AdminNav active="rechnungen" />
       <div className="crumbs"><Link href="/admin/rechnungen">Rechnungen</Link> › {i.no ?? 'Entwurf'}{i.inquiryNo && <> · aus <Link className="alink" href={`/admin/anfrage/${i.inquiryNo}`}>{i.inquiryNo}</Link></>}</div>
-      <InvoiceEditor initial={i} problems={i.no ? [] : invoiceProblems(i)} overdue={isOverdue(i)} due={dueDate(i).toISOString()} total={invoiceTotals(i).gross} mail={mailEnabled()} publicUrl={`${shopUrl()}/rechnung/${i.token}`} acct={{ mail: !!invoiceSettings().bookkeepingEmail, lex: !!invoiceSettings().lexofficeKey }} />
+      <InvoiceEditor initial={i} problems={i.no ? [] : invoiceProblems(i)} overdue={isOverdue(i)} due={dueDate(i).toISOString()} total={invoiceTotals(i).gross} mail={mailEnabled()} publicUrl={`${shopUrl()}/rechnung/${i.token}`} acct={{ mail: !!invoiceSettings().bookkeepingEmail, lex: !!invoiceSettings().lexofficeKey }} maxCredit={i.kind === 'gutschrift' ? (() => { const o = listInvoices().find((x) => x.no === i.refNo); return o ? creditable(o) : 0; })() : i.no ? creditable(i) : 0} refId={i.refNo ? listInvoices().find((x) => x.no === i.refNo)?.id ?? null : null} creditIds={(i.credits ?? []).map((c) => ({ no: c.no, id: listInvoices().find((x) => x.no === c.no)?.id ?? '' }))} />
     </>
   );
 }

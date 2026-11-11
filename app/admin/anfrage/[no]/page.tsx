@@ -9,7 +9,7 @@ import ShippingBox from './ShippingBox';
 import MarginBox from './MarginBox';
 import { dhlLabelEnabled, trackingUrl } from '@/lib/shipping';
 import { inquiryMargin } from '@/lib/margin';
-import { INV_STATUS, invoiceTotals, listInvoices } from '@/lib/invoice';
+import { INV_STATUS, invoiceTotals, kindShort, listInvoices } from '@/lib/invoice';
 import { getTeamShop } from '@/lib/teamshop';
 import { eur } from '@/lib/format';
 import { decoLabel, teamLabel } from '@/lib/deco';
@@ -78,7 +78,7 @@ export default function InquiryPage({ params }: { params: { no: string } }) {
         const invs = listInvoices().filter((x) => x.inquiryNo === i.no);
         if (!i.offer && !invs.length) return null;
         return <><h2>Rechnung</h2><div className="box">
-          {invs.map((x) => <p key={x.id} style={{ margin: '0 0 8px' }}><Link className="alink" href={`/admin/rechnungen/${x.id}`}><b>{x.no ?? 'Entwurf'}</b></Link>{x.kind === 'storno' ? ' (Storno)' : x.kind === 'abschlag' ? ' (Abschlag)' : x.prepaid?.length ? ' (Schlussrechnung)' : ''} · {eur(invoiceTotals(x).gross)} · <span className={`st st-${x.status === 'bezahlt' ? 'angenommen' : x.status === 'offen' ? 'angebot' : x.status === 'storniert' ? 'abgelehnt' : 'neu'}`}>{INV_STATUS[x.status]}</span></p>)}
+          {invs.map((x) => <p key={x.id} style={{ margin: '0 0 8px' }}><Link className="alink" href={`/admin/rechnungen/${x.id}`}><b>{x.no ?? 'Entwurf'}</b></Link>{x.kind === 'rechnung' && !x.prepaid?.length ? '' : ` (${kindShort(x)})`} · {eur(invoiceTotals(x).gross)} · <span className={`st st-${x.status === 'bezahlt' ? 'angenommen' : x.status === 'offen' ? 'angebot' : x.status === 'storniert' ? 'abgelehnt' : 'neu'}`}>{INV_STATUS[x.status]}</span></p>)}
           {!invs.some((x) => x.kind === 'rechnung' && x.status !== 'storniert') && <div className="deco-row">
             <CreateInvoice no={i.no} label={invs.some((x) => x.kind === 'abschlag' && x.no && x.status !== 'storniert') ? 'Schlussrechnung erstellen (Abschläge werden abgezogen)' : 'Rechnung aus Angebot erstellen'} />
             <CreateInvoice no={i.no} pct={50} className="btn alt sm" label="Abschlag 50 %" />

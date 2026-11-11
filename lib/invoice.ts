@@ -2,6 +2,8 @@ import 'server-only';
 import fs from 'node:fs';
 import path from 'node:path';
 import { DATA, randomId, readJSON, writeJSON, type Inquiry } from './store';
+import { isCredit, kindName, type InvKind } from './invoice-kind';
+export { isCredit, kindName, sign, kindShort } from './invoice-kind';
 
 /* ---------- Rechnungseinstellungen (Admin → Rechnungen → Einstellungen) ---------- */
 export type InvoiceSettings = {
@@ -40,7 +42,9 @@ export type Buyer = { company: string; name: string; street: string; zip: string
 export type InvStatus = 'entwurf' | 'offen' | 'bezahlt' | 'storniert';
 export const INV_STATUS: Record<InvStatus, string> = { entwurf: 'Entwurf', offen: 'Offen', bezahlt: 'Bezahlt', storniert: 'Storniert' };
 export type Invoice = {
-  id: string; no: string | null; kind: 'rechnung' | 'storno' | 'abschlag'; status: InvStatus;
+  id: string; no: string | null; kind: InvKind; status: InvStatus;
+  /** Gutschriften/Teilgutschriften, die sich auf diese Rechnung beziehen */
+  credits?: { no: string; date: string; gross: number }[];
   /** Schlussrechnung: bereits gestellte Abschlagsrechnungen, die abgezogen werden */
   prepaid?: { no: string; date: string; net: number; vat: number; gross: number }[];
   inquiryNo?: string | null; token: string;
@@ -52,6 +56,8 @@ export type Invoice = {
   createdAt: string; finalizedAt?: string | null; sentAt?: string | null; paidAt?: string | null; paidAmount?: number | null;
   reminders?: string[]; history?: { date: string; text: string }[];
   exported?: { mail?: string | null; lexoffice?: string | null };
+  /** Gutschrift: Hinweis zur Verrechnung/Erstattung (wird beim Festschreiben gesetzt) */
+  settleNote?: string | null;
 };
 const DIR = path.join(DATA, 'rechnungen');
 const FILE = (id: string) => path.join(DIR, `${id}.json`);
@@ -76,10 +82,12 @@ export function invoiceTotals(i: Pick<Invoice, 'lines' | 'shipping' | 'vat' | 'k
   return { net, rate, vat, gross: r2(net + vat) };
 }
 export const dueDate = (i: Pick<Invoice, 'date' | 'payDays'>) => new Date(Date.parse(i.date) + i.payDays * 864e5);
-export const isOverdue = (i: Invoice) => i.status === 'offen' && i.kind !== 'storno' && Date.now() > dueDate(i).getTime() + 864e5;
+export const isOverdue = (i: Invoice) => i.status === 'offen' && !isCredit(i) && amountDue(i) > 0 && Date.now() > dueDate(i).getTime() + 864e5;
 /** Zahlbetrag: Rechnungsbetrag minus bereits berechneter Abschläge */
-export const amountDue = (i: Invoice) => Math.round((invoiceTotals(i).gross - (i.prepaid ?? []).reduce((s, p) => s + p.gross, 0)) * 100) / 100;
-export const kindLabel = (i: Pick<Invoice, 'kind' | 'prepaid'>) => (i.kind === 'storno' ? 'Rechnungskorrektur (Storno)' : i.kind === 'abschlag' ? 'Abschlagsrechnung' : i.prepaid?.length ? 'Schlussrechnung' : 'Rechnung');
+export const amountDue = (i: Invoice) => Math.round((invoiceTotals(i).gross - (i.prepaid ?? []).reduce((s, p) => s + p.gross, 0) - (i.credits ?? []).reduce((s, c) => s + c.gross, 0)) * 100) / 100;
+/** noch gutschreibbarer Betrag einer Rechnung */
+export const creditable = (i: Invoice) => Math.round((invoiceTotals(i).gross - (i.credits ?? []).reduce((s, c) => s + c.gross, 0)) * 100) / 100;
+export const kindLabel = kindName;
 
 /** Rechnungsadresse aus der Anfrage (PLZ aus „44263 Dortmund“) */
 export function buyerFromInquiry(q: Inquiry): Buyer {

@@ -1368,3 +1368,10 @@ footer.ft{margin-top:64px}
 .otl small{font-size:11.5px}
 .otl a{font-size:11.5px}
 @media (min-width:900px){.admin-nav{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin}.admin-nav a{white-space:nowrap;padding-left:10px;padding-right:10px}}
+.sys-info{background:#eef4ff;border:1px solid #cfe0ff;color:#123a7a;border-radius:10px;padding:10px 14px;font-size:14px}
+.brand-hero>div{flex:1;min-width:260px}
+.brand-txt{margin:4px 0 8px;font-size:15.5px;line-height:1.55;max-width:760px}
+.brand-tags{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px}
+.brand-tags span{color:var(--muted);margin-right:2px}
+.brand-tags b{background:#eef3ff;color:#123a7a;border-radius:20px;padding:3px 10px;font-weight:600}
+.bt-txt{font-size:11.5px;color:var(--muted);line-height:1.35}

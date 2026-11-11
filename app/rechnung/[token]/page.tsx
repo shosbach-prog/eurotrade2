@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { dueDate, invoiceByToken, invoiceTotals } from '@/lib/invoice';
+import { amountDue, dueDate, invoiceByToken, invoiceTotals, kindName } from '@/lib/invoice';
 import { eur } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
@@ -10,14 +10,14 @@ export default function InvoicePage({ params }: { params: { token: string } }) {
   const i = invoiceByToken(params.token);
   if (!i) notFound();
   const t = invoiceTotals(i), s = i.seller!;
-  const storno = i.kind === 'storno';
+  const storno = i.kind === 'storno' || i.kind === 'gutschrift';
   return (
     <div style={{ maxWidth: 720, margin: '0 auto' }}>
       <div className="box inv-pub">
         <span className={`st st-${i.status === 'bezahlt' ? 'angenommen' : i.status === 'storniert' ? 'abgelehnt' : 'angebot'}`}>{storno ? 'Rechnungskorrektur' : i.status === 'bezahlt' ? '✓ Bezahlt' : i.status === 'storniert' ? 'Storniert' : 'Offen'}</span>
-        <h1 style={{ margin: '10px 0 4px' }}>{storno ? 'Rechnungskorrektur' : 'Rechnung'} {i.no}</h1>
+        <h1 style={{ margin: '10px 0 4px' }}>{kindName(i)} {i.no}</h1>{i.refNo && <p className="muted" style={{ margin: 0 }}>zu Rechnung {i.refNo}</p>}{i.settleNote && <p style={{ fontSize: 14 }}>{i.settleNote}</p>}
         <p className="muted" style={{ marginTop: 0 }}>vom {new Date(i.date).toLocaleDateString('de-DE')} · {i.buyer.company || i.buyer.name}</p>
-        <div className="inv-amount">{eur(t.gross)}{!storno && i.status === 'offen' && <small>fällig am {dueDate(i).toLocaleDateString('de-DE')}</small>}</div>
+        <div className="inv-amount">{eur(t.gross)}{!storno && i.status === 'offen' && amountDue(i) < t.gross && <small>noch offen: {eur(amountDue(i))}</small>}{!storno && i.status === 'offen' && <small>fällig am {dueDate(i).toLocaleDateString('de-DE')}</small>}</div>
         {!storno && i.status === 'offen' && s.iban && <dl className="sys-dl" style={{ marginTop: 14 }}>
           <dt>Empfänger</dt><dd>{s.owner || s.company}</dd><dt>IBAN</dt><dd>{s.iban}</dd>{s.bic && <><dt>BIC</dt><dd>{s.bic}</dd></>}<dt>Verwendungszweck</dt><dd><b>{i.no}</b></dd>
         </dl>}

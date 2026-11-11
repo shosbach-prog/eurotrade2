@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { isAdmin } from '@/lib/customer';
 import { getInquiry } from '@/lib/store';
-import { invoiceSettings, getInvoice, invHistory, newInvoice, saveInvoice, saveInvoiceSettings, type Invoice, type InvoiceSettings } from '@/lib/invoice';
-import { finalizeInvoice, forwardToBookkeeping, sendInvoice, stornoInvoice, uploadToLexoffice } from '@/lib/invoice-actions';
+import { kindName, invoiceSettings, getInvoice, invHistory, newInvoice, saveInvoice, saveInvoiceSettings, type Invoice, type InvoiceSettings } from '@/lib/invoice';
+import { finalizeInvoice, forwardToBookkeeping, newCredit, sendInvoice, stornoInvoice, uploadToLexoffice } from '@/lib/invoice-actions';
 
 const str = (v: unknown, n = 200) => String(v ?? '').replace(/\r/g, '').trim().slice(0, n);
 const num = (v: unknown) => { const n = Number(String(v ?? '').replace(',', '.')); return Number.isFinite(n) ? Math.round(n * 100) / 100 : 0; };
@@ -45,7 +45,7 @@ export async function POST(req: Request) {
       if (d.action === 'save') return NextResponse.json({ ok: true, message: 'Entwurf gespeichert.', invoice: n });
       await finalizeInvoice(n);
       if (d.action === 'finalize-send') await sendInvoice(n);
-      return NextResponse.json({ ok: true, message: `Rechnung ${n.no} festgeschrieben${d.action === 'finalize-send' ? ` und an ${n.buyer.email} gesendet` : ''}.`, invoice: n });
+      return NextResponse.json({ ok: true, message: `${kindName(n)} ${n.no} festgeschrieben${d.action === 'finalize-send' ? ` und an ${n.buyer.email} gesendet` : ''}.`, invoice: n });
     }
     if (d.action === 'forward') { await forwardToBookkeeping(i); return NextResponse.json({ ok: true, message: 'An die Buchhaltung gesendet.', invoice: i }); }
     if (d.action === 'lexoffice') { await uploadToLexoffice(i); return NextResponse.json({ ok: true, message: 'An Lexware Office übertragen.', invoice: i }); }
@@ -54,10 +54,11 @@ export async function POST(req: Request) {
     if (d.action === 'paid') {
       if (!i.no || i.status === 'storniert') return NextResponse.json({ error: 'Nicht möglich.' }, { status: 400 });
       if (d.undo) { i.status = 'offen'; i.paidAt = null; i.paidAmount = null; invHistory(i, 'Zahlung zurückgesetzt'); }
-      else { i.status = 'bezahlt'; i.paidAt = day(d.date, new Date().toISOString().slice(0, 10)); i.paidAmount = d.amount != null ? num(d.amount) : null; invHistory(i, `Als bezahlt markiert (${i.paidAt})`); }
+      else { i.status = 'bezahlt'; i.paidAt = day(d.date, new Date().toISOString().slice(0, 10)); if (i.kind !== 'gutschrift') i.paidAmount = d.amount != null ? num(d.amount) : null; invHistory(i, i.kind === 'gutschrift' ? `Erstattet am ${i.paidAt}` : `Als bezahlt markiert (${i.paidAt})`); }
       saveInvoice(i);
-      return NextResponse.json({ ok: true, message: d.undo ? 'Wieder offen.' : 'Als bezahlt markiert.', invoice: i });
+      return NextResponse.json({ ok: true, message: d.undo ? 'Wieder offen.' : i.kind === 'gutschrift' ? 'Als erstattet markiert.' : 'Als bezahlt markiert.', invoice: i });
     }
+    if (d.action === 'credit') { const c = newCredit(i); return NextResponse.json({ ok: true, id: c.id }); }
     if (d.action === 'storno') { const s = await stornoInvoice(i); if (d.send) await sendInvoice(s).catch(() => null); return NextResponse.json({ ok: true, message: `Storniert durch ${s.no}.`, id: s.id }); }
     if (d.action === 'delete') {
       if (i.no) return NextResponse.json({ error: 'Festgeschriebene Rechnungen werden nie gelöscht (Aufbewahrungspflicht) – bitte stornieren.' }, { status: 400 });

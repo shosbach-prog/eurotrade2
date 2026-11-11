@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import AcceptForm from './AcceptForm';
 import ProofBox from './ProofBox';
 import { teamLabel } from '@/lib/deco';
-import { invoiceTotals, listInvoices } from '@/lib/invoice';
+import { invoiceTotals, kindName, listInvoices } from '@/lib/invoice';
 import { eur } from '@/lib/format';
 import { inquiryByToken, offerTotals } from '@/lib/store';
 import { CARRIERS, trackingUrl } from '@/lib/shipping';
@@ -75,7 +75,7 @@ export default function OfferPage({ params }: { params: { token: string } }) {
         </div>;
       })()}
       {invs.map((x) => <div key={x.id} className="box" style={{ marginTop: 16, display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-        <div style={{ flex: 1 }}><b>{x.kind === 'storno' ? 'Rechnungskorrektur' : 'Rechnung'} {x.no}</b><div className="muted" style={{ fontSize: 14 }}>{eur(invoiceTotals(x).gross)} · {x.status === 'bezahlt' ? '✓ bezahlt' : x.status === 'storniert' ? 'storniert' : 'offen'}</div></div>
+        <div style={{ flex: 1 }}><b>{kindName(x)} {x.no}</b><div className="muted" style={{ fontSize: 14 }}>{eur(invoiceTotals(x).gross)} · {x.status === 'bezahlt' ? '✓ bezahlt' : x.status === 'storniert' ? 'storniert' : 'offen'}</div></div>
         <a className="btn alt" href={`/rechnung/${x.token}`} style={{ display: 'inline-grid', placeItems: 'center' }}>Rechnung ansehen</a>
       </div>)}
       {i.proof?.sentAt && <ProofBox token={params.token} proof={i.proof} name={i.customer.name} />}
