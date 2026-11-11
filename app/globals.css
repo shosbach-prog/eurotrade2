@@ -1502,3 +1502,5 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 @media (max-width:420px){.mcards{grid-template-columns:1fr}}
 .ds-admin{margin-top:10px;border:1px dashed #f59e0b;background:#fffbeb;border-radius:10px;padding:10px 12px;display:grid;gap:6px;font-size:13px}
 .ds-admin label{display:flex;align-items:center;gap:8px}.ds-admin input[type=range]{flex:1}
+.ds-ph{width:100%;aspect-ratio:2/1;display:grid;place-items:center;background:repeating-linear-gradient(45deg,rgba(255,200,0,.85),rgba(255,200,0,.85) 6px,rgba(255,180,0,.85) 6px,rgba(255,180,0,.85) 12px);color:#14181f;font-weight:800;font-size:clamp(8px,18cqw,22px);border-radius:3px}
+.ds-admin label{display:grid;grid-template-columns:78px 1fr auto;align-items:center;gap:8px}

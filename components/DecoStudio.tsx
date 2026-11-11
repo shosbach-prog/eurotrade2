@@ -102,7 +102,9 @@ export default function DecoStudio(props: Props) {
   const inView = known.filter((p) => spots[p].view === view);
   const lines = text.split('\n').filter((l) => l.trim());
   const longest = Math.max(1, ...lines.map((l) => l.length));
-  const hasMotif = !!logoSrc || lines.length > 0;
+  // Admin auf dem Foto: Platzhalter-Logo, damit die Lage auch ohne hochgeladenes Logo eingestellt werden kann
+  const adminPh = !!props.admin && showPhoto && !logoSrc && lines.length === 0;
+  const hasMotif = !!logoSrc || lines.length > 0 || adminPh;
 
   function pt(e: React.PointerEvent) {
     const r = stage.current!.getBoundingClientRect();
@@ -176,6 +178,7 @@ export default function DecoStudio(props: Props) {
             <div key={pos} className={`ds-motif ${on ? 'on' : ''} ${method === 'Stick' ? 'stitch' : 'print'} ${light ? 'on-light' : 'on-dark'}`}
               style={{ left: `${toX(c.x, t)}%`, top: `${toY(c.y, t)}%`, width: `${c.w * t.s}%`, transform: t.rot ? `translate(-50%,-50%) rotate(${t.rot}deg)` : undefined }} onPointerDown={(e) => down(e, pos)} title={`${pos} – ziehen zum Verschieben`}>
               {logoSrc && <img src={logoSrc} alt="" draggable={false} />}
+              {adminPh && <div className="ds-ph">LOGO</div>}
               {lines.length > 0 && <div className="ds-text" style={{ fontFamily: fontCss(font), color: colorHex(textColor), fontSize: `${Math.min(34, 150 / longest)}cqw` }}>{lines.map((l, k) => <div key={k}>{l}</div>)}</div>}
               {on && <span className="ds-size">{cmFor(kind, c.w)} cm</span>}
             </div>
@@ -197,6 +200,8 @@ export default function DecoStudio(props: Props) {
       </div>}
       {props.admin && showPhoto && cur && place[cur] && <div className="ds-admin">
         <b>Admin: Lage für dieses Foto</b>
+        <label>Horizontal <input type="range" min={-30} max={130} step={0.25} value={place[cur].x} onChange={(e) => setPlace({ ...place, [cur]: { ...place[cur], x: Number(e.target.value) } })} /></label>
+        <label>Vertikal <input type="range" min={-30} max={130} step={0.25} value={place[cur].y} onChange={(e) => setPlace({ ...place, [cur]: { ...place[cur], y: Number(e.target.value) } })} /></label>
         <label>Maßstab <input type="range" min={0.4} max={2.5} step={0.02} value={adj?.s ?? 1} onChange={(e) => setAdj({ s: Number(e.target.value), rot: adj?.rot ?? 0 })} /></label>
         <label>Drehung <input type="range" min={-35} max={35} step={0.5} value={adj?.rot ?? 0} onChange={(e) => setAdj({ s: adj?.s ?? 1, rot: Number(e.target.value) })} /> {((tfOf(cur).rot ?? 0)).toFixed(1)}°</label>
         <div className="deco-row">
