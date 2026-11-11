@@ -1055,3 +1055,18 @@ footer.ft{margin-top:64px}
   .al-row>span:nth-child(4){grid-area:cat;font-size:12px}.al-row>span:nth-child(5){grid-area:ek;text-align:left}.al-row>span:nth-child(6){grid-area:vk}
   .al-row>span:nth-child(7){grid-area:sw}.al-row>span:nth-child(8){grid-area:ed}
 }
+/* Kopfzeile: Benutzer-Menü */
+.um{position:relative}
+.um-btn{border:0;color:inherit;font:inherit;cursor:pointer}
+.um-av{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#14181f;font-size:12px;font-weight:800}
+.um-name{max-width:140px;overflow:hidden;text-overflow:ellipsis}
+.um-caret{font-size:11px;opacity:.8}
+.um-login{background:var(--accent)!important;color:#14181f!important;font-weight:700}
+.um-menu{position:absolute;right:0;top:calc(100% + 8px);min-width:230px;background:#fff;color:var(--ink);border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.2);padding:6px;z-index:120;animation:fadeIn .12s}
+.um-head{display:flex;flex-direction:column;padding:10px 12px 10px;border-bottom:1px solid var(--line);margin-bottom:4px}
+.um-head b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.um-menu a,.um-menu button{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:8px;border:0;background:none;font-size:14px;color:var(--ink)}
+.um-menu a:hover,.um-menu button:hover{background:#f0f4fb}
+.um-out{color:var(--err)!important;border-top:1px solid var(--line)!important;border-radius:0 0 8px 8px!important;margin-top:4px}
+.logout-ok{background:#e6f4ea;color:#1d7a3e;border-radius:8px;padding:8px 12px;font-weight:600;margin:0 0 14px}
+@media (max-width:820px){.um-menu{position:fixed;left:12px;right:12px;top:auto;min-width:0;margin-top:8px}}

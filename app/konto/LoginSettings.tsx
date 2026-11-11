@@ -25,7 +25,7 @@ export default function LoginSettings() {
   }
 
   return (
-    <div className="box konto-login">
+    <div className="box konto-login" id="anmeldung">
       <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
         <strong>Anmeldung</strong>
         <span className="muted" style={{ fontSize: 14 }}>{info.hasPw ? `E-Mail & Passwort aktiv (${info.email})` : 'Bisher nur mit Zugangscode – legen Sie E-Mail und Passwort fest.'}</span>

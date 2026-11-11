@@ -10,10 +10,11 @@ import LogoutLink from '@/components/LogoutLink';
 import Contact from '@/components/Contact';
 import TrustBadge from '@/components/TrustBadge';
 import { CartButton, CartProvider } from '@/components/CartContext';
-import { AccountButton, WishlistButton, WishlistProvider } from '@/components/Wishlist';
+import { WishlistButton, WishlistProvider } from '@/components/Wishlist';
+import UserMenu from '@/components/UserMenu';
 import { getCategories } from '@/lib/catalog';
 import { previewMode, shopClosed } from '@/lib/access';
-import { shopAccess } from '@/lib/customer';
+import { isAdmin, shopAccess } from '@/lib/customer';
 
 const SHOP = process.env.SHOP_NAME ?? 'Euro-Trade';
 export async function generateMetadata(): Promise<Metadata> {
@@ -48,6 +49,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const path = headers().get('x-path') ?? '/';
   const isPublic = ['/fuer', '/ueber-uns', '/garantie', '/bewerten', '/widerruf', '/newsletter', '/start', '/druck-stick', '/zugang', '/passwort', '/registrieren', '/kontakt', '/impressum', '/datenschutz', '/angebot', '/admin'].some((p) => path === p || path.startsWith(p + '/'));
   const { ok, customer } = await shopAccess();
+  const admin = !customer && (await isAdmin());
   // Code im Admin gesperrt/gelöscht -> zurück zur Anmeldung
   const showcase = !ok && headers().get('x-showcase') === '1';
   if (!ok && !isPublic && !showcase) redirect('/zugang');
@@ -64,7 +66,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <Link href="/" className="logo" aria-label={`${SHOP} – Startseite`}><Logo domain={process.env.SHOP_DOMAIN ?? 'euro-trade.com'} /></Link>
               {open ? <>
                 <Suspense fallback={<div className="search" />}><SearchBar /></Suspense>
-                <div className="hdr-actions"><AccountButton /><WishlistButton /><CartButton /></div>
+                <div className="hdr-actions"><WishlistButton /><CartButton /><UserMenu name={customer?.name ?? null} admin={admin} /></div>
               </> : !path.startsWith('/admin') && <nav className="pub-nav">
                 <Link href="/druck-stick" className="hide-sm">Druck & Stick</Link>
                 <Link href="/#ablauf" className="hide-sm">So funktioniert’s</Link>
