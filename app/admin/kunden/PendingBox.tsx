@@ -21,7 +21,7 @@ export default function PendingBox({ items }: { items: P[] }) {
 
   return (
     <div className="pending-box">
-      <div className="pending-head"><span className="admin-alert-dot">{items.length}</span><strong>{items.length === 1 ? 'Neue Registrierung' : 'Neue Registrierungen'} – warten auf Freigabe</strong></div>
+      <div className="pending-head"><span className="pending-bell" aria-hidden>🔔</span><span className="admin-alert-dot">{items.length}</span><strong>{items.length === 1 ? 'Neuer Kunde hat sich registriert' : `${items.length} neue Kunden haben sich registriert`} – bitte freischalten</strong></div>
       {msg && <p className={msg.ok ? 'ok' : 'err'} style={{ margin: '0 0 10px' }}>{msg.t}</p>}
       {items.map((c) => (
         <div key={c.code} className="pending-row">

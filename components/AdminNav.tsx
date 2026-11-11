@@ -1,10 +1,12 @@
 import Link from 'next/link';
 import AdminLogout from './AdminLogout';
 import { fileCustomers, listAccessRequests } from '@/lib/store';
+import PendingBox from '@/app/admin/kunden/PendingBox';
 
 export default function AdminNav({ active }: { active: 'anfragen' | 'kunden' | 'referenzen' | 'newsletter' | 'bewertungen' | 'artikel' }) {
   // Wartende Registrierungen + offene Zugangsanfragen – immer sichtbar im Admin
-  const pending = fileCustomers().filter((c) => c.pending && c.active === false).length;
+  const waiting = fileCustomers().filter((c) => c.pending && c.active === false);
+  const pending = waiting.length;
   const requests = listAccessRequests().filter((r) => !r.done).length;
   const todo = pending + requests;
   return (
@@ -20,13 +22,8 @@ export default function AdminNav({ active }: { active: 'anfragen' | 'kunden' | '
         <Link href="/">Zum Shop</Link>
         <AdminLogout />
       </div>
-      {pending > 0 && active !== 'kunden' && (
-        <Link href="/admin/kunden" className="admin-alert">
-          <span className="admin-alert-dot">{pending}</span>
-          <b>{pending === 1 ? 'Neue Registrierung wartet' : `${pending} neue Registrierungen warten`} auf Freigabe</b>
-          <span className="admin-alert-go">Jetzt prüfen →</span>
-        </Link>
-      )}
+      {/* Neue Registrierungen: auf JEDER Admin-Seite ganz oben, mit Freischalt-Buttons */}
+      <PendingBox items={waiting.map((c) => ({ code: c.code, name: c.name, email: c.email, note: c.note, createdAt: c.createdAt }))} />
     </>
   );
 }
