@@ -16582,5 +16582,3181 @@
    "Platzhalter"
   ],
   "hidden": false
+ },
+ {
+  "id": "bcfm717",
+  "sku": "BCFM717",
+  "name": "Fleecejacke Herren (BCFM717)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Herren",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCFM717/front.jpg",
+   "/p/bc/BCFM717/back.jpg",
+   "/p/bc/BCFM717/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Black",
+    "hex": "#1f211e",
+    "image": "/p/bc/BCFM717/black.jpg",
+    "images": [
+     "/p/bc/BCFM717/black.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#192939",
+    "image": "/p/bc/BCFM717/navy.jpg",
+    "images": [
+     "/p/bc/BCFM717/navy.jpg"
+    ]
+   },
+   {
+    "name": "Steel Grey (Solid)",
+    "hex": "#565759",
+    "image": "/p/bc/BCFM717/steel-grey-solid.jpg",
+    "images": [
+     "/p/bc/BCFM717/steel-grey-solid.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Fleecejacke",
+   "Herren",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcfu703",
+  "sku": "BCFU703",
+  "name": "Fleecejacke Unisex (BCFU703)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Unisex",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCFU703/front.jpg",
+   "/p/bc/BCFU703/back.jpg",
+   "/p/bc/BCFU703/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Black",
+    "hex": "#25201a",
+    "image": "/p/bc/BCFU703/black.jpg",
+    "images": [
+     "/p/bc/BCFU703/black.jpg"
+    ]
+   },
+   {
+    "name": "Charcoal (Solid)",
+    "hex": "#5a5a5c",
+    "image": "/p/bc/BCFU703/charcoal-solid.jpg",
+    "images": [
+     "/p/bc/BCFU703/charcoal-solid.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#1a2136",
+    "image": "/p/bc/BCFU703/navy.jpg",
+    "images": [
+     "/p/bc/BCFU703/navy.jpg"
+    ]
+   },
+   {
+    "name": "Red",
+    "hex": "#ad2626",
+    "image": "/p/bc/BCFU703/red.jpg",
+    "images": [
+     "/p/bc/BCFU703/red.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Fleecejacke",
+   "Unisex",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcfu704",
+  "sku": "BCFU704",
+  "name": "Fleecejacke Unisex (BCFU704)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Unisex",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCFU704/front.jpg",
+   "/p/bc/BCFU704/back.jpg",
+   "/p/bc/BCFU704/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Black",
+    "hex": "#1e1d18",
+    "image": "/p/bc/BCFU704/black.jpg",
+    "images": [
+     "/p/bc/BCFU704/black.jpg"
+    ]
+   },
+   {
+    "name": "Charcoal (Solid)",
+    "hex": "#616065",
+    "image": "/p/bc/BCFU704/charcoal-solid.jpg",
+    "images": [
+     "/p/bc/BCFU704/charcoal-solid.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#252b3b",
+    "image": "/p/bc/BCFU704/navy.jpg",
+    "images": [
+     "/p/bc/BCFU704/navy.jpg"
+    ]
+   },
+   {
+    "name": "Red",
+    "hex": "#b12233",
+    "image": "/p/bc/BCFU704/red.jpg",
+    "images": [
+     "/p/bc/BCFU704/red.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Fleecejacke",
+   "Unisex",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcfu705",
+  "sku": "BCFU705",
+  "name": "Fleece-Weste Unisex (BCFU705)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Unisex",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCFU705/front.jpg",
+   "/p/bc/BCFU705/back.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Black",
+    "hex": "#22211c",
+    "image": "/p/bc/BCFU705/black.jpg",
+    "images": [
+     "/p/bc/BCFU705/black.jpg"
+    ]
+   },
+   {
+    "name": "Charcoal (Solid)",
+    "hex": "#424040",
+    "image": "/p/bc/BCFU705/charcoal-solid.jpg",
+    "images": [
+     "/p/bc/BCFU705/charcoal-solid.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#1f2738",
+    "image": "/p/bc/BCFU705/navy.jpg",
+    "images": [
+     "/p/bc/BCFU705/navy.jpg"
+    ]
+   },
+   {
+    "name": "Red",
+    "hex": "#b82b29",
+    "image": "/p/bc/BCFU705/red.jpg",
+    "images": [
+     "/p/bc/BCFU705/red.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Fleece-Weste",
+   "Unisex",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcfu749",
+  "sku": "BCFU749",
+  "name": "Fleecejacke Unisex (BCFU749)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Unisex",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCFU749/front.jpg",
+   "/p/bc/BCFU749/back.jpg",
+   "/p/bc/BCFU749/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Black",
+    "hex": "#1a1e1f",
+    "image": "/p/bc/BCFU749/black.jpg",
+    "images": [
+     "/p/bc/BCFU749/black.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#21283a",
+    "image": "/p/bc/BCFU749/navy.jpg",
+    "images": [
+     "/p/bc/BCFU749/navy.jpg"
+    ]
+   },
+   {
+    "name": "Olive",
+    "hex": "#434335",
+    "image": "/p/bc/BCFU749/olive.jpg",
+    "images": [
+     "/p/bc/BCFU749/olive.jpg"
+    ]
+   },
+   {
+    "name": "Red",
+    "hex": "#c02b24",
+    "image": "/p/bc/BCFU749/red.jpg",
+    "images": [
+     "/p/bc/BCFU749/red.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Fleecejacke",
+   "Unisex",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcfui50",
+  "sku": "BCFUI50",
+  "name": "Fleecejacke Unisex (BCFUI50)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Unisex",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCFUI50/front.jpg",
+   "/p/bc/BCFUI50/back.jpg",
+   "/p/bc/BCFUI50/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Atoll",
+    "hex": "#4298bb",
+    "image": "/p/bc/BCFUI50/atoll.jpg",
+    "images": [
+     "/p/bc/BCFUI50/atoll.jpg"
+    ]
+   },
+   {
+    "name": "Black",
+    "hex": "#32312c",
+    "image": "/p/bc/BCFUI50/black.jpg",
+    "images": [
+     "/p/bc/BCFUI50/black.jpg"
+    ]
+   },
+   {
+    "name": "Dark Grey (Solid)",
+    "hex": "#49484d",
+    "image": "/p/bc/BCFUI50/dark-grey-solid.jpg",
+    "images": [
+     "/p/bc/BCFUI50/dark-grey-solid.jpg"
+    ]
+   },
+   {
+    "name": "Forest Green",
+    "hex": "#384033",
+    "image": "/p/bc/BCFUI50/forest-green.jpg",
+    "images": [
+     "/p/bc/BCFUI50/forest-green.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#202634",
+    "image": "/p/bc/BCFUI50/navy.jpg",
+    "images": [
+     "/p/bc/BCFUI50/navy.jpg"
+    ]
+   },
+   {
+    "name": "Pumpkin Orange",
+    "hex": "#c74a1d",
+    "image": "/p/bc/BCFUI50/pumpkin-orange.jpg",
+    "images": [
+     "/p/bc/BCFUI50/pumpkin-orange.jpg"
+    ]
+   },
+   {
+    "name": "Red",
+    "hex": "#af2a2d",
+    "image": "/p/bc/BCFUI50/red.jpg",
+    "images": [
+     "/p/bc/BCFUI50/red.jpg"
+    ]
+   },
+   {
+    "name": "Royal Blue",
+    "hex": "#305694",
+    "image": "/p/bc/BCFUI50/royal-blue.jpg",
+    "images": [
+     "/p/bc/BCFUI50/royal-blue.jpg"
+    ]
+   },
+   {
+    "name": "White",
+    "hex": "#ebeae8",
+    "image": "/p/bc/BCFUI50/white.jpg",
+    "images": [
+     "/p/bc/BCFUI50/white.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Fleecejacke",
+   "Unisex",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcfw752",
+  "sku": "BCFW752",
+  "name": "Fleecejacke Damen (BCFW752)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Damen",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCFW752/front.jpg",
+   "/p/bc/BCFW752/back.jpg",
+   "/p/bc/BCFW752/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Black",
+    "hex": "#202624",
+    "image": "/p/bc/BCFW752/black.jpg",
+    "images": [
+     "/p/bc/BCFW752/black.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#192633",
+    "image": "/p/bc/BCFW752/navy.jpg",
+    "images": [
+     "/p/bc/BCFW752/navy.jpg"
+    ]
+   },
+   {
+    "name": "Steel Grey (Solid)",
+    "hex": "#4d4e50",
+    "image": "/p/bc/BCFW752/steel-grey-solid.jpg",
+    "images": [
+     "/p/bc/BCFW752/steel-grey-solid.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Fleecejacke",
+   "Damen",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcfwi51",
+  "sku": "BCFWI51",
+  "name": "Fleecejacke Damen (BCFWI51)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Damen",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCFWI51/front.jpg",
+   "/p/bc/BCFWI51/back.jpg",
+   "/p/bc/BCFWI51/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Atoll",
+    "hex": "#4297ba",
+    "image": "/p/bc/BCFWI51/atoll.jpg",
+    "images": [
+     "/p/bc/BCFWI51/atoll.jpg"
+    ]
+   },
+   {
+    "name": "Black",
+    "hex": "#32312c",
+    "image": "/p/bc/BCFWI51/black.jpg",
+    "images": [
+     "/p/bc/BCFWI51/black.jpg"
+    ]
+   },
+   {
+    "name": "Dark Grey (Solid)",
+    "hex": "#484c4f",
+    "image": "/p/bc/BCFWI51/dark-grey-solid.jpg",
+    "images": [
+     "/p/bc/BCFWI51/dark-grey-solid.jpg"
+    ]
+   },
+   {
+    "name": "Forest Green",
+    "hex": "#384033",
+    "image": "/p/bc/BCFWI51/forest-green.jpg",
+    "images": [
+     "/p/bc/BCFWI51/forest-green.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#202634",
+    "image": "/p/bc/BCFWI51/navy.jpg",
+    "images": [
+     "/p/bc/BCFWI51/navy.jpg"
+    ]
+   },
+   {
+    "name": "Pumpkin Orange",
+    "hex": "#c84b1b",
+    "image": "/p/bc/BCFWI51/pumpkin-orange.jpg",
+    "images": [
+     "/p/bc/BCFWI51/pumpkin-orange.jpg"
+    ]
+   },
+   {
+    "name": "Red",
+    "hex": "#ad2a2e",
+    "image": "/p/bc/BCFWI51/red.jpg",
+    "images": [
+     "/p/bc/BCFWI51/red.jpg"
+    ]
+   },
+   {
+    "name": "Royal Blue",
+    "hex": "#305694",
+    "image": "/p/bc/BCFWI51/royal-blue.jpg",
+    "images": [
+     "/p/bc/BCFWI51/royal-blue.jpg"
+    ]
+   },
+   {
+    "name": "White",
+    "hex": "#ebeae8",
+    "image": "/p/bc/BCFWI51/white.jpg",
+    "images": [
+     "/p/bc/BCFWI51/white.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Fleecejacke",
+   "Damen",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcjk950",
+  "sku": "BCJK950",
+  "name": "Jacke Kinder (BCJK950)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Kinder",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJK950/atoll.jpg",
+   "/p/bc/BCJK950/back.jpg",
+   "/p/bc/BCJK950/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Atoll",
+    "hex": "#009dda",
+    "image": "/p/bc/BCJK950/atoll.jpg",
+    "images": [
+     "/p/bc/BCJK950/atoll.jpg"
+    ]
+   },
+   {
+    "name": "Black",
+    "hex": "#1e201b",
+    "image": "/p/bc/BCJK950/black.jpg",
+    "images": [
+     "/p/bc/BCJK950/black.jpg"
+    ]
+   },
+   {
+    "name": "Bottle Green",
+    "hex": "#285038",
+    "image": "/p/bc/BCJK950/bottle-green.jpg",
+    "images": [
+     "/p/bc/BCJK950/bottle-green.jpg"
+    ]
+   },
+   {
+    "name": "Gold",
+    "hex": "#f6b330",
+    "image": "/p/bc/BCJK950/gold.jpg",
+    "images": [
+     "/p/bc/BCJK950/gold.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#29333f",
+    "image": "/p/bc/BCJK950/navy.jpg",
+    "images": [
+     "/p/bc/BCJK950/navy.jpg"
+    ]
+   },
+   {
+    "name": "Orange",
+    "hex": "#e2661e",
+    "image": "/p/bc/BCJK950/orange.jpg",
+    "images": [
+     "/p/bc/BCJK950/orange.jpg"
+    ]
+   },
+   {
+    "name": "Purple",
+    "hex": "#523472",
+    "image": "/p/bc/BCJK950/purple.jpg",
+    "images": [
+     "/p/bc/BCJK950/purple.jpg"
+    ]
+   },
+   {
+    "name": "Real Green",
+    "hex": "#3eab40",
+    "image": "/p/bc/BCJK950/real-green.jpg",
+    "images": [
+     "/p/bc/BCJK950/real-green.jpg"
+    ]
+   },
+   {
+    "name": "Red",
+    "hex": "#c8201d",
+    "image": "/p/bc/BCJK950/red.jpg",
+    "images": [
+     "/p/bc/BCJK950/red.jpg"
+    ]
+   },
+   {
+    "name": "Royal Blue",
+    "hex": "#005391",
+    "image": "/p/bc/BCJK950/royal-blue.jpg",
+    "images": [
+     "/p/bc/BCJK950/royal-blue.jpg"
+    ]
+   },
+   {
+    "name": "Ultra Yellow",
+    "hex": "#e8e14a",
+    "image": "/p/bc/BCJK950/ultra-yellow.jpg",
+    "images": [
+     "/p/bc/BCJK950/ultra-yellow.jpg"
+    ]
+   },
+   {
+    "name": "White",
+    "hex": "#e6e5e1",
+    "image": "/p/bc/BCJK950/white.jpg",
+    "images": [
+     "/p/bc/BCJK950/white.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "3/4",
+   "5/6",
+   "7/8",
+   "9/11",
+   "12/14"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Jacke",
+   "Kinder",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcjk969",
+  "sku": "BCJK969",
+  "name": "Jacke Kinder (BCJK969)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Kinder",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJK969/front.jpg",
+   "/p/bc/BCJK969/back.jpg",
+   "/p/bc/BCJK969/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Azure",
+    "hex": "#2974b2",
+    "image": "/p/bc/BCJK969/azure.jpg",
+    "images": [
+     "/p/bc/BCJK969/azure.jpg"
+    ]
+   },
+   {
+    "name": "Black",
+    "hex": "#2b2a32",
+    "image": "/p/bc/BCJK969/black.jpg",
+    "images": [
+     "/p/bc/BCJK969/black.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#2a3544",
+    "image": "/p/bc/BCJK969/navy.jpg",
+    "images": [
+     "/p/bc/BCJK969/navy.jpg"
+    ]
+   },
+   {
+    "name": "Red",
+    "hex": "#d22034",
+    "image": "/p/bc/BCJK969/red.jpg",
+    "images": [
+     "/p/bc/BCJK969/red.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "3/4",
+   "5/6",
+   "7/8",
+   "9/11",
+   "12/14"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Jacke",
+   "Kinder",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcjm825",
+  "sku": "BCJM825",
+  "name": "Jacke Herren (BCJM825)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Herren",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJM825/front.jpg",
+   "/p/bc/BCJM825/back.jpg",
+   "/p/bc/BCJM825/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Atoll_Warm Grey",
+    "hex": "#148cb7",
+    "image": "/p/bc/BCJM825/atoll-warm-grey.jpg",
+    "images": [
+     "/p/bc/BCJM825/atoll-warm-grey.jpg"
+    ]
+   },
+   {
+    "name": "Black_Warm Grey",
+    "hex": "#323232",
+    "image": "/p/bc/BCJM825/black-warm-grey.jpg",
+    "images": [
+     "/p/bc/BCJM825/black-warm-grey.jpg"
+    ]
+   },
+   {
+    "name": "Dark Grey (Solid)_Warm Grey",
+    "hex": "#4a4444",
+    "image": "/p/bc/BCJM825/dark-grey-solid-warm-grey.jpg",
+    "images": [
+     "/p/bc/BCJM825/dark-grey-solid-warm-grey.jpg"
+    ]
+   },
+   {
+    "name": "Navy_Warm Grey",
+    "hex": "#2c3240",
+    "image": "/p/bc/BCJM825/navy-warm-grey.jpg",
+    "images": [
+     "/p/bc/BCJM825/navy-warm-grey.jpg"
+    ]
+   },
+   {
+    "name": "Red_Warm Grey",
+    "hex": "#b31a2f",
+    "image": "/p/bc/BCJM825/red-warm-grey.jpg",
+    "images": [
+     "/p/bc/BCJM825/red-warm-grey.jpg"
+    ]
+   },
+   {
+    "name": "White_White",
+    "hex": "#dfdfdf",
+    "image": "/p/bc/BCJM825/white-white.jpg",
+    "images": [
+     "/p/bc/BCJM825/white-white.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Jacke",
+   "Herren",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcjm930",
+  "sku": "BCJM930",
+  "name": "Steppweste Herren (BCJM930)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Herren",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJM930/front.jpg",
+   "/p/bc/BCJM930/back.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Black",
+    "hex": "#252523",
+    "image": "/p/bc/BCJM930/black.jpg",
+    "images": [
+     "/p/bc/BCJM930/black.jpg"
+    ]
+   },
+   {
+    "name": "Dark Grey (Solid)",
+    "hex": "#4d5356",
+    "image": "/p/bc/BCJM930/dark-grey-solid.jpg",
+    "images": [
+     "/p/bc/BCJM930/dark-grey-solid.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#2b3746",
+    "image": "/p/bc/BCJM930/navy.jpg",
+    "images": [
+     "/p/bc/BCJM930/navy.jpg"
+    ]
+   },
+   {
+    "name": "Red",
+    "hex": "#c2162c",
+    "image": "/p/bc/BCJM930/red.jpg",
+    "images": [
+     "/p/bc/BCJM930/red.jpg"
+    ]
+   },
+   {
+    "name": "White",
+    "hex": "#e4e4e4",
+    "image": "/p/bc/BCJM930/white.jpg",
+    "images": [
+     "/p/bc/BCJM930/white.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Steppweste",
+   "Herren",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcjm940",
+  "sku": "BCJM940",
+  "name": "Steppjacke Herren (BCJM940)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Herren",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJM940/front.jpg",
+   "/p/bc/BCJM940/back.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Black_Cobalt Blue",
+    "hex": "#242424",
+    "image": "/p/bc/BCJM940/black-cobalt-blue.jpg",
+    "images": [
+     "/p/bc/BCJM940/black-cobalt-blue.jpg"
+    ]
+   },
+   {
+    "name": "Dark Grey (Solid)_Neon Orange",
+    "hex": "#444245",
+    "image": "/p/bc/BCJM940/dark-grey-solid-neon-orange.jpg",
+    "images": [
+     "/p/bc/BCJM940/dark-grey-solid-neon-orange.jpg"
+    ]
+   },
+   {
+    "name": "Navy_Neon Green",
+    "hex": "#202634",
+    "image": "/p/bc/BCJM940/navy-neon-green.jpg",
+    "images": [
+     "/p/bc/BCJM940/navy-neon-green.jpg"
+    ]
+   },
+   {
+    "name": "Red_Black",
+    "hex": "#92051d",
+    "image": "/p/bc/BCJM940/red-black.jpg",
+    "images": [
+     "/p/bc/BCJM940/red-black.jpg"
+    ]
+   },
+   {
+    "name": "Royal Blue_Neon Orange",
+    "hex": "#16599d",
+    "image": "/p/bc/BCJM940/royal-blue-neon-orange.jpg",
+    "images": [
+     "/p/bc/BCJM940/royal-blue-neon-orange.jpg"
+    ]
+   },
+   {
+    "name": "White_Warm Grey",
+    "hex": "#c8c8c8",
+    "image": "/p/bc/BCJM940/white-warm-grey.jpg",
+    "images": [
+     "/p/bc/BCJM940/white-warm-grey.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Steppjacke",
+   "Herren",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcjm950",
+  "sku": "BCJM950",
+  "name": "Jacke Herren (BCJM950)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Herren",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJM950/front.jpg",
+   "/p/bc/BCJM950/back.jpg",
+   "/p/bc/BCJM950/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Azure",
+    "hex": "#397bb5",
+    "image": "/p/bc/BCJM950/azure.jpg",
+    "images": [
+     "/p/bc/BCJM950/azure.jpg"
+    ]
+   },
+   {
+    "name": "Black",
+    "hex": "#242620",
+    "image": "/p/bc/BCJM950/black.jpg",
+    "images": [
+     "/p/bc/BCJM950/black.jpg"
+    ]
+   },
+   {
+    "name": "Dark Grey (Solid)",
+    "hex": "#4c5053",
+    "image": "/p/bc/BCJM950/dark-grey-solid.jpg",
+    "images": [
+     "/p/bc/BCJM950/dark-grey-solid.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#131b2d",
+    "image": "/p/bc/BCJM950/navy.jpg",
+    "images": [
+     "/p/bc/BCJM950/navy.jpg"
+    ]
+   },
+   {
+    "name": "Red",
+    "hex": "#bd1b2e",
+    "image": "/p/bc/BCJM950/red.jpg",
+    "images": [
+     "/p/bc/BCJM950/red.jpg"
+    ]
+   },
+   {
+    "name": "White",
+    "hex": "#ede9e8",
+    "image": "/p/bc/BCJM950/white.jpg",
+    "images": [
+     "/p/bc/BCJM950/white.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Jacke",
+   "Herren",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcjm951",
+  "sku": "BCJM951",
+  "name": "Jacke Herren (BCJM951)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Herren",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJM951/front.jpg",
+   "/p/bc/BCJM951/back.jpg",
+   "/p/bc/BCJM951/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "5_Detail",
+    "hex": "#232937",
+    "image": "/p/bc/BCJM951/5-detail.jpg",
+    "images": [
+     "/p/bc/BCJM951/5-detail.jpg"
+    ]
+   },
+   {
+    "name": "Black",
+    "hex": "#2c2a2b",
+    "image": "/p/bc/BCJM951/black.jpg",
+    "images": [
+     "/p/bc/BCJM951/black.jpg"
+    ]
+   },
+   {
+    "name": "Deep Red",
+    "hex": "#d02724",
+    "image": "/p/bc/BCJM951/deep-red.jpg",
+    "images": [
+     "/p/bc/BCJM951/deep-red.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#26324a",
+    "image": "/p/bc/BCJM951/navy.jpg",
+    "images": [
+     "/p/bc/BCJM951/navy.jpg"
+    ]
+   },
+   {
+    "name": "White",
+    "hex": "#f0efed",
+    "image": "/p/bc/BCJM951/white.jpg",
+    "images": [
+     "/p/bc/BCJM951/white.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Jacke",
+   "Herren",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcjm961",
+  "sku": "BCJM961",
+  "name": "Jacke Herren (BCJM961)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Herren",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJM961/front.jpg",
+   "/p/bc/BCJM961/back.jpg",
+   "/p/bc/BCJM961/side.jpg"
+  ],
+  "colors": [],
+  "sizes": [
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Jacke",
+   "Herren",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcjm963",
+  "sku": "BCJM963",
+  "name": "Jacke Herren (BCJM963)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Herren",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJM963/front.jpg",
+   "/p/bc/BCJM963/back.jpg",
+   "/p/bc/BCJM963/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Black_Cobalt Blue",
+    "hex": "#363330",
+    "image": "/p/bc/BCJM963/black-cobalt-blue.jpg",
+    "images": [
+     "/p/bc/BCJM963/black-cobalt-blue.jpg"
+    ]
+   },
+   {
+    "name": "Navy_Neon Green",
+    "hex": "#465b22",
+    "image": "/p/bc/BCJM963/navy-neon-green.jpg",
+    "images": [
+     "/p/bc/BCJM963/navy-neon-green.jpg"
+    ]
+   },
+   {
+    "name": "Real Green_Neon Orange",
+    "hex": "#368f47",
+    "image": "/p/bc/BCJM963/real-green-neon-orange.jpg",
+    "images": [
+     "/p/bc/BCJM963/real-green-neon-orange.jpg"
+    ]
+   },
+   {
+    "name": "Red_Warm Grey",
+    "hex": "#b41930",
+    "image": "/p/bc/BCJM963/red-warm-grey.jpg",
+    "images": [
+     "/p/bc/BCJM963/red-warm-grey.jpg"
+    ]
+   },
+   {
+    "name": "Royal Blue_Neon Orange",
+    "hex": "#18559c",
+    "image": "/p/bc/BCJM963/royal-blue-neon-orange.jpg",
+    "images": [
+     "/p/bc/BCJM963/royal-blue-neon-orange.jpg"
+    ]
+   },
+   {
+    "name": "White_White",
+    "hex": "#e1e1e1",
+    "image": "/p/bc/BCJM963/white-white.jpg",
+    "images": [
+     "/p/bc/BCJM963/white-white.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Jacke",
+   "Herren",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcjm970",
+  "sku": "BCJM970",
+  "name": "Jacke Herren (BCJM970)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Herren",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJM970/front.jpg",
+   "/p/bc/BCJM970/back.jpg",
+   "/p/bc/BCJM970/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Black",
+    "hex": "#20221f",
+    "image": "/p/bc/BCJM970/black.jpg",
+    "images": [
+     "/p/bc/BCJM970/black.jpg"
+    ]
+   },
+   {
+    "name": "Deep Red",
+    "hex": "#c13034",
+    "image": "/p/bc/BCJM970/deep-red.jpg",
+    "images": [
+     "/p/bc/BCJM970/deep-red.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#31334a",
+    "image": "/p/bc/BCJM970/navy.jpg",
+    "images": [
+     "/p/bc/BCJM970/navy.jpg"
+    ]
+   },
+   {
+    "name": "Orange",
+    "hex": "#ec6a39",
+    "image": "/p/bc/BCJM970/orange.jpg",
+    "images": [
+     "/p/bc/BCJM970/orange.jpg"
+    ]
+   },
+   {
+    "name": "Royal Blue",
+    "hex": "#2e65a5",
+    "image": "/p/bc/BCJM970/royal-blue.jpg",
+    "images": [
+     "/p/bc/BCJM970/royal-blue.jpg"
+    ]
+   },
+   {
+    "name": "White",
+    "hex": "#f1eff0",
+    "image": "/p/bc/BCJM970/white.jpg",
+    "images": [
+     "/p/bc/BCJM970/white.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Jacke",
+   "Herren",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcju800",
+  "sku": "BCJU800",
+  "name": "Jacke Unisex (BCJU800)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Unisex",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJU800/front.jpg",
+   "/p/bc/BCJU800/back.jpg",
+   "/p/bc/BCJU800/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Atoll",
+    "hex": "#008dc3",
+    "image": "/p/bc/BCJU800/atoll.jpg",
+    "images": [
+     "/p/bc/BCJU800/atoll.jpg"
+    ]
+   },
+   {
+    "name": "Black",
+    "hex": "#141b17",
+    "image": "/p/bc/BCJU800/black.jpg",
+    "images": [
+     "/p/bc/BCJU800/black.jpg"
+    ]
+   },
+   {
+    "name": "Bottle Green",
+    "hex": "#203d1f",
+    "image": "/p/bc/BCJU800/bottle-green.jpg",
+    "images": [
+     "/p/bc/BCJU800/bottle-green.jpg"
+    ]
+   },
+   {
+    "name": "Gold",
+    "hex": "#f2b127",
+    "image": "/p/bc/BCJU800/gold.jpg",
+    "images": [
+     "/p/bc/BCJU800/gold.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#2a2b42",
+    "image": "/p/bc/BCJU800/navy.jpg",
+    "images": [
+     "/p/bc/BCJU800/navy.jpg"
+    ]
+   },
+   {
+    "name": "Orange",
+    "hex": "#f06224",
+    "image": "/p/bc/BCJU800/orange.jpg",
+    "images": [
+     "/p/bc/BCJU800/orange.jpg"
+    ]
+   },
+   {
+    "name": "Pixel Pink",
+    "hex": "#d07d97",
+    "image": "/p/bc/BCJU800/pixel-pink.jpg",
+    "images": [
+     "/p/bc/BCJU800/pixel-pink.jpg"
+    ]
+   },
+   {
+    "name": "Pixel Turquoise",
+    "hex": "#93c3b5",
+    "image": "/p/bc/BCJU800/pixel-turquoise.jpg",
+    "images": [
+     "/p/bc/BCJU800/pixel-turquoise.jpg"
+    ]
+   },
+   {
+    "name": "Purple",
+    "hex": "#4e326c",
+    "image": "/p/bc/BCJU800/purple.jpg",
+    "images": [
+     "/p/bc/BCJU800/purple.jpg"
+    ]
+   },
+   {
+    "name": "Real Green",
+    "hex": "#1ea435",
+    "image": "/p/bc/BCJU800/real-green.jpg",
+    "images": [
+     "/p/bc/BCJU800/real-green.jpg"
+    ]
+   },
+   {
+    "name": "Red",
+    "hex": "#b82b24",
+    "image": "/p/bc/BCJU800/red.jpg",
+    "images": [
+     "/p/bc/BCJU800/red.jpg"
+    ]
+   },
+   {
+    "name": "Royal Blue",
+    "hex": "#1b4e95",
+    "image": "/p/bc/BCJU800/royal-blue.jpg",
+    "images": [
+     "/p/bc/BCJU800/royal-blue.jpg"
+    ]
+   },
+   {
+    "name": "Ultra Yellow",
+    "hex": "#cdcf2d",
+    "image": "/p/bc/BCJU800/ultra-yellow.jpg",
+    "images": [
+     "/p/bc/BCJU800/ultra-yellow.jpg"
+    ]
+   },
+   {
+    "name": "White",
+    "hex": "#efeeec",
+    "image": "/p/bc/BCJU800/white.jpg",
+    "images": [
+     "/p/bc/BCJU800/white.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Jacke",
+   "Unisex",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcju801",
+  "sku": "BCJU801",
+  "name": "Jacke Unisex (BCJU801)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Unisex",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJU801/front.jpg",
+   "/p/bc/BCJU801/back.jpg",
+   "/p/bc/BCJU801/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Black",
+    "hex": "#262623",
+    "image": "/p/bc/BCJU801/black.jpg",
+    "images": [
+     "/p/bc/BCJU801/black.jpg"
+    ]
+   },
+   {
+    "name": "Bottle Green",
+    "hex": "#2f5442",
+    "image": "/p/bc/BCJU801/bottle-green.jpg",
+    "images": [
+     "/p/bc/BCJU801/bottle-green.jpg"
+    ]
+   },
+   {
+    "name": "Dark Grey (Solid)",
+    "hex": "#5a5f63",
+    "image": "/p/bc/BCJU801/dark-grey-solid.jpg",
+    "images": [
+     "/p/bc/BCJU801/dark-grey-solid.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#2e344b",
+    "image": "/p/bc/BCJU801/navy.jpg",
+    "images": [
+     "/p/bc/BCJU801/navy.jpg"
+    ]
+   },
+   {
+    "name": "Red",
+    "hex": "#ca2020",
+    "image": "/p/bc/BCJU801/red.jpg",
+    "images": [
+     "/p/bc/BCJU801/red.jpg"
+    ]
+   },
+   {
+    "name": "Royal Blue",
+    "hex": "#3a6297",
+    "image": "/p/bc/BCJU801/royal-blue.jpg",
+    "images": [
+     "/p/bc/BCJU801/royal-blue.jpg"
+    ]
+   },
+   {
+    "name": "Very Yellow",
+    "hex": "#fad34a",
+    "image": "/p/bc/BCJU801/very-yellow.jpg",
+    "images": [
+     "/p/bc/BCJU801/very-yellow.jpg"
+    ]
+   },
+   {
+    "name": "White",
+    "hex": "#ececec",
+    "image": "/p/bc/BCJU801/white.jpg",
+    "images": [
+     "/p/bc/BCJU801/white.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Jacke",
+   "Unisex",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcju824",
+  "sku": "BCJU824",
+  "name": "Jacke Unisex (BCJU824)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Unisex",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJU824/front.jpg",
+   "/p/bc/BCJU824/back.jpg",
+   "/p/bc/BCJU824/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Black",
+    "hex": "#2d221e",
+    "image": "/p/bc/BCJU824/black.jpg",
+    "images": [
+     "/p/bc/BCJU824/black.jpg"
+    ]
+   },
+   {
+    "name": "Dark Grey (Solid)",
+    "hex": "#5c5050",
+    "image": "/p/bc/BCJU824/dark-grey-solid.jpg",
+    "images": [
+     "/p/bc/BCJU824/dark-grey-solid.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#253241",
+    "image": "/p/bc/BCJU824/navy.jpg",
+    "images": [
+     "/p/bc/BCJU824/navy.jpg"
+    ]
+   },
+   {
+    "name": "Red",
+    "hex": "#db1328",
+    "image": "/p/bc/BCJU824/red.jpg",
+    "images": [
+     "/p/bc/BCJU824/red.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Jacke",
+   "Unisex",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcju873",
+  "sku": "BCJU873",
+  "name": "Jacke Unisex (BCJU873)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Unisex",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJU873/front.jpg",
+   "/p/bc/BCJU873/back.jpg",
+   "/p/bc/BCJU873/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Black",
+    "hex": "#212121",
+    "image": "/p/bc/BCJU873/black.jpg",
+    "images": [
+     "/p/bc/BCJU873/black.jpg"
+    ]
+   },
+   {
+    "name": "Dark Grey (Solid)",
+    "hex": "#343235",
+    "image": "/p/bc/BCJU873/dark-grey-solid.jpg",
+    "images": [
+     "/p/bc/BCJU873/dark-grey-solid.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#1a202e",
+    "image": "/p/bc/BCJU873/navy.jpg",
+    "images": [
+     "/p/bc/BCJU873/navy.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Jacke",
+   "Unisex",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcju880",
+  "sku": "BCJU880",
+  "name": "Weste Unisex (BCJU880)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Unisex",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJU880/front.jpg",
+   "/p/bc/BCJU880/back.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Beige",
+    "hex": "#ccb799",
+    "image": "/p/bc/BCJU880/beige.jpg",
+    "images": [
+     "/p/bc/BCJU880/beige.jpg"
+    ]
+   },
+   {
+    "name": "Black",
+    "hex": "#141a16",
+    "image": "/p/bc/BCJU880/black.jpg",
+    "images": [
+     "/p/bc/BCJU880/black.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#272e44",
+    "image": "/p/bc/BCJU880/navy.jpg",
+    "images": [
+     "/p/bc/BCJU880/navy.jpg"
+    ]
+   },
+   {
+    "name": "Olive",
+    "hex": "#414336",
+    "image": "/p/bc/BCJU880/olive.jpg",
+    "images": [
+     "/p/bc/BCJU880/olive.jpg"
+    ]
+   },
+   {
+    "name": "Red",
+    "hex": "#bc2422",
+    "image": "/p/bc/BCJU880/red.jpg",
+    "images": [
+     "/p/bc/BCJU880/red.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Weste",
+   "Unisex",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcjuc40",
+  "sku": "BCJUC40",
+  "name": "Bodywarmer Unisex (BCJUC40)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Unisex",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJUC40/front.jpg",
+   "/p/bc/BCJUC40/back.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Black",
+    "hex": "#272627",
+    "image": "/p/bc/BCJUC40/black.jpg",
+    "images": [
+     "/p/bc/BCJUC40/black.jpg"
+    ]
+   },
+   {
+    "name": "Brown",
+    "hex": "#40332a",
+    "image": "/p/bc/BCJUC40/brown.jpg",
+    "images": [
+     "/p/bc/BCJUC40/brown.jpg"
+    ]
+   },
+   {
+    "name": "Dark Grey (Solid)",
+    "hex": "#494a4f",
+    "image": "/p/bc/BCJUC40/dark-grey-solid.jpg",
+    "images": [
+     "/p/bc/BCJUC40/dark-grey-solid.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#2a303e",
+    "image": "/p/bc/BCJUC40/navy.jpg",
+    "images": [
+     "/p/bc/BCJUC40/navy.jpg"
+    ]
+   },
+   {
+    "name": "Red",
+    "hex": "#d12d2d",
+    "image": "/p/bc/BCJUC40/red.jpg",
+    "images": [
+     "/p/bc/BCJUC40/red.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Bodywarmer",
+   "Unisex",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcjuc41",
+  "sku": "BCJUC41",
+  "name": "Jacke Unisex (BCJUC41)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Unisex",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJUC41/front.jpg",
+   "/p/bc/BCJUC41/back.jpg",
+   "/p/bc/BCJUC41/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Black",
+    "hex": "#272727",
+    "image": "/p/bc/BCJUC41/black.jpg",
+    "images": [
+     "/p/bc/BCJUC41/black.jpg"
+    ]
+   },
+   {
+    "name": "Dark Grey (Solid)",
+    "hex": "#44454a",
+    "image": "/p/bc/BCJUC41/dark-grey-solid.jpg",
+    "images": [
+     "/p/bc/BCJUC41/dark-grey-solid.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#2c3841",
+    "image": "/p/bc/BCJUC41/navy.jpg",
+    "images": [
+     "/p/bc/BCJUC41/navy.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Jacke",
+   "Unisex",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcjuc42",
+  "sku": "BCJUC42",
+  "name": "Jacke Unisex (BCJUC42)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Unisex",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJUC42/front.jpg",
+   "/p/bc/BCJUC42/back.jpg",
+   "/p/bc/BCJUC42/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Black",
+    "hex": "#333333",
+    "image": "/p/bc/BCJUC42/black.jpg",
+    "images": [
+     "/p/bc/BCJUC42/black.jpg"
+    ]
+   },
+   {
+    "name": "Dark Grey (Solid)",
+    "hex": "#4f4b4a",
+    "image": "/p/bc/BCJUC42/dark-grey-solid.jpg",
+    "images": [
+     "/p/bc/BCJUC42/dark-grey-solid.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#2e3841",
+    "image": "/p/bc/BCJUC42/navy.jpg",
+    "images": [
+     "/p/bc/BCJUC42/navy.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Jacke",
+   "Unisex",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcjui60",
+  "sku": "BCJUI60",
+  "name": "Jacke Unisex (BCJUI60)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Unisex",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJUI60/front.jpg",
+   "/p/bc/BCJUI60/back.jpg",
+   "/p/bc/BCJUI60/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Black",
+    "hex": "#33332e",
+    "image": "/p/bc/BCJUI60/black.jpg",
+    "images": [
+     "/p/bc/BCJUI60/black.jpg"
+    ]
+   },
+   {
+    "name": "Dark Grey (Solid)",
+    "hex": "#4c4a4d",
+    "image": "/p/bc/BCJUI60/dark-grey-solid.jpg",
+    "images": [
+     "/p/bc/BCJUI60/dark-grey-solid.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#22293b",
+    "image": "/p/bc/BCJUI60/navy.jpg",
+    "images": [
+     "/p/bc/BCJUI60/navy.jpg"
+    ]
+   },
+   {
+    "name": "Orange",
+    "hex": "#c46237",
+    "image": "/p/bc/BCJUI60/orange.jpg",
+    "images": [
+     "/p/bc/BCJUI60/orange.jpg"
+    ]
+   },
+   {
+    "name": "Red",
+    "hex": "#ab2c3d",
+    "image": "/p/bc/BCJUI60/red.jpg",
+    "images": [
+     "/p/bc/BCJUI60/red.jpg"
+    ]
+   },
+   {
+    "name": "White",
+    "hex": "#e9e8e6",
+    "image": "/p/bc/BCJUI60/white.jpg",
+    "images": [
+     "/p/bc/BCJUI60/white.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Jacke",
+   "Unisex",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcjui62",
+  "sku": "BCJUI62",
+  "name": "Jacke Unisex (BCJUI62)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Unisex",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJUI62/front.jpg",
+   "/p/bc/BCJUI62/back.jpg",
+   "/p/bc/BCJUI62/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Atoll_Ghost Grey",
+    "hex": "#138bbb",
+    "image": "/p/bc/BCJUI62/atoll-ghost-grey.jpg",
+    "images": [
+     "/p/bc/BCJUI62/atoll-ghost-grey.jpg"
+    ]
+   },
+   {
+    "name": "Black_Black",
+    "hex": "#303030",
+    "image": "/p/bc/BCJUI62/black-black.jpg",
+    "images": [
+     "/p/bc/BCJUI62/black-black.jpg"
+    ]
+   },
+   {
+    "name": "Dark Grey (Solid)_Neon Orange",
+    "hex": "#54504f",
+    "image": "/p/bc/BCJUI62/dark-grey-solid-neon-orange.jpg",
+    "images": [
+     "/p/bc/BCJUI62/dark-grey-solid-neon-orange.jpg"
+    ]
+   },
+   {
+    "name": "Navy_Neon Green",
+    "hex": "#333f48",
+    "image": "/p/bc/BCJUI62/navy-neon-green.jpg",
+    "images": [
+     "/p/bc/BCJUI62/navy-neon-green.jpg"
+    ]
+   },
+   {
+    "name": "Red_Warm Grey",
+    "hex": "#b01a2d",
+    "image": "/p/bc/BCJUI62/red-warm-grey.jpg",
+    "images": [
+     "/p/bc/BCJUI62/red-warm-grey.jpg"
+    ]
+   },
+   {
+    "name": "White_White",
+    "hex": "#e7e7e7",
+    "image": "/p/bc/BCJUI62/white-white.jpg",
+    "images": [
+     "/p/bc/BCJUI62/white-white.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Jacke",
+   "Unisex",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcjw826",
+  "sku": "BCJW826",
+  "name": "Jacke Damen (BCJW826)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Damen",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJW826/front.jpg",
+   "/p/bc/BCJW826/back.jpg",
+   "/p/bc/BCJW826/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Atoll_Warm Grey",
+    "hex": "#0c86b1",
+    "image": "/p/bc/BCJW826/atoll-warm-grey.jpg",
+    "images": [
+     "/p/bc/BCJW826/atoll-warm-grey.jpg"
+    ]
+   },
+   {
+    "name": "Black_Warm Grey",
+    "hex": "#2e2e2e",
+    "image": "/p/bc/BCJW826/black-warm-grey.jpg",
+    "images": [
+     "/p/bc/BCJW826/black-warm-grey.jpg"
+    ]
+   },
+   {
+    "name": "Dark Grey (Solid)_Warm Grey",
+    "hex": "#49474a",
+    "image": "/p/bc/BCJW826/dark-grey-solid-warm-grey.jpg",
+    "images": [
+     "/p/bc/BCJW826/dark-grey-solid-warm-grey.jpg"
+    ]
+   },
+   {
+    "name": "Navy_Warm Grey",
+    "hex": "#282e3c",
+    "image": "/p/bc/BCJW826/navy-warm-grey.jpg",
+    "images": [
+     "/p/bc/BCJW826/navy-warm-grey.jpg"
+    ]
+   },
+   {
+    "name": "Red_Warm Grey",
+    "hex": "#af192d",
+    "image": "/p/bc/BCJW826/red-warm-grey.jpg",
+    "images": [
+     "/p/bc/BCJW826/red-warm-grey.jpg"
+    ]
+   },
+   {
+    "name": "White_White",
+    "hex": "#e6e6e6",
+    "image": "/p/bc/BCJW826/white-white.jpg",
+    "images": [
+     "/p/bc/BCJW826/white-white.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Jacke",
+   "Damen",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcjw902",
+  "sku": "BCJW902",
+  "name": "Jacke Damen (BCJW902)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Damen",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJW902/front.jpg",
+   "/p/bc/BCJW902/back.jpg",
+   "/p/bc/BCJW902/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Atoll",
+    "hex": "#009dcd",
+    "image": "/p/bc/BCJW902/atoll.jpg",
+    "images": [
+     "/p/bc/BCJW902/atoll.jpg"
+    ]
+   },
+   {
+    "name": "Black",
+    "hex": "#211f1f",
+    "image": "/p/bc/BCJW902/black.jpg",
+    "images": [
+     "/p/bc/BCJW902/black.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#1c2b3f",
+    "image": "/p/bc/BCJW902/navy.jpg",
+    "images": [
+     "/p/bc/BCJW902/navy.jpg"
+    ]
+   },
+   {
+    "name": "Orange",
+    "hex": "#e15926",
+    "image": "/p/bc/BCJW902/orange.jpg",
+    "images": [
+     "/p/bc/BCJW902/orange.jpg"
+    ]
+   },
+   {
+    "name": "Pixel Pink",
+    "hex": "#d4819f",
+    "image": "/p/bc/BCJW902/pixel-pink.jpg",
+    "images": [
+     "/p/bc/BCJW902/pixel-pink.jpg"
+    ]
+   },
+   {
+    "name": "Pixel Turquoise",
+    "hex": "#a3ccbc",
+    "image": "/p/bc/BCJW902/pixel-turquoise.jpg",
+    "images": [
+     "/p/bc/BCJW902/pixel-turquoise.jpg"
+    ]
+   },
+   {
+    "name": "Purple",
+    "hex": "#523872",
+    "image": "/p/bc/BCJW902/purple.jpg",
+    "images": [
+     "/p/bc/BCJW902/purple.jpg"
+    ]
+   },
+   {
+    "name": "Real Green",
+    "hex": "#239f3f",
+    "image": "/p/bc/BCJW902/real-green.jpg",
+    "images": [
+     "/p/bc/BCJW902/real-green.jpg"
+    ]
+   },
+   {
+    "name": "Red",
+    "hex": "#ca1b2a",
+    "image": "/p/bc/BCJW902/red.jpg",
+    "images": [
+     "/p/bc/BCJW902/red.jpg"
+    ]
+   },
+   {
+    "name": "Royal Blue",
+    "hex": "#01548f",
+    "image": "/p/bc/BCJW902/royal-blue.jpg",
+    "images": [
+     "/p/bc/BCJW902/royal-blue.jpg"
+    ]
+   },
+   {
+    "name": "Ultra Yellow",
+    "hex": "#e9e02c",
+    "image": "/p/bc/BCJW902/ultra-yellow.jpg",
+    "images": [
+     "/p/bc/BCJW902/ultra-yellow.jpg"
+    ]
+   },
+   {
+    "name": "White",
+    "hex": "#f0eeef",
+    "image": "/p/bc/BCJW902/white.jpg",
+    "images": [
+     "/p/bc/BCJW902/white.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Jacke",
+   "Damen",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcjw925",
+  "sku": "BCJW925",
+  "name": "Jacke Damen (BCJW925)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Damen",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJW925/front.jpg",
+   "/p/bc/BCJW925/back.jpg",
+   "/p/bc/BCJW925/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Black",
+    "hex": "#1b1e1c",
+    "image": "/p/bc/BCJW925/black.jpg",
+    "images": [
+     "/p/bc/BCJW925/black.jpg"
+    ]
+   },
+   {
+    "name": "Deep Red",
+    "hex": "#bd2b32",
+    "image": "/p/bc/BCJW925/deep-red.jpg",
+    "images": [
+     "/p/bc/BCJW925/deep-red.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#2d2f46",
+    "image": "/p/bc/BCJW925/navy.jpg",
+    "images": [
+     "/p/bc/BCJW925/navy.jpg"
+    ]
+   },
+   {
+    "name": "Orange",
+    "hex": "#ed6a39",
+    "image": "/p/bc/BCJW925/orange.jpg",
+    "images": [
+     "/p/bc/BCJW925/orange.jpg"
+    ]
+   },
+   {
+    "name": "Royal Blue",
+    "hex": "#2763a2",
+    "image": "/p/bc/BCJW925/royal-blue.jpg",
+    "images": [
+     "/p/bc/BCJW925/royal-blue.jpg"
+    ]
+   },
+   {
+    "name": "White",
+    "hex": "#f0eeef",
+    "image": "/p/bc/BCJW925/white.jpg",
+    "images": [
+     "/p/bc/BCJW925/white.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Jacke",
+   "Damen",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcjw935",
+  "sku": "BCJW935",
+  "name": "Steppweste Damen (BCJW935)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Damen",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJW935/front.jpg",
+   "/p/bc/BCJW935/back.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Black",
+    "hex": "#3c3432",
+    "image": "/p/bc/BCJW935/black.jpg",
+    "images": [
+     "/p/bc/BCJW935/black.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#1b212f",
+    "image": "/p/bc/BCJW935/navy.jpg",
+    "images": [
+     "/p/bc/BCJW935/navy.jpg"
+    ]
+   },
+   {
+    "name": "Red",
+    "hex": "#b30c24",
+    "image": "/p/bc/BCJW935/red.jpg",
+    "images": [
+     "/p/bc/BCJW935/red.jpg"
+    ]
+   },
+   {
+    "name": "White",
+    "hex": "#ececec",
+    "image": "/p/bc/BCJW935/white.jpg",
+    "images": [
+     "/p/bc/BCJW935/white.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Steppweste",
+   "Damen",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcjw937",
+  "sku": "BCJW937",
+  "name": "Jacke Damen (BCJW937)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Damen",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJW937/front.jpg",
+   "/p/bc/BCJW937/back.jpg",
+   "/p/bc/BCJW937/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Azure",
+    "hex": "#347cb4",
+    "image": "/p/bc/BCJW937/azure.jpg",
+    "images": [
+     "/p/bc/BCJW937/azure.jpg"
+    ]
+   },
+   {
+    "name": "Black",
+    "hex": "#1f1e1a",
+    "image": "/p/bc/BCJW937/black.jpg",
+    "images": [
+     "/p/bc/BCJW937/black.jpg"
+    ]
+   },
+   {
+    "name": "Dark Grey (Solid)",
+    "hex": "#3c3c40",
+    "image": "/p/bc/BCJW937/dark-grey-solid.jpg",
+    "images": [
+     "/p/bc/BCJW937/dark-grey-solid.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#0e1d2c",
+    "image": "/p/bc/BCJW937/navy.jpg",
+    "images": [
+     "/p/bc/BCJW937/navy.jpg"
+    ]
+   },
+   {
+    "name": "Red",
+    "hex": "#bc1618",
+    "image": "/p/bc/BCJW937/red.jpg",
+    "images": [
+     "/p/bc/BCJW937/red.jpg"
+    ]
+   },
+   {
+    "name": "White",
+    "hex": "#ebe9ea",
+    "image": "/p/bc/BCJW937/white.jpg",
+    "images": [
+     "/p/bc/BCJW937/white.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Jacke",
+   "Damen",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcjw938",
+  "sku": "BCJW938",
+  "name": "Jacke Damen (BCJW938)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Damen",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJW938/front.jpg",
+   "/p/bc/BCJW938/back.jpg",
+   "/p/bc/BCJW938/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "5_Detail",
+    "hex": "#efeeec",
+    "image": "/p/bc/BCJW938/5-detail.jpg",
+    "images": [
+     "/p/bc/BCJW938/5-detail.jpg"
+    ]
+   },
+   {
+    "name": "Black",
+    "hex": "#292b2a",
+    "image": "/p/bc/BCJW938/black.jpg",
+    "images": [
+     "/p/bc/BCJW938/black.jpg"
+    ]
+   },
+   {
+    "name": "Deep Red",
+    "hex": "#d72c28",
+    "image": "/p/bc/BCJW938/deep-red.jpg",
+    "images": [
+     "/p/bc/BCJW938/deep-red.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#1d2735",
+    "image": "/p/bc/BCJW938/navy.jpg",
+    "images": [
+     "/p/bc/BCJW938/navy.jpg"
+    ]
+   },
+   {
+    "name": "White",
+    "hex": "#f4f3f1",
+    "image": "/p/bc/BCJW938/white.jpg",
+    "images": [
+     "/p/bc/BCJW938/white.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Jacke",
+   "Damen",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcjw941",
+  "sku": "BCJW941",
+  "name": "Steppjacke Damen (BCJW941)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Damen",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJW941/front.jpg",
+   "/p/bc/BCJW941/back.jpg",
+   "/p/bc/BCJW941/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Black_Cobalt Blue",
+    "hex": "#2c2c2c",
+    "image": "/p/bc/BCJW941/black-cobalt-blue.jpg",
+    "images": [
+     "/p/bc/BCJW941/black-cobalt-blue.jpg"
+    ]
+   },
+   {
+    "name": "Dark Grey (Solid)_Neon Orange",
+    "hex": "#514f52",
+    "image": "/p/bc/BCJW941/dark-grey-solid-neon-orange.jpg",
+    "images": [
+     "/p/bc/BCJW941/dark-grey-solid-neon-orange.jpg"
+    ]
+   },
+   {
+    "name": "Navy_Neon Green",
+    "hex": "#2e3442",
+    "image": "/p/bc/BCJW941/navy-neon-green.jpg",
+    "images": [
+     "/p/bc/BCJW941/navy-neon-green.jpg"
+    ]
+   },
+   {
+    "name": "Red_Black",
+    "hex": "#850114",
+    "image": "/p/bc/BCJW941/red-black.jpg",
+    "images": [
+     "/p/bc/BCJW941/red-black.jpg"
+    ]
+   },
+   {
+    "name": "Royal Blue_Neon Orange",
+    "hex": "#1a62aa",
+    "image": "/p/bc/BCJW941/royal-blue-neon-orange.jpg",
+    "images": [
+     "/p/bc/BCJW941/royal-blue-neon-orange.jpg"
+    ]
+   },
+   {
+    "name": "White_Warm Grey",
+    "hex": "#c3c3c3",
+    "image": "/p/bc/BCJW941/white-warm-grey.jpg",
+    "images": [
+     "/p/bc/BCJW941/white-warm-grey.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Steppjacke",
+   "Damen",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcjw962",
+  "sku": "BCJW962",
+  "name": "Jacke Damen (BCJW962)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Damen",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJW962/front.jpg",
+   "/p/bc/BCJW962/back.jpg",
+   "/p/bc/BCJW962/side.jpg"
+  ],
+  "colors": [],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Jacke",
+   "Damen",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcjw964",
+  "sku": "BCJW964",
+  "name": "Jacke Damen (BCJW964)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Damen",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJW964/front.jpg",
+   "/p/bc/BCJW964/back.jpg",
+   "/p/bc/BCJW964/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Black_Cobalt Blue",
+    "hex": "#2c3745",
+    "image": "/p/bc/BCJW964/black-cobalt-blue.jpg",
+    "images": [
+     "/p/bc/BCJW964/black-cobalt-blue.jpg"
+    ]
+   },
+   {
+    "name": "Navy_Neon Green",
+    "hex": "#3b414f",
+    "image": "/p/bc/BCJW964/navy-neon-green.jpg",
+    "images": [
+     "/p/bc/BCJW964/navy-neon-green.jpg"
+    ]
+   },
+   {
+    "name": "Real Green_Neon Orange",
+    "hex": "#c7470b",
+    "image": "/p/bc/BCJW964/real-green-neon-orange.jpg",
+    "images": [
+     "/p/bc/BCJW964/real-green-neon-orange.jpg"
+    ]
+   },
+   {
+    "name": "Red_Warm Grey",
+    "hex": "#575554",
+    "image": "/p/bc/BCJW964/red-warm-grey.jpg",
+    "images": [
+     "/p/bc/BCJW964/red-warm-grey.jpg"
+    ]
+   },
+   {
+    "name": "Royal Blue_Neon Orange",
+    "hex": "#804e48",
+    "image": "/p/bc/BCJW964/royal-blue-neon-orange.jpg",
+    "images": [
+     "/p/bc/BCJW964/royal-blue-neon-orange.jpg"
+    ]
+   },
+   {
+    "name": "White_White",
+    "hex": "#e8e8e8",
+    "image": "/p/bc/BCJW964/white-white.jpg",
+    "images": [
+     "/p/bc/BCJW964/white-white.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Jacke",
+   "Damen",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcjwi61",
+  "sku": "BCJWI61",
+  "name": "Jacke Damen (BCJWI61)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Damen",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJWI61/front.jpg",
+   "/p/bc/BCJWI61/back.jpg",
+   "/p/bc/BCJWI61/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Black",
+    "hex": "#34332e",
+    "image": "/p/bc/BCJWI61/black.jpg",
+    "images": [
+     "/p/bc/BCJWI61/black.jpg"
+    ]
+   },
+   {
+    "name": "Dark Grey (Solid)",
+    "hex": "#49474a",
+    "image": "/p/bc/BCJWI61/dark-grey-solid.jpg",
+    "images": [
+     "/p/bc/BCJWI61/dark-grey-solid.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#222b3c",
+    "image": "/p/bc/BCJWI61/navy.jpg",
+    "images": [
+     "/p/bc/BCJWI61/navy.jpg"
+    ]
+   },
+   {
+    "name": "Orange",
+    "hex": "#c76433",
+    "image": "/p/bc/BCJWI61/orange.jpg",
+    "images": [
+     "/p/bc/BCJWI61/orange.jpg"
+    ]
+   },
+   {
+    "name": "Red",
+    "hex": "#b0293b",
+    "image": "/p/bc/BCJWI61/red.jpg",
+    "images": [
+     "/p/bc/BCJWI61/red.jpg"
+    ]
+   },
+   {
+    "name": "White",
+    "hex": "#e9e8e6",
+    "image": "/p/bc/BCJWI61/white.jpg",
+    "images": [
+     "/p/bc/BCJWI61/white.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Jacke",
+   "Damen",
+   "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "bcjwi63",
+  "sku": "BCJWI63",
+  "name": "Jacke Damen (BCJWI63)",
+  "brand": "B&C COLLECTION",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Markenqualität von B&C – ideal zum Bedrucken und Besticken. Ausführliche Produktdetails folgen in Kürze.",
+  "features": [],
+  "material": "",
+  "composition": "",
+  "gender": "Damen",
+  "basePrice": null,
+  "images": [
+   "/p/bc/BCJWI63/front.jpg",
+   "/p/bc/BCJWI63/back.jpg",
+   "/p/bc/BCJWI63/side.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Atoll_Ghost Grey",
+    "hex": "#1c8db9",
+    "image": "/p/bc/BCJWI63/atoll-ghost-grey.jpg",
+    "images": [
+     "/p/bc/BCJWI63/atoll-ghost-grey.jpg"
+    ]
+   },
+   {
+    "name": "Black_Black",
+    "hex": "#282828",
+    "image": "/p/bc/BCJWI63/black-black.jpg",
+    "images": [
+     "/p/bc/BCJWI63/black-black.jpg"
+    ]
+   },
+   {
+    "name": "Dark Grey (Solid)_Neon Orange",
+    "hex": "#494649",
+    "image": "/p/bc/BCJWI63/dark-grey-solid-neon-orange.jpg",
+    "images": [
+     "/p/bc/BCJWI63/dark-grey-solid-neon-orange.jpg"
+    ]
+   },
+   {
+    "name": "Navy_Neon Green",
+    "hex": "#282e3c",
+    "image": "/p/bc/BCJWI63/navy-neon-green.jpg",
+    "images": [
+     "/p/bc/BCJWI63/navy-neon-green.jpg"
+    ]
+   },
+   {
+    "name": "Red_Warm Grey",
+    "hex": "#b21331",
+    "image": "/p/bc/BCJWI63/red-warm-grey.jpg",
+    "images": [
+     "/p/bc/BCJWI63/red-warm-grey.jpg"
+    ]
+   },
+   {
+    "name": "White_White",
+    "hex": "#eaeaea",
+    "image": "/p/bc/BCJWI63/white-white.jpg",
+    "images": [
+     "/p/bc/BCJWI63/white-white.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
+  "specs": {},
+  "tags": [
+   "B&C",
+   "Jacke",
+   "Damen",
+   "Platzhalter"
+  ],
+  "hidden": false
  }
 ]
