@@ -7,6 +7,9 @@ export type Deco = {
   /** Textveredelung */
   text?: string | null; font?: string | null; textColor?: string | null;
   note?: string;
+  /** Live-Vorschau: Lage je Position in % (Mitte x/y, Breite w) und ungefähre Breite in cm */
+  place?: Record<string, { x: number; y: number; w: number }>;
+  sizes?: Record<string, number>;
 };
 export const METHODS = ['Druck', 'Stick', 'Beratung gewünscht'];
 /** Veredelungspositionen je Artikelart – erster Eintrag ist die Vorauswahl */
@@ -71,7 +74,9 @@ export const PREVIEW: Record<string, [number, number, number]> = {
 };
 export const isImage = (name?: string | null) => /\.(png|jpe?g|webp|svg)$/i.test(name ?? '');
 export const decoText = (d?: Deco | null) => (d?.text ? `Text „${d.text.replace(/\n/g, ' / ')}“ (${d.font ?? FONTS[0].id}, ${d.textColor ?? 'Schwarz'})` : '');
-export const decoLabel = (d?: Deco | null) => (d ? [`${d.method}: ${d.positions.join(', ')}`, d.logoName ? `Logo: ${d.logoName}` : '', decoText(d)].filter(Boolean).join(' · ') : '');
+/** „Brust links (ca. 9 cm), Rücken (ca. 28 cm)“ */
+export const posLabel = (d: Deco) => d.positions.map((p) => (d.sizes?.[p] ? `${p} (ca. ${d.sizes[p]} cm)` : p)).join(', ');
+export const decoLabel = (d?: Deco | null) => (d ? [`${d.method}: ${posLabel(d)}`, d.logoName ? `Logo: ${d.logoName}` : '', decoText(d)].filter(Boolean).join(' · ') : '');
 
 /** Veredelung auf einen anderen Artikel übertragen: unpassende Positionen (z. B. „Brust links“ auf einer Cap) werden ersetzt */
 export function adaptDeco(d: Deco | null, p: { category?: string; name?: string }): Deco | null {

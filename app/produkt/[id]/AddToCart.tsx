@@ -1,5 +1,5 @@
 'use client';
-import { Fragment, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import type { PublicProduct } from '@/lib/types';
 import { eur } from '@/lib/format';
 import Gallery from '@/components/Gallery';
@@ -8,7 +8,9 @@ import { swatchBg } from '@/lib/colors';
 import { WishButton } from '@/components/Wishlist';
 import Info from '@/components/Info';
 import Stars from '@/components/Stars';
-import { FONTS, METHODS, MOTIFS, positionsFor, PREVIEW, TEXT_COLORS, colorHex, fontCss, isImage, type Deco, type Motif } from '@/lib/deco';
+import { FONTS, METHODS, MOTIFS, positionsFor, TEXT_COLORS, colorHex, fontCss, isImage, type Deco, type Motif } from '@/lib/deco';
+import DecoStudio, { defaultPlace, type Place } from '@/components/DecoStudio';
+import { cmFor, spotsFor } from '@/lib/deco-layout';
 import { nextTier, unitFor } from '@/lib/tiers';
 
 type Logo = { id: string; name: string };
@@ -26,6 +28,14 @@ export default function AddToCart({ p, customerLogo, delivery, copy }: { p: Publ
   const [method, setMethod] = useState(METHODS[0]);
   const posList = useMemo(() => positionsFor(p), [p]);
   const [positions, setPositions] = useState<string[]>([posList[0]]);
+  // Live-Vorschau: Lage je Position + aktive Position
+  const [place, setPlace] = useState<Place>({});
+  const [activePos, setActivePos] = useState<string | null>(posList[0]);
+  const [showPhotos, setShowPhotos] = useState(false);
+  useEffect(() => {
+    setPlace((pl) => { const n = { ...pl }; for (const x of positions) if (!n[x]) { const d = defaultPlace(p, x); if (d) n[x] = d; } return n; });
+    if (!activePos || !positions.includes(activePos)) setActivePos(positions[positions.length - 1] ?? null);
+  }, [positions]); // eslint-disable-line react-hooks/exhaustive-deps
   const [logo, setLogo] = useState<Logo | null>(customerLogo ?? null);
   const [uploading, setUploading] = useState(false);
   const [upErr, setUpErr] = useState('');
@@ -48,7 +58,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy }: { p: Publ
     return m;
   }, [qty]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const togglePos = (x: string) => setPositions((ps) => (ps.includes(x) ? ps.filter((y) => y !== x) : [...ps, x]));
+  const togglePos = (x: string) => { setPositions((ps) => (ps.includes(x) ? ps.filter((y) => y !== x) : [...ps, x])); if (!positions.includes(x)) setActivePos(x); };
   const decoOk = !decoOn || (positions.length > 0 && (!useText || !!text.trim()) && (!useLogo || method === 'Beratung gewünscht' || !!logo));
 
   async function upload(file?: File | null) {
@@ -63,7 +73,10 @@ export default function AddToCart({ p, customerLogo, delivery, copy }: { p: Publ
   }
 
   const onAdd = () => {
-    const deco: Deco | null = decoOn ? { method, positions, motif, logoId: useLogo ? logo?.id ?? null : null, logoName: useLogo ? logo?.name ?? null : null, text: useText ? text.trim() : null, font: useText ? font : null, textColor: useText ? tColor : null, note: note.trim() } : null;
+    const kind = spotsFor(p).kind;
+    const pl = Object.fromEntries(positions.filter((x) => place[x]).map((x) => [x, place[x]]));
+    const sizes = Object.fromEntries(positions.filter((x) => place[x]).map((x) => [x, cmFor(kind, place[x].w)]));
+    const deco: Deco | null = decoOn ? { method, positions, place: pl, sizes, motif, logoId: useLogo ? logo?.id ?? null : null, logoName: useLogo ? logo?.name ?? null : null, text: useText ? text.trim() : null, font: useText ? font : null, textColor: useText ? tColor : null, note: note.trim() } : null;
     const items = entries.map(([key, n]) => {
       const [c, s] = key.split('|');
       const col = p.colors.find((x) => x.name === c);
@@ -74,27 +87,22 @@ export default function AddToCart({ p, customerLogo, delivery, copy }: { p: Publ
     setQty({});
   };
   const specs = Object.entries(p.specs ?? {}).filter(([, v]) => v && v !== 'Keine Angabe');
-  const showLogo = decoOn && useLogo && logo && isImage(logo.name);
-  const showText = decoOn && useText && !!text.trim();
-  const showPreview = showLogo || showText;
-  const prevPos = positions.filter((x) => PREVIEW[x]);
+  const studioProps = { product: p, colorHex: color?.hex, photo: color?.image ?? null, positions, active: activePos, setActive: setActivePos, place, setPlace, logoSrc: useLogo && logo && isImage(logo.name) ? `/api/upload/${logo.id}` : null, text: useText ? text : '', font, textColor: tColor, method };
   const textStyle = { fontFamily: fontCss(font), color: colorHex(tColor) };
 
   return (
     <div className="pd">
       <div>
-        <Gallery key={cname} p={color?.images?.length ? { ...p, images: color.images } : p} hex={color?.hex} overlay={showPreview ? <>
-          {prevPos.map((x) => {
-            const [l, t, w] = PREVIEW[x];
-            return (
-              <div key={x} className="deco-prev" style={{ left: `${l}%`, top: `${t}%`, width: `${w}%` }}>
-                {showLogo && <img src={`/api/upload/${logo!.id}`} alt="" />}
-                {showText && <span className="text-prev" style={{ ...textStyle, fontSize: `${w * 0.16}cqw` }}>{text}</span>}
-              </div>
-            );
-          })}
-          <div className="prev-note">Vorschau · Position und Größe unverbindlich</div>
-        </> : null} />
+        {decoOn && !showPhotos ? <>
+          <div className="pd-studio">
+            <DecoStudio {...studioProps} />
+            <button type="button" className="linkbtn ds-photos" onClick={() => setShowPhotos(true)}>Produktfotos ansehen</button>
+          </div>
+          <div className="pd-gal-m"><Gallery key={cname} p={color?.images?.length ? { ...p, images: color.images } : p} hex={color?.hex} /></div>
+        </> : <>
+          <Gallery key={cname} p={color?.images?.length ? { ...p, images: color.images } : p} hex={color?.hex} />
+          {decoOn && <button type="button" className="linkbtn ds-photos" onClick={() => setShowPhotos(false)}>← Zurück zur Live-Vorschau</button>}
+        </>}
       </div>
       <div>
         <div className="muted" style={{ textTransform: 'uppercase', fontSize: 13, letterSpacing: '.4px' }}>{p.brand} · Art.-Nr. {p.sku}</div>
@@ -217,6 +225,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy }: { p: Publ
             {upErr && <p className="err" style={{ margin: '6px 0 0', fontSize: 14 }}>{upErr}</p>}
             <p className="hint">PNG, JPG, SVG, PDF, AI oder EPS bis 15 MB. Vektordateien liefern das beste Ergebnis.</p>
             </>}
+            <div className="deco-studio-m"><div className="opt" style={{ marginTop: 14 }}>Live-Vorschau</div><DecoStudio {...studioProps} compact /></div>
             <textarea className="deco-note" placeholder="Hinweise, z. B. Größe ca. 8 cm, Pantone-Farben, Namen/Nummern je Größe …" value={note} onChange={(e) => setNote(e.target.value)} />
           </div>
         )}

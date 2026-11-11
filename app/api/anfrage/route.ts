@@ -22,6 +22,17 @@ function cleanDeco(d: any): Deco | null {
     text, font: text ? (FONTS.some((f) => f.id === d.font) ? d.font : FONTS[0].id) : null,
     textColor: text ? (TEXT_COLORS.some((c) => c.id === d.textColor) ? d.textColor : 'Schwarz') : null,
     note: String(d.note ?? '').slice(0, 1000),
+    ...(() => {
+      // Lage aus der Live-Vorschau (nur bekannte Positionen, Werte begrenzt)
+      const num = (v: unknown, lo: number, hi: number) => { const n = Number(v); return Number.isFinite(n) ? Math.round(Math.min(hi, Math.max(lo, n)) * 10) / 10 : null; };
+      const place: Record<string, { x: number; y: number; w: number }> = {}, sizes: Record<string, number> = {};
+      for (const pos of positions) {
+        const pl = d.place?.[pos], cm = num(d.sizes?.[pos], 1, 80);
+        if (pl) { const x = num(pl.x, 0, 100), y = num(pl.y, 0, 100), w = num(pl.w, 1, 100); if (x != null && y != null && w != null) place[pos] = { x, y, w }; }
+        if (cm != null) sizes[pos] = Math.round(cm);
+      }
+      return { place: Object.keys(place).length ? place : undefined, sizes: Object.keys(sizes).length ? sizes : undefined };
+    })(),
   };
 }
 
