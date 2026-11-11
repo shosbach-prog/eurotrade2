@@ -10,8 +10,8 @@ const S = (view: View, x: number, y: number, w: number, area: [number, number, n
 /** Positionen je Artikelart. „links/rechts“ = aus Sicht des Trägers (auf dem Bild also gespiegelt) */
 export const SPOTS: Record<Kind, Record<string, Spot>> = {
   oberteil: {
-    'Brust links': S('front', 62, 31, 14, [52, 20, 75, 50]),
-    'Brust rechts': S('front', 38, 31, 14, [25, 20, 48, 50]),
+    'Brust links': S('front', 62, 31, 10, [52, 20, 75, 50]),
+    'Brust rechts': S('front', 38, 31, 10, [25, 20, 48, 50]),
     'Brust mittig': S('front', 50, 40, 30, [27, 22, 73, 75]),
     'Ärmel links': S('front', 84, 33, 7, [77, 23, 92, 47]),
     'Ärmel rechts': S('front', 16, 33, 7, [8, 23, 23, 47]),

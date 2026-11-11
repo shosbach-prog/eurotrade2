@@ -1155,3 +1155,36 @@ footer.ft{margin-top:64px}
 .deco-studio-m{display:none}
 @media (max-width:900px){.pd-studio{display:none}.deco-studio-m{display:block}.ds-photos{display:none}}
 .pd-gal-m{display:none}@media (max-width:900px){.pd-gal-m{display:block}}
+/* Admin: Veredelung kalkulieren */
+.pe-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:6px 0 12px}
+.pe-top .btn{height:44px}
+.pe-box h2{margin:0 0 12px;font-size:18px}
+.pe-scroll{overflow-x:auto}
+.pe-table{border-collapse:collapse;width:100%;min-width:640px}
+.pe-table th,.pe-table td{padding:6px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}
+.pe-table th{font-size:12px;color:var(--muted);font-weight:700;vertical-align:bottom}
+.pe-table input{width:64px;height:36px;border:1px solid var(--line);border-radius:7px;padding:0 8px;font-size:14px;text-align:right;background:#fff}
+.pe-table input:focus{outline:2px solid var(--brand);border-color:transparent}
+.pe-tier{display:flex;align-items:center;gap:4px;white-space:nowrap}
+.pe-tier input{width:52px}
+.pe-size{display:flex;align-items:center;gap:6px;white-space:nowrap}
+.pe-size input{width:56px}
+.pe-cell{display:inline-flex;align-items:center;gap:4px}
+.pe-setup{background:#fffaf0}
+.pe-table .x{border:0;background:none;color:var(--muted);font-size:18px;padding:0 4px}
+.pe-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.pe-lbl{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600}
+.pe-lbl input{height:38px;border:1px solid var(--line);border-radius:8px;padding:0 10px;font-size:14px}
+.pe-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.pe-test{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.pe-test label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--muted)}
+.pe-test input,.pe-test select{height:38px;border:1px solid var(--line);border-radius:8px;padding:0 8px;font-size:14px;width:100%}
+.pe-result{margin-top:12px;background:#f6f7f9;border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;font-size:14px}
+.pe-result>div{display:flex;justify-content:space-between;gap:10px}
+.pe-sum{border-top:1px solid var(--line);padding-top:8px;font-size:15px}
+@media (max-width:900px){.pe-grid{grid-template-columns:1fr}.pe-test{grid-template-columns:1fr 1fr}}
+/* Shop: Veredelung ca.-Preis */
+.deco-est{margin-top:12px;background:#f3f8ff;border:1px solid #cfe0ff;border-radius:10px;padding:12px 14px;font-size:14px}
+.deco-est b{font-size:15px}
+.deco-est .row{display:flex;justify-content:space-between;gap:10px;margin-top:4px}
+.deco-est small{color:var(--muted)}

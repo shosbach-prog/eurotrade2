@@ -77,6 +77,7 @@ export const findCustomer = (code: string) => allCustomers().find((c) => c.code 
 
 /* ---------- Anfragen / Angebote ---------- */
 import { posLabel, decoText, type Deco } from './deco';
+import { DEFAULT_PRICING, calcDeco, cleanPricing } from './deco-pricing';
 export type { Deco };
 export type InqLine = { id?: string; sku: string; name: string; color: string; size: string; qty: number; price: number | null; sum: number; deco?: Deco | null };
 export type OfferLine = { text: string; detail?: string; qty: number; price: number };
@@ -131,7 +132,19 @@ export function draftOffer(i: Inquiry): Offer {
     const e = decos.get(k) ?? { d: l.deco, qty: 0 };
     e.qty += l.qty; decos.set(k, e);
   }
-  for (const { d, qty } of decos.values()) lines.push({ text: `Veredelung: ${d.method}`, detail: [posLabel(d), d.logoName ? `Logo: ${d.logoName}` : '', decoText(d)].filter(Boolean).join(' · '), qty, price: 0 });
+  // Veredelung nach Kalkulation (Admin → Veredelung); „Beratung gewünscht“ bleibt bei 0 zum Ausfüllen
+  const raw = readJSON<unknown>(path.join(DATA, 'veredelung.json'), null);
+  const pricing = raw ? cleanPricing(raw) : DEFAULT_PRICING;
+  for (const { d, qty } of decos.values()) {
+    const motiv = [d.logoName ? `Logo: ${d.logoName}` : '', decoText(d)].filter(Boolean).join(' · ');
+    const calc = calcDeco(pricing, d.method, d.positions.map((pos) => ({ pos, cm: d.sizes?.[pos] ?? 10 })), qty);
+    if (!calc) { lines.push({ text: `Veredelung: ${d.method}`, detail: [posLabel(d), motiv].filter(Boolean).join(' · '), qty, price: 0 }); continue; }
+    for (const c of calc.lines) {
+      lines.push({ text: `Veredelung ${calc.method}: ${c.pos}`, detail: [`ca. ${c.cm} cm (${c.size})${c.tooBig ? ' – größer als Tabelle, bitte prüfen' : ''}`, motiv].filter(Boolean).join(' · '), qty, price: c.unit });
+      if (c.setup > 0) lines.push({ text: `${calc.method === 'Stick' ? pricing.stick.setupLabel : pricing.druck.setupLabel} einmalig: ${c.pos}`, detail: c.size, qty: 1, price: c.setup });
+    }
+    if (calc.minApplied > 0) lines.push({ text: 'Mindermengenzuschlag Veredelung', detail: `Mindestbetrag ${pricing.minOrder.toFixed(2).replace('.', ',')} €`, qty: 1, price: calc.minApplied });
+  }
   if (i.discount?.pct) {
     const textil = i.lines.reduce((s, l) => s + l.sum, 0);
     lines.push({ text: `Willkommensrabatt ${i.discount.pct} %`, detail: `Code ${i.discount.code} · auf Textilien`, qty: 1, price: -Math.round(textil * i.discount.pct) / 100 });

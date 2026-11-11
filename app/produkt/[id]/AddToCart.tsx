@@ -12,11 +12,12 @@ import { FONTS, METHODS, MOTIFS, positionsFor, TEXT_COLORS, colorHex, fontCss, i
 import DecoStudio, { defaultPlace, type Place } from '@/components/DecoStudio';
 import { cmFor, spotsFor } from '@/lib/deco-layout';
 import { nextTier, unitFor } from '@/lib/tiers';
+import { calcDeco, type DecoPricing } from '@/lib/deco-pricing';
 
 type Logo = { id: string; name: string };
 
 type PText = { headline: string; intro: string; highlights: string[]; idealFor: string };
-export default function AddToCart({ p, customerLogo, delivery, copy }: { p: PublicProduct; customerLogo?: Logo | null; delivery?: string; copy?: PText }) {
+export default function AddToCart({ p, customerLogo, delivery, copy, pricing }: { p: PublicProduct; customerLogo?: Logo | null; delivery?: string; copy?: PText; pricing?: DecoPricing | null }) {
   const { addMany } = useCart();
   const [color, setColor] = useState(p.colors[0]);
   // Mengen je Farbe + Größe ("Black|M" -> 5) – mehrere Farben in einem Schritt möglich
@@ -87,6 +88,19 @@ export default function AddToCart({ p, customerLogo, delivery, copy }: { p: Publ
     setQty({});
   };
   const specs = Object.entries(p.specs ?? {}).filter(([, v]) => v && v !== 'Keine Angabe');
+  const est = useMemo(() => {
+    if (!pricing || !decoOn) return null;
+    const kd = spotsFor(p).kind;
+    const pos = positions.map((x) => ({ pos: x, cm: place[x] ? cmFor(kd, place[x].w) : 10 }));
+    return calcDeco(pricing, method, pos, Math.max(1, total));
+  }, [pricing, decoOn, positions, place, method, total, p]);
+  const estBox = est && (
+    <div className="deco-est">
+      <div className="row"><span>Veredelung ({est.method}) ca.</span><b>{eur(est.perPiece)} / Stück</b></div>
+      {est.setupTotal > 0 && <div className="row"><span>+ einmalig {pricing![est.method === 'Stick' ? 'stick' : 'druck'].setupLabel}</span><b>{eur(est.setupTotal)}</b></div>}
+      <small>{total > 0 ? `bei ${total} Stück, ${est.lines.map((l) => `${l.pos} ca. ${l.cm} cm`).join(', ')} · netto · ` : 'Menge wählen – ab mehr Stück wird es günstiger · netto · '}verbindlich im Angebot</small>
+    </div>
+  );
   const studioProps = { product: p, colorHex: color?.hex, photo: color?.image ?? null, positions, active: activePos, setActive: setActivePos, place, setPlace, logoSrc: useLogo && logo && isImage(logo.name) ? `/api/upload/${logo.id}` : null, text: useText ? text : '', font, textColor: tColor, method };
   const textStyle = { fontFamily: fontCss(font), color: colorHex(tColor) };
 
@@ -226,6 +240,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy }: { p: Publ
             <p className="hint">PNG, JPG, SVG, PDF, AI oder EPS bis 15 MB. Vektordateien liefern das beste Ergebnis.</p>
             </>}
             <div className="deco-studio-m"><div className="opt" style={{ marginTop: 14 }}>Live-Vorschau</div><DecoStudio {...studioProps} compact /></div>
+            {estBox}
             <textarea className="deco-note" placeholder="Hinweise, z. B. Größe ca. 8 cm, Pantone-Farben, Namen/Nummern je Größe …" value={note} onChange={(e) => setNote(e.target.value)} />
           </div>
         )}

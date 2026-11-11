@@ -44,7 +44,7 @@ function kindOf(raw: string): PosKind | null {
   if (/schal\b|schals|halstuch|halstücher|scarf|loop/.test(t)) return 'schal';
   if (/hose|pants|trousers|shorts|jogger|leggings/.test(t)) return 'hose';
   if (/unterwäsche|bra\b|slip|boxer|briefs/.test(t)) return 'unterwaesche';
-  if (/shirt|polo|hemd|bluse|sweat|hood|pullover|jacke|jacket|weste|bodywarmer|fleece|kittel|kasack|tunic|tunika|longsleeve|top\b|bademantel|trikot|tee\b/.test(t)) return 'oberteil';
+  if (/shirt|polo|hemd|bluse|sweat|hood|pullover|jacke|jacket|weste|bodywarmer|fleece|kittel|kasack|tunic|tunika|longsleeve|top\b|kleid|body\b|bademantel|trikot|tee\b/.test(t)) return 'oberteil';
   return null;
 }
 export const positionsFor = (p: { category?: string; name?: string }): string[] => [...POS[posKind(p)]];
