@@ -124,16 +124,23 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
           </div>
         </>}
 
-        <div className="opt">{sizes.length > 1 ? <>Mengen je Größe <span className="muted" style={{ fontWeight: 400 }}>– für {cname || 'diese Farbe'}</span></> : 'Menge'}</div>
-        <div className="matrix">
-          {sizes.map((s) => (
-            <label key={s} className={`mx ${qty[k(cname, s)] ? 'on' : ''}`}>
-              {s && <span>{s}</span>}
-              <input type="number" inputMode="numeric" min={0} placeholder="0" value={qty[k(cname, s)] || ''} onChange={(e) => setQ(s, Number(e.target.value))} aria-label={`Menge ${s}`} />
-            </label>
-          ))}
+        <div className="opt">{sizes.length > 1 ? <>Größen & Mengen{p.colors.length > 0 && <span className="muted" style={{ fontWeight: 400 }}> für <span className="dot-inline" style={{ background: color ? swatchBg(color) : '#ddd' }} />{cname}</span>}</> : 'Menge'}</div>
+        <div className={`szgrid ${sizes.length === 1 ? 'single' : ''}`}>
+          {sizes.map((s) => {
+            const v = qty[k(cname, s)] || 0;
+            return (
+              <div key={s} className={`sz ${v ? 'on' : ''}`}>
+                {s && <span className="sz-l">{s}</span>}
+                <div className="step">
+                  <button type="button" onClick={() => setQ(s, v - 1)} disabled={!v} aria-label={`${s} weniger`}>−</button>
+                  <input type="number" inputMode="numeric" min={0} placeholder="0" value={v || ''} onChange={(e) => setQ(s, Number(e.target.value))} onFocus={(e) => e.target.select()} aria-label={`Menge ${s}`} />
+                  <button type="button" onClick={() => setQ(s, v + 1)} aria-label={`${s} mehr`}>+</button>
+                </div>
+              </div>
+            );
+          })}
         </div>
-        {p.colors.length > 1 && <p className="hint">Tipp: Farbe wechseln und weitere Mengen eintragen – alles landet zusammen im Warenkorb.</p>}
+        {p.colors.length > 1 && <p className="hint">Mehrere Farben? Oben eine andere Farbe wählen und Mengen eintragen – alles wird unten gesammelt.</p>}
 
         {/* Veredelung */}
         <label className="deco-toggle">
@@ -190,20 +197,43 @@ export default function AddToCart({ p, customerLogo }: { p: PublicProduct; custo
           </div>
         )}
 
+        {total > 0 && (
+          <div className="sel-box">
+            <div className="sel-head"><strong>Ihre Auswahl</strong><button type="button" className="linkbtn" onClick={() => setQty({})}>alles zurücksetzen</button></div>
+            {Object.entries(colorTotals).map(([cn, n]) => {
+              const col = p.colors.find((x) => x.name === cn);
+              const parts = sizes.filter((sz) => qty[k(cn, sz)]).map((sz) => `${sz ? sz + ' × ' : ''}${qty[k(cn, sz)]}`);
+              return (
+                <div key={cn || '-'} className={`sel-row ${cn === cname ? 'cur' : ''}`}>
+                  {col && <span className="dot-inline big" style={{ background: swatchBg(col) }} />}
+                  <div className="sel-main">
+                    <b>{cn || p.name}</b>
+                    <div className="sel-sizes">{parts.map((x) => <span key={x}>{x}</span>)}</div>
+                  </div>
+                  <span className="sel-n">{n} Stk.</span>
+                  {col && cn !== cname && <button type="button" className="linkbtn" onClick={() => setColor(col)}>ändern</button>}
+                  <button type="button" className="x" aria-label={`${cn} entfernen`} onClick={() => setQty((q) => Object.fromEntries(Object.entries(q).filter(([key]) => key.split('|')[0] !== cn)))}>×</button>
+                </div>
+              );
+            })}
+            {p.price != null && (() => {
+              const u = unitFor(p.tiers, total, p.price)!;
+              const nx = nextTier(p.tiers, total);
+              const prev = [...p.tiers].reverse().find((t) => t.min <= total)?.min ?? 1;
+              return <div className="sel-foot">
+                <div className="sel-sum"><span>{total} Stück × {eur(u)}</span><b>{eur(total * u)} <small>netto</small></b></div>
+                {u < p.price && <div className="ok" style={{ fontSize: 13 }}>Staffelpreis aktiv – Sie sparen {eur((p.price - u) * total)}</div>}
+                {nx && <div className="tier-prog"><div className="bar"><i style={{ width: `${Math.min(100, ((total - prev) / (nx.min - prev)) * 100)}%` }} /></div><span>Noch <b>{nx.min - total} Stück</b> bis {eur(nx.price)} pro Stück</span></div>}
+              </div>;
+            })()}
+          </div>
+        )}
         <div className="qtyrow">
           <button className="btn" disabled={!total || !decoOk} onClick={onAdd}>
-            {!total ? 'Menge eintragen' : !decoOk ? (useText && !text.trim() ? 'Text eingeben' : 'Logo / Position wählen') : `${total} Stück in den Warenkorb`}
+            {!total ? (sizes.length > 1 ? 'Größe & Menge wählen' : 'Menge wählen') : !decoOk ? (useText && !text.trim() ? 'Text eingeben' : 'Logo / Position wählen') : `${total} Stück in den Warenkorb`}
           </button>
           <WishButton id={p.id} variant="full" />
         </div>
-        {total > 0 && p.price != null && (() => {
-          const u = unitFor(p.tiers, total, p.price)!;
-          const nx = nextTier(p.tiers, total);
-          return <div className="note">
-            <strong>{total} Stück × {eur(u)} = {eur(total * u)} netto</strong>{u < p.price && <span className="ok"> · Sie sparen {eur((p.price - u) * total)}</span>}
-            {nx && <div className="muted" style={{ fontSize: 13 }}>Noch {nx.min - total} Stück bis {eur(nx.price)} pro Stück</div>}
-          </div>;
-        })()}
         {msg && <div className="note ok">✓ {msg} <a href="/warenkorb" style={{ textDecoration: 'underline' }}>Zum Warenkorb</a></div>}
 
         {p.features?.length ? <ul className="feat">{p.features.map((f) => <li key={f}>{f}</li>)}</ul> : <p style={{ marginTop: 20 }}>{p.description}</p>}
