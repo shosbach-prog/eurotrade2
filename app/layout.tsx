@@ -1,17 +1,15 @@
 import './globals.css';
-import { Suspense } from 'react';
 import Link from 'next/link';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
-import SearchBar from '@/components/SearchBar';
 import Logo from '@/components/Logo';
 import LogoutLink from '@/components/LogoutLink';
 import Contact from '@/components/Contact';
 import TrustBadge from '@/components/TrustBadge';
-import { CartButton, CartProvider } from '@/components/CartContext';
-import { WishlistButton, WishlistProvider } from '@/components/Wishlist';
-import UserMenu from '@/components/UserMenu';
+import { CartProvider } from '@/components/CartContext';
+import { WishlistProvider } from '@/components/Wishlist';
+import SiteHeader from '@/components/SiteHeader';
 import { getCategories } from '@/lib/catalog';
 import { previewMode, shopClosed } from '@/lib/access';
 import { isAdmin, shopAccess } from '@/lib/customer';
@@ -53,32 +51,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // Code im Admin gesperrt/gelöscht -> zurück zur Anmeldung
   const showcase = !ok && headers().get('x-showcase') === '1';
   if (!ok && !isPublic && !showcase) redirect('/zugang');
-  const open = ok && !path.startsWith('/zugang') && !path.startsWith('/passwort') && !path.startsWith('/registrieren') && !path.startsWith('/admin');
-  const cats = open ? getCategories(customer) : showcase ? getCategories() : [];
   return (
     <html lang="de">
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema()) }} />
         <CartProvider><WishlistProvider>
           {previewMode() && ok && !path.startsWith('/start') && <div className="preview-bar">Vorschau-Modus – nur für Sie sichtbar. Preise sind Platzhalter. Kunden-Codes sind gesperrt, bis Sie <code>SHOP_PREVIEW=false</code> setzen.</div>}
-          <header className="hdr">
-            <div className="wrap hdr-row">
-              <Link href="/" className="logo" aria-label={`${SHOP} – Startseite`}><Logo domain={process.env.SHOP_DOMAIN ?? 'euro-trade.com'} /></Link>
-              {open ? <>
-                <Suspense fallback={<div className="search" />}><SearchBar /></Suspense>
-                <div className="hdr-actions"><WishlistButton /><CartButton /><UserMenu name={customer?.name ?? null} admin={admin} /></div>
-              </> : !path.startsWith('/admin') && <nav className="pub-nav">
-                <Link href="/druck-stick" className="hide-sm">Druck & Stick</Link>
-                <Link href="/#ablauf" className="hide-sm">So funktioniert’s</Link>
-                <Link href="/kontakt">Kontakt</Link>
-                <Link href="/registrieren" className="pub-reg">Registrieren</Link>
-                <Link href="/zugang" className="pub-login">Anmelden</Link>
-              </nav>}
-            </div>
-          </header>
-          {(open || showcase) && <nav className="catnav"><div className="wrap">
-            {cats.map((c) => <Link key={c.slug} href={`/kategorie/${c.slug}`}>{c.name}</Link>)}
-          </div></nav>}
+          <SiteHeader ok={ok} customerName={customer?.name ?? null} admin={admin} cats={(ok ? getCategories(customer) : getCategories()).map((c) => ({ name: c.name, slug: c.slug }))} shop={SHOP} domain={process.env.SHOP_DOMAIN ?? 'euro-trade.com'} />
           <main className="wrap">{children}</main>
           <footer className="ft">
             <div className="wrap ft-grid">
@@ -93,7 +72,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               </div>
               <nav className="ft-col" aria-label="Shop">
                 <h4>Shop</h4>
-                {open ? <Link href="/konto">Meine Anfragen</Link> : <><Link href="/zugang">Anmelden</Link><Link href="/registrieren">Registrieren</Link></>}
+                {ok ? <Link href="/konto">Meine Anfragen</Link> : <><Link href="/zugang">Anmelden</Link><Link href="/registrieren">Registrieren</Link></>}
                 <Link href="/kontakt">Kontakt & Anfrage</Link>
                 <Link href="/druck-stick">Druck & Stick</Link>
                 <Link href="/#newsletter">Newsletter & Rabatt</Link>
