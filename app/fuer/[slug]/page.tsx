@@ -50,15 +50,14 @@ export default function Branche({ params }: { params: { slug: string } }) {
         <div className="faq">{z.faq.map(([q, a], k) => <details key={q} className="box" open={k === 0}><summary>{q}</summary><p>{a}</p></details>)}</div>
       </section>
 
-      <section id="anfragen" className="l-section l-quote">
-        <div>
+      <section id="anfragen" className="l-section">
+        <QuoteForm categories={getCategories().map((c) => c.name)} aside={<>
           <h2>Unverbindlich Preis anfragen</h2>
           <p>Beschreiben Sie kurz Ihr Vorhaben – {z.example}. Sie erhalten innerhalb von 24 Stunden ein Angebot.</p>
           <ul><li>Kein Zugangscode nötig</li><li>Logo gleich mitschicken</li><li>Auf Wunsch vorab ein Muster</li></ul>
           <p className="muted" style={{ marginTop: 16 }}>Lieber sprechen? <a className="alink" href="tel:+491732648097">0173 2648097</a></p>
           <p className="muted" style={{ marginTop: 18, fontSize: 14 }}>Auch für: {ZIELGRUPPEN.filter((x) => x.slug !== z.slug).map((x, k) => <span key={x.slug}>{k > 0 && ' · '}<Link className="alink" href={`/fuer/${x.slug}`}>{x.nav}</Link></span>)}</p>
-        </div>
-        <QuoteForm categories={getCategories().map((c) => c.name)} />
+        </>} />
       </section>
     </div>
   );

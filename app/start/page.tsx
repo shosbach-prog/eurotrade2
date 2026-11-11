@@ -112,23 +112,21 @@ export default function Start() {
 
       <NewsletterBox tiers={discountTiers()} />
 
-      <section id="preis" className="l-section l-quote">
-        <div>
+      <section id="preis" className="l-section">
+        <QuoteForm categories={cats.map((c) => c.name)} aside={<>
           <h2>Unverbindlich Preis anfragen</h2>
           <p>Sie haben noch keinen Zugangscode? Kein Problem: Beschreiben Sie kurz Ihr Vorhaben und schicken Sie Ihr Logo gleich mit. Sie erhalten innerhalb von 24 Stunden ein Angebot.</p>
           <ul><li>Kein Zugangscode nötig</li><li>Logo gleich mitschicken</li><li>Auf Wunsch vorab ein Muster</li><li>Unverbindlich und kostenlos</li></ul>
           <p className="muted" style={{ marginTop: 16 }}>Lieber sprechen? <a className="alink" href="tel:+491732648097">0173 2648097</a></p>
-        </div>
-        <QuoteForm categories={cats.map((c) => c.name)} />
+        </>} />
       </section>
 
-      <section id="anfragen" className="l-section l-request">
-        <div>
+      <section id="anfragen" className="l-section">
+        <RequestForm aside={<>
           <h2>Zugang anfragen</h2>
           <p>Unser Shop ist exklusiv für Vereine, Unternehmen und Partner. Schreiben Sie uns kurz, wer Sie sind – Sie erhalten Ihren persönlichen Zugangscode innerhalb von 24 Stunden.</p>
           <p className="muted">Lieber direkt sprechen? <a className="alink" href="tel:+491732648097">0173 2648097</a> · <a className="alink" href="mailto:info@euro-trade.com">info@euro-trade.com</a></p>
-        </div>
-        <RequestForm />
+        </>} />
       </section>
     </div>
   );
