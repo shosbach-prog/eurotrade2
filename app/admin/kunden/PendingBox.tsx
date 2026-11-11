@@ -37,7 +37,7 @@ export default function PendingBox({ items }: { items: P[] }) {
           </div>
         </div>
       ))}
-      <p className="muted" style={{ margin: '10px 0 0', fontSize: 13 }}>Beim Freischalten bekommt der Kunde automatisch eine E-Mail (sofern SMTP eingerichtet ist) und kann sich sofort anmelden. Aufschlag, Kollektion und Logo stellen Sie danach unten beim Kunden ein.</p>
+      <p className="muted" style={{ margin: '10px 0 0', fontSize: 13 }}>Beim Freischalten bekommt der Kunde automatisch eine E-Mail (sofern SMTP eingerichtet ist) und kann sich sofort anmelden. Konditionen, Kollektion und Logo stellen Sie danach über „Bearbeiten“ ein.</p>
     </div>
   );
 }
