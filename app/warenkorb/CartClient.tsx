@@ -9,6 +9,7 @@ import { decoLabel } from '@/lib/deco';
 import { unitFor } from '@/lib/tiers';
 import { saveMyInquiry } from '@/lib/mine';
 import { fmtDate, leadCheck } from '@/lib/leadtime';
+import { productPath } from '@/lib/format';
 
 const FORM_KEY = 'et-form-v1';
 const FIELDS = ['name', 'company', 'email', 'phone', 'street', 'city'] as const;
@@ -130,7 +131,7 @@ export default function CartClient({ share, contact }: { share: string | null; c
             <div className="line cline" key={l.key}>
               <div style={{ width: 64, height: 64 }}><ProductImage p={{ name: l.name, images: l.image ? [l.image] : [], colors: [{ name: l.color ?? '', hex: l.hex }], category: l.category }} /></div>
               <div style={{ minWidth: 0 }}>
-                <Link href={`/produkt/${encodeURIComponent(l.id)}${l.team ? `?team=${l.team}` : ''}`} style={{ fontWeight: 600 }}>{l.name}</Link>{l.sample && <span className="sample-tag">Muster</span>}
+                <Link href={`${productPath(l)}${l.team ? `?team=${l.team}` : ''}`} style={{ fontWeight: 600 }}>{l.name}</Link>{l.sample && <span className="sample-tag">Muster</span>}
                 <div className="muted cl-meta">
                   {l.color && <span>{l.color}</span>}
                   {l.sizes && l.sizes.length > 1

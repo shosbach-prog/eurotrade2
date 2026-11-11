@@ -7,6 +7,7 @@ import { swatchBg } from '@/lib/colors';
 import { WishButton } from './Wishlist';
 import Stars from './Stars';
 import BrandLogo from './BrandLogo';
+import { productPath } from '@/lib/format';
 
 /** echte Merkmale als Badges – keine erfundenen Labels */
 function badges(p: PublicProduct): { t: string; c: string }[] {
@@ -25,7 +26,7 @@ const sizeRange = (s: string[]) => (s.length > 1 ? `${s[0]}–${s[s.length - 1]}
 export default function ProductCard({ p }: { p: PublicProduct }) {
   const min = p.price != null ? (p.tiers.length ? p.tiers[p.tiers.length - 1].price : p.price) : null;
   return (
-    <Link href={`/produkt/${encodeURIComponent(p.id)}`} className="card">
+    <Link href={productPath(p)} className="card">
       <div className="img">
         <ProductImage p={p} />{p.images[1] && <img className="pimg img2" src={webp(p.images[1], p.webp)} alt="" loading="lazy" aria-hidden />}
         <div className="badges">{badges(p).map((x) => <span key={x.t} className={`badge-p ${x.c}`}>{x.t}</span>)}</div>

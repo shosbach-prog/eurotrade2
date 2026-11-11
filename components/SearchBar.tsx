@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import type { PublicProduct } from '@/lib/types';
 import { eur } from '@/lib/format';
 import ProductImage from './ProductImage';
+import { productPath } from '@/lib/format';
 
 export default function SearchBar() {
   const router = useRouter();
@@ -45,7 +46,7 @@ export default function SearchBar() {
     else if (e.key === 'Escape') setOpen(false);
     else if (e.key === 'Enter') {
       e.preventDefault();
-      if (active >= 0 && items[active]) { setOpen(false); router.push(`/produkt/${encodeURIComponent(items[active].id)}`); }
+      if (active >= 0 && items[active]) { setOpen(false); router.push(productPath(items[active])); }
       else goSearch();
     }
   };
@@ -67,7 +68,7 @@ export default function SearchBar() {
             {brands.map((b) => <a key={b.slug} href={`/marken/${b.slug}`} className="sg-chip">{b.logo ? <img src={`/brands/${b.logo}`} alt="" /> : <span>Marke</span>}<b>{b.name}</b><small>{b.count}</small></a>)}
           </div>}
           {items.length === 0 ? <div className="empty">Keine Treffer für „{q}“{suggest && <> – meinten Sie <button type="button" className="linkbtn alink" onMouseDown={(e) => { e.preventDefault(); setQ(suggest); }}>„{suggest}“</button>?</>}<div style={{ marginTop: 8 }}>Nicht dabei? <a className="alink" href={`/kontakt?artikel=${encodeURIComponent(q.trim())}`}>Wir besorgen es Ihnen →</a></div></div> : items.map((p, i) => (
-            <a key={p.id} href={`/produkt/${encodeURIComponent(p.id)}`} className={i === active ? 'on' : ''} onMouseEnter={() => setActive(i)}>
+            <a key={p.id} href={productPath(p)} className={i === active ? 'on' : ''} onMouseEnter={() => setActive(i)}>
               <div className="thumb"><ProductImage p={p} /></div>
               <div><div className="t">{p.name}</div><div className="s">{p.brand} · {p.category} · {p.sku}</div></div>
               <div className="p">{p.price != null ? `ab ${eur(p.price)}` : ''}</div>

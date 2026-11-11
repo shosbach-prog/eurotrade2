@@ -8,6 +8,7 @@ import { adminProduct, adminProducts } from '@/lib/catalog';
 import { readOverrides } from '@/lib/artikel';
 import { markupFor } from '@/lib/pricing';
 import { generateText, getText, seedText } from '@/lib/content';
+import { productPath } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Artikel bearbeiten', robots: { index: false, follow: false } };
@@ -22,7 +23,7 @@ export default function EditArticle({ params }: { params: { id: string } }) {
       <AdminNav active="artikel" />
       <div className="crumbs"><Link href="/admin/artikel">Artikel</Link> › {p.name}</div>
       <h1 style={{ marginBottom: 4 }}>{p.name}</h1>
-      <p className="muted" style={{ marginTop: 0 }}>{p.sku} · {p.brand} · {p.hidden ? 'ausgeblendet' : <Link className="alink" href={`/produkt/${p.id}`} target="_blank">Im Shop ansehen ↗</Link>}</p>
+      <p className="muted" style={{ marginTop: 0 }}>{p.sku} · {p.brand} · {p.hidden ? 'ausgeblendet' : <Link className="alink" href={productPath(p)} target="_blank">Im Shop ansehen ↗</Link>}</p>
 
       <ArticleEditor key={JSON.stringify(readOverrides()[p.id]?.updatedAt ?? '')} p={p} custom={!original} changed={!!readOverrides()[p.id]} categories={categories} markup={markupFor(p.categorySlug)} />
 

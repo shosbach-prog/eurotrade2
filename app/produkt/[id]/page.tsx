@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import AddToCart from './AddToCart';
 import { getPricing } from '@/lib/deco-pricing-store';
 import { fitsFor } from '@/lib/image-fit';
@@ -13,16 +13,19 @@ import { RecentTracker, RecentlyViewed } from '@/components/Recent';
 import ProductReviews from '@/components/ProductReviews';
 import { getText } from '@/lib/content';
 import JsonLd, { crumbSchema } from '@/components/JsonLd';
+import { productPath, productSlug } from '@/lib/format';
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
   const p = getProduct(decodeURIComponent(params.id), await viewCtx());
-  return p ? { title: `${p.name} – ${p.brand}`, description: getText(p).text.intro.slice(0, 155), alternates: { canonical: `/produkt/${p.id}` }, openGraph: { title: `${p.name} – ${p.brand}`, images: p.images.slice(0, 1) } } : {};
+  return p ? { title: `${p.name} – ${p.brand}`, description: getText(p).text.intro.slice(0, 155), alternates: { canonical: productPath(p) }, openGraph: { title: `${p.name} – ${p.brand}`, images: p.images.slice(0, 1) } } : {};
 }
 
 export default async function ProductPage({ params, searchParams }: { params: { id: string }; searchParams?: { team?: string } }) {
   const ctx = await viewCtx();
   const p0 = getProduct(decodeURIComponent(params.id), ctx);
   if (!p0) notFound();
+  // alte/abweichende URLs (z. B. /produkt/bcpu427) dauerhaft auf die sprechende URL umleiten
+  if (decodeURIComponent(params.id) !== productSlug(p0)) permanentRedirect(`${productPath(p0)}${searchParams?.team ? `?team=${encodeURIComponent(String(searchParams.team))}` : ''}`);
   const ts = searchParams?.team ? getTeamShop(String(searchParams.team)) : null;
   // Team-Shop: Mitglieder sehen Preise auch ohne Zugangscode
   const p = ts && ts.items.includes(p0.id) && ctx && 'locked' in ctx ? getProduct(decodeURIComponent(params.id), null) ?? p0 : p0;
@@ -35,7 +38,7 @@ export default async function ProductPage({ params, searchParams }: { params: { 
     <>
       <div className="crumbs">{team ? <><Link href={`/team/${team.slug}`}>← Team-Shop {team.name}</Link></> : <><Link href="/">Start</Link> › <Link href={`/kategorie/${p.categorySlug}`}>{p.category}</Link> › {p.name}</>}</div>
       <AddToCart p={p} team={team} pictos={pictosOf(p.id)} fits={fitsFor(p)} pricing={(() => { const pr = getPricing(); return pr.showEstimate && !p.locked ? pr : null; })()} customerLogo={ctx && 'code' in ctx && ctx.logoId ? { id: ctx.logoId, name: ctx.logoName ?? 'Ihr Logo' } : null} copy={getText(p).text} delivery={process.env.DELIVERY_TEXT ?? 'Lieferung ca. 3–5 Werktage · mit Veredelung ca. 7–14 Werktage nach Freigabe'} />
-      <JsonLd data={crumbSchema([['Start', '/'], [p.category, `/kategorie/${p.categorySlug}`], [p.name, `/produkt/${p.id}`]])} />
+      <JsonLd data={crumbSchema([['Start', '/'], [p.category, `/kategorie/${p.categorySlug}`], [p.name, productPath(p)]])} />
       {!p.rating && <JsonLd data={{ '@context': 'https://schema.org', '@type': 'Product', name: p.name, sku: p.sku, brand: { '@type': 'Brand', name: p.brand }, image: p.images.slice(0, 4).map((u) => (u.startsWith('/') ? `${(process.env.SHOP_URL ?? 'https://euro-trade.com').replace(/\/$/, '')}${u}` : u)), description: getText(p).text.intro, color: p.colors.map((c) => c.name).join(', '), material: p.composition || p.material }} />}
       {match.variants.length > 0 && <><h2>Gleicher Artikel – anderer Schnitt</h2><p className="muted" style={{ marginTop: -8 }}>Ideal für gemischte Teams: Damen-, Herren- und Kinder-Variante im gleichen Look.</p><div className="grid">{match.variants.map((r) => <ProductCard key={r.id} p={r} />)}</div></>}
       {match.combos.length > 0 && <><h2>Passt dazu</h2><p className="muted" style={{ marginTop: -8 }}>Komplettes Outfit mit gleichem Logo – mehr Teile, bessere Staffelpreise bei der Veredelung.</p><div className="grid">{match.combos.map((r) => <ProductCard key={r.id} p={r} />)}</div></>}

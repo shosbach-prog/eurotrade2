@@ -3,6 +3,7 @@ import { previewMode } from '@/lib/access';
 import { getCategories, allProductsBrief } from '@/lib/catalog';
 import { ZIELGRUPPEN } from '@/lib/zielgruppen';
 import { GUIDES } from '@/lib/ratgeber';
+import { productPath } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -26,6 +27,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     ...pages,
     ...getCategories().map((c) => ({ url: `${base}/kategorie/${c.slug}`, priority: 0.8, changeFrequency: 'weekly' as const, lastModified: now })),
-    ...allProductsBrief().map((p) => ({ url: `${base}/produkt/${p.id}`, priority: 0.6, changeFrequency: 'weekly' as const, lastModified: now })),
+    ...allProductsBrief().map((p) => ({ url: `${base}${productPath(p)}`, priority: 0.6, changeFrequency: 'weekly' as const, lastModified: now })),
   ];
 }

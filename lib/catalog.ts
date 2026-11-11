@@ -8,14 +8,14 @@ import { gross, priceTiers, sellPrice } from './pricing';
 import { sortColors } from './colors';
 import { ratingFor } from './reviews';
 import { overridesMtime, readOverrides } from './artikel';
-import { slugify } from './format';
+import { productSlug, slugify } from './format';
 import { pictosFor } from './picto';
 
 const LIVE = path.join(process.cwd(), 'data', 'products.json');
 const SEED = path.join(process.cwd(), 'seed', 'products.json');
 const file = () => (fs.existsSync(LIVE) ? LIVE : SEED);
 
-type State = { mtime: string; all: Product[]; base: Map<string, Product>; products: Product[]; byId: Map<string, Product>; index: MiniSearch<SearchDoc>; skus: Map<string, string>; categories: Category[] };
+type State = { mtime: string; all: Product[]; base: Map<string, Product>; products: Product[]; byId: Map<string, Product>; bySlug: Map<string, Product>; index: MiniSearch<SearchDoc>; skus: Map<string, string>; categories: Category[] };
 let state: State | null = null;
 
 /** Lädt data/products.json neu, sobald der Sync die Datei aktualisiert hat – kein Neustart nötig */
@@ -43,6 +43,7 @@ function load(): State {
     base,
     products,
     byId: new Map(products.map((p) => [p.id, p])),
+    bySlug: new Map(products.map((p) => [productSlug(p), p])),
     index: buildIndex(products),
     skus: buildSkuMap(products),
     categories: [...catMap.values()].sort((a, b) => b.count - a.count),
@@ -108,7 +109,10 @@ export function getCategories(ctx?: Ctx): Category[] {
   return [...m.values()].sort((a, b) => b.count - a.count);
 }
 export const getProduct = (id: string, ctx?: Ctx) => {
-  const p = load().byId.get(id);
+  const s = load();
+  const lc = id.toLowerCase();
+  // id, sprechende URL – oder (nach Namensänderung) alte URL anhand der Art.-Nr. am Ende
+  const p = s.byId.get(id) ?? s.bySlug.get(lc) ?? s.products.find((x) => { const k = slugify(x.sku); return !!k && (lc === k || lc.endsWith(`-${k}`)); });
   return p && visible(ctx)(p) ? toPublic(p, ctx) : null;
 };
 export const getByCategory = (slug: string, ctx?: Ctx) => products(ctx).filter((p) => p.categorySlug === slug).map((p) => toPublic(p, ctx));

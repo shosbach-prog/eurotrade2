@@ -18,6 +18,7 @@ import { nextTier, unitFor } from '@/lib/tiers';
 import { calcDeco, type DecoPricing } from '@/lib/deco-pricing';
 import SizeAdvisor from '@/components/SizeAdvisor';
 import { canDistribute, distribute } from '@/lib/sizing';
+import { productPath } from '@/lib/format';
 
 type Logo = { id: string; name: string };
 
@@ -180,7 +181,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
           <div className="locked-box">
             <b>🔒 Preise und Bestellung nach Anmeldung</b>
             <p>Unser Shop ist exklusiv für Vereine, Unternehmen und Partner. Mit Ihrem persönlichen Zugangscode sehen Sie Ihre Konditionen, Staffelpreise und können direkt anfragen.</p>
-            <div className="deco-row"><a className="btn" href={`/zugang?weiter=/produkt/${p.id}`} style={{ display: 'inline-grid', placeItems: 'center' }}>Anmelden</a><a className="btn alt" href="/#anfragen" style={{ display: 'inline-grid', placeItems: 'center' }}>Zugang anfragen</a></div>
+            <div className="deco-row"><a className="btn" href={`/zugang?weiter=${productPath(p)}`} style={{ display: 'inline-grid', placeItems: 'center' }}>Anmelden</a><a className="btn alt" href="/#anfragen" style={{ display: 'inline-grid', placeItems: 'center' }}>Zugang anfragen</a></div>
           </div>
         ) : p.price != null ? <>
           <div className="price">{eur(p.price)} <span style={{ fontSize: 15, fontWeight: 500 }} className="muted">/ Stück</span></div>

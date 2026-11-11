@@ -5,6 +5,7 @@ import { getProduct } from '@/lib/catalog';
 import { getTeamShop, isOpen } from '@/lib/teamshop';
 import ProductImage from '@/components/ProductImage';
 import { eur } from '@/lib/format';
+import { productPath } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
@@ -33,7 +34,7 @@ export default function TeamShopPage({ params }: { params: { slug: string } }) {
       <ol className="tshop-steps"><li><b>Artikel wählen</b> Farbe und Größe aussuchen</li><li><b>{t.personalize !== 'aus' ? 'Name / Nummer eintragen' : 'Menge festlegen'}</b> das Vereinslogo ist schon gesetzt</li><li><b>Anfrage senden</b> Sie erhalten Ihr Angebot per E-Mail</li></ol>
       <div className="grid">
         {items.map((p) => (
-          <Link key={p.id} href={`/produkt/${p.id}?team=${t.slug}`} className="card">
+          <Link key={p.id} href={`${productPath(p)}?team=${t.slug}`} className="card">
             <div className="img"><ProductImage p={p} /></div>
             <div className="body">
               <div className="name">{p.name}</div>
