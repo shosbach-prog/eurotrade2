@@ -622,29 +622,45 @@
   "gender": "Herren",
   "basePrice": 16,
   "images": [
-   "https://shop.l-shop-team.de/out/pictures/generated/product/1/665_665_75/2570168.jpg",
-   "https://shop.l-shop-team.de/out/pictures/generated/product/2/665_665_75/2513492.jpg",
-   "https://shop.l-shop-team.de/out/pictures/generated/product/3/665_665_75/2513493.jpg",
-   "https://shop.l-shop-team.de/out/pictures/generated/product/4/665_665_75/2513494.jpg",
-   "https://shop.l-shop-team.de/out/pictures/generated/product/5/665_665_75/2513495.jpg"
+   "/p/jn/JN8046/front-1.jpg",
+   "/p/jn/JN8046/back-2.jpg",
+   "/p/jn/JN8046/model.jpg",
+   "/p/jn/JN8046/side-3.jpg",
+   "/p/jn/JN8046/side-4.jpg"
   ],
   "sizeChart": "https://shop.l-shop-team.de/out/media/JN8046_G202505.pdf",
   "colors": [
    {
     "name": "Black",
-    "hex": "#1b1b1f"
+    "hex": "#1b1b1f",
+    "image": "/p/jn/JN8046/black.jpg",
+    "images": [
+     "/p/jn/JN8046/black.jpg"
+    ]
    },
    {
     "name": "Milky Blue",
-    "hex": "#7e9aab"
+    "hex": "#7e9aab",
+    "image": "/p/jn/JN8046/milky-blue.jpg",
+    "images": [
+     "/p/jn/JN8046/milky-blue.jpg"
+    ]
    },
    {
     "name": "Navy",
-    "hex": "#003254"
+    "hex": "#003254",
+    "image": "/p/jn/JN8046/navy.jpg",
+    "images": [
+     "/p/jn/JN8046/navy.jpg"
+    ]
    },
    {
     "name": "Sandstone",
-    "hex": "#cfc6c0"
+    "hex": "#cfc6c0",
+    "image": "/p/jn/JN8046/sandstone.jpg",
+    "images": [
+     "/p/jn/JN8046/sandstone.jpg"
+    ]
    }
   ],
   "sizes": [
@@ -33118,6 +33134,797 @@
    "Sportsocken gestreift",
    "Unisex",
    "Platzhalter"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "jn842",
+  "sku": "JN842",
+  "name": "Men´s Workwear Fleece Jacket – STRONG –",
+  "brand": "Daiber",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Robuste Microfleece-Arbeitsjacke von James & Nicholson mit elastischen Softshell-Einsätzen in Kontrastfarbe an Armen und Seiten – warm, pflegeleicht und ideal für Firmenlogo per Stick.",
+  "features": [
+   "Anti-Pilling-Microfleece, 280 g/m²",
+   "Elastische Softshell-Einsätze in Kontrastfarbe an Armen und Seiten",
+   "Stehkragen",
+   "Durchgehender Reißverschluss mit Kinnschutz",
+   "Zwei Seitentaschen",
+   "Ärmeltasche mit Reißverschluss",
+   "Passendes Damenmodell: JN841"
+  ],
+  "material": "280 g/m²",
+  "composition": "100% Polyester (Microfleece)",
+  "gender": "Herren",
+  "basePrice": null,
+  "images": [
+   "/p/jn/JN842/front-1.jpg",
+   "/p/jn/JN842/back-2.jpg",
+   "/p/jn/JN842/model.jpg",
+   "/p/jn/JN842/side-3.jpg",
+   "/p/jn/JN842/side-4.jpg",
+   "/p/jn/JN842/detail-5.jpg",
+   "/p/jn/JN842/detail-7.jpg",
+   "/p/jn/JN842/detail-8.jpg",
+   "/p/jn/JN842/detail-9.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Black / Carbon",
+    "hex": "#373737",
+    "image": "/p/jn/JN842/black-carbon.jpg",
+    "images": [
+     "/p/jn/JN842/black-carbon.jpg"
+    ]
+   },
+   {
+    "name": "Carbon / Black",
+    "hex": "#696e74",
+    "image": "/p/jn/JN842/carbon-black.jpg",
+    "images": [
+     "/p/jn/JN842/carbon-black.jpg"
+    ]
+   },
+   {
+    "name": "Dark Green / Black",
+    "hex": "#2e6759",
+    "image": "/p/jn/JN842/dark-green-black.jpg",
+    "images": [
+     "/p/jn/JN842/dark-green-black.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#41485b",
+    "image": "/p/jn/JN842/navy-navy.jpg",
+    "images": [
+     "/p/jn/JN842/navy-navy.jpg"
+    ]
+   },
+   {
+    "name": "Red / Black",
+    "hex": "#c92823",
+    "image": "/p/jn/JN842/red-black.jpg",
+    "images": [
+     "/p/jn/JN842/red-black.jpg"
+    ]
+   },
+   {
+    "name": "Royal / Navy",
+    "hex": "#2f71d2",
+    "image": "/p/jn/JN842/royal-navy.jpg",
+    "images": [
+     "/p/jn/JN842/royal-navy.jpg"
+    ]
+   },
+   {
+    "name": "Stone / Black",
+    "hex": "#cfbf9e",
+    "image": "/p/jn/JN842/stone-black.jpg",
+    "images": [
+     "/p/jn/JN842/stone-black.jpg"
+    ]
+   },
+   {
+    "name": "White / Carbon",
+    "hex": "#e7e7e7",
+    "image": "/p/jn/JN842/white-carbon.jpg",
+    "images": [
+     "/p/jn/JN842/white-carbon.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL",
+   "4XL",
+   "5XL",
+   "6XL"
+  ],
+  "specs": {
+   "Passform": "Regular (normal geschnitten)",
+   "Ärmel": "Langarm",
+   "Veredelung": "Bestickung, Transferdruck",
+   "Pflege": "30 °C waschbar, Trockner geeignet"
+  },
+  "tags": [
+   "Jacken",
+   "Workwear",
+   "Fleece",
+   "James & Nicholson"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "jn1000",
+  "sku": "JN1000",
+  "name": "Men´s Winter Softshell Jacket",
+  "brand": "Daiber",
+  "category": "Jacken",
+  "categorySlug": "jacken",
+  "description": "Gefütterte Winter-Softshelljacke von James & Nicholson: 3-Lagen-Softshell mit TPU-Membran, wind- und wasserdicht (5.000 mm Wassersäule), atmungsaktiv, innen mit wärmendem Fleece. Mit abnehmbarer Kapuze und Veredelungsreißverschluss im Rücken.",
+  "features": [
+   "3-Lagen-Funktions-Softshell mit TPU-Membran, Innenseite Fleece",
+   "Winddicht, wasserdicht (Wassersäule 5.000 mm), atmungsaktiv",
+   "Abnehmbare, gefütterte und wattierte Kapuze",
+   "Kragen innen mit Fleece",
+   "Belüftungsreißverschlüsse unter den Armen",
+   "Reflektierende Paspeln an Schultern und Fronttaschen",
+   "Zwei Fronttaschen, Brusttasche, Innentasche mit Handyfach",
+   "2-Wege-Reißverschluss mit Windschutzleiste",
+   "Kapuze und Saum mit Kordelzug und Stoppern",
+   "Veredelungsreißverschluss im Rücken"
+  ],
+  "material": "330 g/m²",
+  "composition": "3-Lagen-Softshell mit TPU-Membran, Innenseite Fleece",
+  "gender": "Herren",
+  "basePrice": null,
+  "images": [
+   "/p/jn/JN1000/front-1.jpg",
+   "/p/jn/JN1000/back-2.jpg",
+   "/p/jn/JN1000/model.jpg",
+   "/p/jn/JN1000/side-3.jpg",
+   "/p/jn/JN1000/side-4.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Aqua",
+    "hex": "#3c9ff8",
+    "image": "/p/jn/JN1000/aqua.jpg",
+    "images": [
+     "/p/jn/JN1000/aqua.jpg"
+    ]
+   },
+   {
+    "name": "Black",
+    "hex": "#3c3c3c",
+    "image": "/p/jn/JN1000/black.jpg",
+    "images": [
+     "/p/jn/JN1000/black.jpg"
+    ]
+   },
+   {
+    "name": "Carbon",
+    "hex": "#65686f",
+    "image": "/p/jn/JN1000/carbon.jpg",
+    "images": [
+     "/p/jn/JN1000/carbon.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#374e6e",
+    "image": "/p/jn/JN1000/navy.jpg",
+    "images": [
+     "/p/jn/JN1000/navy.jpg"
+    ]
+   },
+   {
+    "name": "Orange",
+    "hex": "#ee8839",
+    "image": "/p/jn/JN1000/orange.jpg",
+    "images": [
+     "/p/jn/JN1000/orange.jpg"
+    ]
+   },
+   {
+    "name": "Red",
+    "hex": "#d22234",
+    "image": "/p/jn/JN1000/red.jpg",
+    "images": [
+     "/p/jn/JN1000/red.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL",
+   "4XL",
+   "5XL"
+  ],
+  "specs": {
+   "Passform": "Regular (normal geschnitten)",
+   "Veredelung": "Bestickung, Transferdruck",
+   "Zertifizierung": "OEKO-TEX Standard 100",
+   "Pflege": "30 °C waschbar"
+  },
+  "tags": [
+   "Jacken",
+   "Softshell",
+   "Winterjacke",
+   "James & Nicholson"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "jn963",
+  "sku": "JN963",
+  "name": "Men´s Lifestyle Zip-Hoody",
+  "brand": "Daiber",
+  "category": "Sweatshirts",
+  "categorySlug": "sweatshirts",
+  "description": "Sportliche Kapuzen-Sweatjacke von James & Nicholson aus weichem Sweat mit angerauter Innenseite – zweifarbig mit Kontrast-Kapuzenfutter und -Kordel, ideal für Vereine und Teams.",
+  "features": [
+   "Weiche Sweatqualität mit angerauter Innenseite",
+   "Gekämmte Baumwolle",
+   "Doppellagige Kapuze mit Kordel in Kontrastfarbe",
+   "Durchgehender Reißverschluss",
+   "Kängurutasche",
+   "Bündchen mit Elasthan",
+   "Flatlock-Nähte Ton in Ton"
+  ],
+  "material": "280 g/m²",
+  "composition": "80% Baumwolle (gekämmt) / 20% Polyester",
+  "gender": "Herren",
+  "basePrice": null,
+  "images": [
+   "/p/jn/JN963/front-1.jpg",
+   "/p/jn/JN963/back-2.jpg",
+   "/p/jn/JN963/model.jpg",
+   "/p/jn/JN963/side-3.jpg",
+   "/p/jn/JN963/side-4.jpg",
+   "/p/jn/JN963/detail-5.jpg",
+   "/p/jn/JN963/detail-6.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Black / Grey Heather",
+    "hex": "#323338",
+    "image": "/p/jn/JN963/black-grey-heather.jpg",
+    "images": [
+     "/p/jn/JN963/black-grey-heather.jpg"
+    ]
+   },
+   {
+    "name": "Cobalt / Grey Heather",
+    "hex": "#046dae",
+    "image": "/p/jn/JN963/cobalt-grey-heather.jpg",
+    "images": [
+     "/p/jn/JN963/cobalt-grey-heather.jpg"
+    ]
+   },
+   {
+    "name": "Dark Orange / Navy",
+    "hex": "#e15b04",
+    "image": "/p/jn/JN963/dark-orange-navy.jpg",
+    "images": [
+     "/p/jn/JN963/dark-orange-navy.jpg"
+    ]
+   },
+   {
+    "name": "Green / Navy",
+    "hex": "#15cb5e",
+    "image": "/p/jn/JN963/green-navy.jpg",
+    "images": [
+     "/p/jn/JN963/green-navy.jpg"
+    ]
+   },
+   {
+    "name": "Grey Melange / Navy",
+    "hex": "#838a94",
+    "image": "/p/jn/JN963/grey-melange-navy.jpg",
+    "images": [
+     "/p/jn/JN963/grey-melange-navy.jpg"
+    ]
+   },
+   {
+    "name": "Navy / Cobalt",
+    "hex": "#373b58",
+    "image": "/p/jn/JN963/navy-cobalt.jpg",
+    "images": [
+     "/p/jn/JN963/navy-cobalt.jpg"
+    ]
+   },
+   {
+    "name": "Off White / Grey Heather",
+    "hex": "#e8e8e6",
+    "image": "/p/jn/JN963/off-white-grey-heather.jpg",
+    "images": [
+     "/p/jn/JN963/off-white-grey-heather.jpg"
+    ]
+   },
+   {
+    "name": "Red / Grey Heather",
+    "hex": "#d30b29",
+    "image": "/p/jn/JN963/red-grey-heather.jpg",
+    "images": [
+     "/p/jn/JN963/red-grey-heather.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL"
+  ],
+  "specs": {
+   "Passform": "Regular (normal geschnitten)",
+   "Ärmel": "Langarm, Set-In, mit Bündchen",
+   "Veredelung": "Bestickung, Siebdruck, Transferdruck",
+   "Pflege": "40 °C waschbar, Bügeln erlaubt",
+   "Herkunft": "Pakistan"
+  },
+  "tags": [
+   "Sweatshirts & -jacken",
+   "Zip-Hoody",
+   "James & Nicholson"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "jn1808",
+  "sku": "JN1808",
+  "name": "Men´s Bio Workwear T-Shirt",
+  "brand": "Daiber",
+  "category": "T-Shirts",
+  "categorySlug": "t-shirts",
+  "description": "Strapazierfähiges Workwear-T-Shirt von James & Nicholson aus Bio-Baumwolle und Polyester – bis 60 °C waschbar, formstabil und in vielen Farben für einheitliche Teamkleidung.",
+  "features": [
+   "Mischgewebe aus gekämmter, ringgesponnener Bio-Baumwolle und Polyester",
+   "Bis 60 °C waschbar",
+   "Rundhalsausschnitt mit schmaler Elasthan-Blende",
+   "Nackenband",
+   "Seitennähte",
+   "Kurzarm, Set-In"
+  ],
+  "material": "160 g/m²",
+  "composition": "50% Bio-Baumwolle (gekämmt, ringgesponnen) / 50% Polyester",
+  "gender": "Herren",
+  "basePrice": null,
+  "images": [
+   "/p/jn/JN1808/front-1.jpg",
+   "/p/jn/JN1808/back-2.jpg",
+   "/p/jn/JN1808/model.jpg",
+   "/p/jn/JN1808/side-3.jpg",
+   "/p/jn/JN1808/side-4.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Aqua",
+    "hex": "#32a1df",
+    "image": "/p/jn/JN1808/aqua.jpg",
+    "images": [
+     "/p/jn/JN1808/aqua.jpg"
+    ]
+   },
+   {
+    "name": "Black",
+    "hex": "#343434",
+    "image": "/p/jn/JN1808/black.jpg",
+    "images": [
+     "/p/jn/JN1808/black.jpg"
+    ]
+   },
+   {
+    "name": "Brown",
+    "hex": "#4a3c33",
+    "image": "/p/jn/JN1808/brown.jpg",
+    "images": [
+     "/p/jn/JN1808/brown.jpg"
+    ]
+   },
+   {
+    "name": "Carbon",
+    "hex": "#383b42",
+    "image": "/p/jn/JN1808/carbon.jpg",
+    "images": [
+     "/p/jn/JN1808/carbon.jpg"
+    ]
+   },
+   {
+    "name": "Dark Green",
+    "hex": "#284c40",
+    "image": "/p/jn/JN1808/dark-green.jpg",
+    "images": [
+     "/p/jn/JN1808/dark-green.jpg"
+    ]
+   },
+   {
+    "name": "Dark Grey",
+    "hex": "#535854",
+    "image": "/p/jn/JN1808/dark-grey-solid.jpg",
+    "images": [
+     "/p/jn/JN1808/dark-grey-solid.jpg"
+    ]
+   },
+   {
+    "name": "Grey Heather",
+    "hex": "#a8a8a8",
+    "image": "/p/jn/JN1808/grey-heather.jpg",
+    "images": [
+     "/p/jn/JN1808/grey-heather.jpg"
+    ]
+   },
+   {
+    "name": "Lime Green",
+    "hex": "#61b13c",
+    "image": "/p/jn/JN1808/lime-green.jpg",
+    "images": [
+     "/p/jn/JN1808/lime-green.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#373d4d",
+    "image": "/p/jn/JN1808/navy.jpg",
+    "images": [
+     "/p/jn/JN1808/navy.jpg"
+    ]
+   },
+   {
+    "name": "Orange",
+    "hex": "#fd7601",
+    "image": "/p/jn/JN1808/orange.jpg",
+    "images": [
+     "/p/jn/JN1808/orange.jpg"
+    ]
+   },
+   {
+    "name": "Red",
+    "hex": "#a02335",
+    "image": "/p/jn/JN1808/red.jpg",
+    "images": [
+     "/p/jn/JN1808/red.jpg"
+    ]
+   },
+   {
+    "name": "Royal",
+    "hex": "#285197",
+    "image": "/p/jn/JN1808/royal.jpg",
+    "images": [
+     "/p/jn/JN1808/royal.jpg"
+    ]
+   },
+   {
+    "name": "Stone",
+    "hex": "#c6baa5",
+    "image": "/p/jn/JN1808/stone.jpg",
+    "images": [
+     "/p/jn/JN1808/stone.jpg"
+    ]
+   },
+   {
+    "name": "Turquoise",
+    "hex": "#0a9dc5",
+    "image": "/p/jn/JN1808/turquoise.jpg",
+    "images": [
+     "/p/jn/JN1808/turquoise.jpg"
+    ]
+   },
+   {
+    "name": "White",
+    "hex": "#eaeaea",
+    "image": "/p/jn/JN1808/white.jpg",
+    "images": [
+     "/p/jn/JN1808/white.jpg"
+    ]
+   },
+   {
+    "name": "Wine",
+    "hex": "#781237",
+    "image": "/p/jn/JN1808/wine.jpg",
+    "images": [
+     "/p/jn/JN1808/wine.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL",
+   "4XL",
+   "5XL",
+   "6XL"
+  ],
+  "specs": {
+   "Passform": "Regular (normal geschnitten)",
+   "Ärmel": "Kurzarm, Set-In",
+   "Veredelung": "Siebdruck, Transferdruck, Bestickung",
+   "Pflege": "60 °C waschbar"
+  },
+  "tags": [
+   "T-Shirts",
+   "Workwear",
+   "Bio",
+   "James & Nicholson"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "jn1813",
+  "sku": "JN1813",
+  "name": "Workwear Pants Slim-Line – STRONG –",
+  "brand": "Daiber",
+  "category": "Hosen",
+  "categorySlug": "hosen",
+  "description": "Moderne Arbeitshose von James & Nicholson in schmaler Slim-Line mit 4-Wege-Stretch für volle Bewegungsfreiheit – mit CORDURA®-verstärkten Kniepolstertaschen, Zollstocktasche und YKK-Reißverschlüssen.",
+  "features": [
+   "Elastischer 4-Wege-Stretch für Bewegungsfreiheit",
+   "Mit CORDURA® verstärkte, ergonomisch geformte Kniepolstertaschen",
+   "Reißfeste Dreifachnähte",
+   "Bund mit Gürtelschlaufen",
+   "Schubtaschen und Werkzeugtaschen",
+   "Zollstocktasche und Stiftefächer",
+   "Tasche mit Reißverschluss",
+   "YKK-Reißverschlüsse"
+  ],
+  "material": "205 g/m²",
+  "composition": "73% Polyamid / 17% Baumwolle / 10% Elasthan",
+  "gender": "Unisex",
+  "basePrice": null,
+  "images": [
+   "/p/jn/JN1813/front-1.jpg",
+   "/p/jn/JN1813/back-2.jpg",
+   "/p/jn/JN1813/model.jpg",
+   "/p/jn/JN1813/side-3.jpg",
+   "/p/jn/JN1813/side-4.jpg",
+   "/p/jn/JN1813/detail-5.jpg",
+   "/p/jn/JN1813/detail-6.jpg",
+   "/p/jn/JN1813/detail-7.jpg",
+   "/p/jn/JN1813/detail-8.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Black",
+    "hex": "#1e1e1e",
+    "image": "/p/jn/JN1813/black.jpg",
+    "images": [
+     "/p/jn/JN1813/black.jpg"
+    ]
+   },
+   {
+    "name": "Carbon",
+    "hex": "#333843",
+    "image": "/p/jn/JN1813/carbon.jpg",
+    "images": [
+     "/p/jn/JN1813/carbon.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#233049",
+    "image": "/p/jn/JN1813/navy.jpg",
+    "images": [
+     "/p/jn/JN1813/navy.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "42",
+   "44",
+   "46",
+   "48",
+   "50",
+   "52",
+   "54",
+   "56",
+   "58",
+   "60",
+   "62",
+   "64",
+   "25",
+   "26",
+   "27",
+   "28",
+   "94",
+   "98",
+   "102",
+   "106",
+   "110"
+  ],
+  "specs": {
+   "Passform": "Slim Line",
+   "Größen": "Normalgrößen 42–64, untersetzt 25–28, schlank 94–110",
+   "Pflege": "40 °C waschbar, Bügeln erlaubt",
+   "Herkunft": "China"
+  },
+  "tags": [
+   "Hosen",
+   "Workwear",
+   "Arbeitshose",
+   "Stretch",
+   "James & Nicholson"
+  ],
+  "hidden": false
+ },
+ {
+  "id": "jn8022",
+  "sku": "JN8022",
+  "name": "Men´s Sweat",
+  "brand": "Daiber",
+  "category": "Sweatshirts",
+  "categorySlug": "sweatshirts",
+  "description": "Klassisches Herren-Sweatshirt von James & Nicholson in French-Terry-Qualität mit Raglanärmeln – weich, formstabil und in 14 Farben. Mit abreißbarem Etikett, ideal für Druck und Stick.",
+  "features": [
+   "French-Terry-Qualität",
+   "Gekämmte, ringgesponnene Baumwolle",
+   "Raglanärmel",
+   "Rundhalsausschnitt mit Nackenband",
+   "Kragen und Bündchen mit Elasthan",
+   "Abreißbares Etikett (Tear off!®)"
+  ],
+  "material": "300 g/m²",
+  "composition": "85% Baumwolle (gekämmt, ringgesponnen) / 15% Polyester",
+  "gender": "Herren",
+  "basePrice": null,
+  "images": [
+   "/p/jn/JN8022/front-1.jpg",
+   "/p/jn/JN8022/model.jpg",
+   "/p/jn/JN8022/side-3.jpg",
+   "/p/jn/JN8022/side-4.jpg",
+   "/p/jn/JN8022/detail-5.jpg"
+  ],
+  "colors": [
+   {
+    "name": "Black Heather",
+    "hex": "#4d4d4d",
+    "image": "/p/jn/JN8022/black-heather.jpg",
+    "images": [
+     "/p/jn/JN8022/black-heather.jpg"
+    ]
+   },
+   {
+    "name": "Black",
+    "hex": "#434343",
+    "image": "/p/jn/JN8022/black.jpg",
+    "images": [
+     "/p/jn/JN8022/black.jpg"
+    ]
+   },
+   {
+    "name": "Graphite",
+    "hex": "#484647",
+    "image": "/p/jn/JN8022/graphite-solid.jpg",
+    "images": [
+     "/p/jn/JN8022/graphite-solid.jpg"
+    ]
+   },
+   {
+    "name": "Grey Heather",
+    "hex": "#a9a9a9",
+    "image": "/p/jn/JN8022/grey-heather.jpg",
+    "images": [
+     "/p/jn/JN8022/grey-heather.jpg"
+    ]
+   },
+   {
+    "name": "Lime Green",
+    "hex": "#64b13d",
+    "image": "/p/jn/JN8022/lime-green.jpg",
+    "images": [
+     "/p/jn/JN8022/lime-green.jpg"
+    ]
+   },
+   {
+    "name": "Navy",
+    "hex": "#252b48",
+    "image": "/p/jn/JN8022/navy.jpg",
+    "images": [
+     "/p/jn/JN8022/navy.jpg"
+    ]
+   },
+   {
+    "name": "Olive",
+    "hex": "#5d654e",
+    "image": "/p/jn/JN8022/olive.jpg",
+    "images": [
+     "/p/jn/JN8022/olive.jpg"
+    ]
+   },
+   {
+    "name": "Orange",
+    "hex": "#d94f2a",
+    "image": "/p/jn/JN8022/orange.jpg",
+    "images": [
+     "/p/jn/JN8022/orange.jpg"
+    ]
+   },
+   {
+    "name": "Petrol Melange",
+    "hex": "#326078",
+    "image": "/p/jn/JN8022/petrol-melange.jpg",
+    "images": [
+     "/p/jn/JN8022/petrol-melange.jpg"
+    ]
+   },
+   {
+    "name": "Red",
+    "hex": "#c83142",
+    "image": "/p/jn/JN8022/red.jpg",
+    "images": [
+     "/p/jn/JN8022/red.jpg"
+    ]
+   },
+   {
+    "name": "Royal Heather",
+    "hex": "#4664b7",
+    "image": "/p/jn/JN8022/royal-heather.jpg",
+    "images": [
+     "/p/jn/JN8022/royal-heather.jpg"
+    ]
+   },
+   {
+    "name": "Turquoise",
+    "hex": "#3fa9d1",
+    "image": "/p/jn/JN8022/turquoise.jpg",
+    "images": [
+     "/p/jn/JN8022/turquoise.jpg"
+    ]
+   },
+   {
+    "name": "White",
+    "hex": "#e0e0e0",
+    "image": "/p/jn/JN8022/white.jpg",
+    "images": [
+     "/p/jn/JN8022/white.jpg"
+    ]
+   },
+   {
+    "name": "Wine",
+    "hex": "#771b34",
+    "image": "/p/jn/JN8022/wine.jpg",
+    "images": [
+     "/p/jn/JN8022/wine.jpg"
+    ]
+   }
+  ],
+  "sizes": [
+   "S",
+   "M",
+   "L",
+   "XL",
+   "XXL",
+   "3XL",
+   "4XL",
+   "5XL"
+  ],
+  "specs": {
+   "Ärmel": "Langarm, Raglan, mit Bündchen",
+   "Veredelung": "Siebdruck, Transferdruck, Bestickung",
+   "Pflege": "30 °C waschbar, Bügeln erlaubt",
+   "Herkunft": "Pakistan"
+  },
+  "tags": [
+   "Sweatshirts & -jacken",
+   "Sweatshirt",
+   "James & Nicholson"
   ],
   "hidden": false
  }

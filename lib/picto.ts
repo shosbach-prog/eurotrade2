@@ -10,7 +10,6 @@ const FEAT: [RegExp, string, string][] = [
   [/atmungsaktiv|breathable/i, 'f-atmungsaktiv', 'Atmungsaktiv'],
   [/schnelltrocknend|quick.?dry|trocknet schnell/i, 'f-schnelltrocknend', 'Schnelltrocknend'],
   [/feuchtigkeits?(transport|regul|ableit)|flüssigkeitstransport|moisture|wicking/i, 'f-fluessigkeitstransportierend', 'Feuchtigkeitsregulierend'],
-  [/stretch|elasthan|elastan|spandex/i, 'f-stretch', 'Stretch'],
   [/anti.?pilling/i, 'f-anti-pilling', 'Anti-Pilling'],
   [/antibakteriell|antimikrobiell/i, 'f-antibakteriell', 'Antibakteriell'],
   [/abnehmbare?n? kapuze|abtrennbare kapuze/i, 'f-abnehmbare-kapuze', 'Abnehmbare Kapuze'],
@@ -87,6 +86,9 @@ export function pictosFor(p: Product): { features: Picto[]; care: Picto[]; props
     if (src === 'f-wasserabweisend' && features.some((x) => x.src === 'f-wasserdicht')) continue;
     features.push({ src, label });
   }
+  // Stretch nur bei echtem Stretch-Material (nicht wegen Elasthan in Bündchen)
+  const ela = (p.composition ?? '').match(/(\d+)\s*%\s*(elasthan|elastan|spandex|lycra)/i);
+  if (/stretch/i.test(`${p.name} ${p.description} ${(p.features ?? []).join(' ')}`) || (ela && Number(ela[1]) >= 3)) features.splice(Math.min(features.length, 3), 0, { src: 'f-stretch', label: 'Stretch' });
   if (p.sizes.some((s) => /^[4-8]XL$/.test(s))) features.push({ src: 'f-large-sizes', label: 'Große Größen' });
   // Pflege nur aus Pflegeangaben (Spec „Pflege“ + Merkmale mit Pflegebezug)
   const careText = [p.specs?.['Pflege'] ?? '', p.specs?.['Pflegehinweise'] ?? '', ...(p.features ?? []).filter((f) => /wasch|bügel|trockner|bleich|reinig/i.test(f))].join(' · ');
