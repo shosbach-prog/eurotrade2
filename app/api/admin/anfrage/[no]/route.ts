@@ -4,6 +4,7 @@ import { esc, sendMail, shopUrl } from '@/lib/mail';
 import { button, h1, infoBox, layout, offerTable, p, quote, signature } from '@/lib/mail-templates';
 import { offerPdf } from '@/lib/pdf';
 import { reviewDays, sendReviewRequest } from '@/lib/review-mail';
+import { CARRIERS, createDhlLabel, deliveryNotePdf, markDelivered, sendShippingMail } from '@/lib/shipping';
 import { STATUS, addHistory, getInquiry, offerTotals, randomId, saveInquiry, type Offer, type Status } from '@/lib/store';
 
 const eur = (n: number) => n.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
@@ -49,6 +50,25 @@ export async function POST(req: Request, { params }: { params: { no: string } })
     i.reviewRequestedAt = new Date().toISOString(); addHistory(i, 'Bewertungseinladung gesendet'); saveInquiry(i);
     return NextResponse.json({ ok: true, message: `Bewertungseinladung an ${i.customer.email} gesendet.` });
   }
+
+  if (body.action === 'ship') {
+    // Versand erfassen: Paketdienst + Sendungsnummer (oder DHL-Label erzeugen), Kunde bekommt Mail mit Sendungsverfolgung
+    const carrier = CARRIERS[body.carrier] ? String(body.carrier) : 'dhl';
+    let tracking = String(body.tracking ?? '').replace(/\s/g, '').slice(0, 40), labelId: string | null = null;
+    if (body.dhlLabel) {
+      try { const a = body.addr ?? {}; const r = await createDhlLabel(i, Number(body.weight) || 2, { name1: String(a.name1 ?? i.customer.company ?? i.customer.name), name2: String(a.name2 ?? (i.customer.company ? i.customer.name : '')), street: String(a.street ?? i.customer.street ?? ''), zip: String(a.zip ?? ''), city: String(a.city ?? '') }); tracking = r.tracking; labelId = r.labelId; }
+      catch (e: any) { return NextResponse.json({ error: String(e?.message ?? e) }, { status: 400 }); }
+    }
+    if (carrier !== 'abholung' && !tracking) return NextResponse.json({ error: 'Bitte Sendungsnummer eintragen.' }, { status: 400 });
+    i.shipment = { carrier, tracking, shippedAt: new Date().toISOString(), deliveredAt: null, labelId };
+    if (i.status !== 'geliefert') i.status = 'bestellt';
+    addHistory(i, carrier === 'abholung' ? 'Abholbereit gemeldet' : `Versendet mit ${CARRIERS[carrier].name} (${tracking})`);
+    let mail = '';
+    if (body.mail !== false) { try { if (await sendShippingMail(i)) mail = ' · Kunde informiert'; } catch (e) { console.error('Versandmail fehlgeschlagen', e); mail = ' · Mail fehlgeschlagen'; } }
+    saveInquiry(i);
+    return NextResponse.json({ ok: true, message: `Versand gespeichert${mail}.`, labelId });
+  }
+  if (body.action === 'delivered') { markDelivered(i, 'manuell'); return NextResponse.json({ ok: true, message: `Als geliefert markiert · Bewertungseinladung folgt in ${reviewDays()} Tagen.` }); }
 
   if (body.action === 'proof') {
     // Korrekturabzug zur Freigabe an den Kunden senden
@@ -118,4 +138,12 @@ export async function POST(req: Request, { params }: { params: { no: string } })
     return NextResponse.json({ ok: true, status: i.status, message: sent ? `Angebot an ${i.customer.email} gesendet.` : 'Kein SMTP eingerichtet – bitte den Annahme-Link unten selbst an den Kunden schicken.' });
   }
   return NextResponse.json({ error: 'Unbekannte Aktion.' }, { status: 400 });
+}
+
+/** Lieferschein als PDF */
+export async function GET(_req: Request, { params }: { params: { no: string } }) {
+  if (!(await isAdmin())) return new Response('Nicht angemeldet', { status: 401 });
+  const i = getInquiry(params.no);
+  if (!i) return new Response('Nicht gefunden', { status: 404 });
+  return new Response(await deliveryNotePdf(i), { headers: { 'Content-Type': 'application/pdf', 'Content-Disposition': `inline; filename="Lieferschein-${i.no}.pdf"` } });
 }

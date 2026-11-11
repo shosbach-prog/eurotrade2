@@ -1,7 +1,7 @@
 import 'server-only';
 import { PDFDocument, StandardFonts, degrees, rgb, type PDFFont, type PDFPage } from 'pdf-lib';
 import QRCode from 'qrcode';
-import { dueDate, invoiceTotals, type Invoice, type InvoiceSettings } from './invoice';
+import { amountDue, dueDate, invoiceTotals, kindLabel, type Invoice, type InvoiceSettings } from './invoice';
 
 const eur = (n: number) => n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 const date = (d: string | Date) => new Date(d).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -12,7 +12,8 @@ export async function invoicePdf(inv: Invoice, s: InvoiceSettings): Promise<Buff
   const doc = await PDFDocument.create();
   const font = await doc.embedFont(StandardFonts.Helvetica), bold = await doc.embedFont(StandardFonts.HelveticaBold);
   const storno = inv.kind === 'storno', draft = !inv.no;
-  const title = `${storno ? 'Rechnungskorrektur (Storno)' : 'Rechnung'} ${inv.no ?? 'ENTWURF'}`;
+  const title = `${kindLabel(inv)} ${inv.no ?? 'ENTWURF'}`;
+  const due$ = amountDue(inv);
   doc.setTitle(title); doc.setAuthor(s.company);
   const ok = new Map<string, boolean>();
   const clean = (t: string) => Array.from(String(t ?? '')).map((ch) => { if (!ok.has(ch)) { try { font.encodeText(ch); ok.set(ch, true); } catch { ok.set(ch, false); } } return ok.get(ch) ? ch : '?'; }).join('');
@@ -79,18 +80,28 @@ export async function invoicePdf(inv: Invoice, s: InvoiceSettings): Promise<Buff
   sumRow(inv.kleinunternehmer ? 'Umsatzsteuer' : `zzgl. ${t.rate} % USt. auf ${eur(sg * t.net)}`, eur(sg * t.vat));
   page.drawLine({ start: { x: cols.qty - 60, y: y + 10 }, end: { x: R, y: y + 10 }, thickness: 0.8, color: INK }); y -= 4;
   sumRow(storno ? 'Gutschriftsbetrag' : 'Rechnungsbetrag', eur(sg * t.gross), true);
+  // Schlussrechnung: bereits berechnete Abschläge mit Steueranteil abziehen (§ 14 Abs. 5 UStG)
+  if (inv.prepaid?.length) {
+    for (const pp of inv.prepaid) {
+      if (y < 120) { footer(); page = doc.addPage([W, H]); mark(); y = H - 60; }
+      text(`abzgl. Abschlagsrechnung ${pp.no} vom ${date(pp.date)}`, cols.price, y, { size: 9, right: true }); text(`-${eur(pp.gross)}`, cols.sum, y, { size: 9, right: true }); y -= 11;
+      text(`(netto ${eur(pp.net)} + ${t.rate} % USt. ${eur(pp.vat)})`, cols.price, y, { size: 7.5, color: MUTED, right: true }); y -= 14;
+    }
+    page.drawLine({ start: { x: cols.qty - 60, y: y + 10 }, end: { x: R, y: y + 10 }, thickness: 0.8, color: INK }); y -= 4;
+    sumRow('Zu zahlender Restbetrag', eur(due$), true);
+  }
   y -= 10;
   // Zahlung + GiroCode
   const due = dueDate(inv);
   const notes = [
     inv.kleinunternehmer ? 'Gemäß § 19 UStG wird keine Umsatzsteuer berechnet (Kleinunternehmerregelung).' : '',
-    storno ? '' : `Bitte überweisen Sie ${eur(t.gross)} bis zum ${date(due)} ohne Abzug${s.iban ? ` auf das Konto IBAN ${s.iban}${s.bic ? ` (BIC ${s.bic})` : ''}${s.bank ? `, ${s.bank}` : ''}` : ''}. Verwendungszweck: ${inv.no ?? 'Rechnungsnummer'}.`,
+    storno ? '' : due$ <= 0 ? 'Der Rechnungsbetrag ist durch die Abschlagszahlungen bereits beglichen.' : `Bitte überweisen Sie ${eur(due$)} bis zum ${date(due)} ohne Abzug${s.iban ? ` auf das Konto IBAN ${s.iban}${s.bic ? ` (BIC ${s.bic})` : ''}${s.bank ? `, ${s.bank}` : ''}` : ''}. Verwendungszweck: ${inv.no ?? 'Rechnungsnummer'}.`,
     inv.note,
   ].filter(Boolean);
   let qrH = 0;
-  if (!storno && s.iban && inv.no && t.gross > 0) {
+  if (!storno && s.iban && inv.no && due$ > 0) {
     try {
-      const epc = ['BCD', '002', '1', 'SCT', s.bic.replace(/\s/g, ''), (s.owner || s.company).slice(0, 70), s.iban.replace(/\s/g, ''), `EUR${t.gross.toFixed(2)}`, '', '', inv.no, ''].join('\n');
+      const epc = ['BCD', '002', '1', 'SCT', s.bic.replace(/\s/g, ''), (s.owner || s.company).slice(0, 70), s.iban.replace(/\s/g, ''), `EUR${due$.toFixed(2)}`, '', '', inv.no, ''].join('\n');
       const png = await QRCode.toBuffer(epc, { errorCorrectionLevel: 'M', margin: 1, width: 240 });
       const im = await doc.embedPng(png);
       if (y < 190) { footer(); page = doc.addPage([W, H]); mark(); y = H - 60; }

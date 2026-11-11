@@ -1333,3 +1333,38 @@ footer.ft{margin-top:64px}
 .inv-pub .inv-amount{font-size:34px;font-weight:800;display:flex;flex-direction:column;margin-top:8px}
 .inv-pub .inv-amount small{font-size:14px;font-weight:500;color:var(--muted)}
 @media (max-width:800px){.inv-stats{grid-template-columns:1fr 1fr}.inv-grid,.inv-set{grid-template-columns:1fr}}
+.inv-zip{height:38px;border:1px solid var(--line);border-radius:8px;padding:0 8px;background:#fff;font-size:14px}
+/* Versand */
+.ship-now{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px;padding:10px 12px;border-radius:10px;background:#f3f6fb;font-size:14px}
+/* Marge */
+.margin{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}
+.margin>div{display:flex;flex-direction:column;gap:2px}
+.margin span{font-size:12.5px;color:var(--muted)}
+.margin b{font-size:17px}
+.margin .m-res b{font-size:20px}
+.margin.good .m-res b{color:#1d7a3e}
+.margin.mid .m-res b{color:#a16207}
+.margin.low .m-res b{color:#c0262d}
+@media (max-width:700px){.margin{grid-template-columns:1fr 1fr}}
+/* Zahlen */
+.z-bar{position:relative;height:22px;background:#f3f6fb;border-radius:6px;overflow:hidden}
+.z-bar i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,#9cc0ff,#0a5cf0);border-radius:6px}
+.z-bar span{position:relative;padding-left:8px;font-size:12.5px;font-weight:700;line-height:22px}
+.z-top{margin:0;padding-left:20px;font-size:14px}
+.z-top li{display:flex;justify-content:space-between;gap:10px;padding:3px 0}
+.inv-stats small{font-size:12px}
+@media (min-width:1000px){.inv-stats:has(>div:nth-child(6)){grid-template-columns:repeat(6,1fr)}}
+/* Auftragsstatus */
+.otl{display:flex;list-style:none;margin:0 0 16px;padding:16px 10px;background:#fff;border:1px solid var(--line);border-radius:14px;overflow-x:auto;gap:0}
+.otl li{flex:1;min-width:92px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:3px;position:relative;font-size:13px;color:var(--muted)}
+.otl li::before{content:'';position:absolute;top:14px;left:-50%;width:100%;height:3px;background:var(--line);z-index:0}
+.otl li:first-child::before{display:none}
+.otl li.done::before,.otl li.cur::before{background:#1d7a3e}
+.otl-dot{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#eef0f3;color:var(--muted);font-weight:800;position:relative;z-index:1;font-size:13px}
+.otl li.done .otl-dot{background:#1d7a3e;color:#fff}
+.otl li.cur .otl-dot{background:#ffc21a;color:#14181f;box-shadow:0 0 0 4px #fff3c4}
+.otl li b{color:var(--ink);font-size:13px}
+.otl li.cur b{color:#14181f}
+.otl small{font-size:11.5px}
+.otl a{font-size:11.5px}
+@media (min-width:900px){.admin-nav{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin}.admin-nav a{white-space:nowrap;padding-left:10px;padding-right:10px}}

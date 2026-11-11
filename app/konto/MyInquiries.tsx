@@ -8,7 +8,7 @@ import type { PublicProduct } from '@/lib/types';
 import type { Deco } from '@/lib/deco';
 
 type L = { id?: string; name: string; color: string; size: string; qty: number; deco: Deco | null };
-type Row = { no: string; date: string; status: string; statusLabel: string; pieces: number; total: number; offer: { gross: number; url: string } | null; lines: L[] };
+type Row = { no: string; date: string; status: string; statusLabel: string; pieces: number; total: number; offer: { gross: number; url: string } | null; url: string | null; lines: L[] };
 
 export default function MyInquiries() {
   const [rows, setRows] = useState<Row[] | null>(null);
@@ -58,7 +58,7 @@ export default function MyInquiries() {
               <div className="my-lines">{r.lines.slice(0, 6).map((l, k) => <span key={k}>{l.qty}× {l.name}{l.color && ` · ${l.color}`}{l.size && ` · ${l.size}`}{l.deco && ' ✦'}</span>)}{r.lines.length > 6 && <span>… und {r.lines.length - 6} weitere</span>}</div>
               <div className="my-actions">
                 {r.offer ? <a className="btn" href={r.offer.url} style={{ display: 'inline-grid', placeItems: 'center' }}>Angebot ansehen · {eur(r.offer.gross)}</a>
-                  : <span className="muted" style={{ fontSize: 14 }}>Ihr Angebot ist in Arbeit.</span>}
+                  : r.url ? <a className="btn alt" href={r.url} style={{ display: 'inline-grid', placeItems: 'center' }}>Status ansehen</a> : <span className="muted" style={{ fontSize: 14 }}>Ihr Angebot ist in Arbeit.</span>}
                 <button className="btn alt" onClick={() => reorder(r)}>↻ Nachbestellen</button>
               </div>
             </div>

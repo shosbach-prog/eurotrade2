@@ -30,6 +30,14 @@ export default function InvoiceSettingsForm({ initial, open: o }: { initial: Inv
           <div><label>Zusatz in der Fußzeile</label><input value={s.footer} placeholder="z. B. Amtsgericht / Handelsregister" onChange={(e) => setS({ ...s, footer: e.target.value })} /></div>
         </div>
         <label className="ds-check" style={{ marginTop: 10 }}><input type="checkbox" checked={s.kleinunternehmer} onChange={(e) => setS({ ...s, kleinunternehmer: e.target.checked })} /> Kleinunternehmer nach § 19 UStG (keine Umsatzsteuer ausweisen)</label>
+        <h3 style={{ margin: '18px 0 4px', fontSize: 15 }}>Buchhaltung</h3>
+        <p className="muted" style={{ fontSize: 13, margin: '0 0 8px' }}>Jede festgeschriebene Rechnung (PDF + XRechnung) automatisch weitergeben – z. B. an die Beleg-E-Mail-Adresse von Lexware Office, sevDesk oder DATEV Upload Mail, oder direkt per API an Lexware Office.</p>
+        <div className="inv-set">
+          <div><label>Beleg-E-Mail der Buchhaltung</label><input value={s.bookkeepingEmail} placeholder="z. B. belege-xyz@lexoffice.de" onChange={(e) => setS({ ...s, bookkeepingEmail: e.target.value })} /></div>
+          <div><label>Lexware Office API-Schlüssel</label><input value={s.lexofficeKey} placeholder="aus app.lexoffice.de/addons/public-api" onChange={(e) => setS({ ...s, lexofficeKey: e.target.value })} /></div>
+        </div>
+        <label className="ds-check"><input type="checkbox" checked={s.autoForward} onChange={(e) => setS({ ...s, autoForward: e.target.checked })} /> Rechnungen automatisch an die Beleg-E-Mail senden</label>
+        <label className="ds-check"><input type="checkbox" checked={s.lexofficeAuto} onChange={(e) => setS({ ...s, lexofficeAuto: e.target.checked })} /> Rechnungen automatisch an Lexware Office übertragen</label>
         <div className="deco-row" style={{ marginTop: 12 }}><button className="btn" onClick={save}>Speichern</button>{msg && <span className={msg.ok ? 'ok' : 'err'}>{msg.t}</span>}</div>
         <p className="muted" style={{ fontSize: 13 }}>Diese Daten erscheinen auf jeder Rechnung (Pflichtangaben nach § 14 UStG). Bereits festgeschriebene Rechnungen behalten die Daten zum Zeitpunkt der Erstellung.</p>
       </div>}

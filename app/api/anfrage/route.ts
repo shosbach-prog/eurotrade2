@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getProduct } from '@/lib/catalog';
+import { adminProduct, getProduct } from '@/lib/catalog';
 import { getCustomer } from '@/lib/customer';
 import { FONTS, METHODS, POSITIONS, TEAM_POS, TEXT_COLORS, decoLabel, teamLabel, type Deco } from '@/lib/deco';
 import { getTeamShop } from '@/lib/teamshop';
@@ -70,7 +70,8 @@ export async function POST(req: Request) {
   const lines: InqLine[] = raw.map(({ p, l, qty }) => {
     const price = unitFor(p.tiers, perProduct[p.id], p.price);
     const sample = !!l.sample;
-    return { id: p.id, sku: p.sku, name: p.name, color: String(l.color ?? '').slice(0, 80), size: String(l.size ?? '').slice(0, 40), qty: sample ? 1 : qty, price, sum: Math.round((price ?? 0) * (sample ? 1 : qty) * 100) / 100, deco: cleanDeco(l.deco), ...(sample ? { sample: true } : {}) };
+    const ek = adminProduct(p.id).p?.basePrice ?? null;
+    return { id: p.id, sku: p.sku, name: p.name, color: String(l.color ?? '').slice(0, 80), size: String(l.size ?? '').slice(0, 40), qty: sample ? 1 : qty, price, sum: Math.round((price ?? 0) * (sample ? 1 : qty) * 100) / 100, deco: cleanDeco(l.deco), ek, ...(sample ? { sample: true } : {}) };
   });
   if (!lines.length) return NextResponse.json({ error: 'Warenkorb ist leer.' }, { status: 400 });
   const total = lines.reduce((s, l) => s + l.sum, 0);
@@ -113,7 +114,7 @@ export async function POST(req: Request) {
       + infoBox([['Anfrage-Nr.', no], ['Stückzahl', String(pieces)], ['Richtwert Textil netto', eur(total)], ...(dateTxt ? [['Ihr Wunschtermin', dateTxt] as [string, string]] : [])])
       + itemsTable(mlines, totals)
       + p(`Die angegebenen Preise sind Richtwerte zzgl. MwSt. Versand${hasDeco ? ' und Veredelung' : ''} kalkulieren wir im Angebot.`, true)
-      + button(`${base}/konto`, 'Anfrage-Status ansehen')
+      + button(`${base}/angebot/${inq.token}`, 'Status Ihrer Anfrage ansehen')
       + p('Fragen oder Änderungen? Antworten Sie einfach auf diese E-Mail.')
       + signature(),
   });

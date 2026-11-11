@@ -14,7 +14,8 @@ export async function POST(req: Request) {
     no: i.no, date: i.date, status: i.status, statusLabel: STATUS[i.status ?? 'neu'],
     pieces: i.lines.reduce((s, l) => s + l.qty, 0), total: i.total,
     offer: i.offer?.sentAt && i.token ? { gross: offerTotals(i.offer).gross, url: `/angebot/${i.token}` } : null,
-    lines: i.lines.map((l) => ({ id: l.id, name: l.name, color: l.color, size: l.size, qty: l.qty, deco: l.deco ?? null })),
+    url: i.token ? `/angebot/${i.token}` : null,
+    lines: i.lines.map((l) => ({ id: l.id, name: l.name, color: l.color, size: l.size, qty: l.qty, deco: l.deco ?? null, sample: l.sample })),
   }));
   return NextResponse.json(list, { headers: { 'Cache-Control': 'private, no-store' } });
 }

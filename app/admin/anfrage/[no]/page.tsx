@@ -5,6 +5,10 @@ import AdminNav from '@/components/AdminNav';
 import OfferEditor from './OfferEditor';
 import ProofSender from './ProofSender';
 import CreateInvoice from './CreateInvoice';
+import ShippingBox from './ShippingBox';
+import MarginBox from './MarginBox';
+import { dhlLabelEnabled, trackingUrl } from '@/lib/shipping';
+import { inquiryMargin } from '@/lib/margin';
 import { INV_STATUS, invoiceTotals, listInvoices } from '@/lib/invoice';
 import { getTeamShop } from '@/lib/teamshop';
 import { eur } from '@/lib/format';
@@ -68,12 +72,19 @@ export default function InquiryPage({ params }: { params: { no: string } }) {
       </div>
 
       {i.lines.some((l) => l.deco) && <><h2>Freigabe</h2><ProofSender no={i.no} proof={i.proof ?? null} previews={[...new Map(i.lines.flatMap((l) => (l.deco?.previews ?? []).map((id, k) => [id, `${l.color || l.name}${k ? ' hinten' : ''}`] as const))).entries()].map(([id, label]) => ({ id, label }))} /></>}
+      {['angenommen', 'bestellt', 'geliefert'].includes(i.status!) && <><h2>Versand</h2><ShippingBox no={i.no} shipment={i.shipment ?? null} trackingUrl={trackingUrl(i.shipment)} dhl={dhlLabelEnabled()} addr={(() => { const m = /^\s*(\d{4,5})\s+(.+)$/.exec(c.city ?? ''); return { name1: c.company || c.name, name2: c.company ? c.name : '', street: c.street ?? '', zip: m?.[1] ?? '', city: m?.[2] ?? c.city ?? '' }; })()} /></>}
+      {i.offer && <MarginBox m={inquiryMargin(i)} />}
       {(() => {
         const invs = listInvoices().filter((x) => x.inquiryNo === i.no);
         if (!i.offer && !invs.length) return null;
         return <><h2>Rechnung</h2><div className="box">
-          {invs.map((x) => <p key={x.id} style={{ margin: '0 0 8px' }}><Link className="alink" href={`/admin/rechnungen/${x.id}`}><b>{x.no ?? 'Entwurf'}</b></Link>{x.kind === 'storno' ? ' (Storno)' : ''} · {eur(invoiceTotals(x).gross)} · <span className={`st st-${x.status === 'bezahlt' ? 'angenommen' : x.status === 'offen' ? 'angebot' : x.status === 'storniert' ? 'abgelehnt' : 'neu'}`}>{INV_STATUS[x.status]}</span></p>)}
-          {!invs.some((x) => x.kind === 'rechnung' && x.status !== 'storniert') && <><CreateInvoice no={i.no} label="Rechnung aus Angebot erstellen" /> <span className="muted" style={{ fontSize: 13 }}>übernimmt Positionen, Preise und Kundendaten – vor dem Festschreiben noch änderbar</span></>}
+          {invs.map((x) => <p key={x.id} style={{ margin: '0 0 8px' }}><Link className="alink" href={`/admin/rechnungen/${x.id}`}><b>{x.no ?? 'Entwurf'}</b></Link>{x.kind === 'storno' ? ' (Storno)' : x.kind === 'abschlag' ? ' (Abschlag)' : x.prepaid?.length ? ' (Schlussrechnung)' : ''} · {eur(invoiceTotals(x).gross)} · <span className={`st st-${x.status === 'bezahlt' ? 'angenommen' : x.status === 'offen' ? 'angebot' : x.status === 'storniert' ? 'abgelehnt' : 'neu'}`}>{INV_STATUS[x.status]}</span></p>)}
+          {!invs.some((x) => x.kind === 'rechnung' && x.status !== 'storniert') && <div className="deco-row">
+            <CreateInvoice no={i.no} label={invs.some((x) => x.kind === 'abschlag' && x.no && x.status !== 'storniert') ? 'Schlussrechnung erstellen (Abschläge werden abgezogen)' : 'Rechnung aus Angebot erstellen'} />
+            <CreateInvoice no={i.no} pct={50} className="btn alt sm" label="Abschlag 50 %" />
+            <CreateInvoice no={i.no} pct={30} className="btn alt sm" label="Abschlag 30 %" />
+            <span className="muted" style={{ fontSize: 13 }}>übernimmt Positionen, Preise und Kundendaten – vor dem Festschreiben noch änderbar</span>
+          </div>}
         </div></>;
       })()}
       <h2>Angebot</h2>

@@ -15,7 +15,7 @@ function Num({ v, set, disabled, style }: { v: number; set: (n: number) => void;
   return <input inputMode="decimal" disabled={disabled} style={style} value={t} onChange={(e) => { const x = e.target.value.replace(/[^0-9,.-]/g, ''); setT(x); set(num(x)); }} onBlur={() => setT(fmtN(v))} />;
 }
 
-export default function InvoiceEditor({ initial, problems, overdue, due, mail, publicUrl }: { initial: Invoice; problems: string[]; overdue: boolean; due: string; total: number; mail: boolean; publicUrl: string }) {
+export default function InvoiceEditor({ initial, problems, overdue, due, mail, publicUrl, acct }: { initial: Invoice; problems: string[]; overdue: boolean; due: string; total: number; mail: boolean; publicUrl: string; acct: { mail: boolean; lex: boolean } }) {
   const router = useRouter();
   const [inv, setInv] = useState(initial);
   const [busy, setBusy] = useState(false);
@@ -48,10 +48,10 @@ export default function InvoiceEditor({ initial, problems, overdue, due, mail, p
     <div className="inv-ed">
       <div className="inv-head">
         <div>
-          <h1 style={{ margin: 0 }}>{inv.kind === 'storno' ? 'Rechnungskorrektur' : 'Rechnung'} {inv.no ?? <span className="muted">(Entwurf)</span>}</h1>
+          <h1 style={{ margin: 0 }}>{inv.kind === 'storno' ? 'Rechnungskorrektur' : inv.kind === 'abschlag' ? 'Abschlagsrechnung' : inv.prepaid?.length ? 'Schlussrechnung' : 'Rechnung'} {inv.no ?? <span className="muted">(Entwurf)</span>}</h1>
           <div className="muted" style={{ fontSize: 14 }}>{final ? <>Festgeschrieben {new Date(inv.finalizedAt!).toLocaleString('de-DE')}{inv.refNo && <> · zu {inv.refNo}</>}{inv.stornoNo && <> · storniert durch {inv.stornoNo}</>}</> : 'Noch änderbar – Nummer wird beim Festschreiben vergeben.'}</div>
         </div>
-        <div className="inv-total">{eur(t.gross)}<small>{final && inv.kind === 'rechnung' ? (inv.status === 'bezahlt' ? `bezahlt am ${new Date(inv.paidAt!).toLocaleDateString('de-DE')}` : inv.status === 'storniert' ? 'storniert' : `${overdue ? 'überfällig seit' : 'fällig am'} ${new Date(due).toLocaleDateString('de-DE')}`) : `netto ${eur(t.net)}`}</small></div>
+        <div className="inv-total">{eur(t.gross)}<small>{final && inv.kind !== 'storno' ? (inv.status === 'bezahlt' ? `bezahlt am ${new Date(inv.paidAt!).toLocaleDateString('de-DE')}` : inv.status === 'storniert' ? 'storniert' : `${overdue ? 'überfällig seit' : 'fällig am'} ${new Date(due).toLocaleDateString('de-DE')}`) : `netto ${eur(t.net)}`}</small></div>
       </div>
 
       {!final && problems.length > 0 && <p className="sys-warn">Vor dem Festschreiben ergänzen: {problems.join(' · ')}</p>}
@@ -93,6 +93,8 @@ export default function InvoiceEditor({ initial, problems, overdue, due, mail, p
           <div className="tot"><span>Summe netto</span><span>{eur(t.net)}</span></div>
           <div className="tot"><span>{inv.kleinunternehmer ? 'USt. (§ 19 UStG)' : `USt. ${t.rate} %`}</span><span>{eur(t.vat)}</span></div>
           <div className="tot big"><span>Rechnungsbetrag</span><span>{eur(t.gross)}</span></div>
+          {inv.prepaid?.map((p) => <div key={p.no} className="tot"><span>abzgl. Abschlag {p.no}</span><span>−{eur(p.gross)}</span></div>)}
+          {!!inv.prepaid?.length && <div className="tot big"><span>Restbetrag</span><span>{eur(t.gross - inv.prepaid.reduce((s, p) => s + p.gross, 0))}</span></div>}
         </div>
       </div>
 
@@ -108,14 +110,16 @@ export default function InvoiceEditor({ initial, problems, overdue, due, mail, p
           <a className="btn alt" href={`/api/admin/rechnungen/datei?id=${inv.id}`} target="_blank">PDF</a>
           <a className="btn alt" href={`/api/admin/rechnungen/datei?id=${inv.id}&typ=xml`}>XRechnung (XML)</a>
           <button className="linkbtn" onClick={() => { navigator.clipboard?.writeText(publicUrl); setMsg({ ok: true, t: 'Kunden-Link kopiert.' }); }}>Kunden-Link kopieren</button>
+          {acct.mail && <button className="linkbtn" disabled={busy} onClick={() => act('forward')}>{inv.exported?.mail ? '✓ Buchhaltung' : 'An Buchhaltung'}</button>}
+          {acct.lex && <button className="linkbtn" disabled={busy} onClick={() => act('lexoffice')}>{inv.exported?.lexoffice ? '✓ Lexware Office' : 'An Lexware Office'}</button>}
           <span style={{ flex: 1 }} />
           {mail && <button className="btn alt" disabled={busy} onClick={() => act('send')}>{inv.sentAt ? 'Erneut senden' : 'Per E-Mail senden'}</button>}
-          {inv.kind === 'rechnung' && inv.status === 'offen' && <>
+          {inv.kind !== 'storno' && inv.status === 'offen' && <>
             {mail && <button className="btn alt" disabled={busy} onClick={() => act('remind')}>Zahlungserinnerung</button>}
             <span className="inv-paid"><input type="date" value={paidDate} onChange={(e) => setPaidDate(e.target.value)} /><button className="btn" disabled={busy} onClick={() => act('paid', { date: paidDate })}>✓ Bezahlt</button></span>
           </>}
-          {inv.status === 'bezahlt' && inv.kind === 'rechnung' && <button className="linkbtn" onClick={() => act('paid', { undo: true })}>Zahlung zurücksetzen</button>}
-          {inv.kind === 'rechnung' && inv.status !== 'storniert' && <button className="linkbtn err" disabled={busy} onClick={() => act('storno', { send: mail })}>Stornieren</button>}
+          {inv.status === 'bezahlt' && inv.kind !== 'storno' && <button className="linkbtn" onClick={() => act('paid', { undo: true })}>Zahlung zurücksetzen</button>}
+          {inv.kind !== 'storno' && inv.status !== 'storniert' && <button className="linkbtn err" disabled={busy} onClick={() => act('storno', { send: mail })}>Stornieren</button>}
         </>}
       </div>
       {msg && <p className={msg.ok ? 'ok' : 'err'}>{msg.t}</p>}

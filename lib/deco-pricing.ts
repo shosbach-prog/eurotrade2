@@ -7,7 +7,7 @@ export type MethodPrices = {
   setup: number[];             // je Größe: einmalige Einrichtung (z. B. Stickprogramm) je Position
   setupLabel: string;          // z. B. „Stickprogramm“
 };
-export type DecoPricing = { stick: MethodPrices; druck: MethodPrices; minOrder: number; showEstimate: boolean; /** Personalisierung je Teil (netto) */ team: { name: number; nummer: number }; updatedAt?: string };
+export type DecoPricing = { stick: MethodPrices; druck: MethodPrices; minOrder: number; showEstimate: boolean; /** Personalisierung je Teil (netto) */ team: { name: number; nummer: number }; /** eigene Kosten der Veredelung in % vom Verkaufspreis (für die Margenrechnung) */ costPct: number; updatedAt?: string };
 
 export const DEFAULT_PRICING: DecoPricing = {
   stick: {
@@ -24,6 +24,7 @@ export const DEFAULT_PRICING: DecoPricing = {
   },
   minOrder: 0,
   team: { name: 4.5, nummer: 3.5 },
+  costPct: 50,
   showEstimate: true,
 };
 
@@ -65,7 +66,7 @@ export function cleanPricing(d: any): DecoPricing {
     const setup = order.map(([, k]) => num(m?.setup?.[k]));
     return { sizes: order.map(([s]) => s), tiers, prices, setup, setupLabel: String(m?.setupLabel ?? def.setupLabel).slice(0, 40) || def.setupLabel };
   };
-  return { stick: meth(d?.stick, DEFAULT_PRICING.stick), druck: meth(d?.druck, DEFAULT_PRICING.druck), minOrder: num(d?.minOrder), showEstimate: d?.showEstimate !== false, team: { name: d?.team ? num(d.team.name) : DEFAULT_PRICING.team.name, nummer: d?.team ? num(d.team.nummer) : DEFAULT_PRICING.team.nummer } };
+  return { stick: meth(d?.stick, DEFAULT_PRICING.stick), druck: meth(d?.druck, DEFAULT_PRICING.druck), minOrder: num(d?.minOrder), showEstimate: d?.showEstimate !== false, team: { name: d?.team ? num(d.team.name) : DEFAULT_PRICING.team.name, nummer: d?.team ? num(d.team.nummer) : DEFAULT_PRICING.team.nummer }, costPct: d?.costPct != null ? Math.min(100, num(d.costPct)) : DEFAULT_PRICING.costPct };
 }
 
 /** Preis der Personalisierung je Teil */

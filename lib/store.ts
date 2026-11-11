@@ -79,11 +79,11 @@ export const findCustomer = (code: string) => allCustomers().find((c) => c.code 
 import { posLabel, decoText, type Deco } from './deco';
 import { DEFAULT_PRICING, calcDeco, cleanPricing, teamUnit } from './deco-pricing';
 export type { Deco };
-export type InqLine = { id?: string; sku: string; name: string; color: string; size: string; qty: number; price: number | null; sum: number; deco?: Deco | null; /** Musterteil – wird bei Folgeauftrag angerechnet */ sample?: boolean };
+export type InqLine = { id?: string; sku: string; name: string; color: string; size: string; qty: number; price: number | null; sum: number; deco?: Deco | null; /** Musterteil – wird bei Folgeauftrag angerechnet */ sample?: boolean; /** Einkaufspreis netto zum Zeitpunkt der Anfrage (für die Marge) */ ek?: number | null };
 export type OfferLine = { text: string; detail?: string; qty: number; price: number };
 export type Offer = { lines: OfferLine[]; shipping: number; note: string; validDays: number; createdAt: string; sentAt?: string | null; vat: number };
 export type Status = 'neu' | 'angebot' | 'angenommen' | 'bestellt' | 'geliefert' | 'abgelehnt';
-export const STATUS: Record<Status, string> = { neu: 'Neu', angebot: 'Angebot gesendet', angenommen: 'Angenommen', bestellt: 'Bestellt', geliefert: 'Geliefert', abgelehnt: 'Abgelehnt' };
+export const STATUS: Record<Status, string> = { neu: 'Neu', angebot: 'Angebot gesendet', angenommen: 'Angenommen', bestellt: 'In Produktion', geliefert: 'Geliefert', abgelehnt: 'Abgelehnt' };
 export type Inquiry = {
   no: string; date: string; zugangscode: string | null;
   customer: Record<string, string>; lines: InqLine[]; total: number;
@@ -104,6 +104,8 @@ export type Inquiry = {
   proof?: { ids: { id: string; name: string }[]; note?: string; sentAt?: string | null; approvedAt?: string | null; approvedBy?: string | null; changes?: { date: string; text: string }[] } | null;
   /** Bestellung über einen Vereins-/Team-Shop */
   team?: string | null;
+  /** Versand: Paketdienst, Sendungsnummer, Zeitpunkte */
+  shipment?: { carrier: string; tracking: string; shippedAt: string; deliveredAt?: string | null; labelId?: string | null; lastCheck?: string | null; status?: string | null } | null;
 };
 
 export function listInquiries(): Inquiry[] {

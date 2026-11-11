@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import AdminNav from '@/components/AdminNav';
 import InvoiceEditor from './InvoiceEditor';
-import { getInvoice, invoiceTotals, isOverdue, dueDate } from '@/lib/invoice';
+import { getInvoice, invoiceSettings, invoiceTotals, isOverdue, dueDate } from '@/lib/invoice';
 import { invoiceProblems } from '@/lib/invoice-actions';
 import { mailEnabled, shopUrl } from '@/lib/mail';
 
@@ -17,7 +17,7 @@ export default function InvoicePage({ params }: { params: { id: string } }) {
     <>
       <AdminNav active="rechnungen" />
       <div className="crumbs"><Link href="/admin/rechnungen">Rechnungen</Link> › {i.no ?? 'Entwurf'}{i.inquiryNo && <> · aus <Link className="alink" href={`/admin/anfrage/${i.inquiryNo}`}>{i.inquiryNo}</Link></>}</div>
-      <InvoiceEditor initial={i} problems={i.no ? [] : invoiceProblems(i)} overdue={isOverdue(i)} due={dueDate(i).toISOString()} total={invoiceTotals(i).gross} mail={mailEnabled()} publicUrl={`${shopUrl()}/rechnung/${i.token}`} />
+      <InvoiceEditor initial={i} problems={i.no ? [] : invoiceProblems(i)} overdue={isOverdue(i)} due={dueDate(i).toISOString()} total={invoiceTotals(i).gross} mail={mailEnabled()} publicUrl={`${shopUrl()}/rechnung/${i.token}`} acct={{ mail: !!invoiceSettings().bookkeepingEmail, lex: !!invoiceSettings().lexofficeKey }} />
     </>
   );
 }

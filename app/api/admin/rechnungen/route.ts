@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { isAdmin } from '@/lib/customer';
 import { getInquiry } from '@/lib/store';
-import { getInvoice, invHistory, newInvoice, saveInvoice, saveInvoiceSettings, type Invoice, type InvoiceSettings } from '@/lib/invoice';
-import { finalizeInvoice, sendInvoice, stornoInvoice } from '@/lib/invoice-actions';
+import { invoiceSettings, getInvoice, invHistory, newInvoice, saveInvoice, saveInvoiceSettings, type Invoice, type InvoiceSettings } from '@/lib/invoice';
+import { finalizeInvoice, forwardToBookkeeping, sendInvoice, stornoInvoice, uploadToLexoffice } from '@/lib/invoice-actions';
 
 const str = (v: unknown, n = 200) => String(v ?? '').replace(/\r/g, '').trim().slice(0, n);
 const num = (v: unknown) => { const n = Number(String(v ?? '').replace(',', '.')); return Number.isFinite(n) ? Math.round(n * 100) / 100 : 0; };
@@ -25,14 +25,14 @@ export async function POST(req: Request) {
   try {
     if (d.action === 'settings') {
       const s = d.settings ?? {};
-      const p: Partial<InvoiceSettings> = { company: str(s.company, 120), owner: str(s.owner, 120), street: str(s.street, 120), zip: str(s.zip, 12), city: str(s.city, 80), country: (str(s.country, 2) || 'DE').toUpperCase(), phone: str(s.phone, 40), email: str(s.email, 160), web: str(s.web, 120), taxNo: str(s.taxNo, 40), vatId: str(s.vatId, 20), iban: str(s.iban, 40).toUpperCase(), bic: str(s.bic, 15).toUpperCase(), bank: str(s.bank, 80), payDays: Math.max(0, Math.min(120, Math.floor(num(s.payDays)))), prefix: str(s.prefix, 10) || 'RE-', kleinunternehmer: !!s.kleinunternehmer, reminderDays: Math.max(0, Math.min(60, Math.floor(num(s.reminderDays)))), footer: str(s.footer, 160) };
+      const p: Partial<InvoiceSettings> = { company: str(s.company, 120), owner: str(s.owner, 120), street: str(s.street, 120), zip: str(s.zip, 12), city: str(s.city, 80), country: (str(s.country, 2) || 'DE').toUpperCase(), phone: str(s.phone, 40), email: str(s.email, 160), web: str(s.web, 120), taxNo: str(s.taxNo, 40), vatId: str(s.vatId, 20), iban: str(s.iban, 40).toUpperCase(), bic: str(s.bic, 15).toUpperCase(), bank: str(s.bank, 80), payDays: Math.max(0, Math.min(120, Math.floor(num(s.payDays)))), prefix: str(s.prefix, 10) || 'RE-', kleinunternehmer: !!s.kleinunternehmer, reminderDays: Math.max(0, Math.min(60, Math.floor(num(s.reminderDays)))), footer: str(s.footer, 160), bookkeepingEmail: str(s.bookkeepingEmail, 160), autoForward: !!s.autoForward, lexofficeKey: String(s.lexofficeKey ?? '').startsWith('•') ? invoiceSettings().lexofficeKey : str(s.lexofficeKey, 200), lexofficeAuto: !!s.lexofficeAuto };
       if (p.iban && !/^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/.test(p.iban.replace(/\s/g, ''))) return NextResponse.json({ error: 'Die IBAN sieht nicht gültig aus.' }, { status: 400 });
       saveInvoiceSettings(p);
       return NextResponse.json({ ok: true, message: 'Einstellungen gespeichert.' });
     }
     if (d.action === 'new') {
       const q = d.inquiryNo ? getInquiry(String(d.inquiryNo)) : null;
-      const i = newInvoice(q);
+      const i = newInvoice(q, { abschlagPct: Number(d.abschlagPct) || 0 });
       saveInvoice(i);
       return NextResponse.json({ ok: true, id: i.id });
     }
@@ -47,6 +47,8 @@ export async function POST(req: Request) {
       if (d.action === 'finalize-send') await sendInvoice(n);
       return NextResponse.json({ ok: true, message: `Rechnung ${n.no} festgeschrieben${d.action === 'finalize-send' ? ` und an ${n.buyer.email} gesendet` : ''}.`, invoice: n });
     }
+    if (d.action === 'forward') { await forwardToBookkeeping(i); return NextResponse.json({ ok: true, message: 'An die Buchhaltung gesendet.', invoice: i }); }
+    if (d.action === 'lexoffice') { await uploadToLexoffice(i); return NextResponse.json({ ok: true, message: 'An Lexware Office übertragen.', invoice: i }); }
     if (d.action === 'send') { await sendInvoice(i); return NextResponse.json({ ok: true, message: `An ${i.buyer.email} gesendet.`, invoice: i }); }
     if (d.action === 'remind') { await sendInvoice(i, 'erinnerung'); return NextResponse.json({ ok: true, message: 'Zahlungserinnerung gesendet.', invoice: i }); }
     if (d.action === 'paid') {

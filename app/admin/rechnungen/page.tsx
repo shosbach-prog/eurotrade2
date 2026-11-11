@@ -11,7 +11,7 @@ export default function Rechnungen() {
   const s = invoiceSettings();
   const rows = listInvoices().map((i) => {
     const t = invoiceTotals(i);
-    return { id: i.id, no: i.no, kind: i.kind, status: i.status, date: i.date, due: i.kind === 'rechnung' && i.no ? dueDate(i).toISOString() : null, customer: i.buyer.company || i.buyer.name || '–', gross: (i.kind === 'storno' ? -1 : 1) * t.gross, net: (i.kind === 'storno' ? -1 : 1) * t.net, overdue: isOverdue(i), sent: !!i.sentAt, reminders: i.reminders?.length ?? 0, inquiryNo: i.inquiryNo ?? null };
+    return { id: i.id, no: i.no, kind: i.kind, status: i.status, date: i.date, due: i.kind !== 'storno' && i.no ? dueDate(i).toISOString() : null, customer: i.buyer.company || i.buyer.name || '–', gross: (i.kind === 'storno' ? -1 : 1) * t.gross, net: (i.kind === 'storno' ? -1 : 1) * t.net, overdue: isOverdue(i), sent: !!i.sentAt, reminders: i.reminders?.length ?? 0, inquiryNo: i.inquiryNo ?? null };
   });
   const missing = settingsMissing(s);
   return (
@@ -22,7 +22,7 @@ export default function Rechnungen() {
       </div>
       {missing.length > 0 && <p className="sys-warn">⚠ Für gesetzeskonforme Rechnungen fehlt noch: <b>{missing.join(', ')}</b> – unten unter „Rechnungsdaten“ eintragen.</p>}
       <InvoiceList rows={rows} />
-      <InvoiceSettingsForm initial={s} open={missing.length > 0} />
+      <InvoiceSettingsForm initial={{ ...s, lexofficeKey: s.lexofficeKey ? '••••••••' : '' }} open={missing.length > 0} />
     </>
   );
 }

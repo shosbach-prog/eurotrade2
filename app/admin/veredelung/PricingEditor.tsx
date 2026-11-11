@@ -103,6 +103,7 @@ export default function PricingEditor({ initial, defaults }: { initial: DecoPric
             <label className="pe-lbl">Name je Teil<span className="pe-cell"><N v={p.team?.name ?? 0} set={(n) => { setP((x) => ({ ...x, team: { ...x.team, name: n } })); setDirty(true); }} /><span>€</span></span></label>
             <label className="pe-lbl">Nummer je Teil<span className="pe-cell"><N v={p.team?.nummer ?? 0} set={(n) => { setP((x) => ({ ...x, team: { ...x.team, nummer: n } })); setDirty(true); }} /><span>€</span></span></label>
           </div>
+          <label className="pe-lbl" style={{ marginTop: 12 }}>Eigene Kosten der Veredelung (% vom Verkaufspreis) – für die Margenrechnung<span className="pe-cell" style={{ maxWidth: 160 }}><N v={p.costPct ?? 50} set={(n) => { setP((x) => ({ ...x, costPct: n })); setDirty(true); }} /><span>%</span></span></label>
           <p className="muted" style={{ fontSize: 13, margin: '4px 0 0' }}>Personalisierung aus der Teamliste (Namen/Nummern je Teil) – erscheint als eigene Position im Angebot.</p>
           <label className="ds-check" style={{ marginTop: 14 }}><input type="checkbox" checked={p.showEstimate} onChange={(e) => { setP({ ...p, showEstimate: e.target.checked }); setDirty(true); }} /> Kunden sehen im Shop einen „ca.“-Preis für die Veredelung</label>
           <p className="muted" style={{ fontSize: 13 }}>Alle Preise netto. Im Angebot können Sie jede Position weiterhin von Hand anpassen.</p>
