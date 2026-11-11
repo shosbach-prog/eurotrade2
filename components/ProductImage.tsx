@@ -1,8 +1,9 @@
 import type { PublicProduct } from '@/lib/types';
+import { webp } from '@/lib/img';
 
 /** Echtes Bild aus L-Shop – oder neutraler Platzhalter in der ersten Produktfarbe */
-export default function ProductImage({ p, src, hex }: { p: Pick<PublicProduct, 'name' | 'images' | 'colors' | 'category'>; src?: string; hex?: string }) {
-  const img = src ?? p.images[0];
+export default function ProductImage({ p, src, hex }: { p: Pick<PublicProduct, 'name' | 'images' | 'colors' | 'category'> & { webp?: boolean }; src?: string; hex?: string }) {
+  const img = src ?? webp(p.images[0], p.webp);
   if (img) return <img className="pimg" src={img} alt={p.name} loading="lazy" />;
   const fill = hex ?? p.colors[0]?.hex ?? '#cfd6df';
   const c = p.category.toLowerCase();

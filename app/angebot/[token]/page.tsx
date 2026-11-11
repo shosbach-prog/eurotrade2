@@ -14,7 +14,7 @@ export const metadata: Metadata = { title: 'Ihr Auftrag', robots: { index: false
 export const dynamic = 'force-dynamic';
 const d = (x: Date) => x.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-export default function OfferPage({ params }: { params: { token: string } }) {
+export default function OfferPage({ params, searchParams }: { params: { token: string }; searchParams?: { neu?: string } }) {
   const i = inquiryByToken(params.token);
   if (!i) notFound();
   const o = i.offer?.sentAt ? i.offer : null;
@@ -26,6 +26,10 @@ export default function OfferPage({ params }: { params: { token: string } }) {
   const s = i.shipment;
   return (
     <div style={{ maxWidth: 860, margin: '0 auto' }}>
+      {searchParams?.neu && !o && <div className="box thanks" role="status">
+        <b>✓ Vielen Dank – Ihre Anfrage {i.no} ist eingegangen.</b>
+        <p>Wir melden uns innerhalb von 24 Stunden mit Ihrem Angebot. Eine Bestätigung mit dem Link zu dieser Seite ist per E-Mail an {i.customer.email} unterwegs – hier sehen Sie jederzeit den aktuellen Stand.</p>
+      </div>}
       <div className="list-head">
         <div>
           <h1 style={{ marginBottom: 4 }}>{accepted ? 'Ihr Auftrag' : o ? 'Ihr Angebot' : 'Ihre Anfrage'} {i.no}</h1>

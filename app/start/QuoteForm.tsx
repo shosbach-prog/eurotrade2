@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import StepForm, { type Step } from '@/components/StepForm';
 
 /** Preisanfrage ohne Zugangscode – Schritt für Schritt */
-export default function QuoteForm({ categories, aside }: { categories: string[]; aside?: ReactNode }) {
+export default function QuoteForm({ categories, aside, message }: { categories: string[]; aside?: ReactNode; message?: string }) {
   const steps: Step[] = [
     { title: 'Tragen Sie hier Ihre Kontaktinformationen ein:', fields: [
       { kind: 'text', name: 'first', label: 'Vorname', placeholder: 'Max', required: true, autoComplete: 'given-name' },
@@ -26,7 +26,7 @@ export default function QuoteForm({ categories, aside }: { categories: string[];
     ] },
   ];
   return (
-    <StepForm steps={steps} aside={aside} submitLabel="Angebot anfordern"
+    <StepForm steps={steps} aside={aside} submitLabel="Angebot anfordern" initial={message ? { message } : undefined}
       done={<><span className="qf-ok">✓</span><h3>Vielen Dank!</h3><p>Ihre Anfrage ist da. Wir melden uns innerhalb von 24 Stunden mit Ihrem Angebot – eine Bestätigung ist per E-Mail unterwegs.</p></>}
       onSubmit={async (v, files) => {
         const fd = new FormData();

@@ -168,10 +168,24 @@ export function draftOffer(i: Inquiry): Offer {
 }
 
 /* ---------- Referenzen (öffentlich auf der Startseite) ---------- */
-export type Reference = { id: string; title: string; text: string; imageId?: string | null; imageName?: string | null; tag?: string };
+export type Reference = { id: string; title: string; text: string; imageId?: string | null; imageName?: string | null; tag?: string; /** Wo zeigen: Artikel-Nr., Kategorien oder Marken, kommagetrennt */ match?: string };
 const REFS = path.join(DATA, 'referenzen.json');
 export const listReferences = () => readJSON<Reference[]>(REFS, []);
 export const saveReferences = (r: Reference[]) => writeJSON(REFS, r);
+/** Referenzen für Artikel/Kategorie: zuerst passende (Artikel-Nr., Kategorie, Marke, Stichwort), sonst die neuesten mit Foto */
+export function refsFor(o: { sku?: string; id?: string; category?: string; categorySlug?: string; brand?: string }, n = 3): Reference[] {
+  const all = listReferences().filter((r) => r.imageId);
+  const keys = [o.sku, o.id, o.category, o.categorySlug, o.brand].filter(Boolean).map((x) => String(x).toLowerCase());
+  const hit = all.filter((r) => (r.match ?? '').split(',').map((x) => x.trim().toLowerCase()).filter(Boolean).some((m) => keys.includes(m)));
+  const rest = all.filter((r) => !hit.includes(r) && !(r.match ?? '').trim());
+  return [...hit, ...rest].slice(0, n);
+}
+
+/* ---------- Ansprechpartner (öffentlich im Warenkorb / Artikel) ---------- */
+export type ContactPerson = { name: string; role: string; phone: string; email: string; text: string; photoId?: string | null; hours?: string };
+const CONTACT = path.join(DATA, 'ansprechpartner.json');
+export const getContactPerson = () => readJSON<ContactPerson | null>(CONTACT, null);
+export const saveContactPerson = (c: ContactPerson | null) => writeJSON(CONTACT, c);
 
 /* ---------- Zugangsanfragen (von der Startseite) ---------- */
 export type AccessRequest = { id: string; date: string; name: string; company: string; email: string; phone: string; type: string; message: string; done?: boolean;

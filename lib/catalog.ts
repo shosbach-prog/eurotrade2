@@ -9,6 +9,7 @@ import { sortColors } from './colors';
 import { ratingFor } from './reviews';
 import { overridesMtime, readOverrides } from './artikel';
 import { slugify } from './format';
+import { pictosFor } from './picto';
 
 const LIVE = path.join(process.cwd(), 'data', 'products.json');
 const SEED = path.join(process.cwd(), 'seed', 'products.json');
@@ -52,6 +53,32 @@ function load(): State {
 /** Kundenkontext: eigener Aufschlag, eigene Kollektion */
 export type Ctx = { markup?: number | null; skus?: string[]; exclusive?: boolean; tiers?: string | null; /** Schaufenster: keine Preise */ locked?: boolean } | null | undefined;
 
+/* WebP-Varianten der lokalen Produktbilder (public/p/…/x.webp neben x.jpg) */
+const webpCache = new WeakMap<Product, boolean>();
+const webpExists = new Map<string, boolean>();
+const webpOk = (src?: string) => {
+  if (!src) return true;
+  if (!src.startsWith('/p/')) return true; // externe Bilder bleiben unverändert
+  if (!/\.jpe?g$/i.test(src)) return false;
+  let v = webpExists.get(src);
+  if (v === undefined) { v = fs.existsSync(path.join(process.cwd(), 'public', src.replace(/\.jpe?g$/i, '.webp'))); webpExists.set(src, v); }
+  return v;
+};
+function hasWebp(p: Product) {
+  let v = webpCache.get(p);
+  if (v === undefined) { v = p.images.length > 0 && [...p.images, ...p.colors.flatMap((c) => [c.image, ...(c.images ?? [])])].every(webpOk); webpCache.set(p, v); }
+  return v;
+}
+/** Schlanke Fassung für Produktlisten (ohne lange Texte) – spart Datenmenge im Browser */
+export function slimCard(p: PublicProduct): PublicProduct {
+  const { description: _d, features, specs, composition: _c, stockBy: _s, sizeChart: _sc, tags: _t, ...r } = p;
+  const cert = specs?.['Zertifizierung'];
+  const pend = (features ?? []).filter((x) => /in arbeit/i.test(x));
+  return { ...r, description: '', images: p.images.slice(0, 2), colors: p.colors.map((c) => ({ name: c.name, hex: c.hex, swatch: c.swatch })), ...(cert ? { specs: { Zertifizierung: cert } } : {}), ...(pend.length ? { features: pend } : {}) };
+}
+/** Piktogramme für die Artikelseite */
+export const pictosOf = (id: string) => { const p = load().byId.get(id); return p ? pictosFor(p) : { features: [], care: [], props: [] }; };
+
 export function toPublic(p: Product, ctx?: Ctx): PublicProduct {
   const { basePrice, baseTiers, hidden: _h, custom: _c, ...rest } = p;
   const price = !ctx?.locked && basePrice != null && basePrice > 0 ? sellPrice(basePrice, p.categorySlug, ctx?.markup) : null;
@@ -60,7 +87,7 @@ export function toPublic(p: Product, ctx?: Ctx): PublicProduct {
     : baseTiers?.length && !ctx?.tiers
       ? baseTiers.filter((t) => t.min > 1 && t.price > 0).sort((a, b) => a.min - b.min).map((t) => ({ min: t.min, price: sellPrice(t.price, p.categorySlug, ctx?.markup) })).filter((t) => t.price < price)
       : priceTiers(price, ctx?.tiers);
-  return { ...rest, colors: sortColors(p.colors), price, priceGross: price != null ? gross(price) : null, tiers, rating: ratingFor(p.id), ...(ctx?.locked ? { locked: true } : {}) };
+  return { ...rest, colors: sortColors(p.colors), price, priceGross: price != null ? gross(price) : null, tiers, rating: ratingFor(p.id), props: pictosFor(p).props, ...(hasWebp(p) ? { webp: true } : {}), ...(ctx?.locked ? { locked: true } : {}) };
 }
 
 const skuSet = (ctx: Ctx) => new Set((ctx?.skus ?? []).map((x) => x.toUpperCase()));
@@ -145,3 +172,27 @@ export function didYouMean(q: string, ctx?: Ctx): string | null {
 export const getByBrand = (pred: (brand: string) => boolean, ctx?: Ctx) => products(ctx).filter((p) => pred(p.brand)).map((p) => toPublic(p, ctx));
 /** Anzahl Artikel je Herstellername */
 export function brandCounts(ctx?: Ctx) { const m = new Map<string, number>(); for (const p of products(ctx)) m.set(p.brand, (m.get(p.brand) ?? 0) + 1); return m; }
+
+/* ---------- „Passt dazu“: Varianten (Damen/Herren/Kinder) + Kombi-Artikel ---------- */
+const VARIANT_WORDS = /\b(men|women|ladies|kids|kid|junior|youth|herren|damen|kinder|unisex|baby|babiezz|girls?|boys?)\b|[´'’]s\b|\([^)]*\)/gi;
+const baseName = (n: string) => n.replace(VARIANT_WORDS, ' ').replace(/[^a-z0-9äöüß ]/gi, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
+const PAIRS: Record<string, string[]> = {
+  'T-Shirts': ['Sweatshirts', 'Caps & Mützen', 'Jacken'], Sweatshirts: ['T-Shirts', 'Jacken', 'Hosen'], Jacken: ['Sweatshirts', 'Caps & Mützen', 'Hosen'],
+  Poloshirts: ['Jacken', 'Sweatshirts', 'Caps & Mützen'], Hosen: ['Sweatshirts', 'T-Shirts', 'Jacken'], 'Hemden & Blusen': ['Jacken', 'Hosen', 'Poloshirts'],
+  'Caps & Mützen': ['T-Shirts', 'Sweatshirts', 'Jacken'], Accessoires: ['T-Shirts', 'Sweatshirts', 'Caps & Mützen'],
+};
+export function matchingFor(id: string, ctx?: Ctx): { variants: PublicProduct[]; combos: PublicProduct[] } {
+  const all = products(ctx);
+  const p = all.find((x) => x.id === id);
+  if (!p) return { variants: [], combos: [] };
+  const b = baseName(p.name);
+  const variants = b.length >= 3 ? all.filter((x) => x.id !== p.id && x.brand === p.brand && baseName(x.name) === b && (x.gender ?? '') !== (p.gender ?? '')).slice(0, 4) : [];
+  const used = new Set([p.id, ...variants.map((x) => x.id)]);
+  const combos: Product[] = [];
+  for (const cat of PAIRS[p.category] ?? ['T-Shirts', 'Sweatshirts', 'Caps & Mützen']) {
+    const pool = all.filter((x) => !used.has(x.id) && x.category === cat);
+    const pick = pool.find((x) => x.brand === p.brand && (x.gender ?? 'Unisex') === (p.gender ?? 'Unisex')) ?? pool.find((x) => x.brand === p.brand) ?? (cat === 'Caps & Mützen' ? pool[0] : undefined);
+    if (pick) { combos.push(pick); used.add(pick.id); }
+  }
+  return { variants: variants.map((x) => toPublic(x, ctx)), combos: combos.slice(0, 4).map((x) => toPublic(x, ctx)) };
+}

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import FilterGrid from '@/components/FilterGrid';
-import { didYouMean, getCategories, search } from '@/lib/catalog';
+import { didYouMean, getCategories, search, slimCard } from '@/lib/catalog';
 import { getCustomer } from '@/lib/customer';
 
 export function generateMetadata({ searchParams }: { searchParams: { q?: string } }) {
@@ -15,7 +15,7 @@ export default async function SearchPage({ searchParams }: { searchParams: { q?:
   return (
     <>
       <h1>{q ? <>Ergebnisse für „{q}“</> : 'Suche'}</h1>
-      {res.length ? <FilterGrid items={res} /> : q && (
+      {res.length ? <FilterGrid items={res.map(slimCard)} /> : q && (
         <div className="box">
           {sug ? <p style={{ marginTop: 0, fontSize: 17 }}>Meinten Sie <Link className="alink" href={`/suche?q=${encodeURIComponent(sug)}`}>„{sug}“</Link>?</p>
             : <p style={{ marginTop: 0 }}>Leider nichts gefunden.</p>}

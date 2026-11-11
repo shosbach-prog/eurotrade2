@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { ACCESS_COOKIE, ADMIN_COOKIE, isAdminToken, previewMode, shopClosed, verifyCodeToken } from '@/lib/access';
 
 // Immer erreichbar: Zugang, Pflichtseiten, Angebots-Links aus der E-Mail, Admin-Login
-const PUBLIC = ['/fuer', '/api/preisanfrage', '/ueber-uns', '/og.png', '/garantie', '/p', '/bewerten', '/api/bewerten', '/widerruf', '/newsletter', '/api/newsletter', '/start', '/druck-stick', '/api/zugang-anfrage', '/api/bild', '/sitemap.xml', '/zugang', '/api/zugang', '/api/login', '/passwort', '/api/passwort', '/registrieren', '/api/registrieren', '/kontakt', '/agb', '/ratgeber', '/api/cron', '/impressum', '/datenschutz', '/angebot', '/api/angebot', '/admin/login', '/api/admin/login', '/icon.svg', '/brands', '/marken', '/team', '/api/angebot', '/rechnung', '/api/rechnung', '/favicon.ico', '/robots.txt'];
+const PUBLIC = ['/fuer', '/api/preisanfrage', '/ueber-uns', '/og.png', '/garantie', '/p', '/picto', '/bewerten', '/api/bewerten', '/widerruf', '/newsletter', '/api/newsletter', '/start', '/druck-stick', '/api/zugang-anfrage', '/api/bild', '/sitemap.xml', '/zugang', '/api/zugang', '/api/login', '/passwort', '/api/passwort', '/registrieren', '/api/registrieren', '/kontakt', '/agb', '/ratgeber', '/api/cron', '/impressum', '/datenschutz', '/angebot', '/api/angebot', '/admin/login', '/api/admin/login', '/icon.svg', '/brands', '/marken', '/team', '/api/angebot', '/rechnung', '/api/rechnung', '/favicon.ico', '/robots.txt'];
 const match = (path: string, list: string[]) => list.some((p) => path === p || path.startsWith(p + '/'));
 
 export async function middleware(req: NextRequest) {

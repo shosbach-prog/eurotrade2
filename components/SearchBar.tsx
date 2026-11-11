@@ -12,6 +12,8 @@ export default function SearchBar() {
   const [items, setItems] = useState<PublicProduct[]>([]);
   const [total, setTotal] = useState(0);
   const [suggest, setSuggest] = useState<string | null>(null);
+  const [cats, setCats] = useState<{ name: string; slug: string; count: number }[]>([]);
+  const [brands, setBrands] = useState<{ name: string; slug: string; logo: string; count: number }[]>([]);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
   const box = useRef<HTMLDivElement>(null);
@@ -24,7 +26,7 @@ export default function SearchBar() {
     const t = setTimeout(async () => {
       const r = await fetch(`/api/search?limit=7&q=${encodeURIComponent(term)}`);
       const d = await r.json();
-      if (id === reqId.current) { setItems(d.items); setTotal(d.total); setSuggest(d.suggest ?? null); setActive(-1); }
+      if (id === reqId.current) { setItems(d.items); setTotal(d.total); setSuggest(d.suggest ?? null); setCats(d.cats ?? []); setBrands(d.brands ?? []); setActive(-1); }
     }, 120);
     return () => clearTimeout(t);
   }, [q]);
@@ -60,7 +62,11 @@ export default function SearchBar() {
       </button>
       {open && q.trim().length >= 2 && (
         <div className="sugg">
-          {items.length === 0 ? <div className="empty">Keine Treffer für „{q}“{suggest && <> – meinten Sie <button type="button" className="linkbtn alink" onMouseDown={(e) => { e.preventDefault(); setQ(suggest); }}>„{suggest}“</button>?</>}</div> : items.map((p, i) => (
+          {(cats.length > 0 || brands.length > 0) && <div className="sugg-groups">
+            {cats.map((c) => <a key={c.slug} href={`/kategorie/${c.slug}`} className="sg-chip"><span>Kategorie</span><b>{c.name}</b><small>{c.count}</small></a>)}
+            {brands.map((b) => <a key={b.slug} href={`/marken/${b.slug}`} className="sg-chip">{b.logo ? <img src={`/brands/${b.logo}`} alt="" /> : <span>Marke</span>}<b>{b.name}</b><small>{b.count}</small></a>)}
+          </div>}
+          {items.length === 0 ? <div className="empty">Keine Treffer für „{q}“{suggest && <> – meinten Sie <button type="button" className="linkbtn alink" onMouseDown={(e) => { e.preventDefault(); setQ(suggest); }}>„{suggest}“</button>?</>}<div style={{ marginTop: 8 }}>Nicht dabei? <a className="alink" href={`/kontakt?artikel=${encodeURIComponent(q.trim())}`}>Wir besorgen es Ihnen →</a></div></div> : items.map((p, i) => (
             <a key={p.id} href={`/produkt/${encodeURIComponent(p.id)}`} className={i === active ? 'on' : ''} onMouseEnter={() => setActive(i)}>
               <div className="thumb"><ProductImage p={p} /></div>
               <div><div className="t">{p.name}</div><div className="s">{p.brand} · {p.category} · {p.sku}</div></div>

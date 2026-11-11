@@ -16,7 +16,7 @@ export type CartLine = {
 type NewLine = Omit<CartLine, 'key'>;
 type Ctx = {
   lines: CartLine[]; count: number;
-  add: (l: NewLine) => void; addMany: (ls: NewLine[]) => void;
+  add: (l: NewLine) => void; addMany: (ls: NewLine[], opt?: { replace?: boolean; quiet?: boolean }) => void;
   setQty: (key: string, qty: number) => void; update: (key: string, patch: Partial<NewLine>) => void;
   remove: (key: string) => void; clear: () => void; decoToAll: (deco: Deco | null) => void;
   drawer: boolean; openDrawer: () => void; closeDrawer: () => void; lastAdded: string[];
@@ -39,7 +39,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const ex = base.find((x) => x.key === key);
     return ex ? base.map((x) => (x.key === key ? { ...x, qty: l.sample ? 1 : x.qty + l.qty } : x)) : [...base, { ...l, key }];
   };
-  const addMany: Ctx['addMany'] = (ls) => { save(ls.reduce(merge, lines)); setLastAdded(ls.map(keyOf)); setDrawer(true); };
+  const addMany: Ctx['addMany'] = (ls, opt) => { save(ls.reduce(merge, opt?.replace ? [] : lines)); setLastAdded(ls.map(keyOf)); if (!opt?.quiet) setDrawer(true); };
   const add: Ctx['add'] = (l) => addMany([l]);
   const setQty = (key: string, qty: number) => save(lines.map((x) => (x.key === key ? { ...x, qty: x.sample ? 1 : Math.max(1, Math.floor(qty) || 1) } : x)));
   const update: Ctx['update'] = (key, patch) => {

@@ -4,6 +4,7 @@ import ProductImage from './ProductImage';
 import type { PublicProduct } from '@/lib/types';
 
 /** L-Shop: 665px-Vorschau -> Originalbild für den Zoom */
+import { webp } from '@/lib/img';
 export const hiRes = (src: string) => src.replace(/\/generated\/product\/(\d+)\/\d+_\d+_\d+\//, '/master/product/$1/');
 const Z = 2.6; // Zoomfaktor
 
@@ -11,7 +12,7 @@ type Props = { p: PublicProduct; hex?: string; overlay?: ReactNode };
 
 /** Produktgalerie wie bei Amazon: Thumbnails per Hover, Lupe mit Zoomfenster neben dem Bild, Vollbild per Klick */
 export default function Gallery({ p, hex, overlay }: Props) {
-  const imgs = p.images;
+  const imgs = p.webp ? p.images.map((x) => webp(x, true)!) : p.images;
   const [i, setI] = useState(0);
   const [zoom, setZoom] = useState<{ lx: number; ly: number; lw: number; lh: number; bx: number; by: number; bw: number; bh: number } | null>(null);
   const [full, setFull] = useState(false);

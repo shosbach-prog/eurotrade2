@@ -1,13 +1,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { UPLOADS, listReferences, readJSON } from '@/lib/store';
+import { UPLOADS, getContactPerson, listReferences, readJSON } from '@/lib/store';
 import { imageInUse } from '@/lib/catalog';
 
 const TYPES: Record<string, string> = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp' };
 
-/** Öffentliche Bilder – nur Referenzfotos und Artikelbilder */
+/** Öffentliche Bilder – nur Referenzfotos, Ansprechpartner-Foto und Artikelbilder */
 export function GET(_: Request, { params }: { params: { id: string } }) {
-  if (!/^[a-f0-9]{24}$/.test(params.id) || (!listReferences().some((r) => r.imageId === params.id) && !imageInUse(`/api/bild/${params.id}`))) return new Response('Nicht gefunden', { status: 404 });
+  if (!/^[a-f0-9]{24}$/.test(params.id) || (!listReferences().some((r) => r.imageId === params.id) && getContactPerson()?.photoId !== params.id && !imageInUse(`/api/bild/${params.id}`))) return new Response('Nicht gefunden', { status: 404 });
   const meta = readJSON<{ ext: string } | null>(path.join(UPLOADS, `${params.id}.json`), null);
   const file = meta && path.join(UPLOADS, `${params.id}.${meta.ext}`);
   if (!meta || !TYPES[meta.ext] || !fs.existsSync(file!)) return new Response('Nicht gefunden', { status: 404 });

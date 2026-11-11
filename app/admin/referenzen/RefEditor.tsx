@@ -40,6 +40,8 @@ export default function RefEditor({ initial }: { initial: Reference[] }) {
                 <div><label>Kunde / Titel *</label><input value={r.title} onChange={(e) => upd(k, { title: e.target.value })} placeholder="z. B. SV Musterstadt – Trikots Saison 26/27" /></div>
                 <div><label>Kategorie</label><input value={r.tag ?? ''} onChange={(e) => upd(k, { tag: e.target.value })} placeholder="Verein, Handwerk, Gastro …" /></div>
               </div>
+              <label>Zeigen bei (optional)</label>
+              <input value={r.match ?? ''} onChange={(e) => upd(k, { match: e.target.value })} placeholder="Artikel-Nr., Kategorie oder Marke, kommagetrennt – z. B. Sweatshirts, Stanley/Stella" />
               <label>Kurzbeschreibung</label>
               <textarea value={r.text} onChange={(e) => upd(k, { text: e.target.value })} placeholder="z. B. 120 Hoodies mit Stick auf der Brust, Namen auf dem Rücken, Lieferung in 8 Werktagen" />
               <div className="admin-actions" style={{ margin: '10px 0 0' }}>

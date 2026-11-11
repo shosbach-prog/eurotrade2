@@ -4,10 +4,12 @@ import FilterGrid from '@/components/FilterGrid';
 import { ReviewStrip } from '@/components/ProductReviews';
 import Stars from '@/components/Stars';
 import JsonLd, { crumbSchema, faqSchema } from '@/components/JsonLd';
-import { getByCategory, getCategories } from '@/lib/catalog';
+import { getByCategory, getCategories, slimCard } from '@/lib/catalog';
 import { viewCtx } from '@/lib/customer';
 import { categoryContent } from '@/lib/category-content';
 import { latestReviews } from '@/lib/reviews';
+import { refsFor } from '@/lib/store';
+import RefStrip from '@/components/RefStrip';
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const c = getCategories(await viewCtx()).find((x) => x.slug === params.slug);
@@ -42,7 +44,8 @@ export default async function CategoryPage({ params }: { params: { slug: string 
         <li><b>Vorschau</b> vor jeder Produktion</li>
         <li><b>Angebot in 24 h</b></li>
       </ul>
-      <FilterGrid items={items} />
+      <FilterGrid items={items.map(slimCard)} />
+      <RefStrip refs={refsFor({ category: cat.name, categorySlug: cat.slug })} title={`${cat.name} mit Logo – Beispiele unserer Kunden`} />
       <ReviewStrip reviews={latestReviews(6, items.map((p) => p.id))} overall={catRating} title={`Bewertungen zu ${cat.name}`} />
       <section className="cat-seo">
         <div><h2>{cat.name} mit Ihrem Logo</h2>{txt.seo.map((x) => <p key={x}>{x}</p>)}<p><Link className="alink" href="/druck-stick">Druck & Stick im Vergleich →</Link></p></div>

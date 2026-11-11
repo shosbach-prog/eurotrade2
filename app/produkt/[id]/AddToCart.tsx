@@ -16,12 +16,15 @@ import DecoStudio, { defaultPlace, type Place } from '@/components/DecoStudio';
 import { cmFor, spotsFor } from '@/lib/deco-layout';
 import { nextTier, unitFor } from '@/lib/tiers';
 import { calcDeco, type DecoPricing } from '@/lib/deco-pricing';
+import SizeAdvisor from '@/components/SizeAdvisor';
+import { canDistribute, distribute } from '@/lib/sizing';
 
 type Logo = { id: string; name: string };
 
 export type TeamCtx = { slug: string; name: string; logoId?: string | null; logoName?: string | null; method: string; positions: string[]; personalize: 'aus' | 'name' | 'nummer' | 'beides'; deadline?: string | null; open: boolean };
 type PText = { headline: string; intro: string; highlights: string[]; idealFor: string };
-export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fits, team }: { p: PublicProduct; fits?: Record<string, [number, number, number, number, number]>; team?: TeamCtx | null; customerLogo?: Logo | null; delivery?: string; copy?: PText; pricing?: DecoPricing | null }) {
+type Pic = { src: string; label: string };
+export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fits, team, pictos }: { pictos?: { features: Pic[]; care: Pic[] }; p: PublicProduct; fits?: Record<string, [number, number, number, number, number]>; team?: TeamCtx | null; customerLogo?: Logo | null; delivery?: string; copy?: PText; pricing?: DecoPricing | null }) {
   const { addMany } = useCart();
   const [color, setColor] = useState(p.colors[0]);
   // Mengen je Farbe + Größe ("Black|M" -> 5) – mehrere Farben in einem Schritt möglich
@@ -58,6 +61,11 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
   const [font, setFont] = useState(FONTS[0].id);
   const [tColor, setTColor] = useState('Weiß');
   const useLogo = motif !== 'text', useText = motif !== 'logo';
+  // Veredelung in 3 Schritten (Team-Shop: alles auf einmal, da Logo/Verfahren feststehen)
+  const [dstep, setDstep] = useState(1);
+  const [full, setFull] = useState(false);
+  const [distN, setDistN] = useState('');
+  const s1 = !team && dstep === 1, s2 = !!team || dstep === 2, s3 = !!team || dstep === 3;
 
   const sizes = p.sizes.length ? p.sizes : [''];
   const cname = color?.name ?? '';
@@ -75,6 +83,13 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
   // Team-Shop: Vereinslogo liegt bei uns – Mitglied muss nichts hochladen
   const decoOk = !decoOn || !!team || (positions.length > 0 && (!useText || !!text.trim()) && (!useLogo || method === 'Beratung gewünscht' || !!logo));
   const teamClosed = !!team && !team.open;
+  const step1Ok = (!useText || !!text.trim()) && (!useLogo || method === 'Beratung gewünscht' || !!logo);
+  const STEPS = ['Motiv', 'Position & Größe', 'Namen & Hinweise'];
+  /** Gesamtmenge typisch auf Größen verteilen (aktuelle Farbe) */
+  const doDistribute = () => {
+    const d = distribute(Math.floor(Number(distN)) || 0, sizes); if (!d) return;
+    setQty((q) => ({ ...Object.fromEntries(Object.entries(q).filter(([key]) => key.split('|')[0] !== cname)), ...Object.fromEntries(Object.entries(d).filter(([, n]) => n > 0).map(([s, n]) => [k(cname, s), n])) }));
+  };
 
   async function upload(file?: File | null) {
     if (!file) return;
@@ -187,18 +202,21 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
           <div className="vat">Schon ab 1 Stück · Ihren Preis erhalten Sie umgehend per E-Mail</div>
         </>}
 
+        {!!pictos?.features.length && <ul className="picto-row" aria-label="Eigenschaften">
+          {pictos.features.map((x) => <li key={x.src} title={x.label}><img src={`/picto/${x.src}.png`} alt="" width={36} height={36} loading="lazy" /><span>{x.label}</span></li>)}
+        </ul>}
         {p.colors.length > 0 && <>
           <div className="opt">Farbe: <span className="muted">{cname}</span> <span className="muted" style={{ fontWeight: 400 }}>({p.colors.length} {p.colors.length === 1 ? 'Farbe' : 'Farben'})</span></div>
           <div className="swatches">
             {p.colors.map((c) => (
-              <button key={c.name} data-name={c.name} aria-label={c.name} className={`sw ${c.name === cname ? 'on' : ''}`} style={{ background: swatchBg(c) }} onClick={() => setColor(c)}>
+              <button key={c.name} data-name={c.name} aria-label={`Farbe ${c.name}`} aria-pressed={c.name === cname} title={c.name} className={`sw ${c.name === cname ? 'on' : ''}`} style={{ background: swatchBg(c) }} onClick={() => setColor(c)}>
                 {colorTotals[c.name] ? <span className="sw-n">{colorTotals[c.name]}</span> : null}
               </button>
             ))}
           </div>
         </>}
 
-        <div className="opt opt-row"><span>{sizes.length > 1 ? <>Größen & Mengen{p.colors.length > 0 && <span className="muted" style={{ fontWeight: 400 }}> für <span className="dot-inline" style={{ background: color ? swatchBg(color) : '#ddd' }} />{cname}</span>}</> : 'Menge'}</span>{p.sizeChart && <a href={p.sizeChart} target="_blank" rel="noreferrer" className="sizechart"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><path d="M2 8h20v8H2zM6 8v3M10 8v4M14 8v3M18 8v4" /></svg>Größentabelle</a>}</div>
+        <div className="opt opt-row"><span>{sizes.length > 1 ? <>Größen & Mengen{p.colors.length > 0 && <span className="muted" style={{ fontWeight: 400 }}> für <span className="dot-inline" style={{ background: color ? swatchBg(color) : '#ddd' }} />{cname}</span>}</> : 'Menge'}</span>{p.sizeChart && <a href={p.sizeChart} target="_blank" rel="noreferrer" className="sizechart"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><path d="M2 8h20v8H2zM6 8v3M10 8v4M14 8v3M18 8v4" /></svg>Größentabelle</a>}{!p.locked && <SizeAdvisor name={p.name} gender={p.gender} sizes={p.sizes} extra={`${p.description ?? ''} ${(p.features ?? []).join(' ')}`} chart={p.sizeChart} onPick={(s) => { setQ(s, Math.max(1, qty[k(cname, s)] || 0)); setTimeout(() => (document.querySelector(`[aria-label="Menge ${s}"]`) as HTMLInputElement | null)?.focus(), 50); }} />}</div>
         {p.locked ? (
           <>
             <div className="sizes-ro">{p.sizes.map((x) => <span key={x}>{x}</span>)}</div>
@@ -224,6 +242,12 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
             );
           })}
         </div>
+        {canDistribute(sizes) && <div className="distrib">
+          <label htmlFor="dist-n">Gesamtmenge</label>
+          <input id="dist-n" type="number" inputMode="numeric" min={2} value={distN} onChange={(e) => setDistN(e.target.value)} placeholder="z. B. 50" onKeyDown={(e) => { if (e.key === 'Enter') doDistribute(); }} />
+          <button type="button" className="btn alt sm" disabled={!(Number(distN) >= 2)} onClick={doDistribute}>auf Größen verteilen</button>
+          <Info>Verteilt die Menge nach einer typischen Größenverteilung für Teams und Firmen (S 12 %, M 25 %, L 28 %, XL 20 %, XXL 9 % …). Danach einfach einzelne Größen anpassen.</Info>
+        </div>}
         {p.colors.length > 1 && <p className="hint">Mehrere Farben? Oben eine andere Farbe wählen und Mengen eintragen – alles wird unten gesammelt.</p>}
 
         {/* Veredelung */}
@@ -238,14 +262,13 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
         </label>}
         {decoOn && (
           <div className="deco">
-            {!team && <>
+            {!team && <ol className="dstep" aria-label="Schritte der Veredelung">
+              {STEPS.map((l, n) => <li key={l}><button type="button" className={`${dstep === n + 1 ? 'on' : ''} ${dstep > n + 1 ? 'done' : ''}`} aria-current={dstep === n + 1 ? 'step' : undefined} onClick={() => setDstep(n + 1)}><span>{dstep > n + 1 ? '✓' : n + 1}</span>{l}</button></li>)}
+            </ol>}
+            {s1 && <>
             <p className="hint" style={{ margin: '0 0 10px' }}>Unsicher, welches Verfahren passt? <a href="/druck-stick" target="_blank" className="alink">Druck & Stick im Vergleich</a></p>
             <div className="deco-row">
               {METHODS.map((m) => <button key={m} type="button" className={`size ${m === method ? 'on' : ''}`} onClick={() => setMethod(m)}>{m}</button>)}
-            </div>
-            <div className="opt" style={{ marginTop: 14 }}>Position(en)</div>
-            <div className="deco-row">
-              {posList.map((x) => <button key={x} type="button" className={`size ${positions.includes(x) ? 'on' : ''}`} onClick={() => togglePos(x)}>{x}</button>)}
             </div>
             <div className="opt" style={{ marginTop: 14 }}>Motiv</div>
             <div className="deco-row">
@@ -284,8 +307,16 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
             <p className="hint">PNG, JPG, SVG, PDF, AI oder EPS bis 15 MB. Vektordateien liefern das beste Ergebnis.</p>
             </>}
             </>}
-            <div className="deco-studio-m"><div className="opt" style={{ marginTop: 14 }}>Live-Vorschau</div><DecoStudio {...studioProps} compact /></div>
+            {s2 && <>
+            {!team && <><div className="opt" style={{ marginTop: 0 }}>Position(en)</div>
+            <div className="deco-row">
+              {posList.map((x) => <button key={x} type="button" className={`size ${positions.includes(x) ? 'on' : ''}`} onClick={() => togglePos(x)}>{x}</button>)}
+            </div>
+            <p className="hint">Motiv in der Vorschau verschieben, Größe mit dem Regler einstellen – die Breite in cm wird angezeigt.</p></>}
+            <div className="deco-studio-m"><div className="opt" style={{ marginTop: 14 }}>Live-Vorschau</div><DecoStudio {...studioProps} compact /><button type="button" className="btn alt sm ds-full" onClick={() => setFull(true)}>⤢ Vorschau groß ansehen</button></div>
             {estBox}
+            </>}
+            {s3 && <>
             {(!team || team.personalize !== 'aus') && <div className="teamlist">
               {!team && <label className="ds-check"><input type="checkbox" checked={teamOn} onChange={(e) => setTeamOn(e.target.checked)} /> <b>Namen / Nummern je Teil</b> <span className="muted">(Teamliste)</span></label>}
               {team && <div className="opt" style={{ marginTop: 0 }}>Ihr Name / Ihre Nummer</div>}
@@ -308,9 +339,19 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
                 <p className="hint">Gilt für die gewählte Farbe. Spalten: Name, Nummer, Größe – Reihenfolge egal, auch per Kopieren aus Excel.</p>
               </>}
             </div>}
-            <textarea className="deco-note" placeholder="Hinweise, z. B. Größe ca. 8 cm, Pantone-Farben, Namen/Nummern je Größe …" value={note} onChange={(e) => setNote(e.target.value)} />
+            <textarea className="deco-note" placeholder="Hinweise, z. B. Größe ca. 8 cm, Pantone-Farben, Namen/Nummern je Größe …" value={note} onChange={(e) => setNote(e.target.value)} aria-label="Hinweise zur Veredelung" />
+            </>}
+            {!team && <div className="dstep-nav">
+              {dstep > 1 ? <button type="button" className="btn alt sm" onClick={() => setDstep(dstep - 1)}>← Zurück</button> : <span />}
+              {dstep === 1 && !step1Ok && <span className="muted" style={{ fontSize: 13 }}>{useText && !text.trim() ? 'Text eingeben' : 'Logo hochladen'} – oder „Beratung gewünscht“ wählen</span>}
+              {dstep < 3 ? <button type="button" className="btn sm" disabled={dstep === 1 ? !step1Ok : !positions.length} onClick={() => setDstep(dstep + 1)}>Weiter: {STEPS[dstep]} →</button> : <span className="ok" style={{ fontSize: 13 }}>✓ Veredelung fertig – jetzt Mengen prüfen und in den Warenkorb</span>}
+            </div>}
           </div>
         )}
+        {full && <div className="ds-fs" role="dialog" aria-modal="true" aria-label="Vorschau groß">
+          <div className="ds-fs-head"><b>Live-Vorschau</b><button type="button" className="btn sm" onClick={() => setFull(false)}>Fertig</button></div>
+          <DecoStudio {...studioProps} />
+        </div>}
 
         {total > 0 && (
           <div className="sel-box">
@@ -336,7 +377,10 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
               const nx = nextTier(p.tiers, total);
               const prev = [...p.tiers].reverse().find((t) => t.min <= total)?.min ?? 1;
               return <div className="sel-foot">
-                <div className="sel-sum"><span>{total} Stück × {eur(u)}</span><b>{eur(total * u)} <small>netto</small></b></div>
+                <div className="sel-sum"><span>Textil: {total} Stück × {eur(u)}</span><b>{eur(total * u)} <small>netto</small></b></div>
+                {est && <div className="sel-sum sub"><span>Veredelung ca. {total} × {eur(est.perPiece)}</span><b>{eur(total * est.perPiece)}</b></div>}
+                {est && est.setupTotal > 0 && <div className="sel-sum sub"><span>einmalig ({est.method})</span><b>{eur(est.setupTotal)}</b></div>}
+                {est && <div className="sel-sum grand"><span>Gesamt ca.</span><b>{eur(total * u + total * est.perPiece + est.setupTotal)} <small>netto</small></b></div>}
                 {u < p.price && <div className="ok" style={{ fontSize: 13 }}>Staffelpreis aktiv – Sie sparen {eur((p.price - u) * total)}</div>}
                 {nx && <div className="tier-prog"><div className="bar"><i style={{ width: `${Math.min(100, ((total - prev) / (nx.min - prev)) * 100)}%` }} /></div><span>Noch <b>{nx.min - total} Stück</b> bis {eur(nx.price)} pro Stück</span></div>}
               </div>;
@@ -357,7 +401,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
           </div>
         </div>}
         <div className={`mbar ${total ? 'has' : ''}`}>
-          <div className="mbar-info">{total ? <><b>{total} Stk.</b>{p.price != null && <span> · {eur(unitFor(p.tiers, total, p.price)! * total)} netto</span>}</> : <span className="muted">{p.price != null ? `ab ${eur(p.tiers.length ? p.tiers[p.tiers.length - 1].price : p.price)}` : 'Preis auf Anfrage'}</span>}</div>
+          <div className="mbar-info">{total ? <><b>{total} Stk.</b>{p.price != null && <span> · {est ? 'ca. ' : ''}{eur(unitFor(p.tiers, total, p.price)! * total + (est ? est.perPiece * total + est.setupTotal : 0))} netto{est ? ' inkl. Veredelung' : ''}</span>}</> : <span className="muted">{p.price != null ? `ab ${eur(p.tiers.length ? p.tiers[p.tiers.length - 1].price : p.price)}` : 'Preis auf Anfrage'}</span>}</div>
           <button className="btn" disabled={(!!total && !decoOk) || busy || teamClosed} onClick={() => (total ? onAdd() : document.querySelector('.szgrid')?.scrollIntoView({ behavior: 'smooth', block: 'center' }))}>
             {!total ? 'Größe wählen' : !decoOk ? 'Veredelung prüfen' : 'In den Warenkorb'}
           </button>
@@ -383,6 +427,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
           {p.sizes.length > 0 && <><dt>Größen</dt><dd>{p.sizes.join(', ')}</dd></>}
           {specs.map(([key, v]) => <Fragment key={key}><dt>{key}</dt><dd>{v}</dd></Fragment>)}
         </dl>
+        {!!pictos?.care.length && <div className="care"><b>Pflegehinweise</b><ul>{pictos.care.map((x) => <li key={x.src}><img src={`/picto/${x.src}.png`} alt="" width={34} height={34} loading="lazy" /><span>{x.label}</span></li>)}</ul></div>}
         </details>
       </div>
     </div>

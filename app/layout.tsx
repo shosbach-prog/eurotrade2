@@ -56,10 +56,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="de">
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema()) }} />
+        <a href="#inhalt" className="skip">Zum Inhalt springen</a>
         <CartProvider><WishlistProvider>
           {previewMode() && ok && !path.startsWith('/start') && <div className="preview-bar">Vorschau-Modus – nur für Sie sichtbar. Preise sind Platzhalter. Kunden-Codes sind gesperrt, bis Sie <code>SHOP_PREVIEW=false</code> setzen.</div>}
           <SiteHeader ok={ok} customerName={customer?.name ?? null} admin={admin} cats={(ok ? getCategories(customer) : getCategories()).map((c) => ({ name: c.name, slug: c.slug }))} shop={SHOP} domain={process.env.SHOP_DOMAIN ?? 'euro-trade.com'} />
-          <main className="wrap">{children}</main>
+          <main className="wrap" id="inhalt" tabIndex={-1}>{children}</main>
           <footer className="ft">
             <div className="wrap ft-grid">
               <div className="ft-brand">

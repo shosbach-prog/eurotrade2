@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import FilterGrid from '@/components/FilterGrid';
+import { slimCard } from '@/lib/catalog';
 import JsonLd, { crumbSchema } from '@/components/JsonLd';
 import { viewCtx } from '@/lib/customer';
 import { brandBySlug, productsOfBrand } from '@/lib/brand-catalog';
@@ -38,7 +39,7 @@ export default async function BrandPage({ params }: { params: { slug: string } }
           {txt.x.gehoert && <><dt>Gehört zu</dt><dd>{txt.x.gehoert}</dd></>}
         </dl><small>Angaben laut Unternehmen bzw. Fachpresse</small></aside>}
       </section>}
-      {items.length ? <FilterGrid items={items} /> : <p><Link className="btn" href={`/kontakt?marke=${encodeURIComponent(b.name)}`}>Artikel anfragen</Link></p>}
+      {items.length ? <FilterGrid items={items.map(slimCard)} /> : <p><Link className="btn" href={`/kontakt?marke=${encodeURIComponent(b.name)}`}>Artikel anfragen</Link></p>}
     </>
   );
 }

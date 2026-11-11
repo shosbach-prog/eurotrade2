@@ -1,6 +1,7 @@
 import Stars from './Stars';
 import { ReviewCard, ReviewNote } from './ReviewList';
 import { reviewsFor } from '@/lib/reviews';
+import { contactPerson } from './ContactCard';
 
 /** Bewertungsbereich auf der Produktseite */
 export default function ProductReviews({ productId, name }: { productId: string; name: string }) {
@@ -29,8 +30,7 @@ export default function ProductReviews({ productId, name }: { productId: string;
 
 /** Statt leerer Bewertungen: Darauf können Sie sich verlassen */
 export function TrustBlock() {
-  const phone = process.env.CONTACT_PHONE ?? '0173 2648097';
-  const mail = process.env.CONTACT_EMAIL ?? 'info@euro-trade.com';
+  const cp = contactPerson();
   return (
     <section className="rev-section trust">
       <h2>Darauf können Sie sich verlassen</h2>
@@ -38,7 +38,7 @@ export function TrustBlock() {
         <div className="box"><b>Vorschau vor der Produktion</b><p>Sie sehen Ihr Logo vorab und geben es frei. Erst dann wird gedruckt oder gestickt.</p></div>
         <div className="box"><b>Markenware ab 1 Stück</b><p>Originale Markentextilien, Staffelpreise ab 10 Stück, auch für Nachbestellungen.</p></div>
         <div className="box"><b>Angebot statt Überraschung</b><p>Sie erhalten ein verbindliches Angebot mit allen Kosten, bevor Sie sich entscheiden.</p></div>
-        <div className="box contact-card"><span className="avatar" aria-hidden>SH</span><div><b>Ihr Ansprechpartner</b><p>Sebastian Hosbach<br /><a className="alink" href={`tel:${phone.replace(/[^\d+]/g, '')}`}>{phone}</a> · <a className="alink" href={`mailto:${mail}`}>{mail}</a></p></div></div>
+        <div className="box contact-card">{cp.photoId ? <img className="avatar" src={`/api/bild/${cp.photoId}`} alt={`Foto ${cp.name}`} style={{ objectFit: 'cover' }} /> : <span className="avatar" aria-hidden>{cp.name.split(/\s+/).map((x) => x[0]).join('').slice(0, 2).toUpperCase()}</span>}<div><b>{cp.role || 'Ihr Ansprechpartner'}</b><p>{cp.name}<br />{cp.phone && <><a className="alink" href={`tel:${cp.phone.replace(/[^\d+]/g, '')}`}>{cp.phone}</a> · </>}<a className="alink" href={`mailto:${cp.email}`}>{cp.email}</a></p></div></div>
       </div>
     </section>
   );
