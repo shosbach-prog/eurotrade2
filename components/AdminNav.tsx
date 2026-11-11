@@ -1,17 +1,32 @@
 import Link from 'next/link';
 import AdminLogout from './AdminLogout';
+import { fileCustomers, listAccessRequests } from '@/lib/store';
+
 export default function AdminNav({ active }: { active: 'anfragen' | 'kunden' | 'referenzen' | 'newsletter' | 'bewertungen' | 'artikel' }) {
+  // Wartende Registrierungen + offene Zugangsanfragen – immer sichtbar im Admin
+  const pending = fileCustomers().filter((c) => c.pending && c.active === false).length;
+  const requests = listAccessRequests().filter((r) => !r.done).length;
+  const todo = pending + requests;
   return (
-    <div className="admin-nav">
-      <Link href="/admin" className={active === 'anfragen' ? 'on' : ''}>Anfragen & Angebote</Link>
-      <Link href="/admin/kunden" className={active === 'kunden' ? 'on' : ''}>Kunden & Codes</Link>
-      <Link href="/admin/artikel" className={active === 'artikel' ? 'on' : ''}>Artikel</Link>
-      <Link href="/admin/bewertungen" className={active === 'bewertungen' ? 'on' : ''}>Bewertungen</Link>
-      <Link href="/admin/referenzen" className={active === 'referenzen' ? 'on' : ''}>Referenzen</Link>
-      <Link href="/admin/newsletter" className={active === 'newsletter' ? 'on' : ''}>Newsletter</Link>
-      <span style={{ flex: 1 }} />
-      <Link href="/">Zum Shop</Link>
-      <AdminLogout />
-    </div>
+    <>
+      <div className="admin-nav">
+        <Link href="/admin" className={active === 'anfragen' ? 'on' : ''}>Anfragen & Angebote</Link>
+        <Link href="/admin/kunden" className={active === 'kunden' ? 'on' : ''}>Kunden & Codes{todo > 0 && <span className="nav-badge">{todo}</span>}</Link>
+        <Link href="/admin/artikel" className={active === 'artikel' ? 'on' : ''}>Artikel</Link>
+        <Link href="/admin/bewertungen" className={active === 'bewertungen' ? 'on' : ''}>Bewertungen</Link>
+        <Link href="/admin/referenzen" className={active === 'referenzen' ? 'on' : ''}>Referenzen</Link>
+        <Link href="/admin/newsletter" className={active === 'newsletter' ? 'on' : ''}>Newsletter</Link>
+        <span style={{ flex: 1 }} />
+        <Link href="/">Zum Shop</Link>
+        <AdminLogout />
+      </div>
+      {pending > 0 && active !== 'kunden' && (
+        <Link href="/admin/kunden" className="admin-alert">
+          <span className="admin-alert-dot">{pending}</span>
+          <b>{pending === 1 ? 'Neue Registrierung wartet' : `${pending} neue Registrierungen warten`} auf Freigabe</b>
+          <span className="admin-alert-go">Jetzt prüfen →</span>
+        </Link>
+      )}
+    </>
   );
 }

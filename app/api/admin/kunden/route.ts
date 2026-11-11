@@ -39,7 +39,9 @@ export async function PUT(req: Request) {
     if (prev?.pending && c.active) activated.push(out);
     return out;
   });
-  saveCustomers(next);
+  // Wartende Registrierungen werden separat (Freigabe-Box) verwaltet – nie beim Speichern der Liste verlieren
+  const waiting = old.filter((o) => o.pending && o.active === false && !next.some((n) => n.code === o.code));
+  saveCustomers([...waiting, ...next]);
   // Selbst registrierte Kunden: beim Freischalten automatisch benachrichtigen
   let mailed = 0;
   if (mailEnabled()) for (const c of activated) {

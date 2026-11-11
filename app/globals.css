@@ -853,3 +853,19 @@ footer .wrap{padding-left:112px}
 .l-loginbtns{display:flex;gap:10px;flex:none}
 .l-loginbtns .btn{display:inline-grid;place-items:center;height:44px;padding:0 20px}
 @media (max-width:520px){.l-loginbtns{width:100%}.l-loginbtns .btn{flex:1}}
+/* Admin: Freigaben */
+.nav-badge{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;margin-left:6px;border-radius:999px;background:#e5484d;color:#fff;font-size:12px;font-weight:800;line-height:1}
+.admin-alert{display:flex;align-items:center;gap:12px;margin:0 0 18px;padding:14px 18px;border-radius:12px;background:#fff7e0;border:2px solid var(--accent);color:var(--ink);font-size:16px}
+.admin-alert:hover{background:#ffefc2}
+.admin-alert-dot{display:inline-grid;place-items:center;min-width:30px;height:30px;padding:0 8px;border-radius:999px;background:#e5484d;color:#fff;font-weight:800;font-size:15px;flex:none}
+.admin-alert-go{margin-left:auto;color:var(--brand);font-weight:700;white-space:nowrap}
+.pending-box{background:#fff7e0;border:2px solid var(--accent);border-radius:14px;padding:18px 20px;margin:0 0 20px}
+.pending-head{display:flex;align-items:center;gap:12px;margin-bottom:12px;font-size:18px}
+.pending-row{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:#fff;border-radius:10px;padding:14px 16px;margin-top:10px;box-shadow:var(--shadow)}
+.pending-info{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 300px}
+.pending-info b{font-size:17px}
+.pending-actions{display:flex;gap:10px;flex:none}
+.pending-actions .btn{height:48px;padding:0 22px;font-size:16px}
+.btn-approve{background:#1d7a3e}
+.btn-approve:hover{background:#18693a}
+@media (max-width:600px){.pending-actions{width:100%}.pending-actions .btn{flex:1}}
