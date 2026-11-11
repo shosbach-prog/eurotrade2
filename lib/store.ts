@@ -35,6 +35,10 @@ export type Customer = {
   logoName?: string | null;
   note?: string;
   active?: boolean;
+  /** Login mit E-Mail + Passwort (zusätzlich zum Code) */
+  email?: string | null;
+  /** scrypt-Hash "salt:hash" – verlässt nie den Server */
+  pw?: string | null;
 };
 const CUST = path.join(DATA, 'kunden.json');
 
@@ -51,6 +55,18 @@ export function allCustomers(): (Customer & { source: 'admin' | 'env' })[] {
   const file = fileCustomers().map((c) => ({ ...c, source: 'admin' as const }));
   const env = envCustomers().filter((e) => !file.some((f) => f.code === e.code)).map((c) => ({ ...c, source: 'env' as const }));
   return [...file, ...env];
+}
+export const normEmail = (e: unknown) => String(e ?? '').trim().toLowerCase();
+export const findCustomerByEmail = (email: string) => { const e = normEmail(email); return e ? fileCustomers().find((c) => normEmail(c.email) === e && c.active !== false) ?? null : null; };
+/** Kunde ohne Passwort-Hash (für Admin-Oberfläche) */
+export const publicCustomer = <T extends Customer>({ pw, ...c }: T) => ({ ...c, hasPw: !!pw });
+export function updateCustomer(code: string, patch: Partial<Customer>) {
+  const list = fileCustomers();
+  const i = list.findIndex((c) => c.code === code);
+  if (i < 0) return false;
+  list[i] = { ...list[i], ...patch };
+  saveCustomers(list);
+  return true;
 }
 export const findCustomer = (code: string) => allCustomers().find((c) => c.code === code.toUpperCase() && c.active !== false) ?? null;
 

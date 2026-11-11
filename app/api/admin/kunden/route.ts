@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { isAdmin } from '@/lib/customer';
-import { saveCustomers, type Customer } from '@/lib/store';
+import { fileCustomers, normEmail, saveCustomers, type Customer } from '@/lib/store';
 import { parseTiers, tiersToString } from '@/lib/tiers';
 
 export async function PUT(req: Request) {
@@ -17,11 +17,21 @@ export async function PUT(req: Request) {
     logoName: c.logoId ? String(c.logoName ?? '').slice(0, 120) : null,
     note: String(c.note ?? '').slice(0, 1000),
     active: c.active !== false,
+    email: /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(normEmail(c.email)) ? normEmail(c.email) : null,
+    _orig: String(c._orig ?? c.code ?? '').toUpperCase(),
   }));
   const bad = list.find((c) => c.code.length < 4);
   if (bad) return NextResponse.json({ error: 'Jeder Code braucht mindestens 4 Zeichen (A–Z, 0–9, -).' }, { status: 400 });
   const dup = list.find((c, n) => list.findIndex((x) => x.code === c.code) !== n);
   if (dup) return NextResponse.json({ error: `Der Code ${dup.code} ist doppelt vergeben.` }, { status: 400 });
-  saveCustomers(list.map((c) => ({ ...c, name: c.name || c.code })));
+  const dupMail = list.find((c, n) => c.email && list.findIndex((x) => x.email === c.email) !== n);
+  if (dupMail) return NextResponse.json({ error: `Die E-Mail ${dupMail.email} ist doppelt vergeben.` }, { status: 400 });
+  // Passwort-Hash bleibt auf dem Server: über ursprünglichen Code zuordnen; neue E-Mail = Passwort zurücksetzen
+  const old = fileCustomers();
+  saveCustomers(list.map(({ _orig, ...c }: any) => {
+    const prev = old.find((o) => o.code === _orig) ?? old.find((o) => o.code === c.code);
+    const pw = prev?.pw && normEmail(prev.email) === c.email ? prev.pw : null;
+    return { ...c, name: c.name || c.code, pw };
+  }));
   return NextResponse.json({ ok: true });
 }

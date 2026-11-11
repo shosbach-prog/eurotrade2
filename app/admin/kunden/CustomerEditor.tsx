@@ -1,11 +1,12 @@
 'use client';
 import { useState } from 'react';
-import type { AccessRequest, Customer } from '@/lib/store';
+import type { AccessRequest, Customer as Cust } from '@/lib/store';
+type Customer = Omit<Cust, 'pw'> & { hasPw?: boolean; _orig?: string };
 
 type P = { sku: string; name: string; brand: string };
 const gen = () => Array.from(crypto.getRandomValues(new Uint8Array(6)), (b) => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[b % 32]).join('');
 
-export default function CustomerEditor({ initial, envCodes, products, defaultMarkup, defaultTiers, requests: req0 }: { requests: AccessRequest[]; initial: Customer[]; envCodes: { code: string; name: string }[]; products: P[]; defaultMarkup: number; defaultTiers: string }) {
+export default function CustomerEditor({ initial, envCodes, products, defaultMarkup, defaultTiers, requests: req0, mail }: { mail?: boolean; requests: AccessRequest[]; initial: Customer[]; envCodes: { code: string; name: string }[]; products: P[]; defaultMarkup: number; defaultTiers: string }) {
   const [list, setList] = useState<Customer[]>(initial);
   const [open, setOpen] = useState<number | null>(null);
   const [dirty, setDirty] = useState(false);
@@ -15,7 +16,7 @@ export default function CustomerEditor({ initial, envCodes, products, defaultMar
   const [requests, setRequests] = useState(req0);
   async function doneReq(id: string) { await fetch('/api/admin/zugangsanfragen', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, done: true }) }); setRequests((r) => r.filter((x) => x.id !== id)); }
   function createFrom(r: AccessRequest) {
-    const c: Customer = { code: gen(), name: r.company || r.name, markup: null, skus: [], exclusive: false, active: true, note: `${r.name} · ${r.email}${r.phone ? ' · ' + r.phone : ''}${r.type ? ' · ' + r.type : ''}${r.kind === 'preis' ? `\nPreisanfrage: ${[r.category, r.qty && r.qty + ' Stk.', r.deco, r.sample && 'Muster'].filter(Boolean).join(' · ')}` : ''}${r.message ? '\n' + r.message : ''}` };
+    const c: Customer = { code: gen(), name: r.company || r.name, email: r.email || null, markup: null, skus: [], exclusive: false, active: true, note: `${r.name} · ${r.email}${r.phone ? ' · ' + r.phone : ''}${r.type ? ' · ' + r.type : ''}${r.kind === 'preis' ? `\nPreisanfrage: ${[r.category, r.qty && r.qty + ' Stk.', r.deco, r.sample && 'Muster'].filter(Boolean).join(' · ')}` : ''}${r.message ? '\n' + r.message : ''}` };
     setList((l) => [c, ...l]); setOpen(0); setDirty(true); doneReq(r.id);
     setMsg({ ok: true, t: `Kunde angelegt (Code ${c.code}) – jetzt speichern und Einladung an ${r.email} schicken.` });
   }
@@ -29,7 +30,14 @@ export default function CustomerEditor({ initial, envCodes, products, defaultMar
     const r = await fetch('/api/admin/kunden', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ customers: list }) });
     const d = await r.json().catch(() => ({}));
     setBusy(false);
-    if (r.ok) { setDirty(false); setMsg({ ok: true, t: 'Gespeichert – Änderungen gelten sofort.' }); } else setMsg({ ok: false, t: d.error ?? 'Fehler' });
+    if (r.ok) { setDirty(false); setList((l) => l.map((c) => ({ ...c, _orig: c.code }))); setMsg({ ok: true, t: 'Gespeichert – Änderungen gelten sofort.' }); } else setMsg({ ok: false, t: d.error ?? 'Fehler' });
+  }
+  async function invite(c: Customer) {
+    if (dirty) { setMsg({ ok: false, t: 'Bitte zuerst speichern, dann die Einladung senden.' }); return; }
+    setMsg(null);
+    const r = await fetch('/api/admin/kunden/einladung', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: c.code }) });
+    const d = await r.json().catch(() => ({}));
+    setMsg(r.ok ? { ok: true, t: `Einladung an ${c.email} gesendet – der Kunde legt sein Passwort selbst fest.` } : { ok: false, t: d.error ?? 'Senden fehlgeschlagen' });
   }
   async function uploadLogo(k: number, f?: File | null) {
     if (!f) return;
@@ -72,6 +80,7 @@ export default function CustomerEditor({ initial, envCodes, products, defaultMar
               <span className="muted">{c.markup != null ? `${c.markup} % Aufschlag` : `Standard (${defaultMarkup} %)`}</span>
               {!!c.skus?.length && <span className="muted">· {c.skus.length} Artikel{c.exclusive ? ' (exklusiv)' : ''}</span>}
               {c.logoId && <span className="muted">· Logo</span>}
+              {c.email && <span className="muted">· {c.hasPw ? '🔑 Login aktiv' : '✉ Login offen'}</span>}
               {c.active === false && <span className="st st-abgelehnt">gesperrt</span>}
               <span style={{ marginLeft: 'auto' }} className="muted">{open === k ? '▲' : '▼'}</span>
             </div>
@@ -81,6 +90,15 @@ export default function CustomerEditor({ initial, envCodes, products, defaultMar
                   <div><label>Kunde / Verein *</label><input value={c.name} onChange={(e) => upd(k, { name: e.target.value })} placeholder="z. B. SV Musterstadt" /></div>
                   <div><label>Zugangscode *</label>
                     <div style={{ display: 'flex', gap: 6 }}><input value={c.code} onChange={(e) => upd(k, { code: e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, '') })} style={{ fontFamily: 'ui-monospace,monospace', letterSpacing: 1 }} /><button type="button" className="btn alt" style={{ height: 42 }} onClick={() => upd(k, { code: gen() })}>neu</button></div>
+                  </div>
+                </div>
+                <div className="two">
+                  <div><label>E-Mail für Login (optional)</label><input type="email" value={c.email ?? ''} onChange={(e) => upd(k, { email: e.target.value.trim() || null, hasPw: false })} placeholder="kunde@firma.de" /></div>
+                  <div><label>Login-Status</label>
+                    <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginTop: 6, flexWrap: 'wrap' }}>
+                      <span className="muted" style={{ fontSize: 14 }}>{!c.email ? 'Nur Zugangscode' : c.hasPw ? '🔑 Passwort gesetzt' : '✉ Passwort noch nicht festgelegt'}</span>
+                      {c.email && <button type="button" className="btn alt" style={{ height: 36 }} disabled={!mail} title={mail ? '' : 'SMTP in der .env eintragen, damit E-Mails rausgehen'} onClick={() => invite(c)}>{c.hasPw ? 'Passwort-Link senden' : 'Einladung senden'}</button>}
+                    </div>
                   </div>
                 </div>
                 <div className="two">
@@ -120,7 +138,7 @@ export default function CustomerEditor({ initial, envCodes, products, defaultMar
                 <label>Interne Notiz</label>
                 <textarea value={c.note ?? ''} onChange={(e) => upd(k, { note: e.target.value })} placeholder="nur für Sie sichtbar" />
                 <div className="admin-actions">
-                  <button type="button" className="btn alt" onClick={() => navigator.clipboard.writeText(`Guten Tag,\n\nIhr persönlicher Zugang zu unserem Textil-Shop ist freigeschaltet:\n\n${window.location.origin}\nZugangscode: ${c.code}\n\nDort finden Sie Ihre Konditionen${c.skus?.length ? ' und Ihre eigene Kollektion' : ''}, können Logos hochladen und erhalten Ihr Angebot innerhalb von 24 Stunden.\n\nMit freundlichen Grüßen\nEuro-Trade`)}>Einladungstext kopieren</button>
+                  <button type="button" className="btn alt" onClick={() => navigator.clipboard.writeText(`Guten Tag,\n\nIhr persönlicher Zugang zu unserem Textil-Shop ist freigeschaltet:\n\n${window.location.origin}\nZugangscode: ${c.code}${c.email ? `\nOder Anmeldung mit E-Mail (${c.email}) und Passwort` : ''}\n\nDort finden Sie Ihre Konditionen${c.skus?.length ? ' und Ihre eigene Kollektion' : ''}, können Logos hochladen und erhalten Ihr Angebot innerhalb von 24 Stunden.\n\nMit freundlichen Grüßen\nEuro-Trade`)}>Einladungstext kopieren</button>
                   <span style={{ flex: 1 }} />
                   <button type="button" className="linkbtn err" onClick={() => del(k)}>Kunde löschen</button>
                 </div>
