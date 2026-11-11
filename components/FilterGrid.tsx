@@ -1,5 +1,5 @@
 'use client';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import ProductCard from './ProductCard';
 import type { PublicProduct } from '@/lib/types';
 import { FAMILY_HEX, colorFamily } from '@/lib/colors';
@@ -22,6 +22,16 @@ export default function FilterGrid({ items }: { items: PublicProduct[] }) {
   const [open, setOpen] = useState(false);
   const [dd, setDd] = useState<string | null>(null);
   const [limit, setLimit] = useState(24);
+  const barRef = useRef<HTMLElement>(null);
+  // Dropdown bleibt offen, bis man daneben klickt oder Esc drückt (nicht mehr beim Verlassen mit der Maus)
+  useEffect(() => {
+    if (!dd) return;
+    const down = (e: PointerEvent) => { if (!barRef.current?.contains(e.target as Node)) setDd(null); };
+    const key = (e: KeyboardEvent) => { if (e.key === 'Escape') setDd(null); };
+    document.addEventListener('pointerdown', down);
+    document.addEventListener('keydown', key);
+    return () => { document.removeEventListener('pointerdown', down); document.removeEventListener('keydown', key); };
+  }, [dd]);
 
   const facets = useMemo(() => {
     const count = (vals: string[][]) => { const m = new Map<string, number>(); vals.forEach((v) => new Set(v).forEach((x) => m.set(x, (m.get(x) ?? 0) + 1))); return m; };
@@ -59,7 +69,7 @@ export default function FilterGrid({ items }: { items: PublicProduct[] }) {
     </div>
   );
   const panel = (
-    <aside className={`filters ${open ? 'open' : ''}`} onMouseLeave={() => setDd(null)}>
+    <aside ref={barRef} className={`filters ${open ? 'open' : ''}`}>
       <div className="f-head"><strong>Filter</strong>{active > 0 && <button className="linkbtn" onClick={reset}>zurücksetzen</button>}<button className="x f-close" onClick={() => setOpen(false)} aria-label="Filter schließen">×</button></div>
       {facets.fam.length > 1 && grp('fam', 'Farbe', fams.length, <div className="f-fams">{facets.fam.map(([f, n]) => (
         <button key={f} className={`f-fam ${fams.includes(f) ? 'on' : ''}`} onClick={() => tog(setFams, f)} title={`${f} (${n})`}><span style={{ background: FAMILY_HEX[f] }} />{f}</button>))}</div>)}

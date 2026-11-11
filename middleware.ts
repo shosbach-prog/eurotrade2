@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { ACCESS_COOKIE, ADMIN_COOKIE, isAdminToken, previewMode, shopClosed, verifyCodeToken } from '@/lib/access';
 
 // Immer erreichbar: Zugang, Pflichtseiten, Angebots-Links aus der E-Mail, Admin-Login
-const PUBLIC = ['/ueber-uns', '/og.png', '/garantie', '/p', '/bewerten', '/api/bewerten', '/widerruf', '/newsletter', '/api/newsletter', '/start', '/druck-stick', '/api/zugang-anfrage', '/api/bild', '/sitemap.xml', '/zugang', '/api/zugang', '/impressum', '/datenschutz', '/angebot', '/api/angebot', '/admin/login', '/api/admin/login', '/icon.svg', '/favicon.ico', '/robots.txt'];
+const PUBLIC = ['/fuer', '/api/preisanfrage', '/ueber-uns', '/og.png', '/garantie', '/p', '/bewerten', '/api/bewerten', '/widerruf', '/newsletter', '/api/newsletter', '/start', '/druck-stick', '/api/zugang-anfrage', '/api/bild', '/sitemap.xml', '/zugang', '/api/zugang', '/impressum', '/datenschutz', '/angebot', '/api/angebot', '/admin/login', '/api/admin/login', '/icon.svg', '/favicon.ico', '/robots.txt'];
 const match = (path: string, list: string[]) => list.some((p) => path === p || path.startsWith(p + '/'));
 
 export async function middleware(req: NextRequest) {

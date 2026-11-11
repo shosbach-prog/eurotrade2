@@ -6,7 +6,10 @@ import NewsletterBox from './NewsletterBox';
 import { ReviewStrip } from '@/components/ProductReviews';
 import { latestReviews, overall } from '@/lib/reviews';
 import { discountTiers, listReferences } from '@/lib/store';
-import { getCategories, getFeatured } from '@/lib/catalog';
+import { categoryTiles, getCategories, getFeatured } from '@/lib/catalog';
+import CategoryTiles from '@/components/CategoryTiles';
+import QuoteForm from './QuoteForm';
+import { ZIELGRUPPEN } from '@/lib/zielgruppen';
 import ProductCard from '@/components/ProductCard';
 import { previewMode } from '@/lib/access';
 import HeroProducts from '@/components/HeroProducts';
@@ -22,7 +25,8 @@ const BRANDS = ['Asquith & Fox', 'B&C', 'Beechfield', 'Daiber', 'HRM', 'Mantis',
 
 export default function Start() {
   const refs = listReferences();
-  const cats = getCategories().slice(0, 8);
+  const cats = getCategories();
+  const tiles = categoryTiles().slice(0, 8);
   const showcase = getFeatured(8, { locked: true });
   const hero = heroItems(showcase, { link: !previewMode() });
   return (
@@ -33,7 +37,7 @@ export default function Start() {
           <h1>Teamwear & Firmenbekleidung mit Ihrem Logo</h1>
           <p>Markentextilien schon ab 1 Stück – bedruckt oder bestickt, aus einer Hand. In Ihrem persönlichen Shop mit eigenen Konditionen und Ihrer Kollektion.</p>
           <div className="l-cta">
-            <a href="#anfragen" className="btn l-btn">Zugang anfragen</a>
+            <a href="#preis" className="btn l-btn">Preis anfragen</a>
             <Link href="/druck-stick" className="btn alt l-btn2">Druck & Stick erklärt</Link>
           </div>
           <ul className="l-checks">
@@ -69,13 +73,18 @@ export default function Start() {
         </ol>
       </section>
 
-      {cats.length > 0 && (
+      {tiles.length > 0 && (
         <section className="l-section">
           <h2>Sortiment</h2>
-          <div className="chips">{cats.map((c) => (previewMode() ? <span key={c.slug} className="chip">{c.name}</span> : <Link key={c.slug} href={`/kategorie/${c.slug}`} className="chip">{c.name}</Link>))}<span className="chip">und vieles mehr</span></div>
+          <CategoryTiles tiles={tiles} link={!previewMode()} />
           <p className="muted" style={{ marginTop: 14 }}>Marken u. a.: {BRANDS.join(' · ')}</p>
         </section>
       )}
+
+      <section className="l-section">
+        <h2>Für wen wir arbeiten</h2>
+        <div className="zg-grid">{ZIELGRUPPEN.map((z) => <Link key={z.slug} href={`/fuer/${z.slug}`} className="box zg"><b>{z.nav}</b><span>{z.teaser}</span><em>Mehr erfahren →</em></Link>)}</div>
+      </section>
 
       {!previewMode() && showcase.length > 0 && (
         <section className="l-section">
@@ -102,6 +111,16 @@ export default function Start() {
       <ReviewStrip reviews={latestReviews(6)} overall={overall()} />
 
       <NewsletterBox tiers={discountTiers()} />
+
+      <section id="preis" className="l-section l-quote">
+        <div>
+          <h2>Unverbindlich Preis anfragen</h2>
+          <p>Sie haben noch keinen Zugangscode? Kein Problem: Beschreiben Sie kurz Ihr Vorhaben und schicken Sie Ihr Logo gleich mit. Sie erhalten innerhalb von 24 Stunden ein Angebot.</p>
+          <ul><li>Kein Zugangscode nötig</li><li>Logo gleich mitschicken</li><li>Auf Wunsch vorab ein Muster</li><li>Unverbindlich und kostenlos</li></ul>
+          <p className="muted" style={{ marginTop: 16 }}>Lieber sprechen? <a className="alink" href="tel:+491732648097">0173 2648097</a></p>
+        </div>
+        <QuoteForm categories={cats.map((c) => c.name)} />
+      </section>
 
       <section id="anfragen" className="l-section l-request">
         <div>

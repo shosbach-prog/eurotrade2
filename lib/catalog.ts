@@ -93,6 +93,11 @@ export function getCollection(ctx?: Ctx): PublicProduct[] {
   const bySku = new Map(s.products.map((p) => [p.sku.toUpperCase(), p]));
   return (ctx?.skus ?? []).flatMap((k) => { const p = bySku.get(k.toUpperCase()); return p ? [toPublic(p, ctx)] : []; });
 }
+/** Kategorien mit Vorschaubild (erstes Artikelbild) */
+export function categoryTiles(ctx?: Ctx, slugs?: string[]) {
+  const ps = products(ctx);
+  return getCategories(ctx).filter((c) => !slugs || slugs.includes(c.slug)).map((c) => ({ ...c, image: ps.find((p) => p.categorySlug === c.slug && p.images[0])?.images[0] }));
+}
 /** Admin: alle Artikel inkl. ausgeblendeter, mit EK */
 export const adminProducts = () => load().all;
 export const adminProduct = (id: string) => { const s = load(); return { p: s.all.find((x) => x.id === id) ?? null, original: s.base.get(id) ?? null }; };

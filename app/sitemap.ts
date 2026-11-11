@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { previewMode } from '@/lib/access';
 import { getCategories, allProductsBrief } from '@/lib/catalog';
+import { ZIELGRUPPEN } from '@/lib/zielgruppen';
 
 export const dynamic = 'force-dynamic';
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -9,6 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const pages: MetadataRoute.Sitemap = [
     { url: `${base}/`, priority: 1, changeFrequency: 'weekly', lastModified: now },
     { url: `${base}/druck-stick`, priority: 0.8, changeFrequency: 'monthly', lastModified: now },
+    ...ZIELGRUPPEN.map((z) => ({ url: `${base}/fuer/${z.slug}`, priority: 0.8, changeFrequency: 'monthly' as const, lastModified: now })),
     { url: `${base}/ueber-uns`, priority: 0.5, changeFrequency: 'yearly', lastModified: now },
     { url: `${base}/garantie`, priority: 0.4, changeFrequency: 'yearly', lastModified: now },
     { url: `${base}/widerruf`, priority: 0.3, changeFrequency: 'yearly', lastModified: now },

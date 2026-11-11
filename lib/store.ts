@@ -123,7 +123,8 @@ export const listReferences = () => readJSON<Reference[]>(REFS, []);
 export const saveReferences = (r: Reference[]) => writeJSON(REFS, r);
 
 /* ---------- Zugangsanfragen (von der Startseite) ---------- */
-export type AccessRequest = { id: string; date: string; name: string; company: string; email: string; phone: string; type: string; message: string; done?: boolean };
+export type AccessRequest = { id: string; date: string; name: string; company: string; email: string; phone: string; type: string; message: string; done?: boolean;
+  /** Preisanfrage ohne Zugang */ kind?: 'zugang' | 'preis'; category?: string; qty?: string; deco?: string; sample?: boolean; logoId?: string; logoName?: string };
 const AREQ = path.join(DATA, 'zugangsanfragen.json');
 export const listAccessRequests = () => readJSON<AccessRequest[]>(AREQ, []);
 export const saveAccessRequests = (r: AccessRequest[]) => writeJSON(AREQ, r.slice(-1000));

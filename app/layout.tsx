@@ -25,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
     twitter: { card: 'summary_large_image', images: ['/og.png'] },
     // Geschlossener Shop: nur Landingpage und Info-Seite in Suchmaschinen
     // Geschlossener Shop: Landingpage, Infoseiten und Schaufenster (Kategorien/Artikel ohne Preise) indexierbar
-    robots: previewMode() || (shopClosed() && !(['/start', '/druck-stick', '/widerruf', '/garantie', '/impressum', '/ueber-uns'].includes(headers().get('x-path') ?? '') || headers().get('x-showcase') === '1')) ? { index: false, follow: false } : undefined,
+    robots: previewMode() || (shopClosed() && !(['/start', '/druck-stick', '/widerruf', '/garantie', '/impressum', '/ueber-uns'].includes(headers().get('x-path') ?? '') || (headers().get('x-path') ?? '').startsWith('/fuer/') || headers().get('x-showcase') === '1')) ? { index: false, follow: false } : undefined,
   };
 }
 export const dynamic = 'force-dynamic';
@@ -46,7 +46,7 @@ function orgSchema() {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const gated = shopClosed();
   const path = headers().get('x-path') ?? '/';
-  const isPublic = ['/ueber-uns', '/garantie', '/bewerten', '/widerruf', '/newsletter', '/start', '/druck-stick', '/zugang', '/impressum', '/datenschutz', '/angebot', '/admin'].some((p) => path === p || path.startsWith(p + '/'));
+  const isPublic = ['/fuer', '/ueber-uns', '/garantie', '/bewerten', '/widerruf', '/newsletter', '/start', '/druck-stick', '/zugang', '/impressum', '/datenschutz', '/angebot', '/admin'].some((p) => path === p || path.startsWith(p + '/'));
   const { ok, customer } = await shopAccess();
   // Code im Admin gesperrt/gelöscht -> zurück zur Anmeldung
   const showcase = !ok && headers().get('x-showcase') === '1';
@@ -68,7 +68,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               </> : !path.startsWith('/admin') && <nav className="pub-nav">
                 <Link href="/druck-stick" className="hide-sm">Druck & Stick</Link>
                 <Link href="/#ablauf" className="hide-sm">So funktioniert’s</Link>
-                <Link href="/#anfragen" className="hide-sm">Zugang anfragen</Link>
+                <Link href="/#preis" className="hide-sm">Preis anfragen</Link>
                 <Link href="/zugang" className="pub-login">Anmelden</Link>
               </nav>}
             </div>
@@ -79,7 +79,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <main className="wrap">{children}</main>
           <footer><div className="wrap">
             <span>© {new Date().getFullYear()} {SHOP} · Alle Preise netto zzgl. MwSt. und Versand</span>
-            <span>{open && <><Link href="/konto">Meine Anfragen</Link> · </>}<Link href="/ueber-uns">Über uns</Link> · <Link href="/druck-stick">Druck & Stick</Link> · <Link href="/widerruf">Rückgabe & Widerruf</Link> · <Link href="/garantie">Zufriedenheitsgarantie</Link> · <Link href="/impressum">Impressum</Link> · <Link href="/datenschutz">Datenschutz</Link>{gated && customer && <> · {customer.name} · <LogoutLink /></>}</span>
+            <span>{open && <><Link href="/konto">Meine Anfragen</Link> · </>}<Link href="/ueber-uns">Über uns</Link> · <Link href="/fuer/vereine">Vereine</Link> · <Link href="/fuer/unternehmen">Unternehmen</Link> · <Link href="/fuer/handwerk">Handwerk</Link> · <Link href="/fuer/gastronomie">Gastronomie</Link> · <Link href="/druck-stick">Druck & Stick</Link> · <Link href="/widerruf">Rückgabe & Widerruf</Link> · <Link href="/garantie">Zufriedenheitsgarantie</Link> · <Link href="/impressum">Impressum</Link> · <Link href="/datenschutz">Datenschutz</Link>{gated && customer && <> · {customer.name} · <LogoutLink /></>}</span>
           </div></footer>
           {!path.startsWith('/admin') && <TrustBadge />}
           {!path.startsWith('/admin') && <Contact whatsapp={process.env.CONTACT_WHATSAPP ?? '491732648097'} phone={process.env.CONTACT_PHONE ?? '0173 2648097'} email={process.env.CONTACT_EMAIL ?? 'info@euro-trade.com'} />}

@@ -15,7 +15,7 @@ export default function CustomerEditor({ initial, envCodes, products, defaultMar
   const [requests, setRequests] = useState(req0);
   async function doneReq(id: string) { await fetch('/api/admin/zugangsanfragen', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, done: true }) }); setRequests((r) => r.filter((x) => x.id !== id)); }
   function createFrom(r: AccessRequest) {
-    const c: Customer = { code: gen(), name: r.company || r.name, markup: null, skus: [], exclusive: false, active: true, note: `${r.name} · ${r.email}${r.phone ? ' · ' + r.phone : ''}${r.type ? ' · ' + r.type : ''}${r.message ? '\n' + r.message : ''}` };
+    const c: Customer = { code: gen(), name: r.company || r.name, markup: null, skus: [], exclusive: false, active: true, note: `${r.name} · ${r.email}${r.phone ? ' · ' + r.phone : ''}${r.type ? ' · ' + r.type : ''}${r.kind === 'preis' ? `\nPreisanfrage: ${[r.category, r.qty && r.qty + ' Stk.', r.deco, r.sample && 'Muster'].filter(Boolean).join(' · ')}` : ''}${r.message ? '\n' + r.message : ''}` };
     setList((l) => [c, ...l]); setOpen(0); setDirty(true); doneReq(r.id);
     setMsg({ ok: true, t: `Kunde angelegt (Code ${c.code}) – jetzt speichern und Einladung an ${r.email} schicken.` });
   }
@@ -50,10 +50,10 @@ export default function CustomerEditor({ initial, envCodes, products, defaultMar
 
       {requests.length > 0 && (
         <div className="box" style={{ marginBottom: 14, borderLeft: '4px solid var(--accent)' }}>
-          <strong>Offene Zugangsanfragen ({requests.length})</strong>
+          <strong>Offene Anfragen ({requests.length})</strong>
           {requests.map((r) => (
             <div key={r.id} className="req">
-              <div><b>{r.company || r.name}</b> <span className="muted">· {r.name} · <a className="alink" href={`mailto:${r.email}`}>{r.email}</a>{r.phone && ` · ${r.phone}`}{r.type && ` · ${r.type}`} · {new Date(r.date).toLocaleDateString('de-DE')}</span>{r.message && <div className="muted" style={{ fontSize: 13 }}>{r.message}</div>}</div>
+              <div><b>{r.company || r.name}</b> <span className="muted">· {r.name} · <a className="alink" href={`mailto:${r.email}`}>{r.email}</a>{r.phone && ` · ${r.phone}`}{r.type && ` · ${r.type}`} · {new Date(r.date).toLocaleDateString('de-DE')}</span>{r.kind === 'preis' && <div style={{ fontSize: 13, marginTop: 3 }}><span className="st st-angebot">Preisanfrage</span> {[r.category, r.qty && `${r.qty} Stk.`, r.deco, r.sample && 'Muster gewünscht'].filter(Boolean).join(' · ')}{r.logoId && <> · <a className="alink" href={`/api/upload/${r.logoId}?download`}>Logo ↓</a></>}</div>}{r.message && <div className="muted" style={{ fontSize: 13 }}>{r.message}</div>}</div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'center', flex: 'none' }}>
                 <button className="btn" style={{ height: 38 }} onClick={() => createFrom(r)}>Als Kunde anlegen</button>
                 <button className="linkbtn" onClick={() => doneReq(r.id)}>ablehnen</button>

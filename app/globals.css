@@ -716,3 +716,46 @@ footer .wrap{padding-left:112px}
 }
 @media (max-width:520px){.l-loginbar .gate-form{flex-direction:column;flex-basis:100%}.hs-stage,.hero-shop .hs-stage{height:260px}}
 @media (max-width:520px){.hs-info{flex-wrap:wrap}.hs-price{text-align:left;white-space:normal;display:flex;gap:10px;align-items:baseline;width:100%}.hs-price span{margin:0}}
+/* Kategorie-Kacheln */
+.ct-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.ct{position:relative;display:block;aspect-ratio:4/5;border-radius:16px;overflow:hidden;background:#fff;box-shadow:var(--shadow);text-decoration:none;color:#fff}
+.ct img,.ct-ph{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
+.ct-ph{background:linear-gradient(135deg,#dfe8f7,#c5d6f2)}
+.ct:hover img{transform:scale(1.05)}
+.ct::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(6,20,60,.78))}
+.ct-label{position:absolute;left:14px;right:14px;bottom:12px;z-index:1;display:flex;flex-direction:column;gap:2px}
+.ct-label b{font-size:18px;line-height:1.2}
+.ct-label span{font-size:13px;opacity:.9}
+@media (max-width:520px){.ct-grid{grid-template-columns:1fr 1fr;gap:10px}.ct-label b{font-size:15px}}
+/* Preisanfrage */
+.qf .two{gap:12px}
+.qf-file{display:flex;align-items:center;height:42px;border:1px dashed var(--line);border-radius:8px;padding:0 12px;font-size:14px;font-weight:500;color:var(--muted);cursor:pointer;background:#fafbfc;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;margin:0}
+.qf-file:hover{border-color:var(--brand);color:var(--brand)}
+.qf-check{display:flex;gap:8px;font-weight:400;align-items:flex-start;font-size:14px}
+.qf-check input{width:auto;margin-top:3px}
+.qf-done{text-align:center;padding:36px 24px}
+.qf-done h3{margin:8px 0 6px;font-size:22px}
+.qf-done p{margin:0;color:var(--muted)}
+.qf-ok{display:inline-grid;place-items:center;width:54px;height:54px;border-radius:50%;background:#e6f4ea;color:#1d7a3e;font-size:28px;font-weight:800}
+.l-quote{display:grid;grid-template-columns:1fr 1.3fr;gap:28px;align-items:start}
+.l-quote ul{list-style:none;padding:0;margin:14px 0 0;display:flex;flex-direction:column;gap:8px}
+.l-quote li::before{content:"✓ ";color:var(--ok,#1d7a3e);font-weight:800}
+@media (max-width:900px){.l-quote{grid-template-columns:1fr}}
+.z-hero-img{position:relative;z-index:1;height:340px}
+.z-hero-img img{position:absolute;width:56%;aspect-ratio:4/5;object-fit:cover;border-radius:18px;box-shadow:0 20px 44px rgba(3,25,80,.35);background:#fff}
+.z-hero-img img:nth-child(1){left:22%;top:0;z-index:2}
+.z-hero-img img:nth-child(2){left:0;top:40px;transform:rotate(-6deg);width:44%}
+.z-hero-img img:nth-child(3){right:0;top:40px;transform:rotate(6deg);width:44%}
+@media (min-width:901px){.z-hero{grid-template-columns:1.2fr 1fr}}
+@media (max-width:900px){.z-hero-img{height:260px;max-width:420px;width:100%;margin:0 auto}}
+.zg-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.zg{display:flex;flex-direction:column;gap:6px;text-decoration:none;color:inherit;border-top:4px solid var(--accent)}
+.zg b{font-size:18px;color:var(--brand)}
+.zg span{font-size:14px;color:var(--muted)}
+.zg em{font-style:normal;font-weight:700;font-size:14px;margin-top:auto;padding-top:6px}
+.zg:hover{transform:translateY(-2px);transition:transform .2s}
+@media (max-width:900px){.zg-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.zg-grid{grid-template-columns:1fr}}
+/* Filter-Dropdown: Lücke zwischen Button und Liste überbrücken, Schieberegler gut greifbar */
+@media (min-width:821px){.f-group.open .f-pop::before{content:"";position:absolute;left:0;right:0;top:-8px;height:8px}}
+.f-pop input[type=range]{height:28px;cursor:pointer;accent-color:var(--brand)}

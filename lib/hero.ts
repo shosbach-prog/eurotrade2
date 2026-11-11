@@ -11,7 +11,7 @@ export function heroItems(list: PublicProduct[], opts: { link: boolean; n?: numb
       id: p.id, name: p.name, brand: p.brand, image: p.images[0],
       colors: p.colors.map((c) => c.hex).filter((h): h is string => !!h).slice(0, 6), colorCount: p.colors.length,
       label: p.locked ? '🔒 Preis nach Anmeldung' : from != null && Number.isFinite(from) ? `ab ${eur(from)}` : 'Preis auf Anfrage',
-      href: opts.link ? `/produkt/${p.id}` : '#anfragen',
+      href: opts.link ? `/produkt/${p.id}` : '#preis',
     };
   });
 }
