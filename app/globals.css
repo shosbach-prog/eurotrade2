@@ -974,3 +974,51 @@ footer .wrap{padding-left:112px}
   .ds-grid{grid-template-columns:1fr}
   .cmd-foot{flex-wrap:wrap}
 }
+/* ===== Footer (neu) ===== */
+main{padding-bottom:72px}
+footer.ft{background:#0b1733;color:#b9c3d6;border-top:0;padding:0;font-size:14px;margin-top:24px;position:relative}
+footer.ft::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,#ffc21a,#ffb300 30%,#0a5cf0 30%,#1a8bff)}
+footer.ft .wrap{padding:0 16px;display:block}
+.ft-grid{display:grid!important;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:40px;padding:56px 16px 44px!important}
+.ft-brand p{margin:16px 0 18px;line-height:1.6;max-width:340px;color:#9fabc2}
+.ft-brand .logo-text small,.ft-brand .logo-sub{color:#8fa0c4}
+.ft-contact{display:flex;flex-direction:column;gap:8px}
+.ft-contact a,.ft-contact span{color:#dfe6f3;display:flex;gap:8px;align-items:center}
+.ft-contact a:hover{color:var(--accent)}
+.ft-contact span span,.ft-contact a span{color:var(--accent);width:16px;text-align:center}
+.ft-col{display:flex;flex-direction:column;gap:10px}
+.ft-col h4{margin:4px 0 6px;color:#fff;font-size:13px;text-transform:uppercase;letter-spacing:1.2px}
+.ft-col a{color:#b9c3d6;width:fit-content;transition:color .15s,transform .15s}
+.ft-col a:hover{color:#fff;transform:translateX(2px)}
+.ft-bottom{border-top:1px solid rgba(255,255,255,.08);background:#081127}
+.ft-bottom .wrap{display:flex!important;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:16px 16px!important;font-size:13px;color:#7f8ca6}
+.ft-bottom b{color:#dfe6f3}
+.ft-bottom a{color:#dfe6f3;text-decoration:underline}
+@media (max-width:900px){
+  .ft-grid{grid-template-columns:1fr 1fr;gap:28px;padding:40px 16px 32px!important}
+  .ft-brand{grid-column:1/-1}
+  .ft-bottom .wrap{padding-bottom:96px!important}
+}
+@media (max-width:480px){.ft-grid{grid-template-columns:1fr 1fr}.ft-col:last-child{grid-column:1/-1}}
+
+/* ===== Newsletter-Box im Marken-Design ===== */
+.nl{margin:56px 0 0;background:linear-gradient(120deg,#0646c9 0%,#0a5cf0 55%,#1a8bff 100%);border:0;color:#fff;border-radius:20px;padding:40px 44px;box-shadow:0 18px 40px -18px rgba(6,70,201,.55);position:relative;overflow:hidden}
+.nl::after{content:"";position:absolute;right:-80px;top:-80px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(255,194,26,.35),transparent 70%);pointer-events:none}
+.nl h2{color:#fff}
+.nl-tiers li{color:#e6eeff}
+.nl-pct{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.35);color:#fff}
+.nl-tiers li.top .nl-pct{background:var(--accent);border-color:var(--accent);color:#14181f}
+.nl-hot{background:#fff;color:#0646c9}
+.nl-form{position:relative;z-index:1;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:20px}
+.nl-row{box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.nl-row input{border-color:transparent}
+.nl-btn{background:var(--accent)!important;color:#14181f!important}
+.nl-btn:hover{filter:brightness(1.05)}
+.nl-form select{border-color:transparent}
+.nl-priv,.nl-hint{color:#e6eeff}
+.nl-priv a{color:#fff}
+.nl-small{color:#b9cdfa}
+.nl-done{background:#fff;color:var(--ink)}
+@media (max-width:820px){.nl{padding:28px 20px;margin-top:40px}.nl-form{padding:14px}}
+footer.ft{margin-top:64px}
+@media (min-width:901px){.ft-bottom .wrap{padding-left:130px!important;padding-right:96px!important}.ft-grid{padding-bottom:56px!important}}

@@ -78,10 +78,47 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             {cats.map((c) => <Link key={c.slug} href={`/kategorie/${c.slug}`}>{c.name}</Link>)}
           </div></nav>}
           <main className="wrap">{children}</main>
-          <footer><div className="wrap">
-            <span>© {new Date().getFullYear()} {SHOP} · Alle Preise netto zzgl. MwSt. und Versand</span>
-            <span>{open && <><Link href="/konto">Meine Anfragen</Link> · </>}<Link href="/kontakt">Kontakt</Link> · <Link href="/ueber-uns">Über uns</Link> · <Link href="/fuer/vereine">Vereine</Link> · <Link href="/fuer/unternehmen">Unternehmen</Link> · <Link href="/fuer/handwerk">Handwerk</Link> · <Link href="/fuer/gastronomie">Gastronomie</Link> · <Link href="/druck-stick">Druck & Stick</Link> · <Link href="/widerruf">Rückgabe & Widerruf</Link> · <Link href="/garantie">Zufriedenheitsgarantie</Link> · <Link href="/impressum">Impressum</Link> · <Link href="/datenschutz">Datenschutz</Link>{gated && customer && <> · {customer.name} · <LogoutLink /></>}</span>
-          </div></footer>
+          <footer className="ft">
+            <div className="wrap ft-grid">
+              <div className="ft-brand">
+                <Link href="/" className="logo" aria-label={`${SHOP} – Startseite`}><Logo domain={process.env.SHOP_DOMAIN ?? 'euro-trade.com'} /></Link>
+                <p>Markentextilien ab 1 Stück – bedruckt oder bestickt, aus einer Hand. Für Vereine, Unternehmen und Handwerk.</p>
+                <div className="ft-contact">
+                  <a href="tel:+491732648097"><span aria-hidden>☎</span> 0173 2648097</a>
+                  <a href="mailto:info@euro-trade.com"><span aria-hidden>✉</span> info@euro-trade.com</a>
+                  <span><span aria-hidden>⌂</span> Seehan 28 · 44263 Dortmund</span>
+                </div>
+              </div>
+              <nav className="ft-col" aria-label="Shop">
+                <h4>Shop</h4>
+                {open ? <Link href="/konto">Meine Anfragen</Link> : <><Link href="/zugang">Anmelden</Link><Link href="/registrieren">Registrieren</Link></>}
+                <Link href="/kontakt">Kontakt & Anfrage</Link>
+                <Link href="/druck-stick">Druck & Stick</Link>
+                <Link href="/#newsletter">Newsletter & Rabatt</Link>
+              </nav>
+              <nav className="ft-col" aria-label="Branchen">
+                <h4>Für</h4>
+                <Link href="/fuer/vereine">Vereine</Link>
+                <Link href="/fuer/unternehmen">Unternehmen</Link>
+                <Link href="/fuer/handwerk">Handwerk</Link>
+                <Link href="/fuer/gastronomie">Gastronomie</Link>
+              </nav>
+              <nav className="ft-col" aria-label="Service">
+                <h4>Service</h4>
+                <Link href="/ueber-uns">Über uns</Link>
+                <Link href="/garantie">Zufriedenheitsgarantie</Link>
+                <Link href="/widerruf">Rückgabe & Widerruf</Link>
+                <Link href="/impressum">Impressum</Link>
+                <Link href="/datenschutz">Datenschutz</Link>
+              </nav>
+            </div>
+            <div className="ft-bottom">
+              <div className="wrap">
+                <span>© {new Date().getFullYear()} {SHOP} · Alle Preise netto zzgl. MwSt. und Versand</span>
+                {gated && customer && <span>Angemeldet als <b>{customer.name}</b> · <LogoutLink /></span>}
+              </div>
+            </div>
+          </footer>
           {!path.startsWith('/admin') && <TrustBadge />}
           {!path.startsWith('/admin') && <Contact whatsapp={process.env.CONTACT_WHATSAPP ?? '491732648097'} phone={process.env.CONTACT_PHONE ?? '0173 2648097'} email={process.env.CONTACT_EMAIL ?? 'info@euro-trade.com'} />}
         </WishlistProvider></CartProvider>
