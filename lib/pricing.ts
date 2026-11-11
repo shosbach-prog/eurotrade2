@@ -6,6 +6,8 @@ import { parseTiers, type PriceTier, type Tier } from './tiers';
 let byCat: Record<string, number> = {};
 try { byCat = JSON.parse(process.env.MARKUP_BY_CATEGORY || '{}'); } catch { byCat = {}; }
 
+/** Standard-Aufschlag je Kategorie (Admin-Anzeige) */
+export const markupFor = (categorySlug: string) => byCat[categorySlug] ?? markup;
 /** override = kundenspezifischer Aufschlag (Zugangscode) – hat Vorrang vor Kategorie und Standard */
 export function sellPrice(basePrice: number, categorySlug: string, override?: number | null): number {
   const pct = override != null && Number.isFinite(override) ? override : byCat[categorySlug] ?? markup;

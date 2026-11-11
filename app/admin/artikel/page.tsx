@@ -1,30 +1,48 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import AdminNav from '@/components/AdminNav';
-import { allProductsBrief, getProduct } from '@/lib/catalog';
+import NewArticle from './NewArticle';
+import { adminProducts } from '@/lib/catalog';
+import { readOverrides } from '@/lib/artikel';
+import { sellPrice } from '@/lib/pricing';
 import { getText } from '@/lib/content';
+import { eur } from '@/lib/format';
 
-export const metadata: Metadata = { title: 'Artikeltexte', robots: { index: false, follow: false } };
-const LBL = { eigen: ['Bearbeitet', 'st-angenommen'], vorlage: ['Redaktionelle Vorlage', 'st-angebot'], automatisch: ['Automatisch aus Daten', 'st-neu'] } as const;
+export const dynamic = 'force-dynamic';
+export const metadata: Metadata = { title: 'Artikel', robots: { index: false, follow: false } };
+const LBL = { eigen: ['Bearbeitet', 'st-angenommen'], vorlage: ['Vorlage', 'st-angebot'], automatisch: ['Automatisch', 'st-neu'] } as const;
 
 export default function Artikel() {
-  const rows = allProductsBrief().map((b) => { const p = getProduct(b.id); return p ? { p, ...getText(p) } : null; }).filter(Boolean) as { p: NonNullable<ReturnType<typeof getProduct>>; source: keyof typeof LBL; text: { headline: string } }[];
+  const ov = readOverrides();
+  const rows = adminProducts();
+  const cats = [...new Set(rows.map((p) => p.category))].sort();
   return (
     <>
       <AdminNav active="artikel" />
-      <h1>Artikeltexte</h1>
-      <p className="muted" style={{ marginTop: -8 }}>Verkaufstexte je Artikel: Überschrift, Einleitung, Highlights und Einsatzbereiche. Neue Artikel erhalten automatisch einen Text aus den Produktdaten, den Sie hier verfeinern können. Bitte nur belegbare Eigenschaften nennen.</p>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+        <h1 style={{ marginRight: 'auto' }}>Artikel <span className="muted" style={{ fontSize: 16, fontWeight: 500 }}>({rows.length})</span></h1>
+        <NewArticle categories={cats} />
+      </div>
+      <p className="muted" style={{ marginTop: -4 }}>Name, Preise, Bilder, Farben, Größen, Sichtbarkeit und Verkaufstext je Artikel bearbeiten. Ihre Änderungen bleiben auch bei Katalog-Updates erhalten.</p>
       <div className="box" style={{ padding: 0, overflowX: 'auto' }}>
         <table className="atable">
-          <thead><tr><th></th><th>Artikel</th><th>Überschrift</th><th>Text</th><th></th></tr></thead>
-          <tbody>{rows.map(({ p, source, text }) => (
-            <tr key={p.id}>
-              <td style={{ width: 52 }}>{p.images[0] && <img src={p.images[0]} alt="" style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 6 }} />}</td>
-              <td><b>{p.name}</b><div className="muted" style={{ fontSize: 12 }}>{p.sku} · {p.brand}</div></td>
-              <td>{text.headline}</td>
-              <td><span className={`st ${LBL[source][1]}`}>{LBL[source][0]}</span></td>
-              <td><Link className="btn alt" style={{ height: 34, display: 'inline-grid', placeItems: 'center' }} href={`/admin/artikel/${p.id}`}>Bearbeiten</Link></td>
-            </tr>))}</tbody>
+          <thead><tr><th></th><th>Artikel</th><th>Kategorie</th><th style={{ textAlign: 'right' }}>EK</th><th style={{ textAlign: 'right' }}>VK</th><th>Status</th><th>Text</th><th></th></tr></thead>
+          <tbody>{rows.map((p) => {
+            const src = getText(p).source;
+            const img = p.images[0]?.replace(/^\/api\/bild\//, '/api/upload/');
+            return (
+              <tr key={p.id} style={p.hidden ? { opacity: 0.55 } : undefined}>
+                <td style={{ width: 52 }}>{img ? <img src={img} alt="" style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 6 }} /> : <span className="ae-noimg" />}</td>
+                <td><b>{p.name}</b><div className="muted" style={{ fontSize: 12 }}>{p.sku} · {p.brand}{p.top ? ' · ★ Top' : ''}</div></td>
+                <td>{p.category}</td>
+                <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>{p.basePrice ? eur(p.basePrice) : <span className="muted">–</span>}</td>
+                <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>{p.basePrice ? eur(sellPrice(p.basePrice, p.categorySlug)) : <span className="muted">auf Anfrage</span>}</td>
+                <td>{p.hidden ? <span className="st st-abgelehnt">Ausgeblendet</span> : <span className="st st-angenommen">Sichtbar</span>}{ov[p.id] && !p.custom && <div className="muted" style={{ fontSize: 11, marginTop: 3 }}>geändert</div>}{p.custom && <div className="muted" style={{ fontSize: 11, marginTop: 3 }}>eigener Artikel</div>}</td>
+                <td><span className={`st ${LBL[src][1]}`}>{LBL[src][0]}</span></td>
+                <td><Link className="btn alt" style={{ height: 34, display: 'inline-grid', placeItems: 'center' }} href={`/admin/artikel/${p.id}`}>Bearbeiten</Link></td>
+              </tr>
+            );
+          })}</tbody>
         </table>
       </div>
     </>

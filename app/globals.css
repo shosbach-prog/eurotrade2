@@ -652,3 +652,27 @@ footer .wrap{padding-left:112px}
 .l-collage{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
 .l-collage img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:14px;background:#fff;box-shadow:var(--shadow)}
 @media (max-width:820px){.l-collage{grid-template-columns:repeat(2,1fr)}}
+/* Admin: Artikel bearbeiten */
+.ae h3{margin:22px 0 8px;font-size:16px}
+.ae-top{display:flex;gap:22px;flex-wrap:wrap;align-items:center;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.ae .switch{display:flex;gap:8px;align-items:center;font-weight:500;margin:0;cursor:pointer}
+.ae .switch input{width:18px;height:18px;margin:0}
+.ae-2{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px}
+.ae-imgs{display:flex;flex-wrap:wrap;gap:10px}
+.ae-img{position:relative;width:118px}
+.ae-img img{width:118px;height:118px;object-fit:cover;border-radius:10px;border:1px solid var(--line);background:#fff;display:block}
+.ae-img-act{display:flex;gap:4px;margin-top:4px}
+.ae-img-act button{flex:1;height:26px;border:1px solid var(--line);background:#fff;border-radius:6px;cursor:pointer}
+.ae-img-act button:disabled{opacity:.35;cursor:default}
+.ae-main{position:absolute;top:6px;left:6px;background:var(--brand,#0a5cf0);color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:5px}
+.ae-add{width:118px;height:118px;border:2px dashed var(--line);border-radius:10px;display:grid;place-items:center;text-align:center;font-size:13px;font-weight:600;color:var(--muted,#5d6675);cursor:pointer;margin:0}
+.ae-add:hover{border-color:var(--brand,#0a5cf0);color:var(--brand,#0a5cf0)}
+.ae-colors{display:grid;gap:8px;justify-items:start}
+.ae-color{display:grid;grid-template-columns:42px minmax(140px,1fr) 160px auto;gap:8px;align-items:center;width:100%}
+.ae-color input[type=color]{width:42px;height:38px;padding:2px;margin:0}
+.ae-color input,.ae-color select{margin:0}
+.ae-save{position:sticky;bottom:0;background:#fff;padding:12px 0 2px;border-top:1px solid var(--line);margin-top:18px;align-items:center}
+.ae-new{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px}
+.ae-new input{width:auto;flex:1 1 150px;margin:0}
+.ae-noimg{display:block;width:44px;height:44px;border-radius:6px;background:#eef0f3}
+@media (max-width:700px){.ae-2{grid-template-columns:1fr}.ae-color{grid-template-columns:42px 1fr;}.ae-color select{grid-column:1/-1}}

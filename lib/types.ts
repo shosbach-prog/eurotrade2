@@ -27,6 +27,12 @@ export type Product = {
   /** Staffel-Einkaufspreise von L-Shop: ab Menge -> EK netto */
   baseTiers?: { min: number; price: number }[];
   tags?: string[];
+  /** Admin: im Shop ausgeblendet */
+  hidden?: boolean;
+  /** Admin: oben anzeigen */
+  top?: boolean;
+  /** Admin: selbst angelegter Artikel */
+  custom?: boolean;
 };
 
 /** Was der Browser sieht: Verkaufspreis statt Einkaufspreis */

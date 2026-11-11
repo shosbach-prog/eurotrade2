@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { isAdmin } from '@/lib/customer';
 import { saveText } from '@/lib/content';
-import { getProduct } from '@/lib/catalog';
+import { adminProduct } from '@/lib/catalog';
 
 export async function PUT(req: Request) {
   if (!(await isAdmin())) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
   const { id, text } = await req.json().catch(() => ({}));
-  if (!getProduct(String(id))) return NextResponse.json({ error: 'Artikel nicht gefunden.' }, { status: 404 });
+  if (!adminProduct(String(id)).p) return NextResponse.json({ error: 'Artikel nicht gefunden.' }, { status: 404 });
   if (text === null) { saveText(id, null); return NextResponse.json({ ok: true }); }
   const t = {
     headline: String(text?.headline ?? '').trim().slice(0, 80),

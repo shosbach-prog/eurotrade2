@@ -7,20 +7,29 @@ import { buildIndex, buildSkuMap, runSearch, type SearchDoc } from './search';
 import { gross, priceTiers, sellPrice } from './pricing';
 import { sortColors } from './colors';
 import { ratingFor } from './reviews';
+import { overridesMtime, readOverrides } from './artikel';
+import { slugify } from './format';
 
 const LIVE = path.join(process.cwd(), 'data', 'products.json');
 const SEED = path.join(process.cwd(), 'seed', 'products.json');
 const file = () => (fs.existsSync(LIVE) ? LIVE : SEED);
 
-type State = { mtime: number; products: Product[]; byId: Map<string, Product>; index: MiniSearch<SearchDoc>; skus: Map<string, string>; categories: Category[] };
+type State = { mtime: string; all: Product[]; base: Map<string, Product>; products: Product[]; byId: Map<string, Product>; index: MiniSearch<SearchDoc>; skus: Map<string, string>; categories: Category[] };
 let state: State | null = null;
 
 /** Lädt data/products.json neu, sobald der Sync die Datei aktualisiert hat – kein Neustart nötig */
 function load(): State {
   const FILE = file();
-  const mtime = fs.statSync(FILE).mtimeMs;
+  const mtime = `${fs.statSync(FILE).mtimeMs}|${overridesMtime()}`;
   if (state && state.mtime === mtime) return state;
-  const products: Product[] = JSON.parse(fs.readFileSync(FILE, 'utf8'));
+  const raw: Product[] = JSON.parse(fs.readFileSync(FILE, 'utf8'));
+  const base = new Map(raw.map((p) => [p.id, p]));
+  const ov = readOverrides();
+  const merged: Product[] = raw.map((p) => (ov[p.id] ? { ...p, ...ov[p.id], id: p.id, custom: false } : p));
+  for (const [id, o] of Object.entries(ov)) if (o.custom && !base.has(id)) merged.push({ sku: id, name: 'Neuer Artikel', brand: '', category: 'Sonstiges', description: '', basePrice: null, images: [], colors: [], sizes: [], ...o, id } as Product);
+  for (const p of merged) { p.categorySlug = p.categorySlug && !ov[p.id]?.category ? p.categorySlug : slugify(p.category || 'sonstiges'); }
+  const all = merged.map((p, k) => [p, k] as const).sort((a, b) => Number(!!b[0].top) - Number(!!a[0].top) || a[1] - b[1]).map(([p]) => p);
+  const products = all.filter((p) => !p.hidden);
   const catMap = new Map<string, Category>();
   for (const p of products) {
     const c = catMap.get(p.categorySlug) ?? { name: p.category, slug: p.categorySlug, count: 0 };
@@ -29,6 +38,8 @@ function load(): State {
   }
   state = {
     mtime,
+    all,
+    base,
     products,
     byId: new Map(products.map((p) => [p.id, p])),
     index: buildIndex(products),
@@ -42,7 +53,7 @@ function load(): State {
 export type Ctx = { markup?: number | null; skus?: string[]; exclusive?: boolean; tiers?: string | null; /** Schaufenster: keine Preise */ locked?: boolean } | null | undefined;
 
 export function toPublic(p: Product, ctx?: Ctx): PublicProduct {
-  const { basePrice, baseTiers, ...rest } = p;
+  const { basePrice, baseTiers, hidden: _h, custom: _c, ...rest } = p;
   const price = !ctx?.locked && basePrice != null && basePrice > 0 ? sellPrice(basePrice, p.categorySlug, ctx?.markup) : null;
   // Echte Staffel-EK von L-Shop haben Vorrang – sonst Rabattstaffel auf den Verkaufspreis
   const tiers = price == null ? []
@@ -82,6 +93,10 @@ export function getCollection(ctx?: Ctx): PublicProduct[] {
   const bySku = new Map(s.products.map((p) => [p.sku.toUpperCase(), p]));
   return (ctx?.skus ?? []).flatMap((k) => { const p = bySku.get(k.toUpperCase()); return p ? [toPublic(p, ctx)] : []; });
 }
+/** Admin: alle Artikel inkl. ausgeblendeter, mit EK */
+export const adminProducts = () => load().all;
+export const adminProduct = (id: string) => { const s = load(); return { p: s.all.find((x) => x.id === id) ?? null, original: s.base.get(id) ?? null }; };
+export const imageInUse = (src: string) => load().all.some((p) => p.images.includes(src) || p.colors.some((c) => c.image === src || c.images?.includes(src)));
 /** Alle Artikel (Admin: Auswahl für Kollektionen) */
 export const allProductsBrief = () => load().products.map((p) => ({ id: p.id, sku: p.sku, name: p.name, brand: p.brand }));
 
@@ -92,7 +107,7 @@ export function search(q: string, limit = 48, ctx?: Ctx): PublicProduct[] {
 }
 
 /* ---------- „Meinten Sie …?“ bei 0 Treffern ---------- */
-let vocab: { mtime: number; words: string[] } | null = null;
+let vocab: { mtime: string; words: string[] } | null = null;
 const norm = (w: string) => w.toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss').replace(/[^a-z0-9]/g, '');
 function lev(a: string, b: string) {
   const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
