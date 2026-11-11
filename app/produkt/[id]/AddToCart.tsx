@@ -10,7 +10,7 @@ import Info from '@/components/Info';
 import Stars from '@/components/Stars';
 import BrandLogo from '@/components/BrandLogo';
 import { brandSlug, findBrand } from '@/lib/brands';
-import { FONTS, METHODS, MOTIFS, positionsFor, TEXT_COLORS, TEAM_POS, colorHex, fontCss, isImage, parseTeamList, type Deco, type Motif, type TeamRow } from '@/lib/deco';
+import { FONTS, positionsFor, TEXT_COLORS, TEAM_POS, colorHex, fontCss, isImage, parseTeamList, type Deco, type Motif, type TeamRow } from '@/lib/deco';
 import { uploadPreviews } from '@/components/decoRender';
 import DecoStudio, { defaultPlace, type Place } from '@/components/DecoStudio';
 import { cmFor, spotsFor } from '@/lib/deco-layout';
@@ -34,7 +34,8 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
 
   // Veredelung
   const [decoOn, setDecoOn] = useState(!!team);
-  const [method, setMethod] = useState(team?.method ?? METHODS[0]);
+  // Vorauswahl: Stick für Polos, Jacken, Hemden und Caps – sonst Druck
+  const [method, setMethod] = useState(team?.method ?? (/polo|jacke|hemd|cap|mütze/i.test(p.category) ? 'Stick' : 'Druck'));
   const posList = useMemo(() => positionsFor(p), [p]);
   const [positions, setPositions] = useState<string[]>(() => { const t = (team?.positions ?? []).filter((x) => posList.includes(x)); return t.length ? t : [posList[0]]; });
   // Live-Vorschau: Lage je Position + aktive Position
@@ -53,7 +54,6 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
   const [teamRaw, setTeamRaw] = useState('');
   const teamRows: TeamRow[] = useMemo(() => (teamOn ? parseTeamList(teamRaw, p.sizes) : []), [teamOn, teamRaw, p.sizes]);
   const [busy, setBusy] = useState(false);
-  const [sampleSize, setSampleSize] = useState('');
   const [uploading, setUploading] = useState(false);
   const [upErr, setUpErr] = useState('');
   const [note, setNote] = useState('');
@@ -63,11 +63,12 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
   const [tColor, setTColor] = useState('Weiß');
   const useLogo = motif !== 'text', useText = motif !== 'logo';
   // Veredelung in 3 Schritten (Team-Shop: alles auf einmal, da Logo/Verfahren feststehen)
-  const [dstep, setDstep] = useState(1);
+  const [dragOver, setDragOver] = useState(false);
+  const [noteOn, setNoteOn] = useState(false);
+  const [morePos, setMorePos] = useState(false);
   const [full, setFull] = useState(false);
   const [distN, setDistN] = useState('');
   const [distOpen, setDistOpen] = useState(false);
-  const s1 = !team && dstep === 1, s2 = !!team || dstep === 2, s3 = !!team || dstep === 3;
 
   const sizes = p.sizes.length ? p.sizes : [''];
   const cname = color?.name ?? '';
@@ -83,10 +84,8 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
 
   const togglePos = (x: string) => { setPositions((ps) => (ps.includes(x) ? ps.filter((y) => y !== x) : [...ps, x])); if (!positions.includes(x)) setActivePos(x); };
   // Team-Shop: Vereinslogo liegt bei uns – Mitglied muss nichts hochladen
-  const decoOk = !decoOn || !!team || (positions.length > 0 && (!useText || !!text.trim()) && (!useLogo || method === 'Beratung gewünscht' || !!logo));
+  const decoOk = !decoOn || !!team || (positions.length > 0 && (!useText || !!text.trim()));
   const teamClosed = !!team && !team.open;
-  const step1Ok = (!useText || !!text.trim()) && (!useLogo || method === 'Beratung gewünscht' || !!logo);
-  const STEPS = ['Motiv', 'Position & Größe', 'Namen & Hinweise'];
   /** Gesamtmenge typisch auf Größen verteilen (aktuelle Farbe) */
   const doDistribute = () => {
     const d = distribute(Math.floor(Number(distN)) || 0, sizes); if (!d) return;
@@ -101,14 +100,14 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
     const r = await fetch('/api/upload', { method: 'POST', body: fd });
     const d = await r.json().catch(() => ({}));
     setUploading(false);
-    if (r.ok) setLogo({ id: d.id, name: d.name }); else setUpErr(d.error ?? 'Upload fehlgeschlagen.');
+    if (r.ok) { setLogo({ id: d.id, name: d.name }); setMotif((m) => (m === 'text' ? 'beides' : m)); } else setUpErr(d.error ?? 'Upload fehlgeschlagen.');
   }
 
   const onAdd = async () => {
     const kind = spotsFor(p).kind;
     const pl = Object.fromEntries(positions.filter((x) => place[x]).map((x) => [x, place[x]]));
     const sizes = Object.fromEntries(positions.filter((x) => place[x]).map((x) => [x, cmFor(kind, place[x].w)]));
-    let deco: Deco | null = decoOn ? { method, positions, place: pl, sizes, motif, logoId: useLogo ? logo?.id ?? null : null, logoName: useLogo ? logo?.name ?? null : null, text: useText ? text.trim() : null, font: useText ? font : null, textColor: useText ? tColor : null, note: note.trim() } : null;
+    let deco: Deco | null = decoOn ? { method, positions, place: pl, sizes, motif, logoId: useLogo ? logo?.id ?? null : null, logoName: useLogo ? logo?.name ?? null : null, text: useText ? text.trim() : null, font: useText ? font : null, textColor: useText ? tColor : null, note: [useLogo && !logo ? 'Logo folgt per E-Mail' : '', note.trim()].filter(Boolean).join(' · ') } : null;
     setBusy(true);
     // Live-Vorschau als Bild an die Anfrage hängen (Freigabe im Angebot)
     if (deco && (studioProps.logoSrc || studioProps.text.trim())) {
@@ -135,13 +134,6 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
     const by: Record<string, number> = {};
     for (const r of teamRows) if (r.size) by[r.size] = (by[r.size] ?? 0) + 1;
     setQty((q) => ({ ...Object.fromEntries(Object.entries(q).filter(([key]) => key.split('|')[0] !== cname)), ...Object.fromEntries(Object.entries(by).map(([s, n]) => [k(cname, s), n])) }));
-  };
-  /** 1 Musterteil anfordern */
-  const addSample = () => {
-    const s = sampleSize || (sizes.length === 1 ? sizes[0] : '');
-    if (sizes.length > 1 && !s) return;
-    addMany([{ id: p.id, sku: p.sku, name: p.name, color: cname || undefined, hex: color?.hex, size: s || undefined, qty: 1, price: p.price, category: p.category, image: color?.image ?? p.images[0], deco: null, tiers: p.tiers, sizes: p.sizes, sample: true }]);
-    setMsg(`Muster ${p.name}${cname ? ` in ${cname}` : ''}${s ? `, Größe ${s}` : ''} im Warenkorb – wird bei Ihrer Bestellung angerechnet.`);
   };
   const specs = Object.entries(p.specs ?? {}).filter(([, v]) => v && v !== 'Keine Angabe');
   const est = useMemo(() => {
@@ -210,7 +202,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
           {pictos.features.map((x) => <li key={x.src}><img src={`/picto/${x.src}.png`} alt="" width={20} height={20} />{x.label}</li>)}
         </ul>}
         {p.colors.length > 0 && <>
-          <div className="opt">Farbe: <span className="muted">{cname}</span> <span className="muted" style={{ fontWeight: 400 }}>({p.colors.length} {p.colors.length === 1 ? 'Farbe' : 'Farben'})</span></div>
+          <div className="opt">Farbe: <span className="muted">{cname}</span> {p.colors.length > 1 && <span className="muted" style={{ fontWeight: 400 }}>({p.colors.length} Farben)</span>}</div>
           <div className="swatches">
             {p.colors.map((c) => (
               <button key={c.name} data-name={c.name} aria-label={`Farbe ${c.name}`} aria-pressed={c.name === cname} title={c.name} className={`sw ${c.name === cname ? 'on' : ''}`} style={{ background: swatchBg(c) }} onClick={() => setColor(c)}>
@@ -264,37 +256,13 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
         </div>}
         {!team && <label className="deco-toggle">
           <input type="checkbox" checked={decoOn} onChange={(e) => setDecoOn(e.target.checked)} />
-          <span><strong>Veredeln mit Logo oder Text</strong> <span className="muted">– Druck oder Stick</span></span>
+          <span><strong>Mit Ihrem Logo veredeln</strong> <span className="muted">– gedruckt oder gestickt</span></span>
           <Info>Wir drucken oder besticken Ihr Logo bzw. Ihren Text. Die Kosten stehen als eigene Position im Angebot – vor der Produktion erhalten Sie eine Vorschau zur Freigabe.</Info>
         </label>}
         {decoOn && (
-          <div className="deco">
-            {!team && <ol className="dstep" aria-label="Schritte der Veredelung">
-              {STEPS.map((l, n) => <li key={l}><button type="button" className={`${dstep === n + 1 ? 'on' : ''} ${dstep > n + 1 ? 'done' : ''}`} aria-current={dstep === n + 1 ? 'step' : undefined} onClick={() => setDstep(n + 1)}><span>{dstep > n + 1 ? '✓' : n + 1}</span>{l}</button></li>)}
-            </ol>}
-            {s1 && <>
-            <p className="hint" style={{ margin: '0 0 10px' }}>Unsicher, welches Verfahren passt? <a href="/druck-stick" target="_blank" className="alink">Druck & Stick im Vergleich</a></p>
-            <div className="deco-row">
-              {METHODS.map((m) => <button key={m} type="button" className={`size ${m === method ? 'on' : ''}`} onClick={() => setMethod(m)}>{m}</button>)}
-            </div>
-            <div className="opt" style={{ marginTop: 14 }}>Motiv</div>
-            <div className="deco-row">
-              {MOTIFS.map((m) => <button key={m.id} type="button" className={`size ${m.id === motif ? 'on' : ''}`} onClick={() => setMotif(m.id)}>{m.label}</button>)}
-            </div>
-            {useText && <>
-              <div className="opt" style={{ marginTop: 14 }}>Text</div>
-              <textarea className="deco-text" rows={2} maxLength={120} value={text} onChange={(e) => setText(e.target.value)} placeholder={'z. B. Vereinsname, Slogan oder Webadresse\n(zweite Zeile möglich)'} />
-              <div className="deco-row" style={{ marginTop: 8 }}>
-                {FONTS.map((f) => <button key={f.id} type="button" className={`size ${f.id === font ? 'on' : ''}`} style={{ fontFamily: f.css }} onClick={() => setFont(f.id)}>{f.id}</button>)}
-              </div>
-              <div className="deco-row" style={{ marginTop: 8 }}>
-                {TEXT_COLORS.map((c) => <button key={c.id} type="button" title={c.id} aria-label={`Textfarbe ${c.id}`} className={`sw tc ${c.id === tColor ? 'on' : ''}`} style={{ background: c.hex }} onClick={() => setTColor(c.id)} />)}
-                <span className="muted" style={{ fontSize: 13 }}>{tColor}</span>
-              </div>
-              {text.trim() && <div className="text-sample" style={{ background: color?.hex ?? '#e5e7eb' }}><span style={textStyle}>{text}</span></div>}
-
-            </>}
-            {useLogo && <><div className="opt" style={{ marginTop: 14 }}>Logo</div>
+          <div className="deco deco-simple">
+            {!team && <>
+            <div className="dq"><span className="dq-n">1</span><b>Ihr Logo</b></div>
             {logo ? (
               <div className="logo-file">
                 {isImage(logo.name) ? <img src={`/api/upload/${logo.id}`} alt="" /> : <span className="file-ico">{logo.name.split('.').pop()?.toUpperCase()}</span>}
@@ -302,30 +270,45 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
                 <button type="button" className="linkbtn" onClick={() => setLogo(null)}>ändern</button>
               </div>
             ) : (
-              <div className="deco-row">
-                <label className="btn alt upl">
-                  {uploading ? 'Lädt hoch …' : 'Logo hochladen'}
-                  <input type="file" accept=".png,.jpg,.jpeg,.webp,.svg,.pdf,.ai,.eps" hidden onChange={(e) => upload(e.target.files?.[0])} />
-                </label>
-                {customerLogo && <button type="button" className="linkbtn" onClick={() => setLogo(customerLogo)}>Hinterlegtes Logo verwenden</button>}
-              </div>
+              <label className={`drop ${dragOver ? 'over' : ''}`} onDragOver={(e) => { e.preventDefault(); setDragOver(true); }} onDragLeave={() => setDragOver(false)} onDrop={(e) => { e.preventDefault(); setDragOver(false); upload(e.dataTransfer.files?.[0]); }}>
+                <b>{uploading ? 'Lädt hoch …' : 'Logo hochladen'}</b>
+                <span>oder Datei hierher ziehen · PNG, JPG, SVG, PDF, AI, EPS</span>
+                <input type="file" accept=".png,.jpg,.jpeg,.webp,.svg,.pdf,.ai,.eps" hidden onChange={(e) => upload(e.target.files?.[0])} />
+              </label>
             )}
             {upErr && <p className="err" style={{ margin: '6px 0 0', fontSize: 14 }}>{upErr}</p>}
-            <p className="hint">PNG, JPG, SVG, PDF, AI oder EPS bis 15 MB. Vektordateien liefern das beste Ergebnis.</p>
-            </>}
-            </>}
-            {s2 && <>
-            {!team && <><div className="opt" style={{ marginTop: 0 }}>Position(en)</div>
-            <div className="deco-row">
-              {posList.map((x) => <button key={x} type="button" className={`size ${positions.includes(x) ? 'on' : ''}`} onClick={() => togglePos(x)}>{x}</button>)}
+            <div className="dq-links">
+              {!logo && customerLogo && <button type="button" className="linkbtn" onClick={() => setLogo(customerLogo)}>Hinterlegtes Logo verwenden</button>}
+              {!logo && <span className="muted">Kein Logo zur Hand? Einfach weitermachen – Sie können es nach der Anfrage per E-Mail schicken.</span>}
+              <button type="button" className="linkbtn" onClick={() => setMotif(useText ? 'logo' : logo ? 'beides' : 'text')}>{useText ? '− Text entfernen' : '+ Text hinzufügen (z. B. Vereinsname)'}</button>
             </div>
-            <p className="hint">Motiv in der Vorschau verschieben, Größe mit dem Regler einstellen – die Breite in cm wird angezeigt.</p></>}
-            <div className="deco-studio-m"><div className="opt" style={{ marginTop: 14 }}>Live-Vorschau</div><DecoStudio {...studioProps} compact /><button type="button" className="btn alt sm ds-full" onClick={() => setFull(true)}>⤢ Vorschau groß ansehen</button></div>
-            {estBox}
+            {useText && <>
+              <textarea className="deco-text" rows={2} maxLength={120} value={text} onChange={(e) => setText(e.target.value)} placeholder={'Ihr Text, z. B. Vereinsname oder Webadresse'} aria-label="Text" />
+              <div className="deco-row" style={{ marginTop: 8 }}>
+                {FONTS.map((f) => <button key={f.id} type="button" className={`size ${f.id === font ? 'on' : ''}`} style={{ fontFamily: f.css }} onClick={() => setFont(f.id)}>{f.id}</button>)}
+                {TEXT_COLORS.map((c) => <button key={c.id} type="button" title={c.id} aria-label={`Textfarbe ${c.id}`} className={`sw tc ${c.id === tColor ? 'on' : ''}`} style={{ background: c.hex }} onClick={() => setTColor(c.id)} />)}
+              </div>
             </>}
-            {s3 && <>
+
+            <div className="dq"><span className="dq-n">2</span><b>Wo soll es hin?</b> <span className="muted" style={{ fontSize: 13 }}>– mehrere möglich</span></div>
+            <div className="deco-row">
+              {[...posList].sort((a, b) => { const r = (x: string) => { const i = ['Brust links', 'Brust mittig', 'Rücken'].indexOf(x); return i >= 0 ? i : 10 + posList.indexOf(x); }; return r(a) - r(b); }).filter((x, k) => morePos || k < 3 || positions.includes(x)).map((x) => <button key={x} type="button" className={`size ${positions.includes(x) ? 'on' : ''}`} onClick={() => togglePos(x)}>{x}</button>)}
+              {!morePos && posList.length > 3 && <button type="button" className="linkbtn" onClick={() => setMorePos(true)}>weitere Positionen</button>}
+            </div>
+
+            <div className="dq"><span className="dq-n">3</span><b>Druck oder Stick?</b></div>
+            <div className="mcards">
+              <button type="button" className={`mcard ${method === 'Druck' ? 'on' : ''}`} onClick={() => setMethod('Druck')}><b>Druck</b><span>günstig, auch für große und farbige Motive</span></button>
+              <button type="button" className={`mcard ${method === 'Stick' ? 'on' : ''}`} onClick={() => setMethod('Stick')}><b>Stick</b><span>hochwertig und langlebig, ideal für Polos, Jacken, Caps</span></button>
+            </div>
+            <button type="button" className={`linkbtn dq-help ${method === 'Beratung gewünscht' ? 'on' : ''}`} onClick={() => setMethod('Beratung gewünscht')}>{method === 'Beratung gewünscht' ? '✓ Wir beraten Sie zum passenden Verfahren' : 'Weiß nicht – bitte beraten'}</button>
+            </>}
+
+            <div className="deco-studio-m"><DecoStudio {...studioProps} compact /><button type="button" className="btn alt sm ds-full" onClick={() => setFull(true)}>⤢ Vorschau groß ansehen</button></div>
+            {estBox}
+
             {(!team || team.personalize !== 'aus') && <div className="teamlist">
-              {!team && <label className="ds-check"><input type="checkbox" checked={teamOn} onChange={(e) => setTeamOn(e.target.checked)} /> <b>Namen / Nummern je Teil</b> <span className="muted">(Teamliste)</span></label>}
+              {!team && <button type="button" className="linkbtn dq-more" onClick={() => setTeamOn(!teamOn)}>{teamOn ? '− Namen / Nummern entfernen' : '+ Namen oder Nummern je Teil'}</button>}
               {team && <div className="opt" style={{ marginTop: 0 }}>Ihr Name / Ihre Nummer</div>}
               {teamOn && <>
                 {!team && <div className="deco-row" style={{ marginTop: 8 }}>
@@ -343,16 +326,10 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
                   <span>{teamRows.length} {teamRows.length === 1 ? 'Teil' : 'Teile'}{teamRows.some((r) => !r.size) ? ' · bei einigen fehlt die Größe' : ''}</span>
                   {teamRows.some((r) => r.size) && <button type="button" className="btn alt sm" onClick={takeTeamQty}>Mengen für {cname || 'diese Farbe'} übernehmen</button>}
                 </div>}
-                <p className="hint">Gilt für die gewählte Farbe. Spalten: Name, Nummer, Größe – Reihenfolge egal, auch per Kopieren aus Excel.</p>
               </>}
             </div>}
-            <textarea className="deco-note" placeholder="Hinweise, z. B. Größe ca. 8 cm, Pantone-Farben, Namen/Nummern je Größe …" value={note} onChange={(e) => setNote(e.target.value)} aria-label="Hinweise zur Veredelung" />
-            </>}
-            {!team && <div className="dstep-nav">
-              {dstep > 1 ? <button type="button" className="btn alt sm" onClick={() => setDstep(dstep - 1)}>← Zurück</button> : <span />}
-              {dstep === 1 && !step1Ok && <span className="muted" style={{ fontSize: 13 }}>{useText && !text.trim() ? 'Text eingeben' : 'Logo hochladen'} – oder „Beratung gewünscht“ wählen</span>}
-              {dstep < 3 ? <button type="button" className="btn sm" disabled={dstep === 1 ? !step1Ok : !positions.length} onClick={() => setDstep(dstep + 1)}>Weiter: {STEPS[dstep]} →</button> : <span className="ok" style={{ fontSize: 13 }}>✓ Veredelung fertig – jetzt Mengen prüfen und in den Warenkorb</span>}
-            </div>}
+            {!team && !noteOn && !note ? <button type="button" className="linkbtn dq-more" onClick={() => setNoteOn(true)}>+ Hinweis an uns</button>
+              : <textarea className="deco-note" placeholder="z. B. Pantone-Farben, besondere Wünsche …" value={note} onChange={(e) => setNote(e.target.value)} aria-label="Hinweise zur Veredelung" />}
           </div>
         )}
         {full && <div className="ds-fs" role="dialog" aria-modal="true" aria-label="Vorschau groß">
@@ -396,17 +373,10 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
         )}
         <div className="qtyrow">
           <button className="btn" disabled={!total || !decoOk || busy || teamClosed} onClick={onAdd}>
-            {teamClosed ? 'Bestellschluss erreicht' : busy ? 'Vorschau wird gespeichert …' : !total ? (sizes.length > 1 ? 'Größe & Menge wählen' : 'Menge wählen') : !decoOk ? (useText && !text.trim() ? 'Text eingeben' : 'Logo / Position wählen') : `${total} Stück in den Warenkorb`}
+            {teamClosed ? 'Bestellschluss erreicht' : busy ? 'Vorschau wird gespeichert …' : !total ? (sizes.length > 1 ? 'Größe & Menge wählen' : 'Menge wählen') : !decoOk ? (useText && !text.trim() ? 'Text eingeben' : 'Position wählen') : `${total} Stück in den Warenkorb`}
           </button>
           <WishButton id={p.id} variant="full" />
         </div>
-        {!team && <div className="sample-row">
-          <span><b>Erst testen?</b> 1 Musterteil anfordern – wird bei Ihrer Bestellung angerechnet.</span>
-          <div>
-            {sizes.length > 1 && <select value={sampleSize} onChange={(e) => setSampleSize(e.target.value)} aria-label="Größe für Muster"><option value="">Größe</option>{sizes.map((s) => <option key={s}>{s}</option>)}</select>}
-            <button type="button" className="btn alt sm" disabled={sizes.length > 1 && !sampleSize} onClick={addSample}>Muster bestellen</button>
-          </div>
-        </div>}
         <div className={`mbar ${total ? 'has' : ''}`}>
           <div className="mbar-info">{total ? <><b>{total} Stk.</b>{p.price != null && <span> · {est ? 'ca. ' : ''}{eur(unitFor(p.tiers, total, p.price)! * total + (est ? est.perPiece * total + est.setupTotal : 0))} netto{est ? ' inkl. Veredelung' : ''}</span>}</> : <span className="muted">{p.price != null ? `ab ${eur(p.tiers.length ? p.tiers[p.tiers.length - 1].price : p.price)}` : 'Preis auf Anfrage'}</span>}</div>
           <button className="btn" disabled={(!!total && !decoOk) || busy || teamClosed} onClick={() => (total ? onAdd() : document.querySelector('.szgrid')?.scrollIntoView({ behavior: 'smooth', block: 'center' }))}>

@@ -2200,7 +2200,7 @@
     ]
    },
    {
-    "name": "Black_Dark Grey (Solid)",
+    "name": "Black / Dark Grey (Solid)",
     "hex": "#6d6f7e",
     "image": "/p/bc/BCPG001/black-dark-grey-solid.jpg",
     "images": [
@@ -2208,7 +2208,7 @@
     ]
    },
    {
-    "name": "Forest Green_Green",
+    "name": "Forest Green / Green",
     "hex": "#6f9198",
     "image": "/p/bc/BCPG001/forest-green-green.jpg",
     "images": [
@@ -2216,7 +2216,7 @@
     ]
    },
    {
-    "name": "White_Black",
+    "name": "White / Black",
     "hex": "#ececec",
     "image": "/p/bc/BCPG001/white-black.jpg",
     "images": [
@@ -6793,7 +6793,7 @@
   ],
   "colors": [
    {
-    "name": "White_Navy",
+    "name": "White / Navy",
     "hex": "#f2f0f1",
     "image": "/p/bc/BCTK350/white-navy.jpg",
     "images": [
@@ -6801,7 +6801,7 @@
     ]
    },
    {
-    "name": "White_Red",
+    "name": "White / Red",
     "hex": "#edecea",
     "image": "/p/bc/BCTK350/white-red.jpg",
     "images": [
@@ -8592,7 +8592,7 @@
   ],
   "colors": [
    {
-    "name": "White_Navy",
+    "name": "White / Navy",
     "hex": "#f0f1f0",
     "image": "/p/bc/BCTU020/white-navy.jpg",
     "images": [
@@ -8600,7 +8600,7 @@
     ]
    },
    {
-    "name": "White_Red",
+    "name": "White / Red",
     "hex": "#f1f1ef",
     "image": "/p/bc/BCTU020/white-red.jpg",
     "images": [
@@ -17264,7 +17264,7 @@
   ],
   "colors": [
    {
-    "name": "Atoll_Warm Grey",
+    "name": "Atoll / Warm Grey",
     "hex": "#148cb7",
     "image": "/p/bc/BCJM825/atoll-warm-grey.jpg",
     "images": [
@@ -17272,7 +17272,7 @@
     ]
    },
    {
-    "name": "Black_Warm Grey",
+    "name": "Black / Warm Grey",
     "hex": "#323232",
     "image": "/p/bc/BCJM825/black-warm-grey.jpg",
     "images": [
@@ -17280,7 +17280,7 @@
     ]
    },
    {
-    "name": "Dark Grey (Solid)_Warm Grey",
+    "name": "Dark Grey (Solid) / Warm Grey",
     "hex": "#4a4444",
     "image": "/p/bc/BCJM825/dark-grey-solid-warm-grey.jpg",
     "images": [
@@ -17288,7 +17288,7 @@
     ]
    },
    {
-    "name": "Navy_Warm Grey",
+    "name": "Navy / Warm Grey",
     "hex": "#2c3240",
     "image": "/p/bc/BCJM825/navy-warm-grey.jpg",
     "images": [
@@ -17296,7 +17296,7 @@
     ]
    },
    {
-    "name": "Red_Warm Grey",
+    "name": "Red / Warm Grey",
     "hex": "#b31a2f",
     "image": "/p/bc/BCJM825/red-warm-grey.jpg",
     "images": [
@@ -17304,7 +17304,7 @@
     ]
    },
    {
-    "name": "White_White",
+    "name": "White / White",
     "hex": "#dfdfdf",
     "image": "/p/bc/BCJM825/white-white.jpg",
     "images": [
@@ -17424,7 +17424,7 @@
   ],
   "colors": [
    {
-    "name": "Black_Cobalt Blue",
+    "name": "Black / Cobalt Blue",
     "hex": "#242424",
     "image": "/p/bc/BCJM940/black-cobalt-blue.jpg",
     "images": [
@@ -17432,7 +17432,7 @@
     ]
    },
    {
-    "name": "Dark Grey (Solid)_Neon Orange",
+    "name": "Dark Grey (Solid) / Neon Orange",
     "hex": "#444245",
     "image": "/p/bc/BCJM940/dark-grey-solid-neon-orange.jpg",
     "images": [
@@ -17440,7 +17440,7 @@
     ]
    },
    {
-    "name": "Navy_Neon Green",
+    "name": "Navy / Neon Green",
     "hex": "#202634",
     "image": "/p/bc/BCJM940/navy-neon-green.jpg",
     "images": [
@@ -17448,7 +17448,7 @@
     ]
    },
    {
-    "name": "Red_Black",
+    "name": "Red / Black",
     "hex": "#92051d",
     "image": "/p/bc/BCJM940/red-black.jpg",
     "images": [
@@ -17456,7 +17456,7 @@
     ]
    },
    {
-    "name": "Royal Blue_Neon Orange",
+    "name": "Royal Blue / Neon Orange",
     "hex": "#16599d",
     "image": "/p/bc/BCJM940/royal-blue-neon-orange.jpg",
     "images": [
@@ -17464,7 +17464,7 @@
     ]
    },
    {
-    "name": "White_Warm Grey",
+    "name": "White / Warm Grey",
     "hex": "#c8c8c8",
     "image": "/p/bc/BCJM940/white-warm-grey.jpg",
     "images": [
@@ -17700,7 +17700,7 @@
   ],
   "colors": [
    {
-    "name": "Black_Cobalt Blue",
+    "name": "Black / Cobalt Blue",
     "hex": "#363330",
     "image": "/p/bc/BCJM963/black-cobalt-blue.jpg",
     "images": [
@@ -17708,7 +17708,7 @@
     ]
    },
    {
-    "name": "Navy_Neon Green",
+    "name": "Navy / Neon Green",
     "hex": "#465b22",
     "image": "/p/bc/BCJM963/navy-neon-green.jpg",
     "images": [
@@ -17716,7 +17716,7 @@
     ]
    },
    {
-    "name": "Real Green_Neon Orange",
+    "name": "Real Green / Neon Orange",
     "hex": "#368f47",
     "image": "/p/bc/BCJM963/real-green-neon-orange.jpg",
     "images": [
@@ -17724,7 +17724,7 @@
     ]
    },
    {
-    "name": "Red_Warm Grey",
+    "name": "Red / Warm Grey",
     "hex": "#b41930",
     "image": "/p/bc/BCJM963/red-warm-grey.jpg",
     "images": [
@@ -17732,7 +17732,7 @@
     ]
    },
    {
-    "name": "Royal Blue_Neon Orange",
+    "name": "Royal Blue / Neon Orange",
     "hex": "#18559c",
     "image": "/p/bc/BCJM963/royal-blue-neon-orange.jpg",
     "images": [
@@ -17740,7 +17740,7 @@
     ]
    },
    {
-    "name": "White_White",
+    "name": "White / White",
     "hex": "#e1e1e1",
     "image": "/p/bc/BCJM963/white-white.jpg",
     "images": [
@@ -18618,7 +18618,7 @@
   ],
   "colors": [
    {
-    "name": "Atoll_Ghost Grey",
+    "name": "Atoll / Ghost Grey",
     "hex": "#138bbb",
     "image": "/p/bc/BCJUI62/atoll-ghost-grey.jpg",
     "images": [
@@ -18626,7 +18626,7 @@
     ]
    },
    {
-    "name": "Black_Black",
+    "name": "Black / Black",
     "hex": "#303030",
     "image": "/p/bc/BCJUI62/black-black.jpg",
     "images": [
@@ -18634,7 +18634,7 @@
     ]
    },
    {
-    "name": "Dark Grey (Solid)_Neon Orange",
+    "name": "Dark Grey (Solid) / Neon Orange",
     "hex": "#54504f",
     "image": "/p/bc/BCJUI62/dark-grey-solid-neon-orange.jpg",
     "images": [
@@ -18642,7 +18642,7 @@
     ]
    },
    {
-    "name": "Navy_Neon Green",
+    "name": "Navy / Neon Green",
     "hex": "#333f48",
     "image": "/p/bc/BCJUI62/navy-neon-green.jpg",
     "images": [
@@ -18650,7 +18650,7 @@
     ]
    },
    {
-    "name": "Red_Warm Grey",
+    "name": "Red / Warm Grey",
     "hex": "#b01a2d",
     "image": "/p/bc/BCJUI62/red-warm-grey.jpg",
     "images": [
@@ -18658,7 +18658,7 @@
     ]
    },
    {
-    "name": "White_White",
+    "name": "White / White",
     "hex": "#e7e7e7",
     "image": "/p/bc/BCJUI62/white-white.jpg",
     "images": [
@@ -18704,7 +18704,7 @@
   ],
   "colors": [
    {
-    "name": "Atoll_Warm Grey",
+    "name": "Atoll / Warm Grey",
     "hex": "#0c86b1",
     "image": "/p/bc/BCJW826/atoll-warm-grey.jpg",
     "images": [
@@ -18712,7 +18712,7 @@
     ]
    },
    {
-    "name": "Black_Warm Grey",
+    "name": "Black / Warm Grey",
     "hex": "#2e2e2e",
     "image": "/p/bc/BCJW826/black-warm-grey.jpg",
     "images": [
@@ -18720,7 +18720,7 @@
     ]
    },
    {
-    "name": "Dark Grey (Solid)_Warm Grey",
+    "name": "Dark Grey (Solid) / Warm Grey",
     "hex": "#49474a",
     "image": "/p/bc/BCJW826/dark-grey-solid-warm-grey.jpg",
     "images": [
@@ -18728,7 +18728,7 @@
     ]
    },
    {
-    "name": "Navy_Warm Grey",
+    "name": "Navy / Warm Grey",
     "hex": "#282e3c",
     "image": "/p/bc/BCJW826/navy-warm-grey.jpg",
     "images": [
@@ -18736,7 +18736,7 @@
     ]
    },
    {
-    "name": "Red_Warm Grey",
+    "name": "Red / Warm Grey",
     "hex": "#af192d",
     "image": "/p/bc/BCJW826/red-warm-grey.jpg",
     "images": [
@@ -18744,7 +18744,7 @@
     ]
    },
    {
-    "name": "White_White",
+    "name": "White / White",
     "hex": "#e6e6e6",
     "image": "/p/bc/BCJW826/white-white.jpg",
     "images": [
@@ -19230,7 +19230,7 @@
   ],
   "colors": [
    {
-    "name": "Black_Cobalt Blue",
+    "name": "Black / Cobalt Blue",
     "hex": "#2c2c2c",
     "image": "/p/bc/BCJW941/black-cobalt-blue.jpg",
     "images": [
@@ -19238,7 +19238,7 @@
     ]
    },
    {
-    "name": "Dark Grey (Solid)_Neon Orange",
+    "name": "Dark Grey (Solid) / Neon Orange",
     "hex": "#514f52",
     "image": "/p/bc/BCJW941/dark-grey-solid-neon-orange.jpg",
     "images": [
@@ -19246,7 +19246,7 @@
     ]
    },
    {
-    "name": "Navy_Neon Green",
+    "name": "Navy / Neon Green",
     "hex": "#2e3442",
     "image": "/p/bc/BCJW941/navy-neon-green.jpg",
     "images": [
@@ -19254,7 +19254,7 @@
     ]
    },
    {
-    "name": "Red_Black",
+    "name": "Red / Black",
     "hex": "#850114",
     "image": "/p/bc/BCJW941/red-black.jpg",
     "images": [
@@ -19262,7 +19262,7 @@
     ]
    },
    {
-    "name": "Royal Blue_Neon Orange",
+    "name": "Royal Blue / Neon Orange",
     "hex": "#1a62aa",
     "image": "/p/bc/BCJW941/royal-blue-neon-orange.jpg",
     "images": [
@@ -19270,7 +19270,7 @@
     ]
    },
    {
-    "name": "White_Warm Grey",
+    "name": "White / Warm Grey",
     "hex": "#c3c3c3",
     "image": "/p/bc/BCJW941/white-warm-grey.jpg",
     "images": [
@@ -19351,7 +19351,7 @@
   ],
   "colors": [
    {
-    "name": "Black_Cobalt Blue",
+    "name": "Black / Cobalt Blue",
     "hex": "#2c3745",
     "image": "/p/bc/BCJW964/black-cobalt-blue.jpg",
     "images": [
@@ -19359,7 +19359,7 @@
     ]
    },
    {
-    "name": "Navy_Neon Green",
+    "name": "Navy / Neon Green",
     "hex": "#3b414f",
     "image": "/p/bc/BCJW964/navy-neon-green.jpg",
     "images": [
@@ -19367,7 +19367,7 @@
     ]
    },
    {
-    "name": "Real Green_Neon Orange",
+    "name": "Real Green / Neon Orange",
     "hex": "#c7470b",
     "image": "/p/bc/BCJW964/real-green-neon-orange.jpg",
     "images": [
@@ -19375,7 +19375,7 @@
     ]
    },
    {
-    "name": "Red_Warm Grey",
+    "name": "Red / Warm Grey",
     "hex": "#575554",
     "image": "/p/bc/BCJW964/red-warm-grey.jpg",
     "images": [
@@ -19383,7 +19383,7 @@
     ]
    },
    {
-    "name": "Royal Blue_Neon Orange",
+    "name": "Royal Blue / Neon Orange",
     "hex": "#804e48",
     "image": "/p/bc/BCJW964/royal-blue-neon-orange.jpg",
     "images": [
@@ -19391,7 +19391,7 @@
     ]
    },
    {
-    "name": "White_White",
+    "name": "White / White",
     "hex": "#e8e8e8",
     "image": "/p/bc/BCJW964/white-white.jpg",
     "images": [
@@ -19521,7 +19521,7 @@
   ],
   "colors": [
    {
-    "name": "Atoll_Ghost Grey",
+    "name": "Atoll / Ghost Grey",
     "hex": "#1c8db9",
     "image": "/p/bc/BCJWI63/atoll-ghost-grey.jpg",
     "images": [
@@ -19529,7 +19529,7 @@
     ]
    },
    {
-    "name": "Black_Black",
+    "name": "Black / Black",
     "hex": "#282828",
     "image": "/p/bc/BCJWI63/black-black.jpg",
     "images": [
@@ -19537,7 +19537,7 @@
     ]
    },
    {
-    "name": "Dark Grey (Solid)_Neon Orange",
+    "name": "Dark Grey (Solid) / Neon Orange",
     "hex": "#494649",
     "image": "/p/bc/BCJWI63/dark-grey-solid-neon-orange.jpg",
     "images": [
@@ -19545,7 +19545,7 @@
     ]
    },
    {
-    "name": "Navy_Neon Green",
+    "name": "Navy / Neon Green",
     "hex": "#282e3c",
     "image": "/p/bc/BCJWI63/navy-neon-green.jpg",
     "images": [
@@ -19553,7 +19553,7 @@
     ]
    },
    {
-    "name": "Red_Warm Grey",
+    "name": "Red / Warm Grey",
     "hex": "#b21331",
     "image": "/p/bc/BCJWI63/red-warm-grey.jpg",
     "images": [
@@ -19561,7 +19561,7 @@
     ]
    },
    {
-    "name": "White_White",
+    "name": "White / White",
     "hex": "#eaeaea",
     "image": "/p/bc/BCJWI63/white-white.jpg",
     "images": [
@@ -20159,7 +20159,7 @@
   ],
   "colors": [
    {
-    "name": "Black_Charcoal (Heather)",
+    "name": "Black / Charcoal (Heather)",
     "hex": "#292928",
     "image": "/p/byb/BY007/black-charcoal-heather.jpg",
     "images": [
@@ -20167,7 +20167,7 @@
     ]
    },
    {
-    "name": "Charcoal (Heather)_Black",
+    "name": "Charcoal (Heather) / Black",
     "hex": "#434343",
     "image": "/p/byb/BY007/charcoal-heather-black.jpg",
     "images": [
@@ -20175,7 +20175,7 @@
     ]
    },
    {
-    "name": "White_Black",
+    "name": "White / Black",
     "hex": "#f1f1f1",
     "image": "/p/byb/BY007/white-black.jpg",
     "images": [
@@ -20284,7 +20284,7 @@
   ],
   "colors": [
    {
-    "name": "Black_White",
+    "name": "Black / White",
     "hex": "#212121",
     "image": "/p/byb/BY009/black-white.jpg",
     "images": [
@@ -20292,7 +20292,7 @@
     ]
    },
    {
-    "name": "White_Black",
+    "name": "White / Black",
     "hex": "#dadada",
     "image": "/p/byb/BY009/white-black.jpg",
     "images": [
@@ -20896,7 +20896,7 @@
   ],
   "colors": [
    {
-    "name": "Black_Red",
+    "name": "Black / Red",
     "hex": "#1f1f1f",
     "image": "/p/byb/BY015/black-red.jpg",
     "images": [
@@ -20904,7 +20904,7 @@
     ]
    },
    {
-    "name": "Black_White",
+    "name": "Black / White",
     "hex": "#1f1f1f",
     "image": "/p/byb/BY015/black-white.jpg",
     "images": [
@@ -20952,7 +20952,7 @@
   ],
   "colors": [
    {
-    "name": "Black_Black",
+    "name": "Black / Black",
     "hex": "#2d2d2d",
     "image": "/p/byb/BY016/black-black.jpg",
     "images": [
@@ -20960,7 +20960,7 @@
     ]
    },
    {
-    "name": "Black_Red",
+    "name": "Black / Red",
     "hex": "#2d2d2d",
     "image": "/p/byb/BY016/black-red.jpg",
     "images": [
@@ -20968,7 +20968,7 @@
     ]
    },
    {
-    "name": "Black_White",
+    "name": "Black / White",
     "hex": "#313131",
     "image": "/p/byb/BY016/black-white.jpg",
     "images": [
@@ -20976,7 +20976,7 @@
     ]
    },
    {
-    "name": "Burgundy_Black",
+    "name": "Burgundy / Black",
     "hex": "#962831",
     "image": "/p/byb/BY016/burgundy-black.jpg",
     "images": [
@@ -20984,7 +20984,7 @@
     ]
    },
    {
-    "name": "Dark Shadow_Dark Shadow",
+    "name": "Dark Shadow / Dark Shadow",
     "hex": "#4d4b4f",
     "image": "/p/byb/BY016/dark-shadow-dark-shadow.jpg",
     "images": [
@@ -20992,7 +20992,7 @@
     ]
    },
    {
-    "name": "Navy_Navy",
+    "name": "Navy / Navy",
     "hex": "#32323c",
     "image": "/p/byb/BY016/navy-navy.jpg",
     "images": [
@@ -21000,7 +21000,7 @@
     ]
    },
    {
-    "name": "Red_White",
+    "name": "Red / White",
     "hex": "#dc1e34",
     "image": "/p/byb/BY016/red-white.jpg",
     "images": [
@@ -21362,7 +21362,7 @@
   ],
   "colors": [
    {
-    "name": "Black_White",
+    "name": "Black / White",
     "hex": "#1d1d1d",
     "image": "/p/byb/BY027/black-white.jpg",
     "images": [
@@ -22109,7 +22109,7 @@
   ],
   "colors": [
    {
-    "name": "Black_Black",
+    "name": "Black / Black",
     "hex": "#252525",
     "image": "/p/byb/BY046/black-black.jpg",
     "images": [
@@ -22156,7 +22156,7 @@
   ],
   "colors": [
    {
-    "name": "Black_Black_White",
+    "name": "Black / Black / White",
     "hex": "#161616",
     "image": "/p/byb/BY047/black-black-white.jpg",
     "images": [
@@ -24750,7 +24750,7 @@
   ],
   "colors": [
    {
-    "name": "Black_White",
+    "name": "Black / White",
     "hex": "#3e3634",
     "image": "/p/byb/BY129/black-white.jpg",
     "images": [
@@ -25463,7 +25463,7 @@
   ],
   "colors": [
    {
-    "name": "Black_Black",
+    "name": "Black / Black",
     "hex": "#343434",
     "image": "/p/byb/BY151/black-black.jpg",
     "images": [
@@ -26428,7 +26428,7 @@
   ],
   "colors": [
    {
-    "name": "Black_White",
+    "name": "Black / White",
     "hex": "#1a1a1a",
     "image": "/p/byb/BY187/black-white.jpg",
     "images": [
@@ -28519,7 +28519,7 @@
   ],
   "colors": [
    {
-    "name": "Black_White",
+    "name": "Black / White",
     "hex": "#1f1d1e",
     "image": "/p/byb/BY269/black-white.jpg",
     "images": [
@@ -33121,7 +33121,7 @@
   ],
   "colors": [
    {
-    "name": "Black_White",
+    "name": "Black / White",
     "hex": "#262626",
     "image": "/p/byb/BY450C/black-white.jpg",
     "images": [
@@ -33129,7 +33129,7 @@
     ]
    },
    {
-    "name": "White_Black",
+    "name": "White / Black",
     "hex": "#ededed",
     "image": "/p/byb/BY450C/white-black.jpg",
     "images": [

@@ -121,7 +121,7 @@ export default function Start() {
       <StartForms quote={<QuoteForm categories={cats.map((c) => c.name)} aside={<>
           <h2>Unverbindlich Preis anfragen</h2>
           <p>Sie haben noch keinen Zugangscode? Kein Problem: Beschreiben Sie kurz Ihr Vorhaben und schicken Sie Ihr Logo gleich mit. Sie erhalten innerhalb von 24 Stunden ein Angebot.</p>
-          <ul><li>Kein Zugangscode nötig</li><li>Logo gleich mitschicken</li><li>Auf Wunsch vorab ein Muster</li><li>Unverbindlich und kostenlos</li></ul>
+          <ul><li>Kein Zugangscode nötig</li><li>Logo gleich mitschicken</li><li>Vorschau vor der Produktion</li><li>Unverbindlich und kostenlos</li></ul>
           <p className="muted" style={{ marginTop: 16 }}>Lieber sprechen? Produktberatung: <a className="alink" href="tel:+493040719258">030 40719258</a></p>
         </>} />} access={<RequestForm aside={<>
           <h2>Zugang anfragen</h2>

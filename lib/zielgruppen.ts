@@ -74,7 +74,7 @@ export const ZIELGRUPPEN: Zielgruppe[] = [
     faq: [
       ['Gibt es Damen- und Herrenschnitte?', 'Bei vielen Artikeln ja. Wir zeigen Ihnen passende Kombinationen.'],
       ['Wie wasche ich bestickte Hemden?', 'Auf links gedreht bei der angegebenen Temperatur waschen und nicht direkt auf dem Stick bügeln.'],
-      ['Können wir vorab ein Muster sehen?', 'Ja. Kreuzen Sie bei der Preisanfrage einfach „Muster gewünscht“ an.'],
+      ['Sehen wir das Ergebnis vorher?', 'Ja. Vor jeder Produktion erhalten Sie eine Vorschau mit Position und Größe Ihres Logos zur Freigabe.'],
     ],
     example: 'z. B. 12 Blusen und Hemden mit gesticktem Logo',
   },

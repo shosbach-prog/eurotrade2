@@ -60,7 +60,7 @@ export default async function Aktion({ params }: { params: { slug: string } }) {
         <QuoteForm categories={getCategories().map((c) => c.name)} aside={<>
           <h2>Unverbindlich Preis anfragen</h2>
           <p>Beschreiben Sie kurz Ihr Vorhaben – {a.example}. Sie erhalten innerhalb von 24 Stunden ein Angebot.</p>
-          <ul><li>Kein Zugangscode nötig</li><li>Logo gleich mitschicken</li><li>Auf Wunsch vorab ein Muster</li></ul>
+          <ul><li>Kein Zugangscode nötig</li><li>Logo gleich mitschicken</li><li>Vorschau vor der Produktion</li></ul>
           <p className="muted" style={{ marginTop: 16 }}>Lieber sprechen? Produktberatung: <a className="alink" href="tel:+493040719258">030 40719258</a></p>
           <p className="muted" style={{ marginTop: 18, fontSize: 14 }}>Weitere Aktionen: {AKTIONEN.filter((x) => x.slug !== a.slug).map((x, k) => <span key={x.slug}>{k > 0 && ' · '}<Link className="alink" href={`/aktion/${x.slug}`}>{x.nav}</Link></span>)}</p>
         </>} />

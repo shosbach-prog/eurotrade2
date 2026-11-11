@@ -21,7 +21,6 @@ export default function QuoteForm({ categories, aside, message }: { categories: 
     ] },
     { title: 'Noch etwas, das wir wissen sollten?', fields: [
       { kind: 'textarea', name: 'message', label: 'Nachricht (optional)', placeholder: 'Farben, Größen, Termin, Namen und Nummern …' },
-      { kind: 'check', name: 'sample', label: <><b>Muster gewünscht</b> – wir schicken vorab ein Musterteil zur Ansicht.</> },
       { kind: 'check', name: 'privacy', required: true, label: <>Ich stimme der Verarbeitung meiner Daten gemäß <Link href="/datenschutz" style={{ textDecoration: 'underline' }}>Datenschutzerklärung</Link> zu.</> },
     ] },
   ];

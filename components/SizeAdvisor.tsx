@@ -50,7 +50,7 @@ export default function SizeAdvisor({ name, gender, sizes, extra, chart, onPick 
             <details className="sa-tab"><summary>Richtwerte Brustumfang</summary>
               <table><tbody>{tab.map(([max, s], n) => <tr key={s}><td>{s}</td><td>{n ? `${tab[n - 1][0] + 1}–${max}` : `bis ${max}`} cm</td></tr>)}</tbody></table>
             </details>
-            <p className="hint">Richtwerte – je Hersteller kann es abweichen.{chart && <> Verbindlich ist die <a className="alink" href={chart} target="_blank" rel="noreferrer">Größentabelle des Herstellers</a>.</>} Unsicher? Bestellen Sie vorab ein Musterteil.</p>
+            <p className="hint">Richtwerte – je Hersteller kann es abweichen.{chart && <> Verbindlich ist die <a className="alink" href={chart} target="_blank" rel="noreferrer">Größentabelle des Herstellers</a>.</>} Unsicher? Produktberatung: <a className="alink" href="tel:+493040719258">030 40719258</a>.</p>
           </div>
         </div>
       )}
