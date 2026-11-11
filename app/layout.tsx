@@ -37,7 +37,7 @@ function orgSchema() {
     { '@type': 'Store', '@id': `${url}/#org`, name: 'euro-trade.com', alternateName: 'Euro-Trade', url, logo: `${url}/icon.svg`, image: `${url}/og.png`,
       description: 'Teamwear und Firmenbekleidung mit Logo – Markentextilien ab 1 Stück, bedruckt oder bestickt.',
       email: process.env.CONTACT_EMAIL ?? 'info@euro-trade.com', telephone: '+49 173 2648097', founder: { '@type': 'Person', name: 'Sebastian Hosbach' },
-      address: { '@type': 'PostalAddress', streetAddress: 'Seehan 28', postalCode: '44263', addressLocality: 'Dortmund', addressCountry: 'DE' },
+      address: { '@type': 'PostalAddress', streetAddress: 'Seehang 28', postalCode: '44263', addressLocality: 'Dortmund', addressCountry: 'DE' },
       areaServed: ['DE', 'AT', 'CH'] },
     { '@type': 'WebSite', '@id': `${url}/#website`, url, name: 'euro-trade.com', inLanguage: 'de-DE', publisher: { '@id': `${url}/#org` } },
   ] };
@@ -46,7 +46,7 @@ function orgSchema() {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const gated = shopClosed();
   const path = headers().get('x-path') ?? '/';
-  const isPublic = ['/fuer', '/ueber-uns', '/garantie', '/bewerten', '/widerruf', '/newsletter', '/start', '/druck-stick', '/zugang', '/passwort', '/registrieren', '/kontakt', '/agb', '/ratgeber', '/impressum', '/datenschutz', '/angebot', '/admin', '/marken'].some((p) => path === p || path.startsWith(p + '/'));
+  const isPublic = ['/fuer', '/ueber-uns', '/garantie', '/bewerten', '/widerruf', '/newsletter', '/start', '/druck-stick', '/zugang', '/passwort', '/registrieren', '/kontakt', '/agb', '/ratgeber', '/impressum', '/datenschutz', '/angebot', '/admin', '/marken', '/team'].some((p) => path === p || path.startsWith(p + '/')) || headers().get('x-public') === '1';
   const { ok, customer } = await shopAccess();
   const admin = !customer && (await isAdmin());
   // Code im Admin gesperrt/gelöscht -> zurück zur Anmeldung
@@ -68,7 +68,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <div className="ft-contact">
                   <a href="tel:+491732648097"><span aria-hidden>☎</span> 0173 2648097</a>
                   <a href="mailto:info@euro-trade.com"><span aria-hidden>✉</span> info@euro-trade.com</a>
-                  <span><span aria-hidden>⌂</span> Seehan 28 · 44263 Dortmund</span>
+                  <span><span aria-hidden>⌂</span> Seehang 28 · 44263 Dortmund</span>
                 </div>
               </div>
               <nav className="ft-col" aria-label="Shop">

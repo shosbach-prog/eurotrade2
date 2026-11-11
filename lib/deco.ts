@@ -10,6 +10,10 @@ export type Deco = {
   /** Live-Vorschau: Lage je Position in % (Mitte x/y, Breite w) und ungefähre Breite in cm */
   place?: Record<string, { x: number; y: number; w: number }>;
   sizes?: Record<string, number>;
+  /** Bilder der Live-Vorschau (Upload-IDs) – hängen an Anfrage und Angebot */
+  previews?: string[];
+  /** Personalisierung je Teil: Namen und/oder Nummern */
+  team?: { rows: TeamRow[]; pos: string; what: 'name' | 'nummer' | 'beides' } | null;
 };
 export const METHODS = ['Druck', 'Stick', 'Beratung gewünscht'];
 /** Veredelungspositionen je Artikelart – erster Eintrag ist die Vorauswahl */
@@ -76,7 +80,7 @@ export const isImage = (name?: string | null) => /\.(png|jpe?g|webp|svg)$/i.test
 export const decoText = (d?: Deco | null) => (d?.text ? `Text „${d.text.replace(/\n/g, ' / ')}“ (${d.font ?? FONTS[0].id}, ${d.textColor ?? 'Schwarz'})` : '');
 /** „Brust links (ca. 9 cm), Rücken (ca. 28 cm)“ */
 export const posLabel = (d: Deco) => d.positions.map((p) => (d.sizes?.[p] ? `${p} (ca. ${d.sizes[p]} cm)` : p)).join(', ');
-export const decoLabel = (d?: Deco | null) => (d ? [`${d.method}: ${posLabel(d)}`, d.logoName ? `Logo: ${d.logoName}` : '', decoText(d)].filter(Boolean).join(' · ') : '');
+export const decoLabel = (d?: Deco | null) => (d ? [`${d.method}: ${posLabel(d)}`, d.logoName ? `Logo: ${d.logoName}` : '', decoText(d), d.team?.rows.length ? `${d.team.what === 'nummer' ? 'Nummern' : d.team.what === 'name' ? 'Namen' : 'Namen + Nummern'} (${d.team.pos}): ${d.team.rows.length}×` : ''].filter(Boolean).join(' · ') : '');
 
 /** Veredelung auf einen anderen Artikel übertragen: unpassende Positionen (z. B. „Brust links“ auf einer Cap) werden ersetzt */
 export function adaptDeco(d: Deco | null, p: { category?: string; name?: string }): Deco | null {
@@ -85,3 +89,24 @@ export function adaptDeco(d: Deco | null, p: { category?: string; name?: string 
   const pos = d.positions.filter((x) => ok.includes(x));
   return { ...d, positions: pos.length ? pos : [ok[0]] };
 }
+
+/* ---------- Teamliste (Namen / Nummern je Teil) ---------- */
+export type TeamRow = { name: string; nr: string; size: string };
+export const TEAM_POS = ['Rücken', 'Brust', 'Ärmel'] as const;
+/** Text aus Excel (Tab), CSV (; oder ,) oder Zeilen „Name 10 M“ einlesen */
+export function parseTeamList(raw: string, sizes: string[]): TeamRow[] {
+  const up = sizes.map((s) => s.toUpperCase());
+  return raw.replace(/\r/g, '').split('\n').map((l) => l.trim()).filter(Boolean).map((l) => {
+    let cells = l.includes('\t') ? l.split('\t') : l.includes(';') ? l.split(';') : l.includes(',') ? l.split(',') : l.split(/\s+/);
+    cells = cells.map((c) => c.trim()).filter((c, k) => c || k < 3);
+    let size = '', nr = '';
+    const rest: string[] = [];
+    for (const c of cells) {
+      if (!size && up.includes(c.toUpperCase())) size = sizes[up.indexOf(c.toUpperCase())];
+      else if (!nr && /^\d{1,3}$/.test(c)) nr = c;
+      else if (c) rest.push(c);
+    }
+    return { name: rest.join(' ').slice(0, 30), nr, size };
+  }).filter((r) => (r.name || r.nr) && !/^(name|nummer|nr|größe|groesse|size)$/i.test(r.name)).slice(0, 300);
+}
+export const teamLabel = (rows?: TeamRow[] | null) => (rows?.length ? rows.map((r) => [r.name, r.nr && `#${r.nr}`, r.size && `(${r.size})`].filter(Boolean).join(' ')).join(', ') : '');

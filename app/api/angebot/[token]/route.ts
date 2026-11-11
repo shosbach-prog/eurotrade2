@@ -10,12 +10,13 @@ export async function POST(req: Request, { params }: { params: { token: string }
   if (i.status === 'angenommen' || i.status === 'bestellt' || i.status === 'geliefert') return NextResponse.json({ ok: true, already: true });
   const valid = new Date(new Date(i.offer.createdAt).getTime() + i.offer.validDays * 86400000);
   if (Date.now() > valid.getTime() + 86400000) return NextResponse.json({ error: 'Dieses Angebot ist abgelaufen – bitte kontaktieren Sie uns für ein neues Angebot.' }, { status: 410 });
-  const { name, comment } = await req.json().catch(() => ({}));
+  const { name, comment, previewOk } = await req.json().catch(() => ({}));
   if (!String(name ?? '').trim()) return NextResponse.json({ error: 'Bitte Ihren Namen angeben.' }, { status: 400 });
 
   i.status = 'angenommen';
   i.acceptedAt = new Date().toISOString();
-  addHistory(i, `Angebot angenommen von ${String(name).slice(0, 100)}${comment ? ` – „${String(comment).slice(0, 500)}“` : ''}`);
+  if (previewOk) i.previewApprovedAt = i.acceptedAt;
+  addHistory(i, `Angebot angenommen${previewOk ? ' inkl. Freigabe der Motiv-Vorschau' : ''} von ${String(name).slice(0, 100)}${comment ? ` – „${String(comment).slice(0, 500)}“` : ''}`);
   saveInquiry(i);
   // Willkommensrabatt ist mit der Annahme eingelöst
   if (i.discount?.code) {

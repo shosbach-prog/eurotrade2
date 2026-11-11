@@ -18,10 +18,10 @@ export default function SystemTools({ kind, defaultTo = '' }: { kind: 'mail' | '
     const r = await fetch('/api/admin/system', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ to }) });
     const d = await r.json().catch(() => ({}));
     setBusy(false);
-    if (d.ok) setRes({ ok: true, t: `✓ Testmail an ${d.to} gesendet – bitte Postfach (und Spam) prüfen.` });
+    if (d.ok) setRes({ ok: true, t: `✓ Testmail an ${d.to} gesendet (Port ${d.port}) – bitte Postfach (und Spam) prüfen.`, hint: d.hint });
     else {
       const raw = [d.error, d.code, d.response].filter(Boolean).join(' · ');
-      setRes({ ok: false, t: `✗ ${d.step === 'login' ? 'Anmeldung am Mailserver fehlgeschlagen' : d.step === 'send' ? 'Versand abgelehnt' : 'Konfiguration unvollständig'}`, hint: HINTS.find(([re]) => re.test(raw))?.[1], raw });
+      setRes({ ok: false, t: `✗ ${d.step === 'login' ? 'Anmeldung am Mailserver fehlgeschlagen' : d.step === 'send' ? 'Versand abgelehnt' : 'Konfiguration unvollständig'}`, hint: d.hint ?? HINTS.find(([re]) => re.test(raw))?.[1], raw: [raw, ...(d.tried ?? [])].join('\n') });
     }
   }
   async function runCron() {

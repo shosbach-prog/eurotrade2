@@ -7,6 +7,7 @@ import { eur } from '@/lib/format';
 import { decoLabel } from '@/lib/deco';
 import { unitFor } from '@/lib/tiers';
 import { saveMyInquiry } from '@/lib/mine';
+import { fmtDate, leadCheck } from '@/lib/leadtime';
 
 const FORM_KEY = 'et-form-v1';
 const FIELDS = ['name', 'company', 'email', 'phone', 'city'] as const;
@@ -18,6 +19,7 @@ export default function CartPage() {
   const [form, setForm] = useState<Record<string, string>>({});
   const [no, setNo] = useState('');
   const [code, setCode] = useState('');
+  const [wish, setWish] = useState('');
   const [codeInfo, setCodeInfo] = useState<{ ok: boolean; tiers: { pct: number; min: number }[] } | null>(null);
   async function checkCode() {
     if (!code.trim()) { setCodeInfo(null); return; }
@@ -38,7 +40,8 @@ export default function CartPage() {
   const unit = (l: (typeof lines)[number]) => unitFor(l.tiers, perProduct[l.id], l.price);
   const net = lines.reduce((s, l) => s + (unit(l) ?? 0) * l.qty, 0);
   const anyOpen = lines.some((l) => l.price == null);
-  const decos = [...new Map(lines.filter((l) => l.deco).map((l) => [JSON.stringify(l.deco), l.deco!])).values()];
+  // Vorschläge „gleiche Veredelung“: ohne Teamliste/Vorschaubilder vergleichen und übertragen
+  const decos = [...new Map(lines.filter((l) => l.deco).map((l) => { const d = { ...l.deco!, team: null, previews: undefined }; return [JSON.stringify(d), d]; })).values()];
   const minDate = new Date(Date.now() + 5 * 86400000).toISOString().slice(0, 10);
   const pct = codeInfo?.ok ? [...codeInfo.tiers].reverse().find((t) => net >= t.min)?.pct ?? 0 : 0;
   const nextT = codeInfo?.ok ? codeInfo.tiers.find((t) => t.min > net) : undefined;
@@ -50,7 +53,7 @@ export default function CartPage() {
     try { localStorage.setItem(FORM_KEY, JSON.stringify(Object.fromEntries(FIELDS.map((k) => [k, f[k] ?? ''])))); } catch {}
     const r = await fetch('/api/anfrage', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ customer: f, code: codeInfo?.ok ? code.trim() : '', lines: lines.map(({ id, color, size, qty, deco }) => ({ id, color, size, qty, deco })) }),
+      body: JSON.stringify({ customer: f, code: codeInfo?.ok ? code.trim() : '', team: lines.find((l) => l.team)?.team ?? '', lines: lines.map(({ id, color, size, qty, deco, sample }) => ({ id, color, size, qty, deco, sample })) }),
     });
     const d = await r.json().catch(() => ({}));
     if (r.ok) { if (d.token) saveMyInquiry(d.no, d.token); setNo(d.no ?? ''); setState('done'); clear(); } else { setState('error'); setErr(d.error ?? 'Senden fehlgeschlagen.'); }
@@ -84,7 +87,7 @@ export default function CartPage() {
             <div className="line cline" key={l.key}>
               <div style={{ width: 64, height: 64 }}><ProductImage p={{ name: l.name, images: l.image ? [l.image] : [], colors: [{ name: l.color ?? '', hex: l.hex }], category: l.category }} /></div>
               <div style={{ minWidth: 0 }}>
-                <Link href={`/produkt/${encodeURIComponent(l.id)}`} style={{ fontWeight: 600 }}>{l.name}</Link>
+                <Link href={`/produkt/${encodeURIComponent(l.id)}${l.team ? `?team=${l.team}` : ''}`} style={{ fontWeight: 600 }}>{l.name}</Link>{l.sample && <span className="sample-tag">Muster</span>}
                 <div className="muted cl-meta">
                   {l.color && <span>{l.color}</span>}
                   {l.sizes && l.sizes.length > 1
@@ -93,19 +96,21 @@ export default function CartPage() {
                   {l.price != null && <span>{eur(unit(l))}/Stk.{unit(l)! < l.price && <span className="ok"> (Staffel)</span>}</span>}
                 </div>
                 {l.deco && <div className="deco-tag">✦ {decoLabel(l.deco)} <button className="linkbtn" onClick={() => update(l.key, { deco: null })}>entfernen</button></div>}
+                {l.deco?.team?.rows.length ? <div className="muted" style={{ fontSize: 12.5 }}>{l.deco.team.rows.map((r) => [r.name, r.nr && `#${r.nr}`].filter(Boolean).join(' ')).join(', ')}</div> : null}
+                {l.deco?.previews?.length ? <div className="cl-prev">{l.deco.previews.map((id) => <img key={id} src={`/api/upload/${id}`} alt="Vorschau" />)}</div> : null}
               </div>
-              <div className="step" style={{ width: 112 }}>
+              {l.sample ? <div className="muted" style={{ width: 112, textAlign: 'center', fontSize: 13 }}>1 Stück</div> : <div className="step" style={{ width: 112 }}>
                 <button type="button" onClick={() => (l.qty > 1 ? setQty(l.key, l.qty - 1) : remove(l.key))} aria-label="weniger">−</button>
                 <input type="number" min={1} value={l.qty} onFocus={(e) => e.target.select()} onChange={(e) => setQty(l.key, Number(e.target.value) || 1)} aria-label="Menge" />
                 <button type="button" onClick={() => setQty(l.key, l.qty + 1)} aria-label="mehr">+</button>
-              </div>
+              </div>}
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-end' }}>
                 <strong>{l.price != null ? eur(unit(l)! * l.qty) : '—'}</strong>
                 <button className="x" onClick={() => remove(l.key)} aria-label="Entfernen">×</button>
               </div>
             </div>
           ))}
-          {decos.length > 0 && lines.some((l) => !l.deco || decos.length > 1) && (
+          {decos.length > 0 && lines.some((l) => (!l.deco && !l.sample) || decos.length > 1) && (
             <div className="deco-all">
               <span>✦ Gleiche Veredelung für alle Positionen?</span>
               {decos.map((d) => <button key={JSON.stringify(d)} className="btn alt" style={{ height: 36 }} onClick={() => decoToAll(d)}>{decos.length > 1 ? `„${decoLabel(d)}“ übernehmen` : 'Auf alle übertragen'}</button>)}
@@ -135,8 +140,18 @@ export default function CartPage() {
           </div>
           <div className="two">
             <div><label>PLZ / Ort</label><input name="city" defaultValue={form.city} key={`o${form.city}`} autoComplete="address-level2" /></div>
-            <div><label>Wunschliefertermin</label><input name="date" type="date" min={minDate} /></div>
+            <div><label>Wunschliefertermin</label><input name="date" type="date" min={minDate} value={wish} onChange={(e) => setWish(e.target.value)} /></div>
           </div>
+          {(() => {
+            const hasDeco = lines.some((l) => l.deco);
+            const c = leadCheck(wish ? new Date(wish + 'T12:00:00') : null, hasDeco);
+            return <div className={`lead lead-${c.state}`}>
+              {c.state === 'offen' && <>Frühester Liefertermin: <b>{fmtDate(c.earliest)}</b>{hasDeco ? ' (mit Veredelung)' : ''} – Wunschtermin eintragen, wir prüfen ihn sofort.</>}
+              {c.state === 'ok' && <>✓ Machbar – wenn Sie Angebot{hasDeco ? ' und Vorschau' : ''} bis <b>{fmtDate(c.latestApproval!)}</b> freigeben.</>}
+              {c.state === 'knapp' && <>⚠ Knapp, aber möglich – Freigabe bitte spätestens <b>{fmtDate(c.latestApproval!)}</b>. Wir melden uns schnell.</>}
+              {c.state === 'zu-spaet' && <>✗ Sehr knapp – regulär frühestens <b>{fmtDate(c.earliest)}</b>. Schreiben Sie uns trotzdem: Express ist oft möglich.</>}
+            </div>;
+          })()}
           <label>Nachricht</label>
           <textarea name="message" placeholder="Optional: Lieferadresse, Fragen, Namen/Nummern …" />
           <input className="hp" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />

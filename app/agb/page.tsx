@@ -18,7 +18,7 @@ export default function AGB() {
 
       <S n={1} t="Geltungsbereich, Anbieter">
         <p>(1) Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für alle Verträge über die Lieferung von Textilien, Werbemitteln und deren Veredelung (Druck, Stick, Transfer), die über die Website euro-trade.com, per E-Mail oder telefonisch geschlossen werden zwischen</p>
-        <p>Euro-Trade, Inhaber Sebastian Hosbach, Seehan 28, 44263 Dortmund, Telefon 0173 2648097, E-Mail info@euro-trade.com (nachfolgend „Euro-Trade“ oder „wir“)</p>
+        <p>Euro-Trade, Inhaber Sebastian Hosbach, Seehang 28, 44263 Dortmund, Telefon 0173 2648097, E-Mail info@euro-trade.com (nachfolgend „Euro-Trade“ oder „wir“)</p>
         <p>und dem Kunden. Kunden sind Verbraucher (§ 13 BGB) und Unternehmer (§ 14 BGB) einschließlich Vereinen, juristischen Personen und öffentlichen Einrichtungen.</p>
         <p>(2) Abweichende Bedingungen des Kunden gelten nicht, es sei denn, wir stimmen ihnen ausdrücklich schriftlich zu.</p>
       </S>

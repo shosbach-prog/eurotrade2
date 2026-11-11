@@ -77,9 +77,9 @@ export const findCustomer = (code: string) => allCustomers().find((c) => c.code 
 
 /* ---------- Anfragen / Angebote ---------- */
 import { posLabel, decoText, type Deco } from './deco';
-import { DEFAULT_PRICING, calcDeco, cleanPricing } from './deco-pricing';
+import { DEFAULT_PRICING, calcDeco, cleanPricing, teamUnit } from './deco-pricing';
 export type { Deco };
-export type InqLine = { id?: string; sku: string; name: string; color: string; size: string; qty: number; price: number | null; sum: number; deco?: Deco | null };
+export type InqLine = { id?: string; sku: string; name: string; color: string; size: string; qty: number; price: number | null; sum: number; deco?: Deco | null; /** Musterteil – wird bei Folgeauftrag angerechnet */ sample?: boolean };
 export type OfferLine = { text: string; detail?: string; qty: number; price: number };
 export type Offer = { lines: OfferLine[]; shipping: number; note: string; validDays: number; createdAt: string; sentAt?: string | null; vat: number };
 export type Status = 'neu' | 'angebot' | 'angenommen' | 'bestellt' | 'geliefert' | 'abgelehnt';
@@ -95,6 +95,15 @@ export type Inquiry = {
   reviewRequestedAt?: string | null;
   /** Erinnerung zum Angebot gesendet */
   remindedAt?: string | null;
+  /** Status „geliefert“ gesetzt – Bewertungseinladung folgt automatisch nach ein paar Tagen */
+  deliveredAt?: string | null;
+  reviewRemindedAt?: string | null;
+  /** Kunde hat die Motiv-Vorschau mit der Annahme freigegeben */
+  previewApprovedAt?: string | null;
+  /** Druck-/Stickfreigabe: Korrekturabzug vom Admin, Freigabe durch den Kunden */
+  proof?: { ids: { id: string; name: string }[]; note?: string; sentAt?: string | null; approvedAt?: string | null; approvedBy?: string | null; changes?: { date: string; text: string }[] } | null;
+  /** Bestellung über einen Vereins-/Team-Shop */
+  team?: string | null;
 };
 
 export function listInquiries(): Inquiry[] {
@@ -125,10 +134,13 @@ export function offerTotals(o: Offer) {
 
 /** Angebot aus der Anfrage vorbelegen (Shoppreise + Veredelung als eigene Position) */
 export function draftOffer(i: Inquiry): Offer {
-  const lines: OfferLine[] = i.lines.map((l) => ({ text: `${l.sku} ${l.name}`, detail: [l.color, l.size].filter(Boolean).join(', '), qty: l.qty, price: l.price ?? 0 }));
+  const lines: OfferLine[] = i.lines.map((l) => ({ text: `${l.sample ? 'MUSTER · ' : ''}${l.sku} ${l.name}`, detail: [l.color, l.size, l.sample ? 'Musterteil – wird bei Folgeauftrag angerechnet' : ''].filter(Boolean).join(', '), qty: l.qty, price: l.price ?? 0 }));
   const decos = new Map<string, { d: Deco; qty: number }>();
+  const teamRows: { what: string; pos: string; n: number; names: string }[] = [];
+  for (const l of i.lines) if (l.deco?.team?.rows.length) teamRows.push({ what: l.deco.team.what, pos: l.deco.team.pos, n: l.deco.team.rows.length, names: l.deco.team.rows.map((r) => [r.name, r.nr && `#${r.nr}`].filter(Boolean).join(' ')).join(', ') });
   for (const l of i.lines) if (l.deco) {
-    const k = JSON.stringify(l.deco);
+    // gleiche Veredelung über Größen hinweg zusammenfassen (Teamliste und Vorschaubilder zählen nicht)
+    const k = JSON.stringify({ ...l.deco, team: null, previews: null });
     const e = decos.get(k) ?? { d: l.deco, qty: 0 };
     e.qty += l.qty; decos.set(k, e);
   }
@@ -145,6 +157,7 @@ export function draftOffer(i: Inquiry): Offer {
     }
     if (calc.minApplied > 0) lines.push({ text: 'Mindermengenzuschlag Veredelung', detail: `Mindestbetrag ${pricing.minOrder.toFixed(2).replace('.', ',')} €`, qty: 1, price: calc.minApplied });
   }
+  for (const t of teamRows) lines.push({ text: `Personalisierung ${t.what === 'nummer' ? 'Nummer' : t.what === 'name' ? 'Name' : 'Name + Nummer'} (${t.pos})`, detail: t.names.slice(0, 300), qty: t.n, price: teamUnit(pricing, t.what) });
   if (i.discount?.pct) {
     const textil = i.lines.reduce((s, l) => s + l.sum, 0);
     lines.push({ text: `Willkommensrabatt ${i.discount.pct} %`, detail: `Code ${i.discount.code} · auf Textilien`, qty: 1, price: -Math.round(textil * i.discount.pct) / 100 });

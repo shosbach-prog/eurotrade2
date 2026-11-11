@@ -1,6 +1,9 @@
 import 'server-only';
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from 'pdf-lib';
-import { offerTotals, type Inquiry } from './store';
+import fs from 'node:fs';
+import path from 'node:path';
+import { UPLOADS, offerTotals, readJSON, type Inquiry } from './store';
+import { teamLabel } from './deco';
 
 const eur = (n: number) => n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' EUR';
 const date = (d: Date) => d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -10,7 +13,7 @@ const MUTED = rgb(0.36, 0.4, 0.46);
 const LINE = rgb(0.86, 0.88, 0.91);
 
 /** Absenderzeilen – überschreibbar per .env OFFER_SENDER="Zeile 1|Zeile 2|…" */
-const sender = () => (process.env.OFFER_SENDER ?? 'Euro-Trade · Sebastian Hosbach|Seehan 28 · 44263 Dortmund|Tel. 0173 2648097 · info@euro-trade.com').split('|');
+const sender = () => (process.env.OFFER_SENDER ?? 'Euro-Trade · Sebastian Hosbach|Seehang 28 · 44263 Dortmund|Tel. 0173 2648097 · info@euro-trade.com').split('|');
 
 export async function offerPdf(i: Inquiry): Promise<Buffer> {
   const o = i.offer!;
@@ -121,5 +124,49 @@ export async function offerPdf(i: Inquiry): Promise<Buffer> {
   text('Mit freundlichen Grüßen', L, y, { size: 9.5 });
   text(sender()[0], L, y - 13, { size: 9.5, f: bold });
   footer();
+
+  // Motiv-Vorschau(en) aus dem Shop + Teamlisten auf eigener Seite
+  const prev = previewsOf(i);
+  const teams = i.lines.filter((l) => l.deco?.team?.rows.length);
+  if (prev.length || teams.length) {
+    page = doc.addPage([W, H]); y = H - 60;
+    text('Motiv-Vorschau', L, y, { f: bold, size: 16 }); y -= 16;
+    text('Darstellung zur Orientierung – Position und Größe wie im Shop gewählt. Vor der Produktion erhalten Sie eine exakte Freigabe.', L, y, { size: 9, color: MUTED }); y -= 22;
+    const box = (R - L - 20) / 2;
+    let col = 0;
+    for (const pv of prev.slice(0, 6)) {
+      try {
+        const bytes = fs.readFileSync(pv.file);
+        const im = pv.ext === 'png' ? await doc.embedPng(bytes) : await doc.embedJpg(bytes);
+        const sc = Math.min(box / im.width, box / im.height);
+        if (y - box < 70) { footer(); page = doc.addPage([W, H]); y = H - 60; col = 0; }
+        const x = L + col * (box + 20);
+        page.drawRectangle({ x, y: y - box, width: box, height: box, borderColor: LINE, borderWidth: 0.6 });
+        page.drawImage(im, { x: x + (box - im.width * sc) / 2, y: y - box + (box - im.height * sc) / 2, width: im.width * sc, height: im.height * sc });
+        text(pv.label, x, y - box - 12, { size: 8.5, color: MUTED });
+        if (col === 1) { y -= box + 30; col = 0; } else col = 1;
+      } catch {}
+    }
+    if (col === 1) y -= box + 30;
+    for (const l of teams) {
+      const rows = wrap(`${l.name} ${l.color} ${l.size} – ${l.deco!.team!.what === 'nummer' ? 'Nummern' : l.deco!.team!.what === 'name' ? 'Namen' : 'Namen + Nummern'} (${l.deco!.team!.pos}): ${teamLabel(l.deco!.team!.rows)}`, font, 9, R - L);
+      for (const s of rows) { if (y < 80) { footer(); page = doc.addPage([W, H]); y = H - 60; } text(s, L, y, { size: 9 }); y -= 12; }
+      y -= 6;
+    }
+    footer();
+  }
   return Buffer.from(await doc.save());
+}
+
+/** Vorschaubilder einer Anfrage (nur PNG/JPG) */
+export function previewsOf(i: Inquiry) {
+  const out: { id: string; file: string; ext: string; label: string }[] = [];
+  const seen = new Set<string>();
+  for (const l of i.lines) for (const id of l.deco?.previews ?? []) {
+    if (seen.has(id)) continue; seen.add(id);
+    const meta = readJSON<{ ext: string } | null>(path.join(UPLOADS, `${id}.json`), null);
+    if (!meta || !['png', 'jpg', 'jpeg'].includes(meta.ext)) continue;
+    out.push({ id, file: path.join(UPLOADS, `${id}.${meta.ext}`), ext: meta.ext, label: `${l.name} · ${l.color}` });
+  }
+  return out;
 }

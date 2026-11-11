@@ -3,8 +3,10 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import AdminNav from '@/components/AdminNav';
 import OfferEditor from './OfferEditor';
+import ProofSender from './ProofSender';
+import { getTeamShop } from '@/lib/teamshop';
 import { eur } from '@/lib/format';
-import { decoLabel } from '@/lib/deco';
+import { decoLabel, teamLabel } from '@/lib/deco';
 import { mailEnabled, shopUrl } from '@/lib/mail';
 import { STATUS, draftOffer, getInquiry } from '@/lib/store';
 
@@ -30,6 +32,9 @@ export default function InquiryPage({ params }: { params: { no: string } }) {
           <p style={{ margin: '6px 0 0' }}>{c.company && <><b>{c.company}</b><br /></>}{c.name}<br /><a href={`mailto:${c.email}`} className="alink">{c.email}</a>{c.phone && <> · {c.phone}</>}{c.city && <><br />{c.city}</>}</p>
           {c.date && <p style={{ margin: '8px 0 0' }}><b>Wunschliefertermin:</b> {new Date(c.date).toLocaleDateString('de-DE')}</p>}
           {i.zugangscode && <p className="muted" style={{ margin: '8px 0 0' }}>Zugangscode: {i.zugangscode}</p>}
+          {i.team && <p style={{ margin: '8px 0 0' }}><span className="st st-angebot">Team-Shop: {getTeamShop(i.team)?.name ?? i.team}</span> <Link className="alink" href="/admin/teamshops" style={{ fontSize: 13 }}>Sammelbestellung</Link></p>}
+          {i.lines.some((l) => l.sample) && <p style={{ margin: '8px 0 0' }}><span className="st st-neu">Musterbestellung</span> <span className="muted" style={{ fontSize: 13 }}>– bei Folgeauftrag anrechnen</span></p>}
+          {i.previewApprovedAt && <p className="ok" style={{ margin: '8px 0 0', fontSize: 14 }}>✓ Motiv-Vorschau mit der Annahme freigegeben</p>}
           {i.discount && <p style={{ margin: '8px 0 0' }}><span className="st st-angenommen">Rabattcode {i.discount.code} · {i.discount.pct} %</span> <span className="muted" style={{ fontSize: 13 }}>– im Angebot als Position enthalten</span></p>}
           {c.message && <p style={{ whiteSpace: 'pre-wrap', margin: '10px 0 0', background: '#f6f7f9', padding: 10, borderRadius: 8 }}>{c.message}</p>}
           <p className="muted" style={{ fontSize: 13, margin: '10px 0 0' }}>Eingegangen: {fmt(i.date)}</p>
@@ -51,13 +56,16 @@ export default function InquiryPage({ params }: { params: { no: string } }) {
           <tbody>{i.lines.map((l, k) => (
             <tr key={k}>
               <td>{l.sku}</td>
-              <td>{l.id ? <Link href={`/produkt/${l.id}`} className="alink" target="_blank">{l.name}</Link> : l.name}{l.deco && <div className="deco-tag">✦ {decoLabel(l.deco)}{l.deco.note && <> – <i>{l.deco.note}</i></>}</div>}</td>
+              <td>{l.sample && <span className="sample-tag">Muster</span>}{l.id ? <Link href={`/produkt/${l.id}`} className="alink" target="_blank">{l.name}</Link> : l.name}{l.deco && <div className="deco-tag">✦ {decoLabel(l.deco)}{l.deco.note && <> – <i>{l.deco.note}</i></>}</div>}
+                {l.deco?.team?.rows.length ? <div className="muted" style={{ fontSize: 12.5 }}>{l.deco.team.pos}: {teamLabel(l.deco.team.rows)}</div> : null}
+                {l.deco?.previews?.length ? <div className="cl-prev">{l.deco.previews.map((id) => <a key={id} href={`/api/upload/${id}`} target="_blank"><img src={`/api/upload/${id}`} alt="Vorschau" /></a>)}</div> : null}</td>
               <td>{l.color}</td><td>{l.size}</td><td>{l.qty}</td><td>{eur(l.price)}</td><td>{l.price == null ? '–' : eur(l.sum)}</td>
             </tr>))}
           </tbody>
         </table>
       </div>
 
+      {i.lines.some((l) => l.deco) && <><h2>Freigabe</h2><ProofSender no={i.no} proof={i.proof ?? null} previews={[...new Map(i.lines.flatMap((l) => (l.deco?.previews ?? []).map((id, k) => [id, `${l.color || l.name}${k ? ' hinten' : ''}`] as const))).entries()].map(([id, label]) => ({ id, label }))} /></>}
       <h2>Angebot</h2>
       <OfferEditor no={i.no} initial={i.offer ?? draftOffer(i)} saved={!!i.offer} status={i.status!} statuses={STATUS} mail={mailEnabled()} acceptUrl={i.token ? `${shopUrl()}/angebot/${i.token}` : ''} sentAt={i.offer?.sentAt ?? null} />
     </>

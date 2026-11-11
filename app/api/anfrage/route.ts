@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getProduct } from '@/lib/catalog';
 import { getCustomer } from '@/lib/customer';
-import { FONTS, METHODS, POSITIONS, TEXT_COLORS, decoLabel, type Deco } from '@/lib/deco';
+import { FONTS, METHODS, POSITIONS, TEAM_POS, TEXT_COLORS, decoLabel, teamLabel, type Deco } from '@/lib/deco';
+import { getTeamShop } from '@/lib/teamshop';
 import { esc, sendMail, shopUrl } from '@/lib/mail';
 import { button, contactBlock, eur, h1, infoBox, itemsTable, layout, p, quote, signature, type MailLine } from '@/lib/mail-templates';
 import { unitFor } from '@/lib/tiers';
@@ -33,6 +34,12 @@ function cleanDeco(d: any): Deco | null {
       }
       return { place: Object.keys(place).length ? place : undefined, sizes: Object.keys(sizes).length ? sizes : undefined };
     })(),
+    previews: (Array.isArray(d.previews) ? d.previews : []).map(String).filter((x: string) => /^[a-f0-9]{24}$/.test(x)).slice(0, 4),
+    team: (() => {
+      const rows = (Array.isArray(d.team?.rows) ? d.team.rows : []).slice(0, 300).map((r: any) => ({ name: String(r?.name ?? '').slice(0, 30).trim(), nr: String(r?.nr ?? '').replace(/\D/g, '').slice(0, 3), size: String(r?.size ?? '').slice(0, 20) })).filter((r: any) => r.name || r.nr);
+      if (!rows.length) return null;
+      return { rows, pos: (TEAM_POS as readonly string[]).includes(d.team?.pos) ? d.team.pos : 'Rücken', what: ['name', 'nummer', 'beides'].includes(d.team?.what) ? d.team.what : 'beides' };
+    })(),
   };
 }
 
@@ -62,7 +69,8 @@ export async function POST(req: Request) {
   const perProduct = raw.reduce((m: Record<string, number>, x) => ({ ...m, [x.p.id]: (m[x.p.id] ?? 0) + x.qty }), {});
   const lines: InqLine[] = raw.map(({ p, l, qty }) => {
     const price = unitFor(p.tiers, perProduct[p.id], p.price);
-    return { id: p.id, sku: p.sku, name: p.name, color: String(l.color ?? '').slice(0, 80), size: String(l.size ?? '').slice(0, 40), qty, price, sum: Math.round((price ?? 0) * qty * 100) / 100, deco: cleanDeco(l.deco) };
+    const sample = !!l.sample;
+    return { id: p.id, sku: p.sku, name: p.name, color: String(l.color ?? '').slice(0, 80), size: String(l.size ?? '').slice(0, 40), qty: sample ? 1 : qty, price, sum: Math.round((price ?? 0) * (sample ? 1 : qty) * 100) / 100, deco: cleanDeco(l.deco), ...(sample ? { sample: true } : {}) };
   });
   if (!lines.length) return NextResponse.json({ error: 'Warenkorb ist leer.' }, { status: 400 });
   const total = lines.reduce((s, l) => s + l.sum, 0);
@@ -71,13 +79,14 @@ export async function POST(req: Request) {
 
   const sub = body.code ? validCode(String(body.code)) : null;
   const discount = sub && discountFor(total) > 0 ? { code: sub.code!, pct: discountFor(total) } : null;
-  const inq: Inquiry = { no, date: new Date().toISOString(), zugangscode: via, customer, lines, total, discount, status: 'neu', token: randomId(16), offer: null, history: [{ date: new Date().toISOString(), text: 'Anfrage eingegangen' }] };
+  const team = body.team ? getTeamShop(String(body.team)) : null;
+  const inq: Inquiry = { no, date: new Date().toISOString(), zugangscode: via, customer, lines, total, discount, status: 'neu', token: randomId(16), offer: null, team: team?.slug ?? null, history: [{ date: new Date().toISOString(), text: team ? `Anfrage über Team-Shop „${team.name}“ eingegangen` : 'Anfrage eingegangen' }] };
   saveInquiry(inq); // immer lokal sichern (auch wenn Mail ausfällt)
 
   const base = shopUrl();
   const abs = (u?: string) => (u && u.startsWith('/') ? `${base}${u}` : u ?? '');
   const imgOf = new Map(raw.map(({ p }) => [p.id, abs(p.images[0])]));
-  const mlines: MailLine[] = lines.map((l) => ({ sku: l.sku, name: l.name, color: l.color, size: l.size, qty: l.qty, price: l.price, sum: l.sum, deco: l.deco ? decoLabel(l.deco) : undefined, note: l.deco?.note || undefined, image: imgOf.get(l.id!) ?? '' }));
+  const mlines: MailLine[] = lines.map((l) => ({ sku: l.sku, name: `${l.sample ? 'MUSTER · ' : ''}${l.name}`, color: l.color, size: l.size, qty: l.qty, price: l.price, sum: l.sum, deco: l.deco ? decoLabel(l.deco) : undefined, note: [l.deco?.note, teamLabel(l.deco?.team?.rows)].filter(Boolean).join(' · ') || undefined, image: (l.deco?.previews?.[0] ? `${base}/api/upload/${l.deco.previews[0]}` : imgOf.get(l.id!)) ?? '' }));
   const pieces = lines.reduce((s, l) => s + l.qty, 0);
   const hasDeco = lines.some((l) => l.deco);
   const totals: [string, string, boolean?][] = discount
@@ -89,7 +98,7 @@ export async function POST(req: Request) {
   const toShop = layout({
     preheader: `${customer.company || customer.name} · ${pieces} Stück · ${eur(total)}`, title: `Neue Anfrage ${no}`,
     body: h1(`Neue Anfrage ${no}`)
-      + infoBox([['Kunde', esc(customer.company || customer.name)], ['Stückzahl', String(pieces)], ['Summe Textil netto', eur(total)], ...(dateTxt ? [['Wunschtermin', dateTxt] as [string, string]] : []), ...(via ? [['Zugangscode', esc(via)] as [string, string]] : []), ...(discount ? [['Rabattcode', `${discount.code} (${discount.pct} %)`] as [string, string]] : [])], '#ffc21a')
+      + infoBox([['Kunde', esc(customer.company || customer.name)], ['Stückzahl', String(pieces)], ['Summe Textil netto', eur(total)], ...(team ? [['Team-Shop', esc(team.name)] as [string, string]] : []), ...(lines.some((l) => l.sample) ? [['Muster', 'ja – wird angerechnet'] as [string, string]] : []), ...(dateTxt ? [['Wunschtermin', dateTxt] as [string, string]] : []), ...(via ? [['Zugangscode', esc(via)] as [string, string]] : []), ...(discount ? [['Rabattcode', `${discount.code} (${discount.pct} %)`] as [string, string]] : [])], '#ffc21a')
       + contactBlock(customer)
       + (customer.message ? `<div style="font-size:13px;font-weight:700;margin:0 0 6px">Nachricht</div>${quote(customer.message)}` : '')
       + itemsTable(mlines, totals)

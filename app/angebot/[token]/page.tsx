@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import AcceptForm from './AcceptForm';
+import ProofBox from './ProofBox';
+import { teamLabel } from '@/lib/deco';
 import { eur } from '@/lib/format';
 import { inquiryByToken, offerTotals } from '@/lib/store';
 
@@ -39,10 +41,22 @@ export default function OfferPage({ params }: { params: { token: string } }) {
         </div>
         {o.note && <p style={{ whiteSpace: 'pre-wrap', marginTop: 16 }}>{o.note}</p>}
       </div>
+      {(() => {
+        const prev = [...new Map(i.lines.flatMap((l) => (l.deco?.previews ?? []).map((id) => [id, `${l.name}${l.color ? ` · ${l.color}` : ''}`] as const))).entries()];
+        const teams = i.lines.filter((l) => l.deco?.team?.rows.length);
+        if (!prev.length && !teams.length) return null;
+        return <div className="box" style={{ marginTop: 16 }}>
+          <h2 style={{ marginTop: 0 }}>Ihre Motiv-Vorschau</h2>
+          <p className="muted" style={{ marginTop: -4 }}>So haben Sie Position und Größe im Shop gewählt.{i.previewApprovedAt ? ' ✓ Mit der Annahme freigegeben.' : ' Mit der Annahme geben Sie diese Vorschau frei – kleine technische Anpassungen (z. B. Farbtöne, Stickdichte) stimmen wir vorher mit Ihnen ab.'}</p>
+          {prev.length > 0 && <div className="of-prev">{prev.map(([id, label]) => <a key={id} href={`/api/angebot/${params.token}/bild/${id}`} target="_blank" rel="noreferrer"><img src={`/api/angebot/${params.token}/bild/${id}`} alt={`Vorschau ${label}`} /><span>{label}</span></a>)}</div>}
+          {teams.map((l, k) => <p key={k} style={{ fontSize: 14 }}><b>{l.name} {l.color} {l.size}</b> – {l.deco!.team!.pos}: {teamLabel(l.deco!.team!.rows)}</p>)}
+        </div>;
+      })()}
+      {i.proof?.sentAt && <ProofBox token={params.token} proof={i.proof} name={i.customer.name} />}
       <div className="box" style={{ marginTop: 16 }}>
         {accepted ? <p className="ok" style={{ margin: 0, fontWeight: 600 }}>✓ Sie haben dieses Angebot angenommen. Vielen Dank – wir melden uns mit der Druckfreigabe bzw. dem Liefertermin.</p>
           : expired ? <p className="err" style={{ margin: 0 }}>Dieses Angebot ist abgelaufen. Antworten Sie gern auf unsere E-Mail – wir erstellen Ihnen ein neues.</p>
-          : <AcceptForm token={params.token} defaultName={i.customer.name} total={eur(t.gross)} />}
+          : <AcceptForm token={params.token} defaultName={i.customer.name} total={eur(t.gross)} hasPreview={i.lines.some((l) => l.deco?.previews?.length)} />}
       </div>
     </div>
   );

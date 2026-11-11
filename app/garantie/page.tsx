@@ -22,7 +22,7 @@ export default function Garantie() {
 
       <h2>Garantiebedingungen</h2>
       <div className="box legal">
-        <p><strong>Garantiegeber:</strong> Sebastian Hosbach, Euro-Trade, Seehan 28, 44263 Dortmund, Telefon 0173 2648097, E-Mail info@euro-trade.com.</p>
+        <p><strong>Garantiegeber:</strong> Sebastian Hosbach, Euro-Trade, Seehang 28, 44263 Dortmund, Telefon 0173 2648097, E-Mail info@euro-trade.com.</p>
         <p><strong>Geltungsbereich:</strong> Die Garantie gilt für alle über euro-trade.com angenommenen Angebote, für Verbraucher wie für Unternehmen, Vereine und Behörden.</p>
         <p><strong>1. Veredelung:</strong> Maßgeblich ist die vor der Produktion von Ihnen freigegebene Vorschau. Übliche, produktionsbedingte Toleranzen bei Farbe (z. B. Druck- und Garnfarben gegenüber der Bildschirmdarstellung), Größe (± 5 mm) und Position (± 1 cm) stellen keine Abweichung dar. Nicht umfasst sind Fehler in von Ihnen gelieferten Vorlagen, Texten oder Namenslisten, die in der Vorschau erkennbar waren und freigegeben wurden.</p>
         <p><strong>2. Mängel und Falschlieferung:</strong> Bitte melden Sie offensichtliche Mängel oder Falschlieferungen innerhalb von 7 Tagen nach Erhalt mit Fotos an info@euro-trade.com.</p>

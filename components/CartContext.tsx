@@ -8,6 +8,10 @@ export type CartLine = {
   hex?: string; category: string; image?: string; deco?: Deco | null; tiers?: { min: number; price: number }[];
   /** verfügbare Größen – für die Bearbeitung im Warenkorb */
   sizes?: string[];
+  /** Musterteil (1 Stück, wird angerechnet) */
+  sample?: boolean;
+  /** Bestellung über einen Team-Shop */
+  team?: string;
 };
 type NewLine = Omit<CartLine, 'key'>;
 type Ctx = {
@@ -20,7 +24,7 @@ type Ctx = {
 
 const CartCtx = createContext<Ctx | null>(null);
 const KEY = 'et-cart-v2';
-const keyOf = (l: NewLine) => `${l.id}|${l.color ?? ''}|${l.size ?? ''}|${l.deco ? JSON.stringify(l.deco) : ''}`;
+const keyOf = (l: NewLine) => `${l.id}|${l.color ?? ''}|${l.size ?? ''}|${l.deco ? JSON.stringify(l.deco) : ''}${l.sample ? '|muster' : ''}${l.team ? `|t:${l.team}` : ''}`;
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>([]);
@@ -33,18 +37,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const merge = (base: CartLine[], l: NewLine) => {
     const key = keyOf(l);
     const ex = base.find((x) => x.key === key);
-    return ex ? base.map((x) => (x.key === key ? { ...x, qty: x.qty + l.qty } : x)) : [...base, { ...l, key }];
+    return ex ? base.map((x) => (x.key === key ? { ...x, qty: l.sample ? 1 : x.qty + l.qty } : x)) : [...base, { ...l, key }];
   };
   const addMany: Ctx['addMany'] = (ls) => { save(ls.reduce(merge, lines)); setLastAdded(ls.map(keyOf)); setDrawer(true); };
   const add: Ctx['add'] = (l) => addMany([l]);
-  const setQty = (key: string, qty: number) => save(lines.map((x) => (x.key === key ? { ...x, qty: Math.max(1, Math.floor(qty) || 1) } : x)));
+  const setQty = (key: string, qty: number) => save(lines.map((x) => (x.key === key ? { ...x, qty: x.sample ? 1 : Math.max(1, Math.floor(qty) || 1) } : x)));
   const update: Ctx['update'] = (key, patch) => {
     const cur = lines.find((x) => x.key === key);
     if (!cur) return;
     const { key: _k, ...rest } = cur;
     save(merge(lines.filter((x) => x.key !== key), { ...rest, ...patch }));
   };
-  const decoToAll = (deco: Deco | null) => save(lines.reduce<CartLine[]>((acc, { key: _k, ...l }) => merge(acc, { ...l, deco: adaptDeco(deco, l) }), []));
+  const decoToAll = (deco: Deco | null) => save(lines.reduce<CartLine[]>((acc, { key: _k, ...l }) => merge(acc, l.sample ? l : { ...l, deco: deco ? { ...adaptDeco(deco, l)!, team: l.deco?.team ?? null, previews: l.deco?.previews } : null }), []));
   const remove = (key: string) => save(lines.filter((x) => x.key !== key));
   const clear = () => save([]);
   const count = lines.reduce((s, l) => s + l.qty, 0);

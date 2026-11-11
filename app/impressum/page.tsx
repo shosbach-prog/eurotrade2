@@ -1,4 +1,4 @@
-export const metadata = { title: 'Impressum', description: 'Impressum von euro-trade.com – Sebastian Hosbach, Seehan 28, 44263 Dortmund. Kontakt: info@euro-trade.com, Telefon 0173 2648097.', alternates: { canonical: '/impressum' } };
+export const metadata = { title: 'Impressum', description: 'Impressum von euro-trade.com – Sebastian Hosbach, Seehang 28, 44263 Dortmund. Kontakt: info@euro-trade.com, Telefon 0173 2648097.', alternates: { canonical: '/impressum' } };
 
 export default function Page() {
   return (
@@ -8,7 +8,7 @@ export default function Page() {
       <h2 style={{ marginTop: 8 }}>Angaben gemäß § 5 DDG</h2>
       <p>
         Sebastian Hosbach<br />
-        Seehan 28<br />
+        Seehang 28<br />
         44263 Dortmund<br />
         Deutschland
       </p>

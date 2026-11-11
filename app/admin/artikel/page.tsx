@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import AdminNav from '@/components/AdminNav';
 import NewArticle from './NewArticle';
+import ArticleImport from './ArticleImport';
 import ArticleList, { type Row } from './ArticleList';
 import { adminProducts } from '@/lib/catalog';
 import { readOverrides } from '@/lib/artikel';
@@ -29,6 +30,7 @@ export default function Artikel() {
         <NewArticle categories={cats} />
       </div>
       <p className="muted" style={{ marginTop: 0 }}>Suchen, filtern, mehrere Artikel auf einmal sichtbar schalten oder einer Kategorie zuordnen. Ihre Änderungen bleiben auch bei Katalog-Updates erhalten.</p>
+      <ArticleImport placeholders={rows.filter((r) => r.placeholder).length} />
       <ArticleList rows={rows} categories={cats} />
     </>
   );

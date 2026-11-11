@@ -3,7 +3,7 @@ import { isAdmin } from '@/lib/customer';
 import { esc, sendMail, shopUrl } from '@/lib/mail';
 import { button, h1, infoBox, layout, offerTable, p, quote, signature } from '@/lib/mail-templates';
 import { offerPdf } from '@/lib/pdf';
-import { sendReviewRequest } from '@/lib/review-mail';
+import { reviewDays, sendReviewRequest } from '@/lib/review-mail';
 import { STATUS, addHistory, getInquiry, offerTotals, randomId, saveInquiry, type Offer, type Status } from '@/lib/store';
 
 const eur = (n: number) => n.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
@@ -37,11 +37,8 @@ export async function POST(req: Request, { params }: { params: { no: string } })
     let extra = '';
     if (s !== i.status) {
       i.status = s; addHistory(i, `Status: ${STATUS[s]}`);
-      // nach Lieferung automatisch um eine Bewertung bitten (einmalig)
-      if (s === 'geliefert' && !i.reviewRequestedAt) {
-        try { if (await sendReviewRequest(i)) { i.reviewRequestedAt = new Date().toISOString(); addHistory(i, 'Bewertungseinladung gesendet'); extra = ' · Bewertungseinladung gesendet'; } }
-        catch (e) { console.error('Bewertungseinladung fehlgeschlagen', e); }
-      }
+      // nach Lieferung: Bewertungseinladung geht automatisch nach ein paar Tagen raus (täglicher Lauf)
+      if (s === 'geliefert' && !i.deliveredAt) { i.deliveredAt = new Date().toISOString(); if (!i.reviewRequestedAt) extra = ` · Bewertungseinladung folgt automatisch in ${reviewDays()} Tagen`; }
       saveInquiry(i);
     }
     return NextResponse.json({ ok: true, status: s, message: `Status: ${STATUS[s]}${extra}` });
@@ -51,6 +48,28 @@ export async function POST(req: Request, { params }: { params: { no: string } })
     try { await sendReviewRequest(i); } catch { return NextResponse.json({ error: 'E-Mail konnte nicht gesendet werden.' }, { status: 500 }); }
     i.reviewRequestedAt = new Date().toISOString(); addHistory(i, 'Bewertungseinladung gesendet'); saveInquiry(i);
     return NextResponse.json({ ok: true, message: `Bewertungseinladung an ${i.customer.email} gesendet.` });
+  }
+
+  if (body.action === 'proof') {
+    // Korrekturabzug zur Freigabe an den Kunden senden
+    const ids = (Array.isArray(body.ids) ? body.ids : []).filter((x: any) => /^[a-f0-9]{24}$/.test(String(x?.id))).slice(0, 8).map((x: any) => ({ id: String(x.id), name: String(x.name ?? 'Vorschau').slice(0, 120) }));
+    if (!ids.length) return NextResponse.json({ error: 'Bitte mindestens eine Vorschau hochladen.' }, { status: 400 });
+    i.proof = { ...(i.proof ?? {}), ids, note: String(body.note ?? '').slice(0, 2000), sentAt: new Date().toISOString(), approvedAt: null, approvedBy: null };
+    const link = `${shopUrl()}/angebot/${i.token}#freigabe`;
+    try {
+      await sendMail({ to: i.customer.email, replyTo: process.env.INQUIRY_TO, subject: `Bitte freigeben: Ihre Vorschau zu ${i.no}`,
+        html: layout({ preheader: 'Bitte prüfen Sie Ihre Vorschau – mit einem Klick freigeben.', title: `Freigabe ${i.no}`,
+          body: h1('Ihre Vorschau zur Freigabe')
+            + p(`Guten Tag ${esc(i.customer.name)},`)
+            + p('anbei die Vorschau Ihrer Veredelung. Bitte prüfen Sie Schreibweise, Farben, Position und Größe – erst nach Ihrer Freigabe starten wir die Produktion.')
+            + (i.proof.note ? quote(i.proof.note) : '')
+            + button(link, 'Vorschau ansehen & freigeben')
+            + p('Etwas ändern? Einfach auf der Seite „Änderung wünschen“ klicken oder auf diese E-Mail antworten.', true)
+            + signature() }) });
+    } catch (e) { console.error('Freigabe-Mail fehlgeschlagen', e); addHistory(i, 'Vorschau gespeichert – E-Mail konnte nicht gesendet werden'); saveInquiry(i); return NextResponse.json({ error: 'Gespeichert, aber die E-Mail konnte nicht gesendet werden. Link manuell schicken: ' + link }, { status: 500 }); }
+    addHistory(i, `Vorschau zur Freigabe gesendet (${ids.length} Datei${ids.length > 1 ? 'en' : ''})`);
+    saveInquiry(i);
+    return NextResponse.json({ ok: true, message: `Vorschau an ${i.customer.email} gesendet.` });
   }
 
   const first = !i.offer;

@@ -10,7 +10,8 @@ import Info from '@/components/Info';
 import Stars from '@/components/Stars';
 import BrandLogo from '@/components/BrandLogo';
 import { brandSlug, findBrand } from '@/lib/brands';
-import { FONTS, METHODS, MOTIFS, positionsFor, TEXT_COLORS, colorHex, fontCss, isImage, type Deco, type Motif } from '@/lib/deco';
+import { FONTS, METHODS, MOTIFS, positionsFor, TEXT_COLORS, TEAM_POS, colorHex, fontCss, isImage, parseTeamList, type Deco, type Motif, type TeamRow } from '@/lib/deco';
+import { uploadPreviews } from '@/components/decoRender';
 import DecoStudio, { defaultPlace, type Place } from '@/components/DecoStudio';
 import { cmFor, spotsFor } from '@/lib/deco-layout';
 import { nextTier, unitFor } from '@/lib/tiers';
@@ -18,8 +19,9 @@ import { calcDeco, type DecoPricing } from '@/lib/deco-pricing';
 
 type Logo = { id: string; name: string };
 
+export type TeamCtx = { slug: string; name: string; logoId?: string | null; logoName?: string | null; method: string; positions: string[]; personalize: 'aus' | 'name' | 'nummer' | 'beides'; deadline?: string | null; open: boolean };
 type PText = { headline: string; intro: string; highlights: string[]; idealFor: string };
-export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fits }: { p: PublicProduct; fits?: Record<string, [number, number, number, number, number]>; customerLogo?: Logo | null; delivery?: string; copy?: PText; pricing?: DecoPricing | null }) {
+export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fits, team }: { p: PublicProduct; fits?: Record<string, [number, number, number, number, number]>; team?: TeamCtx | null; customerLogo?: Logo | null; delivery?: string; copy?: PText; pricing?: DecoPricing | null }) {
   const { addMany } = useCart();
   const [color, setColor] = useState(p.colors[0]);
   // Mengen je Farbe + Größe ("Black|M" -> 5) – mehrere Farben in einem Schritt möglich
@@ -27,10 +29,10 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
   const [msg, setMsg] = useState('');
 
   // Veredelung
-  const [decoOn, setDecoOn] = useState(false);
-  const [method, setMethod] = useState(METHODS[0]);
+  const [decoOn, setDecoOn] = useState(!!team);
+  const [method, setMethod] = useState(team?.method ?? METHODS[0]);
   const posList = useMemo(() => positionsFor(p), [p]);
-  const [positions, setPositions] = useState<string[]>([posList[0]]);
+  const [positions, setPositions] = useState<string[]>(() => { const t = (team?.positions ?? []).filter((x) => posList.includes(x)); return t.length ? t : [posList[0]]; });
   // Live-Vorschau: Lage je Position + aktive Position
   const [place, setPlace] = useState<Place>({});
   const [activePos, setActivePos] = useState<string | null>(posList[0]);
@@ -39,7 +41,15 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
     setPlace((pl) => { const n = { ...pl }; for (const x of positions) if (!n[x]) { const d = defaultPlace(p, x); if (d) n[x] = d; } return n; });
     if (!activePos || !positions.includes(activePos)) setActivePos(positions[positions.length - 1] ?? null);
   }, [positions]); // eslint-disable-line react-hooks/exhaustive-deps
-  const [logo, setLogo] = useState<Logo | null>(customerLogo ?? null);
+  const [logo, setLogo] = useState<Logo | null>(team?.logoId ? { id: team.logoId, name: team.logoName ?? 'Vereinslogo' } : customerLogo ?? null);
+  // Teamliste: Namen / Nummern je Teil
+  const [teamOn, setTeamOn] = useState(!!team && team.personalize !== 'aus');
+  const [teamWhat, setTeamWhat] = useState<'name' | 'nummer' | 'beides'>(team && team.personalize !== 'aus' ? team.personalize : 'beides');
+  const [teamPos, setTeamPos] = useState<string>('Rücken');
+  const [teamRaw, setTeamRaw] = useState('');
+  const teamRows: TeamRow[] = useMemo(() => (teamOn ? parseTeamList(teamRaw, p.sizes) : []), [teamOn, teamRaw, p.sizes]);
+  const [busy, setBusy] = useState(false);
+  const [sampleSize, setSampleSize] = useState('');
   const [uploading, setUploading] = useState(false);
   const [upErr, setUpErr] = useState('');
   const [note, setNote] = useState('');
@@ -62,7 +72,9 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
   }, [qty]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const togglePos = (x: string) => { setPositions((ps) => (ps.includes(x) ? ps.filter((y) => y !== x) : [...ps, x])); if (!positions.includes(x)) setActivePos(x); };
-  const decoOk = !decoOn || (positions.length > 0 && (!useText || !!text.trim()) && (!useLogo || method === 'Beratung gewünscht' || !!logo));
+  // Team-Shop: Vereinslogo liegt bei uns – Mitglied muss nichts hochladen
+  const decoOk = !decoOn || !!team || (positions.length > 0 && (!useText || !!text.trim()) && (!useLogo || method === 'Beratung gewünscht' || !!logo));
+  const teamClosed = !!team && !team.open;
 
   async function upload(file?: File | null) {
     if (!file) return;
@@ -75,19 +87,44 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
     if (r.ok) setLogo({ id: d.id, name: d.name }); else setUpErr(d.error ?? 'Upload fehlgeschlagen.');
   }
 
-  const onAdd = () => {
+  const onAdd = async () => {
     const kind = spotsFor(p).kind;
     const pl = Object.fromEntries(positions.filter((x) => place[x]).map((x) => [x, place[x]]));
     const sizes = Object.fromEntries(positions.filter((x) => place[x]).map((x) => [x, cmFor(kind, place[x].w)]));
-    const deco: Deco | null = decoOn ? { method, positions, place: pl, sizes, motif, logoId: useLogo ? logo?.id ?? null : null, logoName: useLogo ? logo?.name ?? null : null, text: useText ? text.trim() : null, font: useText ? font : null, textColor: useText ? tColor : null, note: note.trim() } : null;
+    let deco: Deco | null = decoOn ? { method, positions, place: pl, sizes, motif, logoId: useLogo ? logo?.id ?? null : null, logoName: useLogo ? logo?.name ?? null : null, text: useText ? text.trim() : null, font: useText ? font : null, textColor: useText ? tColor : null, note: note.trim() } : null;
+    setBusy(true);
+    // Live-Vorschau als Bild an die Anfrage hängen (Freigabe im Angebot)
+    if (deco && (studioProps.logoSrc || studioProps.text.trim())) {
+      const previews = await uploadPreviews({ ...studioProps, product: p }).catch(() => []);
+      if (previews.length) deco = { ...deco, previews };
+    }
+    // Teamliste auf die Größen der aktuellen Farbe verteilen; Einträge ohne Größe an die erste Position
+    const own = entries.filter(([key]) => key.split('|')[0] === cname);
+    const rowsFor = (s: string, first: boolean) => teamRows.filter((r) => (r.size ? r.size === s : first));
     const items = entries.map(([key, n]) => {
       const [c, s] = key.split('|');
       const col = p.colors.find((x) => x.name === c);
-      return { id: p.id, sku: p.sku, name: p.name, color: c || undefined, hex: col?.hex, size: s || undefined, qty: n, price: p.price, category: p.category, image: p.images[0], deco, tiers: p.tiers, sizes: p.sizes };
+      const rows = deco && teamOn && c === cname ? rowsFor(s, own[0]?.[0] === key) : [];
+      const d = deco && rows.length ? { ...deco, team: { rows, pos: teamPos, what: teamWhat } } : deco;
+      return { id: p.id, sku: p.sku, name: p.name, color: c || undefined, hex: col?.hex, size: s || undefined, qty: n, price: p.price, category: p.category, image: col?.image ?? p.images[0], deco: d, tiers: p.tiers, sizes: p.sizes, ...(team ? { team: team.slug } : {}) };
     });
     addMany(items);
+    setBusy(false);
     setMsg(`${total} Stück von ${p.name} im Warenkorb${deco ? ' (mit Veredelung)' : ''}.`);
     setQty({});
+  };
+  /** Teamliste → Mengen der aktuellen Farbe übernehmen */
+  const takeTeamQty = () => {
+    const by: Record<string, number> = {};
+    for (const r of teamRows) if (r.size) by[r.size] = (by[r.size] ?? 0) + 1;
+    setQty((q) => ({ ...Object.fromEntries(Object.entries(q).filter(([key]) => key.split('|')[0] !== cname)), ...Object.fromEntries(Object.entries(by).map(([s, n]) => [k(cname, s), n])) }));
+  };
+  /** 1 Musterteil anfordern */
+  const addSample = () => {
+    const s = sampleSize || (sizes.length === 1 ? sizes[0] : '');
+    if (sizes.length > 1 && !s) return;
+    addMany([{ id: p.id, sku: p.sku, name: p.name, color: cname || undefined, hex: color?.hex, size: s || undefined, qty: 1, price: p.price, category: p.category, image: color?.image ?? p.images[0], deco: null, tiers: p.tiers, sizes: p.sizes, sample: true }]);
+    setMsg(`Muster ${p.name}${cname ? ` in ${cname}` : ''}${s ? `, Größe ${s}` : ''} im Warenkorb – wird bei Ihrer Bestellung angerechnet.`);
   };
   const specs = Object.entries(p.specs ?? {}).filter(([, v]) => v && v !== 'Keine Angabe');
   const est = useMemo(() => {
@@ -190,13 +227,18 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
         {p.colors.length > 1 && <p className="hint">Mehrere Farben? Oben eine andere Farbe wählen und Mengen eintragen – alles wird unten gesammelt.</p>}
 
         {/* Veredelung */}
-        <label className="deco-toggle">
+        {team && <div className="team-banner">
+          {team.logoId && <img src={`/api/upload/${team.logoId}`} alt="" />}
+          <div><b>Team-Shop {team.name}</b><span>{team.method} mit Vereinslogo · {positions.join(', ')}{team.deadline ? ` · Bestellschluss ${new Date(team.deadline).toLocaleDateString('de-DE')}` : ''}</span></div>
+        </div>}
+        {!team && <label className="deco-toggle">
           <input type="checkbox" checked={decoOn} onChange={(e) => setDecoOn(e.target.checked)} />
           <span><strong>Veredeln mit Logo oder Text</strong> <span className="muted">– Druck oder Stick</span></span>
           <Info>Wir drucken oder besticken Ihr Logo bzw. Ihren Text. Die Kosten stehen als eigene Position im Angebot – vor der Produktion erhalten Sie eine Vorschau zur Freigabe.</Info>
-        </label>
+        </label>}
         {decoOn && (
           <div className="deco">
+            {!team && <>
             <p className="hint" style={{ margin: '0 0 10px' }}>Unsicher, welches Verfahren passt? <a href="/druck-stick" target="_blank" className="alink">Druck & Stick im Vergleich</a></p>
             <div className="deco-row">
               {METHODS.map((m) => <button key={m} type="button" className={`size ${m === method ? 'on' : ''}`} onClick={() => setMethod(m)}>{m}</button>)}
@@ -220,7 +262,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
                 <span className="muted" style={{ fontSize: 13 }}>{tColor}</span>
               </div>
               {text.trim() && <div className="text-sample" style={{ background: color?.hex ?? '#e5e7eb' }}><span style={textStyle}>{text}</span></div>}
-              <p className="hint">Unterschiedliche Namen oder Nummern je Teil? Einfach unten im Hinweisfeld auflisten, z. B. „M: Lisa 7, L: Tom 10“.</p>
+
             </>}
             {useLogo && <><div className="opt" style={{ marginTop: 14 }}>Logo</div>
             {logo ? (
@@ -241,8 +283,31 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
             {upErr && <p className="err" style={{ margin: '6px 0 0', fontSize: 14 }}>{upErr}</p>}
             <p className="hint">PNG, JPG, SVG, PDF, AI oder EPS bis 15 MB. Vektordateien liefern das beste Ergebnis.</p>
             </>}
+            </>}
             <div className="deco-studio-m"><div className="opt" style={{ marginTop: 14 }}>Live-Vorschau</div><DecoStudio {...studioProps} compact /></div>
             {estBox}
+            {(!team || team.personalize !== 'aus') && <div className="teamlist">
+              {!team && <label className="ds-check"><input type="checkbox" checked={teamOn} onChange={(e) => setTeamOn(e.target.checked)} /> <b>Namen / Nummern je Teil</b> <span className="muted">(Teamliste)</span></label>}
+              {team && <div className="opt" style={{ marginTop: 0 }}>Ihr Name / Ihre Nummer</div>}
+              {teamOn && <>
+                {!team && <div className="deco-row" style={{ marginTop: 8 }}>
+                  {(['beides', 'name', 'nummer'] as const).map((w) => <button key={w} type="button" className={`size ${teamWhat === w ? 'on' : ''}`} onClick={() => setTeamWhat(w)}>{w === 'beides' ? 'Name + Nummer' : w === 'name' ? 'Nur Namen' : 'Nur Nummern'}</button>)}
+                  <select value={teamPos} onChange={(e) => setTeamPos(e.target.value)} aria-label="Position">{TEAM_POS.map((x) => <option key={x}>{x}</option>)}</select>
+                </div>}
+                <textarea className="deco-note" rows={team ? 2 : 4} value={teamRaw} onChange={(e) => setTeamRaw(e.target.value)}
+                  placeholder={team ? `z. B. ${teamWhat === 'nummer' ? '10 M' : teamWhat === 'name' ? 'Lisa M' : 'Lisa 10 M'}` : 'Eine Zeile pro Teil – direkt aus Excel einfügen:\nLisa\t7\tM\nTom\t10\tL\nMia\t3\tS'} />
+                {teamRows.length > 0 && <div className="tl-table">
+                  <div className="tl-head"><span>Name</span><span>Nr.</span><span>Größe</span></div>
+                  {teamRows.slice(0, 40).map((r, n) => <div key={n} className={r.size ? '' : 'warn'}><span>{r.name || '–'}</span><span>{r.nr || '–'}</span><span>{r.size || 'fehlt'}</span></div>)}
+                  {teamRows.length > 40 && <div className="muted">… und {teamRows.length - 40} weitere</div>}
+                </div>}
+                {teamRows.length > 0 && <div className="tl-foot">
+                  <span>{teamRows.length} {teamRows.length === 1 ? 'Teil' : 'Teile'}{teamRows.some((r) => !r.size) ? ' · bei einigen fehlt die Größe' : ''}</span>
+                  {teamRows.some((r) => r.size) && <button type="button" className="btn alt sm" onClick={takeTeamQty}>Mengen für {cname || 'diese Farbe'} übernehmen</button>}
+                </div>}
+                <p className="hint">Gilt für die gewählte Farbe. Spalten: Name, Nummer, Größe – Reihenfolge egal, auch per Kopieren aus Excel.</p>
+              </>}
+            </div>}
             <textarea className="deco-note" placeholder="Hinweise, z. B. Größe ca. 8 cm, Pantone-Farben, Namen/Nummern je Größe …" value={note} onChange={(e) => setNote(e.target.value)} />
           </div>
         )}
@@ -279,14 +344,21 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
           </div>
         )}
         <div className="qtyrow">
-          <button className="btn" disabled={!total || !decoOk} onClick={onAdd}>
-            {!total ? (sizes.length > 1 ? 'Größe & Menge wählen' : 'Menge wählen') : !decoOk ? (useText && !text.trim() ? 'Text eingeben' : 'Logo / Position wählen') : `${total} Stück in den Warenkorb`}
+          <button className="btn" disabled={!total || !decoOk || busy || teamClosed} onClick={onAdd}>
+            {teamClosed ? 'Bestellschluss erreicht' : busy ? 'Vorschau wird gespeichert …' : !total ? (sizes.length > 1 ? 'Größe & Menge wählen' : 'Menge wählen') : !decoOk ? (useText && !text.trim() ? 'Text eingeben' : 'Logo / Position wählen') : `${total} Stück in den Warenkorb`}
           </button>
           <WishButton id={p.id} variant="full" />
         </div>
+        {!team && <div className="sample-row">
+          <span><b>Erst testen?</b> 1 Musterteil anfordern – wird bei Ihrer Bestellung angerechnet.</span>
+          <div>
+            {sizes.length > 1 && <select value={sampleSize} onChange={(e) => setSampleSize(e.target.value)} aria-label="Größe für Muster"><option value="">Größe</option>{sizes.map((s) => <option key={s}>{s}</option>)}</select>}
+            <button type="button" className="btn alt sm" disabled={sizes.length > 1 && !sampleSize} onClick={addSample}>Muster bestellen</button>
+          </div>
+        </div>}
         <div className={`mbar ${total ? 'has' : ''}`}>
           <div className="mbar-info">{total ? <><b>{total} Stk.</b>{p.price != null && <span> · {eur(unitFor(p.tiers, total, p.price)! * total)} netto</span>}</> : <span className="muted">{p.price != null ? `ab ${eur(p.tiers.length ? p.tiers[p.tiers.length - 1].price : p.price)}` : 'Preis auf Anfrage'}</span>}</div>
-          <button className="btn" disabled={!!total && !decoOk} onClick={() => (total ? onAdd() : document.querySelector('.szgrid')?.scrollIntoView({ behavior: 'smooth', block: 'center' }))}>
+          <button className="btn" disabled={(!!total && !decoOk) || busy || teamClosed} onClick={() => (total ? onAdd() : document.querySelector('.szgrid')?.scrollIntoView({ behavior: 'smooth', block: 'center' }))}>
             {!total ? 'Größe wählen' : !decoOk ? 'Veredelung prüfen' : 'In den Warenkorb'}
           </button>
         </div>

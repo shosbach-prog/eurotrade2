@@ -4,7 +4,8 @@ import crypto from 'node:crypto';
 import path from 'node:path';
 import { esc, mailEnabled, sendMail, shopUrl } from './mail';
 import { button, h1, layout, p, signature } from './mail-templates';
-import { DATA, addHistory, listInquiries, offerTotals, readJSON, saveInquiry, writeJSON } from './store';
+import { DATA, addHistory, listInquiries, listReviews, offerTotals, readJSON, saveInquiry, writeJSON } from './store';
+import { reviewDays, sendReviewRequest } from './review-mail';
 
 const STATE = path.join(DATA, 'cron.json');
 export const followDays = () => Math.max(1, Number(process.env.NACHFASS_TAGE ?? 3));
@@ -51,7 +52,22 @@ export async function runFollowUps() {
       sent++;
     } catch (e) { console.error('Nachfass-Mail fehlgeschlagen', i.no, e); failed++; }
   }
-  const result = !mailEnabled() ? `${due.length} fällig – kein Mailversand eingerichtet` : `${sent} Erinnerung(en) gesendet${failed ? `, ${failed} fehlgeschlagen` : ''}${!due.length ? ' (nichts fällig)' : ''}`;
+  // Bewertungseinladung X Tage nach Lieferung, eine Erinnerung 7 Tage später (nur ohne Bewertung)
+  const rd = reviewDays(), reviewed = new Set(listReviews().map((r) => r.inquiryNo));
+  let rev = 0, revRem = 0;
+  if (mailEnabled()) for (const i of listInquiries()) {
+    if (i.status !== 'geliefert' || !i.deliveredAt || !i.token || !i.customer?.email || reviewed.has(i.no)) continue;
+    const first = !i.reviewRequestedAt && now - Date.parse(i.deliveredAt) >= rd * 864e5;
+    const again = !!i.reviewRequestedAt && !i.reviewRemindedAt && now - Date.parse(i.reviewRequestedAt) >= 7 * 864e5 && now - Date.parse(i.deliveredAt) < 60 * 864e5;
+    if (!first && !again) continue;
+    try {
+      await sendReviewRequest(i, again);
+      if (first) { i.reviewRequestedAt = new Date().toISOString(); addHistory(i, `Bewertungseinladung gesendet (${rd} Tage nach Lieferung)`); rev++; }
+      else { i.reviewRemindedAt = new Date().toISOString(); addHistory(i, 'Erinnerung zur Bewertung gesendet'); revRem++; }
+      saveInquiry(i);
+    } catch (e) { console.error('Bewertungsmail fehlgeschlagen', i.no, e); failed++; }
+  }
+  const result = !mailEnabled() ? `${due.length} fällig – kein Mailversand eingerichtet` : `${sent} Angebots-Erinnerung(en), ${rev} Bewertungseinladung(en), ${revRem} Bewertungs-Erinnerung(en)${failed ? `, ${failed} fehlgeschlagen` : ''}`;
   writeJSON(STATE, { lastRun: new Date().toISOString(), lastResult: result });
   return { due: due.length, sent, failed, result };
 }

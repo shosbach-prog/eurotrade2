@@ -4,11 +4,11 @@ import { button, h1, layout, p, signature } from './mail-templates';
 import type { Inquiry } from './store';
 
 /** Einladung zur Bewertung (nach Lieferung) */
-export async function sendReviewRequest(i: Inquiry) {
+export async function sendReviewRequest(i: Inquiry, reminder = false) {
   const link = `${shopUrl()}/bewerten/${i.token}`;
   const products = [...new Map(i.lines.map((l) => [l.id ?? l.sku, l.name])).values()];
   return sendMail({
-    to: i.customer.email, replyTo: process.env.INQUIRY_TO, subject: `Wie zufrieden sind Sie mit Ihrer Bestellung ${i.no}?`,
+    to: i.customer.email, replyTo: process.env.INQUIRY_TO, subject: reminder ? `Kurze Erinnerung: Ihre Meinung zu Bestellung ${i.no}` : `Wie zufrieden sind Sie mit Ihrer Bestellung ${i.no}?`,
     html: layout({
       preheader: 'Ihre Meinung hilft anderen Vereinen und Unternehmen – dauert nur 1 Minute.', title: 'Ihre Bewertung',
       body: h1('Wie gefällt Ihnen Ihre Bestellung?')
@@ -22,3 +22,5 @@ export async function sendReviewRequest(i: Inquiry) {
     }),
   });
 }
+
+export const reviewDays = () => Math.max(1, Number(process.env.BEWERTUNG_TAGE ?? 7));

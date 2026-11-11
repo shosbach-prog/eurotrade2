@@ -20,10 +20,32 @@ const REF: Partial<Record<string, { top: number; bottom: number; shoulder?: bool
   oberteil: { top: 14, bottom: 95, shoulder: true }, hose: { top: 6, bottom: 95 }, tasche: { top: 8, bottom: 94 },
   cap: { top: 27, bottom: 80 }, muetze: { top: 22, bottom: 80 }, schuerze: { top: 2, bottom: 95 }, unterwaesche: { top: 22, bottom: 70 },
 };
-type Tf = { s: number; ox: number; oy: number; rt: number };
-const ident: Tf = { s: 1, ox: 50, oy: 0, rt: 0 };
+export type Tf = { s: number; ox: number; oy: number; rt: number };
+export const ident: Tf = { s: 1, ox: 50, oy: 0, rt: 0 };
+export type FitT = [number, number, number, number, number];
 
-const lum = (hex?: string) => { const m = /^#?([0-9a-f]{6})$/i.exec(hex ?? ''); if (!m) return 1; const n = parseInt(m[1], 16); return (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255; };
+/** Skizze je Artikel (Hoodie mit Kapuze, Langarm usw.) */
+export function shapeFor(product: { category?: string; name?: string }) {
+  const { kind, spots, shape: base } = spotsFor(product);
+  const label = `${product.name} ${product.category}`;
+  const hoodie = kind === 'oberteil' && /hood|kapuz/i.test(label);
+  const LONG = 'M36 11 L22 15 L11 30 L5 80 L15 82 L22 46 L22 95 L78 95 L78 46 L85 82 L95 80 L89 30 L78 15 L64 11 Q50 22 36 11 Z';
+  const longArm = kind === 'oberteil' && /hood|kapuz|sweat|jacke|jacket|fleece|langarm|long ?sleeve|hemd|softshell|pullover|bodywarmer/i.test(label) && !/bodywarmer|weste|vest/i.test(label);
+  const base2 = longArm ? { ...base, front: [LONG], back: [LONG.replace('Q50 22 36 11', 'Q50 15 36 11')] } : base;
+  const shape = hoodie ? { ...base2, front: [...base2.front, 'M35 12 Q50 -1 65 12 Q50 24 35 12 Z'], detail: ['M35 12 Q50 24 65 12', 'M33 66 H67 L71 86 H29 Z', 'M47 18 L46 34 M53 18 L54 34'], back: [...(base2.back ?? base2.front), 'M35 12 Q50 -6 65 12 Q50 30 35 12 Z'] } : base2;
+  return { kind, spots, shape, hoodie };
+}
+/** Ausrichtung am echten Artikel im Foto: Skizzen-Koordinaten -> Foto-Koordinaten (gleichmäßig skaliert) */
+export function photoTf(kind: string, fit: FitT | null | undefined, hoodie: boolean): Tf {
+  const r = REF[kind];
+  if (!r || !fit) return ident;
+  const top = r.shoulder ? (hoodie ? fit[2] : fit[1]) : fit[0];
+  const s = (fit[3] - top) / (r.bottom - r.top);
+  if (!(s > 0.3 && s < 2)) return ident;
+  return { s, ox: fit[4], oy: top, rt: r.top };
+}
+
+export const lum = (hex?: string) => { const m = /^#?([0-9a-f]{6})$/i.exec(hex ?? ''); if (!m) return 1; const n = parseInt(m[1], 16); return (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255; };
 
 /** Standard-Lage je Position (für neue Positionen) */
 export function defaultPlace(product: { category?: string; name?: string }, pos: string) {
@@ -34,15 +56,7 @@ export function defaultPlace(product: { category?: string; name?: string }, pos:
 /** Live-Vorschau: Motiv in der Artikelfarbe an der gewählten Position – verschieben per Ziehen, Größe per Regler */
 export default function DecoStudio(props: Props) {
   const { product, positions, active, setActive, place, setPlace, logoSrc, text = '', font, textColor, method, compact } = props;
-  const { kind, spots, shape: base } = useMemo(() => spotsFor(product), [product]);
-  // Hoodies bekommen Kapuze und Bauchtasche in der Skizze
-  const label = `${product.name} ${product.category}`;
-  const hoodie = kind === 'oberteil' && /hood|kapuz/i.test(label);
-  // Langarm-Artikel: lange Ärmel in der Skizze
-  const LONG = 'M36 11 L22 15 L11 30 L5 80 L15 82 L22 46 L22 95 L78 95 L78 46 L85 82 L95 80 L89 30 L78 15 L64 11 Q50 22 36 11 Z';
-  const longArm = kind === 'oberteil' && /hood|kapuz|sweat|jacke|jacket|fleece|langarm|long ?sleeve|hemd|softshell|pullover|bodywarmer/i.test(label) && !/bodywarmer|weste|vest/i.test(label);
-  const base2 = longArm ? { ...base, front: [LONG], back: [LONG.replace('Q50 22 36 11', 'Q50 15 36 11')] } : base;
-  const shape = hoodie ? { ...base2, front: [...base2.front, 'M35 12 Q50 -1 65 12 Q50 24 35 12 Z'], detail: ['M35 12 Q50 24 65 12', 'M33 66 H67 L71 86 H29 Z', 'M47 18 L46 34 M53 18 L54 34'], back: [...(base2.back ?? base2.front), 'M35 12 Q50 -6 65 12 Q50 30 35 12 Z'] } : base2;
+  const { kind, spots, shape, hoodie } = useMemo(() => shapeFor(product), [product]);
   const known = positions.filter((p) => spots[p]);
   const cur = active && spots[active] ? active : known[0] ?? null;
   const [view, setView] = useState<View>(cur ? spots[cur].view : 'front');
@@ -60,14 +74,7 @@ export default function DecoStudio(props: Props) {
   const hasBack = !!shape.back || known.some((p) => spots[p].view === 'back');
   const showPhoto = photoMode && view === 'front' && !!props.photo;
   // Ausrichtung am echten Artikel im Foto: Skizzen-Koordinaten -> Foto-Koordinaten (gleichmäßig skaliert)
-  const tf: Tf = useMemo(() => {
-    const r = REF[kind], f = props.fit;
-    if (!showPhoto || !r || !f) return ident;
-    const top = r.shoulder ? (hoodie ? f[2] : f[1]) : f[0];
-    const s = (f[3] - top) / (r.bottom - r.top);
-    if (!(s > 0.3 && s < 2)) return ident;
-    return { s, ox: f[4], oy: top, rt: r.top };
-  }, [showPhoto, kind, props.fit, hoodie]);
+  const tf: Tf = useMemo(() => (showPhoto ? photoTf(kind, props.fit, hoodie) : ident), [showPhoto, kind, props.fit, hoodie]);
   const toX = (x: number) => tf.ox + (x - 50) * tf.s, toY = (y: number) => tf.oy + (y - tf.rt) * tf.s;
   const fromX = (x: number) => (x - tf.ox) / tf.s + 50, fromY = (y: number) => (y - tf.oy) / tf.s + tf.rt;
   const inView = known.filter((p) => spots[p].view === view);
