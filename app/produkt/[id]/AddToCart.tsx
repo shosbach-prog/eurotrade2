@@ -99,7 +99,13 @@ export default function AddToCart({ p, customerLogo, delivery, copy }: { p: Publ
         <div className="muted" style={{ textTransform: 'uppercase', fontSize: 13, letterSpacing: '.4px' }}>{p.brand} · Art.-Nr. {p.sku}</div>
         <h1 style={{ margin: '4px 0 0' }}>{p.name}</h1>
         {p.rating && <a href="#bewertungen" className="pd-rating"><Stars value={p.rating.avg} size={16} showValue count={p.rating.count} /></a>}
-        {p.price != null ? <>
+        {p.locked ? (
+          <div className="locked-box">
+            <b>🔒 Preise und Bestellung nach Anmeldung</b>
+            <p>Unser Shop ist exklusiv für Vereine, Unternehmen und Partner. Mit Ihrem persönlichen Zugangscode sehen Sie Ihre Konditionen, Staffelpreise und können direkt anfragen.</p>
+            <div className="deco-row"><a className="btn" href={`/zugang?weiter=/produkt/${p.id}`} style={{ display: 'inline-grid', placeItems: 'center' }}>Anmelden</a><a className="btn alt" href="/#anfragen" style={{ display: 'inline-grid', placeItems: 'center' }}>Zugang anfragen</a></div>
+          </div>
+        ) : p.price != null ? <>
           <div className="price">{eur(p.price)} <span style={{ fontSize: 15, fontWeight: 500 }} className="muted">/ Stück</span></div>
           <div className="vat">netto zzgl. MwSt. ({eur(p.priceGross)} brutto) · schon ab 1 Stück{decoOn ? ' · Veredelung wird im Angebot kalkuliert' : ''}</div>
           {delivery && <div className="delivery"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M1 4h14v12H1zM15 9h4l3 3v4h-7z" /><circle cx="6" cy="18" r="2" /><circle cx="18" cy="18" r="2" /></svg>{delivery}</div>}
@@ -131,6 +137,12 @@ export default function AddToCart({ p, customerLogo, delivery, copy }: { p: Publ
         </>}
 
         <div className="opt opt-row"><span>{sizes.length > 1 ? <>Größen & Mengen{p.colors.length > 0 && <span className="muted" style={{ fontWeight: 400 }}> für <span className="dot-inline" style={{ background: color ? swatchBg(color) : '#ddd' }} />{cname}</span>}</> : 'Menge'}</span>{p.sizeChart && <a href={p.sizeChart} target="_blank" rel="noreferrer" className="sizechart"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><path d="M2 8h20v8H2zM6 8v3M10 8v4M14 8v3M18 8v4" /></svg>Größentabelle</a>}</div>
+        {p.locked ? (
+          <>
+            <div className="sizes-ro">{p.sizes.map((x) => <span key={x}>{x}</span>)}</div>
+            <div className="qtyrow"><WishButton id={p.id} variant="full" /></div>
+          </>
+        ) : <>
         <div className={`szgrid ${sizes.length === 1 ? 'single' : ''}`}>
           {sizes.map((s) => {
             const v = qty[k(cname, s)] || 0;
@@ -251,6 +263,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy }: { p: Publ
             {!total ? 'Größe wählen' : !decoOk ? 'Veredelung prüfen' : 'In den Warenkorb'}
           </button>
         </div>
+        </>}
         {msg && <div className="note ok">✓ {msg} <a href="/warenkorb" style={{ textDecoration: 'underline' }}>Zum Warenkorb</a></div>}
 
         {copy && (

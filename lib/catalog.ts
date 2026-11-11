@@ -39,17 +39,17 @@ function load(): State {
 }
 
 /** Kundenkontext: eigener Aufschlag, eigene Kollektion */
-export type Ctx = { markup?: number | null; skus?: string[]; exclusive?: boolean; tiers?: string | null } | null | undefined;
+export type Ctx = { markup?: number | null; skus?: string[]; exclusive?: boolean; tiers?: string | null; /** Schaufenster: keine Preise */ locked?: boolean } | null | undefined;
 
 export function toPublic(p: Product, ctx?: Ctx): PublicProduct {
   const { basePrice, baseTiers, ...rest } = p;
-  const price = basePrice != null && basePrice > 0 ? sellPrice(basePrice, p.categorySlug, ctx?.markup) : null;
+  const price = !ctx?.locked && basePrice != null && basePrice > 0 ? sellPrice(basePrice, p.categorySlug, ctx?.markup) : null;
   // Echte Staffel-EK von L-Shop haben Vorrang – sonst Rabattstaffel auf den Verkaufspreis
   const tiers = price == null ? []
     : baseTiers?.length && !ctx?.tiers
       ? baseTiers.filter((t) => t.min > 1 && t.price > 0).sort((a, b) => a.min - b.min).map((t) => ({ min: t.min, price: sellPrice(t.price, p.categorySlug, ctx?.markup) })).filter((t) => t.price < price)
       : priceTiers(price, ctx?.tiers);
-  return { ...rest, colors: sortColors(p.colors), price, priceGross: price != null ? gross(price) : null, tiers, rating: ratingFor(p.id) };
+  return { ...rest, colors: sortColors(p.colors), price, priceGross: price != null ? gross(price) : null, tiers, rating: ratingFor(p.id), ...(ctx?.locked ? { locked: true } : {}) };
 }
 
 const skuSet = (ctx: Ctx) => new Set((ctx?.skus ?? []).map((x) => x.toUpperCase()));

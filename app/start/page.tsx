@@ -6,7 +6,9 @@ import NewsletterBox from './NewsletterBox';
 import { ReviewStrip } from '@/components/ProductReviews';
 import { latestReviews, overall } from '@/lib/reviews';
 import { discountTiers, listReferences } from '@/lib/store';
-import { getCategories } from '@/lib/catalog';
+import { getCategories, getFeatured } from '@/lib/catalog';
+import ProductCard from '@/components/ProductCard';
+import { previewMode } from '@/lib/access';
 
 export const metadata: Metadata = {
   title: 'Teamwear & Firmenbekleidung mit Logo – ab 1 Stück',
@@ -19,6 +21,8 @@ const BRANDS = ['Asquith & Fox', 'B&C', 'Beechfield', 'Daiber', 'HRM', 'Mantis',
 export default function Start() {
   const refs = listReferences();
   const cats = getCategories().slice(0, 8);
+  const showcase = getFeatured(8, { locked: true });
+  const collage = showcase.flatMap((p) => p.images.slice(0, 1)).slice(0, 4);
   return (
     <div className="landing">
       <section className="l-hero">
@@ -43,6 +47,10 @@ export default function Start() {
         </div>
       </section>
 
+      {collage.length >= 3 && (
+        <div className="l-collage" aria-hidden>{collage.map((src) => <img key={src} src={src} alt="" loading="lazy" />)}</div>
+      )}
+
       <section className="l-feats">
         {[
           ['Ab 1 Stück', 'Einzelteile, Nachbestellungen oder ganze Teams – ohne Mindestmenge, mit Staffelpreisen ab 10 Stück.'],
@@ -65,8 +73,16 @@ export default function Start() {
       {cats.length > 0 && (
         <section className="l-section">
           <h2>Sortiment</h2>
-          <div className="chips">{cats.map((c) => <span key={c.slug} className="chip">{c.name}</span>)}<span className="chip">und vieles mehr</span></div>
+          <div className="chips">{cats.map((c) => (previewMode() ? <span key={c.slug} className="chip">{c.name}</span> : <Link key={c.slug} href={`/kategorie/${c.slug}`} className="chip">{c.name}</Link>))}<span className="chip">und vieles mehr</span></div>
           <p className="muted" style={{ marginTop: 14 }}>Marken u. a.: {BRANDS.join(' · ')}</p>
+        </section>
+      )}
+
+      {!previewMode() && showcase.length > 0 && (
+        <section className="l-section">
+          <h2>Beliebte Artikel</h2>
+          <div className="grid">{showcase.map((p) => <ProductCard key={p.id} p={p} />)}</div>
+          <p className="muted" style={{ marginTop: 10 }}>Preise und Bestellung nach Anmeldung mit Ihrem Zugangscode.</p>
         </section>
       )}
 

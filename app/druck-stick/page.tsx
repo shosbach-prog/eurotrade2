@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import JsonLd, { crumbSchema, faqSchema } from '@/components/JsonLd';
 
 export const metadata: Metadata = {
-  title: 'Druck & Stick – welches Verfahren passt zu Ihrem Logo?',
+  title: 'Druck oder Stick? Verfahren im Vergleich',
   description: 'Siebdruck, Transferdruck, Digitaldruck (DTF) und Stick im Vergleich: Mindestmengen, Vorteile, Grenzen, Logo-Anforderungen und typische Größen für Teamwear und Firmenbekleidung.',
   alternates: { canonical: '/druck-stick' },
 };
@@ -33,6 +34,8 @@ const METHODS = [
     for: 'Trikots, Personalisierung, Warnwesten-Schriftzüge',
   },
 ];
+
+const FAQ: [string, string][] = [["Kann ich auch nur ein einzelnes Teil veredeln lassen?", "Ja. Mit Digitaltransfer oder Flex ist das ab 1 Stück möglich. Für Stick fallen einmalige Kosten für das Stickprogramm an, deshalb lohnt er sich meist ab etwa 10 Teilen. Bei Nachbestellungen nutzen wir dasselbe Programm erneut."], ["Was kostet die Veredelung?", "Das hängt von Verfahren, Größe, Farbanzahl und Menge ab. Sie erhalten die Kosten transparent als eigene Position im Angebot."], ["Können Namen und Nummern individuell sein?", "Ja. Tragen Sie die Namen und Nummern einfach im Hinweisfeld der Veredelung ein oder schicken Sie uns eine Liste. Das ist ideal für Trikots und Teamwear."], ["Wie wasche ich veredelte Textilien?", "Auf links gedreht bei der angegebenen Temperatur waschen und nicht direkt auf dem Motiv bügeln. So bleiben Druck und Stick lange schön."]];
 
 const SIZES = [
   ['Brust links / rechts', 'ca. 8–10 cm breit', 'Klassisch für Logos auf Polos, Hemden, Jacken'],
@@ -92,11 +95,10 @@ export default function DruckStick() {
 
       <h2>Häufige Fragen</h2>
       <div className="faq">
-        <details className="box"><summary>Kann ich auch nur ein einzelnes Teil veredeln lassen?</summary><p>Ja. Mit Digitaltransfer oder Flex ist das ab 1 Stück möglich. Für Stick fallen einmalige Kosten für das Stickprogramm an, deshalb lohnt er sich meist ab etwa 10 Teilen. Bei Nachbestellungen nutzen wir dasselbe Programm erneut.</p></details>
-        <details className="box"><summary>Was kostet die Veredelung?</summary><p>Das hängt von Verfahren, Größe, Farbanzahl und Menge ab. Sie erhalten die Kosten transparent als eigene Position im Angebot.</p></details>
-        <details className="box"><summary>Können Namen und Nummern individuell sein?</summary><p>Ja. Tragen Sie die Namen und Nummern einfach im Hinweisfeld der Veredelung ein oder schicken Sie uns eine Liste. Das ist ideal für Trikots und Teamwear.</p></details>
-        <details className="box"><summary>Wie wasche ich veredelte Textilien?</summary><p>Auf links gedreht bei der angegebenen Temperatur waschen und nicht direkt auf dem Motiv bügeln. So bleiben Druck und Stick lange schön.</p></details>
+        {FAQ.map(([q, a], k) => <details key={q} className="box" open={k === 0}><summary>{q}</summary><p>{a}</p></details>)}
       </div>
+      <JsonLd data={faqSchema(FAQ)} />
+      <JsonLd data={crumbSchema([['Start', '/'], ['Druck & Stick', '/druck-stick']])} />
 
       <div className="box l-cta-box">
         <div><h2 style={{ margin: 0 }}>Bereit für Ihr Projekt?</h2><p className="muted" style={{ margin: '4px 0 0' }}>Fragen Sie Ihren persönlichen Zugang an, oder melden Sie sich mit Ihrem Code an.</p></div>

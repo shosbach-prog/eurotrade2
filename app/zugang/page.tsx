@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import AccessForm from './AccessForm';
 
-export const metadata: Metadata = { title: 'Zugang', robots: { index: false, follow: false } };
+export const metadata: Metadata = { title: 'Anmelden', description: 'Anmeldung für Kunden von euro-trade.com mit persönlichem Zugangscode.', robots: { index: false, follow: false } };
 
 export default function Zugang({ searchParams }: { searchParams: { weiter?: string } }) {
   const next = searchParams.weiter?.startsWith('/') && !searchParams.weiter.startsWith('//') ? searchParams.weiter : '/';

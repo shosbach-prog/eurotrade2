@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-export const metadata: Metadata = { title: 'Datenschutz' };
+export const metadata: Metadata = { title: 'Datenschutz', description: 'Datenschutzerklärung von euro-trade.com: welche Daten wir bei Anfragen, Newsletter, Bewertungen und Uploads verarbeiten und welche Rechte Sie haben.', robots: { index: false, follow: true } };
 
 const S = ({ t, children }: { t: string; children: React.ReactNode }) => (<section><h2>{t}</h2>{children}</section>);
 

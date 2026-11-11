@@ -3,18 +3,19 @@ import { notFound } from 'next/navigation';
 import FilterGrid from '@/components/FilterGrid';
 import { ReviewStrip } from '@/components/ProductReviews';
 import Stars from '@/components/Stars';
+import JsonLd, { crumbSchema, faqSchema } from '@/components/JsonLd';
 import { getByCategory, getCategories } from '@/lib/catalog';
-import { getCustomer } from '@/lib/customer';
+import { viewCtx } from '@/lib/customer';
 import { categoryContent } from '@/lib/category-content';
 import { latestReviews } from '@/lib/reviews';
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const c = getCategories(await getCustomer()).find((x) => x.slug === params.slug);
-  return { title: c?.name ?? 'Kategorie', description: c ? categoryContent(c.slug, c.name).intro : undefined };
+  const c = getCategories(await viewCtx()).find((x) => x.slug === params.slug);
+  return { title: c ? `${c.name} mit Logo bedrucken & besticken` : 'Kategorie', description: c ? categoryContent(c.slug, c.name).intro : undefined, alternates: c ? { canonical: `/kategorie/${c.slug}` } : undefined };
 }
 
 export default async function CategoryPage({ params }: { params: { slug: string } }) {
-  const ctx = await getCustomer();
+  const ctx = await viewCtx();
   const cat = getCategories(ctx).find((x) => x.slug === params.slug);
   if (!cat) notFound();
   const items = getByCategory(params.slug, ctx);
@@ -24,6 +25,8 @@ export default async function CategoryPage({ params }: { params: { slug: string 
   const heroImgs = items.flatMap((p) => p.images.slice(0, 1)).slice(0, 3);
   return (
     <>
+      <JsonLd data={crumbSchema([['Start', '/'], [cat.name, `/kategorie/${cat.slug}`]])} />
+      <JsonLd data={faqSchema(txt.faq)} />
       <div className="crumbs"><Link href="/">Start</Link> › {cat.name}</div>
       <section className="cat-hero">
         <div className="cat-hero-text">

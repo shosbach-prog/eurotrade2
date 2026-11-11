@@ -639,3 +639,16 @@ footer .wrap{padding-right:84px}
 footer .wrap{padding-left:112px}
 @media (max-width:820px){.tbadge svg{width:58px;height:58px}.tbadge{left:12px;bottom:12px}body:has(.mbar) .tbadge{bottom:80px}footer .wrap{padding-left:16px;padding-bottom:70px}}
 @media print{.tbadge,.contact{display:none}}
+/* Schaufenster */
+.lock-p{font-size:13px!important;color:var(--brand)!important;font-weight:600!important}
+.locked-box{margin-top:12px;background:#f3f7ff;border:1px solid #c9dafb;border-radius:12px;padding:14px 16px}
+.locked-box p{margin:6px 0 12px;font-size:14px;color:#3b4250}
+.sizes-ro{display:flex;flex-wrap:wrap;gap:6px}
+.sizes-ro span{border:1px solid var(--line);border-radius:8px;padding:5px 10px;font-size:13px;background:#fff}
+.about-card{display:flex;gap:20px;align-items:flex-start}
+.about-card p{line-height:1.65;color:#2b313b}
+.avatar.big{width:84px;height:84px;font-size:26px}
+@media (max-width:600px){.about-card{flex-direction:column}}
+.l-collage{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
+.l-collage img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:14px;background:#fff;box-shadow:var(--shadow)}
+@media (max-width:820px){.l-collage{grid-template-columns:repeat(2,1fr)}}

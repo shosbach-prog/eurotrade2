@@ -30,6 +30,6 @@ export type Product = {
 };
 
 /** Was der Browser sieht: Verkaufspreis statt Einkaufspreis */
-export type PublicProduct = Omit<Product, 'basePrice' | 'baseTiers'> & { price: number | null; priceGross: number | null; /** Staffelpreise netto (ab Menge) */ tiers: { min: number; price: number }[]; /** Kundenbewertung (nur freigegebene, verifizierte) */ rating?: { avg: number; count: number } | null };
+export type PublicProduct = Omit<Product, 'basePrice' | 'baseTiers'> & { price: number | null; priceGross: number | null; /** Staffelpreise netto (ab Menge) */ tiers: { min: number; price: number }[]; /** Kundenbewertung (nur freigegebene, verifizierte) */ rating?: { avg: number; count: number } | null; /** Schaufenster ohne Preise */ locked?: boolean };
 
 export type Category = { name: string; slug: string; count: number };
