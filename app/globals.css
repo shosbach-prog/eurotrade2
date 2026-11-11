@@ -1375,3 +1375,15 @@ footer.ft{margin-top:64px}
 .brand-tags span{color:var(--muted);margin-right:2px}
 .brand-tags b{background:#eef3ff;color:#123a7a;border-radius:20px;padding:3px 10px;font-weight:600}
 .bt-txt{font-size:11.5px;color:var(--muted);line-height:1.35}
+.brand-about{display:grid;grid-template-columns:1fr 280px;gap:20px;margin:0 0 24px;align-items:start}
+.brand-copy{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px 24px}
+.brand-copy h2{margin:0 0 8px;font-size:20px}
+.brand-copy p{margin:0 0 12px;font-size:15.5px;line-height:1.65}
+.brand-copy p:last-child{margin-bottom:0}
+.brand-facts{background:#f6f8fc;border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+.brand-facts h3{margin:0 0 10px;font-size:15px}
+.brand-facts dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:14px}
+.brand-facts dt{color:var(--muted)}
+.brand-facts dd{margin:0;font-weight:600}
+.brand-facts small{display:block;margin-top:10px;font-size:11.5px;color:var(--muted)}
+@media (max-width:800px){.brand-about{grid-template-columns:1fr}}
