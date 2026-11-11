@@ -607,3 +607,20 @@ footer .wrap{padding-right:84px}
 .cat-seo p{color:#3b4250;line-height:1.65}
 .cat-seo h2{margin-top:0}
 @media (max-width:820px){.cat-hero{grid-template-columns:1fr;padding:20px}.cat-hero h1{font-size:28px}.cat-hero-imgs{justify-content:flex-start}.cat-seo{grid-template-columns:1fr}}
+/* Verkaufstext */
+.ptext{margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}
+.ptext h2{font-size:21px;margin:0 0 8px;letter-spacing:-.3px}
+.ptext p{margin:0 0 10px;color:#2b313b;line-height:1.65}
+.hl{list-style:none;padding:0;margin:12px 0;display:grid;gap:6px}
+.hl li{padding-left:26px;position:relative;font-size:14px}
+.hl li::before{content:"✓";position:absolute;left:0;top:0;width:18px;height:18px;border-radius:50%;background:#e3f5e9;color:var(--ok);font-size:11px;font-weight:900;display:grid;place-items:center}
+.ideal{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;margin-top:6px}
+.ideal span{color:var(--muted);margin-right:2px}
+.ideal b{background:#f3f7ff;color:var(--brand);border-radius:999px;padding:3px 10px;font-weight:600}
+.pdetails{margin-top:18px;border-top:1px solid var(--line);padding-top:12px}
+.pdetails summary{cursor:pointer;font-weight:700;font-size:15px}
+.te-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;align-items:start}
+.te-facts{position:sticky;top:90px;max-height:calc(100vh - 110px);overflow:auto;font-size:13px}
+.te-facts .specs dt{width:120px}.te-facts .specs dd{margin-left:120px}
+.te-prev{margin-top:16px;padding:16px;border:1px dashed var(--line);border-radius:10px;background:#fafbfc}
+@media (max-width:900px){.te-grid{grid-template-columns:1fr}.te-facts{position:static;max-height:none}}

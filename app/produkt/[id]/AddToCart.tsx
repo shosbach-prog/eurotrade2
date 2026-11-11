@@ -13,7 +13,8 @@ import { nextTier, unitFor } from '@/lib/tiers';
 
 type Logo = { id: string; name: string };
 
-export default function AddToCart({ p, customerLogo, delivery }: { p: PublicProduct; customerLogo?: Logo | null; delivery?: string }) {
+type PText = { headline: string; intro: string; highlights: string[]; idealFor: string };
+export default function AddToCart({ p, customerLogo, delivery, copy }: { p: PublicProduct; customerLogo?: Logo | null; delivery?: string; copy?: PText }) {
   const { addMany } = useCart();
   const [color, setColor] = useState(p.colors[0]);
   // Mengen je Farbe + Größe ("Black|M" -> 5) – mehrere Farben in einem Schritt möglich
@@ -252,7 +253,17 @@ export default function AddToCart({ p, customerLogo, delivery }: { p: PublicProd
         </div>
         {msg && <div className="note ok">✓ {msg} <a href="/warenkorb" style={{ textDecoration: 'underline' }}>Zum Warenkorb</a></div>}
 
-        {p.features?.length ? <ul className="feat">{p.features.map((f) => <li key={f}>{f}</li>)}</ul> : <p style={{ marginTop: 20 }}>{p.description}</p>}
+        {copy && (
+          <div className="ptext">
+            <h2>{copy.headline}</h2>
+            {copy.intro.split(/\n\s*\n/).map((x) => <p key={x}>{x}</p>)}
+            {copy.highlights.length > 0 && <ul className="hl">{copy.highlights.map((h) => <li key={h}>{h}</li>)}</ul>}
+            {copy.idealFor && <div className="ideal"><span>Ideal für:</span>{copy.idealFor.split(',').map((x) => <b key={x}>{x.trim()}</b>)}</div>}
+          </div>
+        )}
+        <details className="pdetails" open={!copy}>
+          <summary>Produktdetails & Material</summary>
+          {p.features?.length ? <ul className="feat">{p.features.map((f) => <li key={f}>{f}</li>)}</ul> : <p style={{ marginTop: 12 }}>{p.description}</p>}
         <dl className="specs">
           {p.material && <><dt>Material</dt><dd>{p.material}</dd></>}
           {p.composition && <><dt>Zusammensetzung</dt><dd>{p.composition}</dd></>}
@@ -260,6 +271,7 @@ export default function AddToCart({ p, customerLogo, delivery }: { p: PublicProd
           {p.sizes.length > 0 && <><dt>Größen</dt><dd>{p.sizes.join(', ')}</dd></>}
           {specs.map(([key, v]) => <Fragment key={key}><dt>{key}</dt><dd>{v}</dd></Fragment>)}
         </dl>
+        </details>
       </div>
     </div>
   );

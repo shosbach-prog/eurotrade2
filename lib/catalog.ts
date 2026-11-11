@@ -83,7 +83,7 @@ export function getCollection(ctx?: Ctx): PublicProduct[] {
   return (ctx?.skus ?? []).flatMap((k) => { const p = bySku.get(k.toUpperCase()); return p ? [toPublic(p, ctx)] : []; });
 }
 /** Alle Artikel (Admin: Auswahl für Kollektionen) */
-export const allProductsBrief = () => load().products.map((p) => ({ sku: p.sku, name: p.name, brand: p.brand }));
+export const allProductsBrief = () => load().products.map((p) => ({ id: p.id, sku: p.sku, name: p.name, brand: p.brand }));
 
 export function search(q: string, limit = 48, ctx?: Ctx): PublicProduct[] {
   const s = load();

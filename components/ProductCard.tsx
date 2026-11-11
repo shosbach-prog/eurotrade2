@@ -11,7 +11,11 @@ function badges(p: PublicProduct): { t: string; c: string }[] {
   const b: { t: string; c: string }[] = [];
   if (p.rating && p.rating.count >= 3 && p.rating.avg >= 4.5) b.push({ t: 'Top bewertet', c: 'b-top' });
   if (p.price != null && p.tiers.length) b.push({ t: `bis −${Math.round((1 - p.tiers[p.tiers.length - 1].price / p.price) * 100)} % Staffel`, c: 'b-deal' });
-  if (/bio|organic|recycl/i.test(`${p.name} ${p.material ?? ''} ${(p.features ?? []).join(' ')}`)) b.push({ t: 'Nachhaltig', c: 'b-eco' });
+  // nur belegte Material-Labels (keine pauschalen Umweltaussagen)
+  const cert = p.specs?.['Zertifizierung'] ?? '';
+  const pending = (p.features ?? []).some((x) => /in arbeit/i.test(x));
+  if (/recycel/i.test(cert)) b.push({ t: 'Recycelt', c: 'b-eco' });
+  else if (/bio/i.test(cert) && !pending) b.push({ t: 'Bio-Baumwolle', c: 'b-eco' });
   return b.slice(0, 2);
 }
 const sizeRange = (s: string[]) => (s.length > 1 ? `${s[0]}–${s[s.length - 1]}` : s[0] ?? '');
