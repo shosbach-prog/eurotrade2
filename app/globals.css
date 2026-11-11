@@ -1188,3 +1188,7 @@ footer.ft{margin-top:64px}
 .deco-est b{font-size:15px}
 .deco-est .row{display:flex;justify-content:space-between;gap:10px;margin-top:4px}
 .deco-est small{color:var(--muted)}
+/* Startseite: ein Formular mit Umschalter */
+.sf-switch{display:flex;width:max-content;max-width:100%;margin:0 auto 18px}
+.sf-switch button{padding:10px 18px;font-size:15px}
+@media (max-width:600px){.sf-switch{width:100%}.sf-switch button{flex:1;padding:10px 8px;font-size:14px}}

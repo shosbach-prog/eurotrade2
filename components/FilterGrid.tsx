@@ -22,6 +22,13 @@ export default function FilterGrid({ items }: { items: PublicProduct[] }) {
   const [open, setOpen] = useState(false);
   const [dd, setDd] = useState<string | null>(null);
   const [limit, setLimit] = useState(24);
+  // Lazy Load: weitere Artikel automatisch nachladen, sobald das Ende der Liste in Sicht kommt
+  const more = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = more.current; if (!el) return;
+    const io = new IntersectionObserver((e) => { if (e[0].isIntersecting) setLimit((l) => l + 24); }, { rootMargin: '800px 0px' });
+    io.observe(el); return () => io.disconnect();
+  });
   const barRef = useRef<HTMLElement>(null);
   // Dropdown bleibt offen, bis man daneben klickt oder Esc drückt (nicht mehr beim Verlassen mit der Maus)
   useEffect(() => {
@@ -104,6 +111,7 @@ export default function FilterGrid({ items }: { items: PublicProduct[] }) {
         <div className="more">
           <div className="more-bar"><i style={{ width: `${(limit / shown.length) * 100}%` }} /></div>
           <span className="muted">{limit} von {shown.length} Artikeln</span>
+          <div ref={more} aria-hidden style={{ height: 1 }} />
           <button className="btn alt" onClick={() => setLimit((l) => l + 24)}>Mehr laden</button>
         </div>
       )}
