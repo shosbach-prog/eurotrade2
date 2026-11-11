@@ -88,9 +88,12 @@ export default function DecoStudio(props: Props) {
   // Admin-Feinjustage (nur zum Speichern eines Ankers)
   const [adj, setAdj] = useState<{ s: number; rot: number } | null>(null);
   const [saved, setSaved] = useState('');
+  const [localAnchor, setLocalAnchor] = useState<Record<string, Anchor> | null>(null);
+  useEffect(() => { setLocalAnchor(null); setAdj(null); }, [props.photo]);
+  const anc = localAnchor ? { ...(props.anchor ?? {}), ...localAnchor } : props.anchor;
   const tfOf = (pos: string | null): Tf => {
     let t = tf;
-    if (showPhoto && pos && props.anchor?.[pos] && spots[pos]) t = anchorTf(spots[pos], props.anchor[pos]);
+    if (showPhoto && pos && anc?.[pos] && spots[pos]) t = anchorTf(spots[pos], anc[pos]);
     if (adj && pos === cur && showPhoto) t = { ...t, s: t.s * adj.s, rot: (t.rot ?? 0) + adj.rot };
     return t;
   };
@@ -115,7 +118,9 @@ export default function DecoStudio(props: Props) {
   function move(e: React.PointerEvent) {
     const d = drag.current; if (!d) return;
     const t = tfOf(d.pos), q = pt(e), p = { x: fromX(q.x, t), y: fromY(q.y, t) }, s = spots[d.pos], c = place[d.pos];
-    const [x0, y0, x1, y1] = s.area;
+    // Admin auf dem Foto: frei verschieben (zum Festlegen der Lage), sonst innerhalb des Druckbereichs
+    const free = !!props.admin && showPhoto;
+    const [x0, y0, x1, y1] = free ? [-50, -50, 150, 150] : s.area;
     const x = Math.min(x1 - c.w / 2, Math.max(x0 + c.w / 2, p.x - d.dx));
     const y = Math.min(y1 - 2, Math.max(y0 + 2, p.y - d.dy));
     setPlace({ ...place, [d.pos]: { ...c, x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 } });
@@ -197,9 +202,11 @@ export default function DecoStudio(props: Props) {
         <div className="deco-row">
           <button type="button" className="btn sm" onClick={async () => {
             const t = tfOf(cur), c = place[cur], sp = spots[cur];
-            const anchor: Anchor = [toX(c.x, t) + (sp.x - c.x) * t.s, toY(c.y, t) + (sp.y - c.y) * t.s, sp.w * t.s, t.rot ?? 0];
+            // aktuelle Lage des Motivs wird zur Standard-Lage dieser Position auf diesem Foto
+            const anchor: Anchor = [toX(c.x, t), toY(c.y, t), sp.w * t.s, t.rot ?? 0];
             const r = await fetch('/api/admin/bildanker', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ src: props.photo, pos: cur, anchor }) });
-            setSaved(r.ok ? 'Gespeichert – gilt ab sofort für dieses Foto (neu laden).' : 'Fehler beim Speichern');
+            if (r.ok) { setLocalAnchor({ ...(localAnchor ?? {}), [cur]: anchor }); setAdj(null); const dp = defaultPlace(product, cur); if (dp) setPlace({ ...place, [cur]: dp }); }
+            setSaved(r.ok ? 'Gespeichert – gilt ab sofort für dieses Foto.' : 'Fehler beim Speichern');
           }}>Lage speichern</button>
           {props.anchor?.[cur] && <button type="button" className="linkbtn" onClick={async () => { await fetch('/api/admin/bildanker', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ src: props.photo, pos: cur, anchor: null }) }); setSaved('Entfernt – automatische Lage (neu laden).'); }}>Anker entfernen</button>}
           {saved && <span className="ok" style={{ fontSize: 13 }}>{saved}</span>}
