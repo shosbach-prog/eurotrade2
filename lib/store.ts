@@ -92,6 +92,8 @@ export type Inquiry = {
   /** Willkommensrabatt aus dem Newsletter */
   discount?: { code: string; pct: number } | null;
   reviewRequestedAt?: string | null;
+  /** Erinnerung zum Angebot gesendet */
+  remindedAt?: string | null;
 };
 
 export function listInquiries(): Inquiry[] {

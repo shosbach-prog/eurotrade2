@@ -19,7 +19,7 @@ export default function AcceptForm({ token, defaultName, total }: { token: strin
       </div>
       <label style={{ display: 'flex', gap: 8, fontWeight: 400, marginTop: 14 }}>
         <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} style={{ width: 'auto' }} />
-        <span>Ich nehme das Angebot über {total} verbindlich an. Die <a href="/widerruf" target="_blank" style={{ textDecoration: 'underline' }}>Widerrufsbelehrung</a> habe ich zur Kenntnis genommen. Mir ist bekannt, dass für nach meinen Vorgaben veredelte Ware kein Widerrufsrecht besteht.</span>
+        <span>Ich nehme das Angebot über {total} verbindlich an. Es gelten die <a href="/agb" target="_blank" style={{ textDecoration: 'underline' }}>AGB</a>. Die <a href="/widerruf" target="_blank" style={{ textDecoration: 'underline' }}>Widerrufsbelehrung</a> habe ich zur Kenntnis genommen. Mir ist bekannt, dass für nach meinen Vorgaben veredelte Ware kein Widerrufsrecht besteht.</span>
       </label>
       <button className="btn" disabled={!agree || !name.trim() || state === 'busy'}>{state === 'busy' ? 'Wird gesendet …' : 'Verbindlich annehmen'}</button>
       {err && <p className="err">{err}</p>}

@@ -46,7 +46,7 @@ function orgSchema() {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const gated = shopClosed();
   const path = headers().get('x-path') ?? '/';
-  const isPublic = ['/fuer', '/ueber-uns', '/garantie', '/bewerten', '/widerruf', '/newsletter', '/start', '/druck-stick', '/zugang', '/passwort', '/registrieren', '/kontakt', '/impressum', '/datenschutz', '/angebot', '/admin'].some((p) => path === p || path.startsWith(p + '/'));
+  const isPublic = ['/fuer', '/ueber-uns', '/garantie', '/bewerten', '/widerruf', '/newsletter', '/start', '/druck-stick', '/zugang', '/passwort', '/registrieren', '/kontakt', '/agb', '/ratgeber', '/impressum', '/datenschutz', '/angebot', '/admin'].some((p) => path === p || path.startsWith(p + '/'));
   const { ok, customer } = await shopAccess();
   const admin = !customer && (await isAdmin());
   // Code im Admin gesperrt/gelöscht -> zurück zur Anmeldung
@@ -76,6 +76,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 {ok ? <Link href="/konto">Meine Anfragen</Link> : <><Link href="/zugang">Anmelden</Link><Link href="/registrieren">Registrieren</Link></>}
                 <Link href="/kontakt">Kontakt & Anfrage</Link>
                 <Link href="/druck-stick">Druck & Stick</Link>
+                <Link href="/ratgeber">Ratgeber</Link>
                 <Link href="/#newsletter">Newsletter & Rabatt</Link>
               </nav>
               <nav className="ft-col" aria-label="Branchen">
@@ -89,6 +90,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <h4>Service</h4>
                 <Link href="/ueber-uns">Über uns</Link>
                 <Link href="/garantie">Zufriedenheitsgarantie</Link>
+                <Link href="/agb">AGB</Link>
                 <Link href="/widerruf">Rückgabe & Widerruf</Link>
                 <Link href="/impressum">Impressum</Link>
                 <Link href="/datenschutz">Datenschutz</Link>

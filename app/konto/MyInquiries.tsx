@@ -13,11 +13,10 @@ type Row = { no: string; date: string; status: string; statusLabel: string; piec
 export default function MyInquiries() {
   const [rows, setRows] = useState<Row[] | null>(null);
   const [msg, setMsg] = useState('');
-  const { addMany } = useCart();
+  const { addMany, openDrawer } = useCart();
 
   useEffect(() => {
     const mine = myInquiries();
-    if (!mine.length) { setRows([]); return; }
     fetch('/api/meine-anfragen', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tokens: mine.map((m) => m.token) }) })
       .then((r) => r.json()).then(setRows).catch(() => setRows([]));
   }, []);
@@ -33,14 +32,15 @@ export default function MyInquiries() {
     });
     if (!items.length) { setMsg('Die Artikel dieser Anfrage sind nicht mehr verfügbar.'); return; }
     addMany(items);
-    setMsg(items.length < r.lines.length ? 'Einige Artikel sind nicht mehr verfügbar und wurden übersprungen.' : '');
+    openDrawer();
+    setMsg(items.length < r.lines.length ? 'Einige Artikel sind nicht mehr verfügbar und wurden übersprungen.' : `✓ ${items.reduce((s, x) => s + x.qty, 0)} Stück aus Anfrage ${r.no} im Warenkorb – gleiche Farben, Größen und Veredelung. Mengen können Sie im Warenkorb anpassen.`);
   }
 
   if (rows === null) return <h1>Meine Anfragen</h1>;
   return (
     <>
       <h1>Meine Anfragen</h1>
-      <p className="muted" style={{ marginTop: -8 }}>Anfragen, die Sie auf diesem Gerät gesendet haben – mit Status, Angebot und Nachbestellung.</p>
+      <p className="muted" style={{ marginTop: -8 }}>Ihre Anfragen und Bestellungen – mit Status, Angebot und Nachbestellung per Klick (gleiche Artikel, Farben, Größen und Logo).</p>
       {msg && <div className="note">{msg}</div>}
       {!rows.length ? (
         <div className="box" style={{ textAlign: 'center' }}>
@@ -59,7 +59,7 @@ export default function MyInquiries() {
               <div className="my-actions">
                 {r.offer ? <a className="btn" href={r.offer.url} style={{ display: 'inline-grid', placeItems: 'center' }}>Angebot ansehen · {eur(r.offer.gross)}</a>
                   : <span className="muted" style={{ fontSize: 14 }}>Ihr Angebot ist in Arbeit.</span>}
-                <button className="btn alt" onClick={() => reorder(r)}>Erneut in den Warenkorb</button>
+                <button className="btn alt" onClick={() => reorder(r)}>↻ Nachbestellen</button>
               </div>
             </div>
           ))}

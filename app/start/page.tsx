@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { GUIDES } from '@/lib/ratgeber';
 import type { Metadata } from 'next';
 import RequestForm from './RequestForm';
 import NewsletterBox from './NewsletterBox';
@@ -108,6 +109,11 @@ export default function Start() {
       )}
 
       <ReviewStrip reviews={latestReviews(6)} overall={overall()} />
+
+      <section className="l-section">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}><h2 style={{ margin: 0 }}>Ratgeber</h2><Link href="/ratgeber" className="alink">Alle Ratgeber →</Link></div>
+        <div className="rg-grid">{GUIDES.slice(0, 3).map((g) => <Link key={g.slug} href={`/ratgeber/${g.slug}`} className="rg-card"><span className="rg-ico" aria-hidden>{g.icon}</span><h3>{g.title}</h3><p>{g.teaser}</p><span className="rg-meta">{g.minutes} Min. Lesezeit →</span></Link>)}</div>
+      </section>
 
       <NewsletterBox tiers={discountTiers()} />
 

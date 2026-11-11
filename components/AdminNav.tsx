@@ -3,7 +3,7 @@ import AdminLogout from './AdminLogout';
 import { fileCustomers, listAccessRequests } from '@/lib/store';
 import PendingBox from '@/app/admin/kunden/PendingBox';
 
-export default function AdminNav({ active }: { active: 'anfragen' | 'kunden' | 'referenzen' | 'newsletter' | 'bewertungen' | 'artikel' }) {
+export default function AdminNav({ active }: { active: 'anfragen' | 'kunden' | 'referenzen' | 'newsletter' | 'bewertungen' | 'artikel' | 'system' }) {
   // Wartende Registrierungen + offene Zugangsanfragen – immer sichtbar im Admin
   const waiting = fileCustomers().filter((c) => c.pending && c.active === false);
   const pending = waiting.length;
@@ -18,6 +18,7 @@ export default function AdminNav({ active }: { active: 'anfragen' | 'kunden' | '
         <Link href="/admin/bewertungen" className={active === 'bewertungen' ? 'on' : ''}>Bewertungen</Link>
         <Link href="/admin/referenzen" className={active === 'referenzen' ? 'on' : ''}>Referenzen</Link>
         <Link href="/admin/newsletter" className={active === 'newsletter' ? 'on' : ''}>Newsletter</Link>
+        <Link href="/admin/system" className={active === 'system' ? 'on' : ''}>System{!process.env.SMTP_HOST && <span className="nav-badge">!</span>}</Link>
         <span style={{ flex: 1 }} />
         <Link href="/">Zum Shop</Link>
         <AdminLogout />

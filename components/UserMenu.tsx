@@ -32,7 +32,7 @@ export default function UserMenu({ name, admin }: { name?: string | null; admin?
       {open && (
         <div className="um-menu" role="menu">
           <div className="um-head"><span className="muted" style={{ fontSize: 12 }}>Angemeldet als</span><b>{label}</b></div>
-          {name && <a role="menuitem" href="/konto">📋 Meine Anfragen</a>}
+          {name && <a role="menuitem" href="/konto">📋 Anfragen &amp; Nachbestellen</a>}
           {name && <a role="menuitem" href="/merkliste">♡ Merkliste</a>}
           {name && <a role="menuitem" href="/konto#anmeldung">🔑 E-Mail & Passwort</a>}
           {admin && <a role="menuitem" href="/admin">⚙ Admin-Bereich</a>}

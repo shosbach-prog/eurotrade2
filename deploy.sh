@@ -18,6 +18,7 @@ fi
 
 # 3) Datenordner vorbereiten (Container läuft als root, Daten bleiben bei Updates erhalten)
 mkdir -p data/anfragen
+[ -s data/cron-key ] || head -c 24 /dev/urandom | od -An -tx1 | tr -d ' \n' > data/cron-key  # Schlüssel für täglichen Lauf
 
 # 4) Sicherung vor dem Update, dann neuesten Stand aus Git holen
 [ -d data ] && bash scripts/backup.sh 2>/dev/null || true
@@ -35,7 +36,9 @@ docker image prune -f >/dev/null
 # 6) Nächtlicher L-Shop-Sync (03:00) – wird nur einmal eingetragen
 CRON="0 3 * * * cd $(pwd) && docker compose exec -T shop node scripts/sync-lshop.mjs >> $(pwd)/data/sync.log 2>&1"
 BACKUP="30 2 * * * cd $(pwd) && bash scripts/backup.sh >> $(pwd)/data/backup.log 2>&1"
-( crontab -l 2>/dev/null | grep -v 'scripts/sync-lshop.mjs' | grep -v 'scripts/backup.sh' ; echo "$CRON" ; echo "$BACKUP" ) | crontab -
+# Täglich 09:15: Angebote nachfassen (Erinnerungs-Mails)
+FOLLOW="15 9 * * * cd $(pwd) && docker compose exec -T shop sh -c 'wget -qO- \"http://127.0.0.1:3000/api/cron?key=\$(cat /app/data/cron-key)\"' >> $(pwd)/data/cron.log 2>&1"
+( crontab -l 2>/dev/null | grep -v 'scripts/sync-lshop.mjs' | grep -v 'scripts/backup.sh' | grep -v '/api/cron' ; echo "$CRON" ; echo "$BACKUP" ; echo "$FOLLOW" ) | crontab -
 
 echo
 echo ">> Fertig. Status:"
