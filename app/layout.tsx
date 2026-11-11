@@ -46,12 +46,12 @@ function orgSchema() {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const gated = shopClosed();
   const path = headers().get('x-path') ?? '/';
-  const isPublic = ['/fuer', '/ueber-uns', '/garantie', '/bewerten', '/widerruf', '/newsletter', '/start', '/druck-stick', '/zugang', '/passwort', '/impressum', '/datenschutz', '/angebot', '/admin'].some((p) => path === p || path.startsWith(p + '/'));
+  const isPublic = ['/fuer', '/ueber-uns', '/garantie', '/bewerten', '/widerruf', '/newsletter', '/start', '/druck-stick', '/zugang', '/passwort', '/registrieren', '/kontakt', '/impressum', '/datenschutz', '/angebot', '/admin'].some((p) => path === p || path.startsWith(p + '/'));
   const { ok, customer } = await shopAccess();
   // Code im Admin gesperrt/gelöscht -> zurück zur Anmeldung
   const showcase = !ok && headers().get('x-showcase') === '1';
   if (!ok && !isPublic && !showcase) redirect('/zugang');
-  const open = ok && !path.startsWith('/zugang') && !path.startsWith('/passwort') && !path.startsWith('/admin');
+  const open = ok && !path.startsWith('/zugang') && !path.startsWith('/passwort') && !path.startsWith('/registrieren') && !path.startsWith('/admin');
   const cats = open ? getCategories(customer) : showcase ? getCategories() : [];
   return (
     <html lang="de">
@@ -68,7 +68,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               </> : !path.startsWith('/admin') && <nav className="pub-nav">
                 <Link href="/druck-stick" className="hide-sm">Druck & Stick</Link>
                 <Link href="/#ablauf" className="hide-sm">So funktioniert’s</Link>
-                <Link href="/#preis" className="hide-sm">Preis anfragen</Link>
+                <Link href="/kontakt">Kontakt</Link>
+                <Link href="/registrieren" className="pub-reg">Registrieren</Link>
                 <Link href="/zugang" className="pub-login">Anmelden</Link>
               </nav>}
             </div>
@@ -79,7 +80,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <main className="wrap">{children}</main>
           <footer><div className="wrap">
             <span>© {new Date().getFullYear()} {SHOP} · Alle Preise netto zzgl. MwSt. und Versand</span>
-            <span>{open && <><Link href="/konto">Meine Anfragen</Link> · </>}<Link href="/ueber-uns">Über uns</Link> · <Link href="/fuer/vereine">Vereine</Link> · <Link href="/fuer/unternehmen">Unternehmen</Link> · <Link href="/fuer/handwerk">Handwerk</Link> · <Link href="/fuer/gastronomie">Gastronomie</Link> · <Link href="/druck-stick">Druck & Stick</Link> · <Link href="/widerruf">Rückgabe & Widerruf</Link> · <Link href="/garantie">Zufriedenheitsgarantie</Link> · <Link href="/impressum">Impressum</Link> · <Link href="/datenschutz">Datenschutz</Link>{gated && customer && <> · {customer.name} · <LogoutLink /></>}</span>
+            <span>{open && <><Link href="/konto">Meine Anfragen</Link> · </>}<Link href="/kontakt">Kontakt</Link> · <Link href="/ueber-uns">Über uns</Link> · <Link href="/fuer/vereine">Vereine</Link> · <Link href="/fuer/unternehmen">Unternehmen</Link> · <Link href="/fuer/handwerk">Handwerk</Link> · <Link href="/fuer/gastronomie">Gastronomie</Link> · <Link href="/druck-stick">Druck & Stick</Link> · <Link href="/widerruf">Rückgabe & Widerruf</Link> · <Link href="/garantie">Zufriedenheitsgarantie</Link> · <Link href="/impressum">Impressum</Link> · <Link href="/datenschutz">Datenschutz</Link>{gated && customer && <> · {customer.name} · <LogoutLink /></>}</span>
           </div></footer>
           {!path.startsWith('/admin') && <TrustBadge />}
           {!path.startsWith('/admin') && <Contact whatsapp={process.env.CONTACT_WHATSAPP ?? '491732648097'} phone={process.env.CONTACT_PHONE ?? '0173 2648097'} email={process.env.CONTACT_EMAIL ?? 'info@euro-trade.com'} />}

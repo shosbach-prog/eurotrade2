@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { isAdmin } from '@/lib/customer';
 import { fileCustomers, normEmail, saveCustomers, type Customer } from '@/lib/store';
 import { parseTiers, tiersToString } from '@/lib/tiers';
+import { esc, mailEnabled, sendMail, shopUrl } from '@/lib/mail';
+import { button, h1, layout, p, signature } from '@/lib/mail-templates';
 
 export async function PUT(req: Request) {
   if (!(await isAdmin())) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
@@ -28,10 +30,28 @@ export async function PUT(req: Request) {
   if (dupMail) return NextResponse.json({ error: `Die E-Mail ${dupMail.email} ist doppelt vergeben.` }, { status: 400 });
   // Passwort-Hash bleibt auf dem Server: über ursprünglichen Code zuordnen; neue E-Mail = Passwort zurücksetzen
   const old = fileCustomers();
-  saveCustomers(list.map(({ _orig, ...c }: any) => {
+  const activated: Customer[] = [];
+  const next = list.map(({ _orig, ...c }: any) => {
     const prev = old.find((o) => o.code === _orig) ?? old.find((o) => o.code === c.code);
     const pw = prev?.pw && normEmail(prev.email) === c.email ? prev.pw : null;
-    return { ...c, name: c.name || c.code, pw };
-  }));
-  return NextResponse.json({ ok: true });
+    const pending = !!prev?.pending && !c.active;
+    const out: Customer = { ...c, name: c.name || c.code, pw, pending, createdAt: prev?.createdAt };
+    if (prev?.pending && c.active) activated.push(out);
+    return out;
+  });
+  saveCustomers(next);
+  // Selbst registrierte Kunden: beim Freischalten automatisch benachrichtigen
+  let mailed = 0;
+  if (mailEnabled()) for (const c of activated) {
+    if (!c.email) continue;
+    try {
+      await sendMail({ to: c.email, subject: `Ihr Konto bei ${process.env.SHOP_NAME ?? 'Euro-Trade'} ist freigeschaltet`,
+        html: layout({ preheader: 'Sie können sich jetzt anmelden und bestellen.', title: 'Konto freigeschaltet',
+          body: h1('Ihr Konto ist freigeschaltet') + p(`Guten Tag ${esc(c.name)},`)
+            + p('Ihr Kundenkonto ist jetzt aktiv. Melden Sie sich mit Ihrer E-Mail-Adresse und Ihrem Passwort an – dann sehen Sie Ihre Preise, können Logos hochladen und direkt anfragen.')
+            + button(`${shopUrl()}/zugang`, 'Jetzt anmelden') + signature() }) });
+      mailed++;
+    } catch (e) { console.error('Freischalt-Mail fehlgeschlagen', e); }
+  }
+  return NextResponse.json({ ok: true, activated: activated.length, mailed });
 }

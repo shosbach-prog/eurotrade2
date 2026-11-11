@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import AccessForm from '../zugang/AccessForm';
 import RequestForm from './RequestForm';
 import NewsletterBox from './NewsletterBox';
 import { ReviewStrip } from '@/components/ProductReviews';
@@ -50,8 +49,8 @@ export default function Start() {
       </section>
 
       <div className="l-loginbar box">
-        <div><strong>Schon Kunde?</strong><span className="muted"> Mit Ihrem Zugangscode direkt in Ihren Shop.</span></div>
-        <AccessForm next="/" />
+        <div><strong>Schon Kunde?</strong><span className="muted"> Anmelden mit E-Mail und Passwort oder Zugangscode. Neu hier? Konto anlegen – wir schalten es innerhalb von 24 Stunden frei.</span></div>
+        <div className="l-loginbtns"><Link className="btn alt" href="/registrieren">Registrieren</Link><Link className="btn" href="/zugang">Anmelden</Link></div>
       </div>
 
       <section className="l-feats">

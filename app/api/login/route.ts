@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { ACCESS_COOKIE, ACCESS_DAYS, previewMode, signCode } from '@/lib/access';
-import { findCustomerByEmail } from '@/lib/store';
+import { anyCustomerByEmail } from '@/lib/store';
 import { verifyPassword } from '@/lib/password';
 
 const tries = new Map<string, number[]>();
@@ -15,8 +15,9 @@ export async function POST(req: Request) {
 
   if (previewMode()) return NextResponse.json({ error: 'Unser Shop startet in Kürze – Ihr Zugang wird dann freigeschaltet. Bei Fragen: info@euro-trade.com' }, { status: 403 });
   const body = await req.json().catch(() => ({}));
-  const c = findCustomerByEmail(body?.email);
+  const c = anyCustomerByEmail(body?.email);
   if (!c || !verifyPassword(String(body?.password ?? ''), c.pw)) return NextResponse.json({ error: 'E-Mail oder Passwort ist falsch.' }, { status: 403 });
+  if (c.active === false) return NextResponse.json({ error: c.pending ? 'Ihr Konto wird gerade geprüft. Sie erhalten eine E-Mail, sobald es freigeschaltet ist – in der Regel innerhalb von 24 Stunden.' : 'Dieses Konto ist gesperrt. Bei Fragen: info@euro-trade.com' }, { status: 403 });
 
   tries.delete(ip);
   const res = NextResponse.json({ ok: true });

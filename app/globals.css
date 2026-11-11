@@ -841,3 +841,15 @@ footer .wrap{padding-left:112px}
 .tf-choice:focus-visible{outline:2px solid #1a1a1a;outline-offset:2px}
 @media (max-width:900px){.tf-enter{display:none}}
 .tf-main:focus{outline:none}
+/* Registrieren */
+.pub-nav .pub-reg{color:#fff;border:1px solid rgba(255,255,255,.55);font-weight:600}
+.pub-nav .pub-reg:hover{background:rgba(255,255,255,.15)}
+.reg-box{max-width:560px;text-align:left}
+.reg-box h1,.reg-box > .muted,.reg-box .gate-lock{text-align:center}
+.reg-form{margin-top:18px}
+.reg-done{text-align:center;margin-top:20px}
+.reg-done h3{margin:10px 0 6px;font-size:22px}
+.reg-done p{color:var(--muted);margin:0}
+.l-loginbtns{display:flex;gap:10px;flex:none}
+.l-loginbtns .btn{display:inline-grid;place-items:center;height:44px;padding:0 20px}
+@media (max-width:520px){.l-loginbtns{width:100%}.l-loginbtns .btn{flex:1}}

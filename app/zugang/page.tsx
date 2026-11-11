@@ -14,7 +14,7 @@ export default function Zugang({ searchParams }: { searchParams: { weiter?: stri
         <h1>Anmelden</h1>
         <p className="muted">Unser Shop steht ausgewählten Kunden, Vereinen und Partnern offen. Melden Sie sich mit E-Mail und Passwort oder Ihrem persönlichen Zugangscode an.</p>
         <AccessForm next={next} initialMode={searchParams.code != null ? 'code' : 'mail'} />
-        <p className="gate-foot">Noch kein Zugang? Schreiben Sie uns an <a href="mailto:info@euro-trade.com">info@euro-trade.com</a>.</p>
+        <p className="gate-foot">Noch kein Konto? <a href="/registrieren">Jetzt registrieren</a></p>
       </div>
     </div>
   );

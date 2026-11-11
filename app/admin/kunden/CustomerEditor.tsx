@@ -30,7 +30,7 @@ export default function CustomerEditor({ initial, envCodes, products, defaultMar
     const r = await fetch('/api/admin/kunden', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ customers: list }) });
     const d = await r.json().catch(() => ({}));
     setBusy(false);
-    if (r.ok) { setDirty(false); setList((l) => l.map((c) => ({ ...c, _orig: c.code }))); setMsg({ ok: true, t: 'Gespeichert – Änderungen gelten sofort.' }); } else setMsg({ ok: false, t: d.error ?? 'Fehler' });
+    if (r.ok) { setDirty(false); setList((l) => l.map((c) => ({ ...c, _orig: c.code, pending: c.pending && c.active === false }))); setMsg({ ok: true, t: d.activated ? `Gespeichert – ${d.activated} Konto freigeschaltet${d.mailed ? ', Kunde per E-Mail benachrichtigt' : ' (keine Mail: SMTP fehlt – bitte Kunde selbst informieren)'}.` : 'Gespeichert – Änderungen gelten sofort.' }); } else setMsg({ ok: false, t: d.error ?? 'Fehler' });
   }
   async function invite(c: Customer) {
     if (dirty) { setMsg({ ok: false, t: 'Bitte zuerst speichern, dann die Einladung senden.' }); return; }
@@ -81,7 +81,7 @@ export default function CustomerEditor({ initial, envCodes, products, defaultMar
               {!!c.skus?.length && <span className="muted">· {c.skus.length} Artikel{c.exclusive ? ' (exklusiv)' : ''}</span>}
               {c.logoId && <span className="muted">· Logo</span>}
               {c.email && <span className="muted">· {c.hasPw ? '🔑 Login aktiv' : '✉ Login offen'}</span>}
-              {c.active === false && <span className="st st-abgelehnt">gesperrt</span>}
+              {c.pending ? <span className="st st-angebot">neu registriert – wartet auf Freigabe</span> : c.active === false && <span className="st st-abgelehnt">gesperrt</span>}
               <span style={{ marginLeft: 'auto' }} className="muted">{open === k ? '▲' : '▼'}</span>
             </div>
             {open === k && (
@@ -104,7 +104,7 @@ export default function CustomerEditor({ initial, envCodes, products, defaultMar
                 <div className="two">
                   <div><label>Aufschlag in % (leer = Standard {defaultMarkup} %)</label><input inputMode="decimal" value={c.markup ?? ''} onChange={(e) => upd(k, { markup: e.target.value === '' ? null : Number(e.target.value.replace(',', '.')) })} /></div>
                   <div><label>Status</label>
-                    <label style={{ display: 'flex', gap: 8, fontWeight: 400, margin: '10px 0 0' }}><input type="checkbox" style={{ width: 'auto' }} checked={c.active !== false} onChange={(e) => upd(k, { active: e.target.checked })} /> Code aktiv</label>
+                    <label style={{ display: 'flex', gap: 8, fontWeight: 400, margin: '10px 0 0' }}><input type="checkbox" style={{ width: 'auto' }} checked={c.active !== false} onChange={(e) => upd(k, { active: e.target.checked })} /> {c.pending ? 'Freischalten (Kunde wird per E-Mail informiert)' : 'Konto aktiv'}</label>
                   </div>
                 </div>
 

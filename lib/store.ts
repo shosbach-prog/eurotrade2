@@ -39,6 +39,9 @@ export type Customer = {
   email?: string | null;
   /** scrypt-Hash "salt:hash" – verlässt nie den Server */
   pw?: string | null;
+  /** Selbst registriert, wartet auf Freigabe im Admin */
+  pending?: boolean;
+  createdAt?: string;
 };
 const CUST = path.join(DATA, 'kunden.json');
 
@@ -57,6 +60,8 @@ export function allCustomers(): (Customer & { source: 'admin' | 'env' })[] {
   return [...file, ...env];
 }
 export const normEmail = (e: unknown) => String(e ?? '').trim().toLowerCase();
+/** auch gesperrte/wartende Konten (für Registrierung + Login-Hinweis) */
+export const anyCustomerByEmail = (email: string) => { const e = normEmail(email); return e ? fileCustomers().find((c) => normEmail(c.email) === e) ?? null : null; };
 export const findCustomerByEmail = (email: string) => { const e = normEmail(email); return e ? fileCustomers().find((c) => normEmail(c.email) === e && c.active !== false) ?? null : null; };
 /** Kunde ohne Passwort-Hash (für Admin-Oberfläche) */
 export const publicCustomer = <T extends Customer>({ pw, ...c }: T) => ({ ...c, hasPw: !!pw });
