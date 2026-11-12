@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { DEAL_RE, dealCount, didYouMean, getCategories, search } from '@/lib/catalog';
+import { EOL_RE, SALE_RE, didYouMean, eolCount, getCategories, saleCount, search } from '@/lib/catalog';
 import { getCustomer } from '@/lib/customer';
 import { brandList } from '@/lib/brand-catalog';
 
@@ -21,7 +21,11 @@ export async function GET(req: Request) {
   const n = norm(q);
   // Kategorien und Marken als eigene Vorschlagsgruppen
   const syn = new Set(SYN.filter(([re]) => re.test(n)).map(([, slug]) => slug));
-  const deal = new RegExp(DEAL_RE.source, 'i').test(q) ? [{ name: 'Sonderangebote & Auslaufartikel', slug: 'sonderangebote', count: dealCount(ctx) }] : [];
+  const isSale = new RegExp(SALE_RE.source, 'i').test(q), isEol = new RegExp(EOL_RE.source, 'i').test(q);
+  const deal = [
+    ...(isSale ? [{ name: 'Sonderangebote', slug: 'sonderangebote', count: saleCount(ctx) }] : []),
+    ...(isEol ? [{ name: 'Auslaufartikel', slug: 'auslaufartikel', count: eolCount(ctx) }] : []),
+  ].filter((x) => x.count > 0 || (x.slug === 'sonderangebote' && !isEol));
   const cats = deal.length ? deal : n.length >= 2 ? getCategories(ctx).filter((c) => syn.has(c.slug) || norm(c.name).includes(n) || n.includes(norm(c.name).slice(0, 5))).slice(0, 3).map((c) => ({ name: c.name, slug: c.slug, count: c.count })) : [];
   const brands = n.length >= 2 ? brandList(ctx).filter((b) => b.count > 0 && (norm(b.name).includes(n) || (n.length >= 3 && norm(b.name).startsWith(n.slice(0, 3))))).slice(0, 3).map((b) => ({ name: b.name, slug: b.slug, logo: b.logo, count: b.count })) : [];
   // schlanke Treffer – nur was die Vorschlagsliste braucht

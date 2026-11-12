@@ -78,14 +78,19 @@ export async function PATCH(req: Request) {
   const patch: Override = {};
   if (typeof b?.patch?.hidden === 'boolean') patch.hidden = b.patch.hidden;
   if (typeof b?.patch?.top === 'boolean') patch.top = b.patch.top;
+  // Sonderangebot: { pct } setzen, null = entfernen
+  const saleOff = b?.patch && 'sale' in b.patch && b.patch.sale === null;
+  if (b?.patch?.sale && typeof b.patch.sale.pct === 'number') patch.sale = { pct: Math.max(0, Math.min(80, Math.round(b.patch.sale.pct))) };
   if (typeof b?.patch?.category === 'string' && str(b.patch.category, 60)) patch.category = str(b.patch.category, 60);
-  if (!ids.length || !Object.keys(patch).length) return NextResponse.json({ error: 'Nichts zu ändern.' }, { status: 400 });
+  if (!ids.length || (!Object.keys(patch).length && !saleOff)) return NextResponse.json({ error: 'Nichts zu ändern.' }, { status: 400 });
   const all = readOverrides();
   let n = 0;
   for (const id of ids) {
     const { p } = adminProduct(id);
     if (!p) continue;
-    saveOverride(id, { ...(all[id] ?? {}), ...patch });
+    const next = { ...(all[id] ?? {}), ...patch };
+    if (saleOff) delete next.sale;
+    saveOverride(id, next);
     n++;
   }
   return NextResponse.json({ ok: true, count: n });

@@ -13,6 +13,7 @@ import { Money } from './PriceMode';
 /** echte Merkmale als Badges – keine erfundenen Labels */
 function badges(p: PublicProduct): { t: string; c: string }[] {
   const b: { t: string; c: string }[] = [];
+  if (p.sale) b.push({ t: p.sale.pct ? `Sonderangebot −${p.sale.pct} %` : 'Sonderangebot', c: 'b-sale' });
   if (p.eol?.all) b.push({ t: 'Auslaufartikel', c: 'b-eol' });
   if (p.rating && p.rating.count >= 3 && p.rating.avg >= 4.5) b.push({ t: 'Top bewertet', c: 'b-top' });
   if (p.price != null && p.tiers.length) b.push({ t: `bis −${Math.round((1 - p.tiers[p.tiers.length - 1].price / p.price) * 100)} % Staffel`, c: 'b-deal' });
@@ -42,7 +43,7 @@ export default function ProductCard({ p }: { p: PublicProduct }) {
           {p.colors.slice(0, 7).map((c) => <span key={c.name} className="dot" title={c.name} style={{ background: swatchBg(c) }} />)}
           {p.colors.length > 7 && <span className="dots-more">+{p.colors.length - 7}</span>}
         </div>
-        <div className="price">{p.locked ? <small className="lock-p">🔒 Preise nach Anmeldung</small> : min != null ? <><Money net={p.price!} label />{min! < p.price! && <span className="tier-hint">ab {p.tiers[p.tiers.length - 1].min} Stk. <Money net={min!} /></span>}</> : <small style={{ fontSize: 14, color: 'var(--brand)', fontWeight: 600 }}>Preis auf Anfrage</small>}</div>
+        <div className="price">{p.locked ? <small className="lock-p">🔒 Preise nach Anmeldung</small> : min != null ? <>{p.was != null && <span className="price-was"><Money net={p.was} /></span>}<Money net={p.price!} label />{min! < p.price! && <span className="tier-hint">ab {p.tiers[p.tiers.length - 1].min} Stk. <Money net={min!} /></span>}</> : <small style={{ fontSize: 14, color: 'var(--brand)', fontWeight: 600 }}>Preis auf Anfrage</small>}</div>
       </div>
     </Link>
   );

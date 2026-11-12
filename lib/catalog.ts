@@ -89,7 +89,10 @@ export function toPublic(p: Product, ctx?: Ctx): PublicProduct {
     : baseTiers?.length && !ctx?.tiers
       ? baseTiers.filter((t) => t.min > 1 && t.price > 0).sort((a, b) => a.min - b.min).map((t) => ({ min: t.min, price: sellPrice(t.price, p.categorySlug, ctx?.markup) })).filter((t) => t.price < price)
       : priceTiers(price, ctx?.tiers);
-  return { ...rest, colors: sortColors(p.colors), price, priceGross: price != null ? gross(price) : null, tiers, rating: ratingFor(p.id), props: pictosFor(p).props, ...(hasWebp(p) ? { webp: true } : {}), ...(ctx?.locked ? { locked: true } : {}) };
+  const off = p.sale?.pct && p.sale.pct > 0 && p.sale.pct < 90 && price != null ? (100 - p.sale.pct) / 100 : null;
+  const sp = off != null ? Math.round(price! * off * 100) / 100 : price;
+  const st = off != null ? tiers.map((t) => ({ min: t.min, price: Math.round(t.price * off * 100) / 100 })) : tiers;
+  return { ...rest, colors: sortColors(p.colors), price: sp, priceGross: sp != null ? gross(sp) : null, tiers: st, ...(off != null ? { was: price } : {}), rating: ratingFor(p.id), props: pictosFor(p).props, ...(hasWebp(p) ? { webp: true } : {}), ...(ctx?.locked ? { locked: true } : {}) };
 }
 
 const skuSet = (ctx: Ctx) => new Set((ctx?.skus ?? []).map((x) => x.toUpperCase()));
@@ -138,18 +141,29 @@ export const imageInUse = (src: string) => load().all.some((p) => p.images.inclu
 export const allProductsBrief = () => load().products.map((p) => ({ id: p.id, sku: p.sku, name: p.name, brand: p.brand, categorySlug: p.categorySlug }));
 
 /* ---------- Sonderangebote = Auslaufartikel (ganz oder einzelne Farben/Größen) ---------- */
-export const DEAL_RE = /\b(auslauf\w*|sonder\w*|angebot\w*|restposten|abverkauf|sale|reduziert\w*|schn(?:ä|ae)ppchen\w*|deals?|rabatt\w*|aktion(?:en|sware)?)\b/gi;
-const dealList = (ctx?: Ctx) => products(ctx).filter((p) => p.eol).sort((a, b) => Number(!!b.eol!.all) - Number(!!a.eol!.all));
-export const dealProducts = (ctx?: Ctx) => dealList(ctx).map((p) => toPublic(p, ctx));
-export const dealCount = (ctx?: Ctx) => dealList(ctx).length;
+/** Suchbegriffe für Auslaufartikel (L-Shop-Auslaufliste) */
+export const EOL_RE = /\b(auslauf\w*|restposten|abverkauf|ausverkauf|solange vorrat)\b/gi;
+/** Suchbegriffe für Sonderangebote (im Admin markiert) */
+export const SALE_RE = /\b(sonder\w*|angebot\w*|sale|reduziert\w*|schn(?:ä|ae)ppchen\w*|deals?|rabatt\w*|aktion(?:en|sware|spreis)?)\b/gi;
+/** alt: beide zusammen (z. B. für Synonyme) */
+export const DEAL_RE = new RegExp(`${EOL_RE.source}|${SALE_RE.source}`, 'gi');
+const eolList = (ctx?: Ctx) => products(ctx).filter((p) => p.eol).sort((a, b) => Number(!!b.eol!.all) - Number(!!a.eol!.all));
+const saleList = (ctx?: Ctx) => products(ctx).filter((p) => p.sale).sort((a, b) => (b.sale!.pct ?? 0) - (a.sale!.pct ?? 0));
+export const eolProducts = (ctx?: Ctx) => eolList(ctx).map((p) => toPublic(p, ctx));
+export const eolCount = (ctx?: Ctx) => eolList(ctx).length;
+export const saleProducts = (ctx?: Ctx) => saleList(ctx).map((p) => toPublic(p, ctx));
+export const saleCount = (ctx?: Ctx) => saleList(ctx).length;
+/** Sonderangebote + Auslauf (Badge-Zähler) */
+export const dealCount = (ctx?: Ctx) => eolCount(ctx) + saleCount(ctx);
 
 export function search(q: string, limit = 48, ctx?: Ctx): PublicProduct[] {
   const s = load();
   const ok = visible(ctx);
-  // „Auslaufartikel“, „Sonderangebote“, „Restposten“ … → Auslaufartikel, optional weiter eingegrenzt („sonderangebot hoodie“)
-  if (new RegExp(DEAL_RE.source, 'i').test(q)) {
+  // „Auslaufartikel“, „Restposten“ … → Auslaufliste; „Sonderangebot“, „Sale“ … → Sonderangebote; optional weiter eingegrenzt („sonderangebot hoodie“)
+  const isEol = new RegExp(EOL_RE.source, 'i').test(q), isSale = new RegExp(SALE_RE.source, 'i').test(q);
+  if (isEol || isSale) {
     const rest = q.replace(new RegExp(DEAL_RE.source, 'gi'), ' ').replace(/\b(und|&|oder)\b/gi, ' ').trim();
-    let list = dealList(ctx);
+    let list = isEol && isSale ? [...saleList(ctx), ...eolList(ctx).filter((p) => !p.sale)] : isEol ? eolList(ctx) : saleList(ctx);
     if (rest.length >= 2) { const ids = new Set(runSearch(s.index, rest, 500, s.skus)); const f = list.filter((p) => ids.has(p.id)); if (f.length) list = f; }
     return list.slice(0, limit).map((p) => toPublic(p, ctx));
   }

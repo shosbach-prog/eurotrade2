@@ -5,7 +5,7 @@ import FilterGrid from '@/components/FilterGrid';
 import { ReviewStrip } from '@/components/ProductReviews';
 import Stars from '@/components/Stars';
 import JsonLd, { crumbSchema, faqSchema } from '@/components/JsonLd';
-import { dealProducts, getByCategory, getCategories, slimCard } from '@/lib/catalog';
+import { eolCount, eolProducts, getByCategory, getCategories, saleCount, saleProducts, slimCard } from '@/lib/catalog';
 import { viewCtx } from '@/lib/customer';
 import { categoryContent } from '@/lib/category-content';
 import { latestReviews } from '@/lib/reviews';
@@ -27,7 +27,8 @@ const forG = (g: string | null) => (p: { gender?: string }) => !g || p.gender ==
 const gLabel = (g: string) => (g === 'Kinder' ? 'für Kinder' : `für ${g}`);
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
-  if (params.slug === 'sonderangebote') return { title: 'Sonderangebote & Auslaufartikel – Markentextilien mit Logo', description: 'Auslaufartikel und Restposten bekannter Marken – solange Vorrat, bedruckt oder bestickt mit Ihrem Logo ab 1 Stück.', alternates: { canonical: catPath('sonderangebote') } };
+  if (params.slug === 'sonderangebote') return { title: 'Sonderangebote – Markentextilien mit Logo zum Aktionspreis', description: 'Aktuelle Sonderangebote: ausgewählte Markentextilien zum reduzierten Preis – bedruckt oder bestickt mit Ihrem Logo ab 1 Stück.', alternates: { canonical: catPath('sonderangebote') } };
+  if (params.slug === 'auslaufartikel') return { title: 'Auslaufartikel & Restposten – Markentextilien solange Vorrat', description: 'Auslaufartikel und Restposten bekannter Marken – solange Vorrat, bedruckt oder bestickt mit Ihrem Logo ab 1 Stück.', alternates: { canonical: catPath('auslaufartikel') } };
   const cats = getCategories(await viewCtx());
   const { base, g } = parseSlug(params.slug, cats);
   const sb = subBySlug(base);
@@ -40,20 +41,27 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
 export default async function CategoryView({ params, searchParams = {} }: { params: { slug: string }; searchParams?: SP }) {
   const ctx = await viewCtx();
-  if (params.slug === 'sonderangebote') {
-    const deals = dealProducts(ctx);
+  if (params.slug === 'sonderangebote' || params.slug === 'auslaufartikel') {
+    const sale = params.slug === 'sonderangebote';
+    const items = sale ? saleProducts(ctx) : eolProducts(ctx);
+    const other = sale ? eolCount(ctx) : saleCount(ctx);
+    const title = sale ? 'Sonderangebote' : 'Auslaufartikel';
     return (
       <>
-        <JsonLd data={crumbSchema([['Start', '/'], ['Sonderangebote', catPath('sonderangebote')]])} />
-        <div className="crumbs"><Link href="/">Start</Link> › Sonderangebote</div>
+        <JsonLd data={crumbSchema([['Start', '/'], [title, catPath(params.slug)]])} />
+        <div className="crumbs"><Link href="/">Start</Link> › {title}</div>
         <section className="cat-hero deal-hero">
           <div className="cat-hero-text">
-            <h1>Sonderangebote & Auslaufartikel</h1>
-            <p>Markentextilien, die beim Hersteller auslaufen – lieferbar solange Vorrat. Ideal für Aktionen, Events und Teams, die jetzt bestellen. Auch hier: bedruckt oder bestickt mit Ihrem Logo ab 1 Stück.</p>
+            <h1>{sale ? 'Sonderangebote' : 'Auslaufartikel & Restposten'}</h1>
+            <p>{sale ? 'Ausgewählte Markentextilien zum Aktionspreis – solange die Aktion läuft. Auch hier gilt: bedruckt oder bestickt mit Ihrem Logo schon ab 1 Stück, Staffelpreise ab 10 Stück.' : 'Markentextilien, die beim Hersteller auslaufen – lieferbar solange Vorrat. Ideal für Aktionen, Events und Teams, die jetzt bestellen. Auch hier: bedruckt oder bestickt mit Ihrem Logo ab 1 Stück.'}</p>
           </div>
         </section>
-        {deals.length ? <FilterGrid items={deals.map(slimCard)} /> : <div className="box muted">Aktuell keine Sonderangebote – schauen Sie bald wieder vorbei.</div>}
-        <p className="muted" style={{ fontSize: 13 }}>„Läuft aus“ heißt: Der Hersteller produziert den Artikel bzw. die Farbe nicht mehr nach. Bei größeren Mengen prüfen wir die Verfügbarkeit vor dem Angebot.</p>
+        {other > 0 && <nav className="subchips" aria-label="Angebote">
+          <Link href={catPath('sonderangebote')} className={sale ? 'on' : ''}>Sonderangebote <span>{sale ? items.length : other}</span></Link>
+          <Link href={catPath('auslaufartikel')} className={!sale ? 'on' : ''}>Auslaufartikel <span>{sale ? other : items.length}</span></Link>
+        </nav>}
+        {items.length ? <FilterGrid items={items.map(slimCard)} /> : <div className="box muted">{sale ? <>Aktuell laufen keine Sonderangebote – schauen Sie bald wieder vorbei{other > 0 && <> oder stöbern Sie in unseren <Link className="alink" href={catPath('auslaufartikel')}>Auslaufartikeln</Link></>}.</> : 'Aktuell keine Auslaufartikel.'}</div>}
+        {!sale && <p className="muted" style={{ fontSize: 13 }}>„Läuft aus“ heißt: Der Hersteller produziert den Artikel bzw. die Farbe nicht mehr nach. Bei größeren Mengen prüfen wir die Verfügbarkeit vor dem Angebot.</p>}
       </>
     );
   }

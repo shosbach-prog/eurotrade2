@@ -93,5 +93,8 @@ export type Menu = {
   genders: { label: string; cats: { slug: string; name: string; count: number }[]; total: number }[];
   brands: { slug: string; name: string; count: number }[];
   branchen: { href: string; label: string }[];
-  deals: number;
+  /** im Admin markierte Sonderangebote */
+  sale: number;
+  /** Auslaufartikel laut L-Shop-Liste */
+  eol: number;
 };

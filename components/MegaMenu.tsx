@@ -33,8 +33,20 @@ export default function MegaMenu({ menu }: { menu: Menu }) {
     ...(menu.genders.length ? [{ key: 'wer', label: 'Damen · Herren · Kinder', on: false }] : []),
     { key: 'mehr', label: 'Marken', on: path.startsWith('/marken') || path.startsWith('/fuer/') || path.startsWith('/aktion/') },
   ];
+  const offers = menu.sale + menu.eol > 0;
+  const offerOn = path === catHref('sonderangebote') || path === catHref('auslaufartikel');
 
   const panel = (k: string) => {
+    if (k === 'angebote') return (
+      <div className="mm-offers">
+        <Link href={catHref('sonderangebote')} className="mm-offer sale" onClick={close}>
+          <b>Sonderangebote</b><span>{menu.sale ? `${menu.sale} Artikel zum Aktionspreis` : 'Aktuell keine Aktion – bald wieder'}</span><i>Zu den Sonderangeboten →</i>
+        </Link>
+        <Link href={catHref('auslaufartikel')} className="mm-offer eol" onClick={close}>
+          <b>Auslaufartikel & Restposten</b><span>{menu.eol} Artikel, die beim Hersteller auslaufen – solange Vorrat</span><i>Zu den Auslaufartikeln →</i>
+        </Link>
+      </div>
+    );
     const g = menu.groups.find((x) => x.key === k);
     if (g) return (
       <div className="mm-cols">
@@ -50,7 +62,7 @@ export default function MegaMenu({ menu }: { menu: Menu }) {
             </div>
           </div>
         ))}
-        <MegaPromo deals={menu.deals} close={close} />
+        <MegaPromo sale={menu.sale} eol={menu.eol} close={close} />
       </div>
     );
     if (k === 'wer') return (
@@ -61,7 +73,7 @@ export default function MegaMenu({ menu }: { menu: Menu }) {
             <ul>{ge.cats.map((c) => <li key={c.slug}><Link href={catHref(`${c.slug}-${ge.label.toLowerCase()}`)} onClick={close}>{c.name} <span>{c.count}</span></Link></li>)}</ul>
           </div>
         ))}
-        <MegaPromo deals={menu.deals} close={close} />
+        <MegaPromo sale={menu.sale} eol={menu.eol} close={close} />
       </div>
     );
     return (
@@ -86,7 +98,7 @@ export default function MegaMenu({ menu }: { menu: Menu }) {
             <li><Link href="/kontakt" onClick={close}>Kontakt</Link></li>
           </ul>
         </div>
-        <MegaPromo deals={menu.deals} close={close} />
+        <MegaPromo sale={menu.sale} eol={menu.eol} close={close} />
       </div>
     );
   };
@@ -100,19 +112,20 @@ export default function MegaMenu({ menu }: { menu: Menu }) {
             {t.label}<span className="mm-car" aria-hidden>▾</span>
           </button>
         ))}
-        {menu.deals > 0 && <Link href={catHref('sonderangebote')} className={`mm-tab deal ${path === catHref('sonderangebote') ? 'on' : ''}`} onMouseEnter={leave}>Sonderangebote</Link>}
+        {offers && <button type="button" className={`mm-tab deal ${open === 'angebote' ? 'open' : ''} ${offerOn ? 'on' : ''}`} aria-expanded={open === 'angebote'} onMouseEnter={() => enter('angebote')} onClick={() => setOpen(open === 'angebote' ? null : 'angebote')}>Angebote<span className="mm-car" aria-hidden>▾</span></button>}
       </div>
       {open && <div className="mm-panel" onMouseEnter={() => clearTimeout(timer.current)}><div className="wrap">{panel(open)}</div></div>}
     </nav>
   );
 }
 
-function MegaPromo({ deals, close }: { deals: number; close: () => void }) {
+function MegaPromo({ sale, eol, close }: { sale: number; eol: number; close: () => void }) {
   return (
     <div className="mm-promo">
       <b>Mit Ihrem Logo – ab 1 Stück</b>
       <p>Bedruckt oder bestickt, Staffelpreise ab 10 Stück.</p>
-      {deals > 0 && <Link href={catHref('sonderangebote')} className="mm-deal" onClick={close}>Sonderangebote ansehen ({deals}) →</Link>}
+      {sale > 0 && <Link href={catHref('sonderangebote')} className="mm-deal" onClick={close}>Sonderangebote ({sale}) →</Link>}
+      {eol > 0 && <Link href={catHref('auslaufartikel')} className={sale > 0 ? 'mm-eol' : 'mm-deal'} onClick={close}>Auslaufartikel ({eol}) →</Link>}
       <a href="tel:+493040719258" className="mm-tel">Produktberatung: 030 40719258</a>
     </div>
   );

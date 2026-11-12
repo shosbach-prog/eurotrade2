@@ -1,5 +1,5 @@
 import 'server-only';
-import { dealCount, getCategories, visibleProducts, type Ctx } from './catalog';
+import { eolCount, saleCount, getCategories, visibleProducts, type Ctx } from './catalog';
 import { brandList } from './brand-catalog';
 import { ZIELGRUPPEN } from './zielgruppen';
 import { AKTIONEN } from './aktionen';
@@ -28,5 +28,5 @@ export function menuData(ctx?: Ctx): Menu {
   }).filter((g) => g.cats.length);
   const brands = brandList(ctx).filter((b) => b.count > 0).sort((a, b) => b.count - a.count).slice(0, 10).map((b) => ({ slug: b.slug, name: b.name, count: b.count }));
   const branchen = [...ZIELGRUPPEN.map((z) => ({ href: `/fuer/${z.slug}`, label: z.nav })), ...AKTIONEN.map((a) => ({ href: `/aktion/${a.slug}`, label: a.nav }))];
-  return { groups: groups.filter((g) => g.cats.length), genders, brands, branchen, deals: dealCount(ctx) };
+  return { groups: groups.filter((g) => g.cats.length), genders, brands, branchen, sale: saleCount(ctx), eol: eolCount(ctx) };
 }

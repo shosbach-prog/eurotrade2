@@ -23,7 +23,7 @@ export default function Artikel() {
     ek: p.basePrice ?? null, vk: p.basePrice ? sellPrice(p.basePrice, p.categorySlug) : null,
     hidden: !!p.hidden, top: !!p.top, changed: !!ov[p.id] && !p.custom, custom: !!p.custom,
     text: getText(p).source, img: p.images[0]?.replace(/^\/api\/bild\//, '/api/upload/') ?? null,
-    colors: p.colors.length, placeholder: (p.tags ?? []).includes('Platzhalter'), eol: p.eol ? (p.eol.all ? `Auslauf${p.eol.date ? ` ${p.eol.date.split('-').reverse().join('.')}` : ''}` : `${Object.keys(p.eol.colors).length} Farbe(n) laufen aus`) : null,
+    sale: p.sale ? p.sale.pct : null, colors: p.colors.length, placeholder: (p.tags ?? []).includes('Platzhalter'), eol: p.eol ? (p.eol.all ? `Auslauf${p.eol.date ? ` ${p.eol.date.split('-').reverse().join('.')}` : ''}` : `${Object.keys(p.eol.colors).length} Farbe(n) laufen aus`) : null,
   }));
   const cats = [...new Set(all.map((p) => p.category))].sort();
   return (

@@ -1620,3 +1620,16 @@ a.mm-h:hover{color:var(--brand)}
 @media (min-width:1181px){.catnav.mm .mm-tab{font-size:13.5px;padding:12px 6px}}
 .gchips{margin-top:-6px}
 .gchips a{font-size:13px;padding:5px 11px}
+.mm-offers{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:22px 0 26px;max-width:860px}
+.catnav.mm .mm-panel a.mm-offer{display:flex;flex-direction:column;gap:6px;padding:20px 22px;border-radius:12px;border:1px solid var(--line)}
+.catnav.mm .mm-panel a.mm-offer b{font-size:18px}
+.catnav.mm .mm-panel a.mm-offer span{color:var(--muted);font-size:14px}
+.catnav.mm .mm-panel a.mm-offer i{font-style:normal;font-weight:700;font-size:14px;margin-top:4px}
+.catnav.mm .mm-panel a.mm-offer.sale{background:#fff4ed;border-color:#fdba74}.mm-offer.sale b,.mm-offer.sale i{color:#c2410c}
+.catnav.mm .mm-panel a.mm-offer.eol{background:#f3f6fb}.mm-offer.eol i{color:var(--brand)}
+.catnav.mm .mm-panel a.mm-offer:hover{box-shadow:0 6px 18px rgba(15,23,42,.1)}
+.catnav.mm .mm-panel .mm-promo a.mm-eol{color:#fff;border:1px solid rgba(255,255,255,.6);padding:7px 12px;border-radius:8px;text-align:center;font-size:13.5px}
+.price-was{text-decoration:line-through;color:var(--muted);font-weight:500;font-size:.75em;margin-right:6px}
+.b-sale{background:#c2410c;color:#fff}
+@media (max-width:600px){.mm-offers{grid-template-columns:1fr}}
+.tag.tag-sale{background:#fff4ed;color:#c2410c;border-color:#fdba74}

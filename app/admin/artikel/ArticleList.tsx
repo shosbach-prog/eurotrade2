@@ -5,9 +5,9 @@ import { useMemo, useState } from 'react';
 export type Row = {
   id: string; name: string; sku: string; brand: string; category: string; ek: number | null; vk: number | null;
   hidden: boolean; top: boolean; changed: boolean; custom: boolean; text: 'eigen' | 'vorlage' | 'automatisch';
-  img: string | null; colors: number; placeholder: boolean; eol?: string | null;
+  img: string | null; colors: number; placeholder: boolean; eol?: string | null; sale?: number | null;
 };
-type Status = 'alle' | 'sichtbar' | 'aus' | 'ohne-preis' | 'platzhalter' | 'geaendert' | 'auslauf';
+type Status = 'alle' | 'sichtbar' | 'aus' | 'ohne-preis' | 'platzhalter' | 'geaendert' | 'auslauf' | 'angebot';
 const PER = 50;
 const eur = (n: number | null) => (n == null ? '–' : n.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' }));
 const TXT = { eigen: ['Eigener Text', 'st-angenommen'], vorlage: ['Vorlage', 'st-angebot'], automatisch: ['Automatisch', 'st-neu'] } as const;
@@ -28,7 +28,7 @@ export default function ArticleList({ rows: init, categories }: { rows: Row[]; c
 
   const count = (s: Status) => rows.filter((r) => match(r, s)).length;
   function match(r: Row, s: Status) {
-    return s === 'alle' || (s === 'sichtbar' && !r.hidden) || (s === 'aus' && r.hidden) || (s === 'ohne-preis' && r.ek == null) || (s === 'platzhalter' && r.placeholder) || (s === 'geaendert' && (r.changed || r.custom)) || (s === 'auslauf' && !!r.eol);
+    return s === 'alle' || (s === 'sichtbar' && !r.hidden) || (s === 'aus' && r.hidden) || (s === 'ohne-preis' && r.ek == null) || (s === 'platzhalter' && r.placeholder) || (s === 'geaendert' && (r.changed || r.custom)) || (s === 'auslauf' && !!r.eol) || (s === 'angebot' && r.sale != null);
   }
   const filtered = useMemo(() => {
     const t = q.trim().toLowerCase();
@@ -48,15 +48,15 @@ export default function ArticleList({ rows: init, categories }: { rows: Row[]; c
   const toggleShown = () => setSel((s) => { const n = new Set(s); shown.forEach((r) => (allShownSel ? n.delete(r.id) : n.add(r.id))); return n; });
   const selectFiltered = () => setSel(new Set(filtered.map((r) => r.id)));
 
-  async function bulk(patch: { hidden?: boolean; category?: string; top?: boolean }, ids = [...sel]) {
+  async function bulk(patch: { hidden?: boolean; category?: string; top?: boolean; sale?: { pct: number } | null }, ids = [...sel]) {
     if (!ids.length) return;
     setBusy(true);
     const r = await fetch('/api/admin/artikel', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ids, patch }) });
     const d = await r.json().catch(() => ({}));
     setBusy(false);
     if (!r.ok) { say(false, d.error ?? 'Fehler beim Speichern'); return; }
-    setRows((rs) => rs.map((x) => (ids.includes(x.id) ? { ...x, ...patch, changed: !x.custom || x.changed } : x)));
-    say(true, `${ids.length} Artikel ${patch.hidden === false ? 'sichtbar geschaltet' : patch.hidden ? 'ausgeblendet' : patch.category ? `nach „${patch.category}“ verschoben` : patch.top ? 'als Top markiert' : 'aktualisiert'}.`);
+    setRows((rs) => rs.map((x) => (ids.includes(x.id) ? { ...x, ...patch, sale: 'sale' in patch ? (patch.sale ? patch.sale.pct : null) : x.sale, changed: !x.custom || x.changed } : x)));
+    say(true, `${ids.length} Artikel ${patch.hidden === false ? 'sichtbar geschaltet' : patch.hidden ? 'ausgeblendet' : patch.category ? `nach „${patch.category}“ verschoben` : patch.top ? 'als Top markiert' : patch.sale ? `als Sonderangebot markiert${patch.sale.pct ? ` (−${patch.sale.pct} %)` : ''}` : 'sale' in patch ? 'aus den Sonderangeboten genommen' : 'aktualisiert'}.`);
     if (ids.length > 1) setSel(new Set());
   }
 
@@ -71,7 +71,7 @@ export default function ArticleList({ rows: init, categories }: { rows: Row[]; c
         </select>
       </div>
       <div className="cm-filters al-filters" role="tablist">
-        {([['alle', 'Alle'], ['sichtbar', 'Sichtbar'], ['aus', 'Ausgeblendet'], ['ohne-preis', 'Ohne Preis'], ['platzhalter', 'Platzhalter'], ['geaendert', 'Bearbeitet'], ['auslauf', 'Auslauf']] as [Status, string][]).map(([s, l]) => (
+        {([['alle', 'Alle'], ['sichtbar', 'Sichtbar'], ['aus', 'Ausgeblendet'], ['ohne-preis', 'Ohne Preis'], ['platzhalter', 'Platzhalter'], ['geaendert', 'Bearbeitet'], ['auslauf', 'Auslauf'], ['angebot', 'Sonderangebot']] as [Status, string][]).map(([s, l]) => (
           <button key={s} role="tab" aria-selected={status === s} className={status === s ? 'on' : ''} onClick={() => { setStatus(s); reset(); }}>{l} <span>{count(s)}</span></button>
         ))}
       </div>
@@ -85,6 +85,9 @@ export default function ArticleList({ rows: init, categories }: { rows: Row[]; c
           <button className="btn alt sm" disabled={busy} onClick={() => bulk({ hidden: true })}>Ausblenden</button>
           <select disabled={busy} value="" onChange={(e) => e.target.value && bulk({ category: e.target.value })} aria-label="Kategorie setzen">
             <option value="">Kategorie setzen …</option>{categories.map((c) => <option key={c}>{c}</option>)}
+          </select>
+          <select disabled={busy} value="" onChange={(e) => { const v = e.target.value; if (v === 'off') bulk({ sale: null }); else if (v) bulk({ sale: { pct: Number(v) } }); }} aria-label="Sonderangebot">
+            <option value="">Sonderangebot …</option><option value="0">markieren (ohne Rabatt)</option>{[5, 10, 15, 20, 25, 30, 40, 50].map((n) => <option key={n} value={n}>markieren mit −{n} %</option>)}<option value="off">kein Sonderangebot mehr</option>
           </select>
           <button className="linkbtn" onClick={() => setSel(new Set())}>Auswahl aufheben</button>
         </div>
@@ -106,6 +109,7 @@ export default function ArticleList({ rows: init, categories }: { rows: Row[]; c
               <span className="al-tags">
                 {r.top && <span className="tag tag-ok">★ Top</span>}
                 {r.placeholder && <span className="tag tag-warn">Platzhalter</span>}
+                {r.sale != null && <span className="tag tag-sale">Sonderangebot{r.sale ? ` −${r.sale} %` : ''}</span>}
                 {r.eol && <span className="tag tag-warn" title="laut L-Shop-Auslaufliste">⏳ {r.eol}</span>}
                 {r.custom ? <span className="tag">eigener Artikel</span> : r.changed && <span className="tag">bearbeitet</span>}
                 <span className={`st ${TXT[r.text][1]}`} style={{ fontSize: 11 }}>{TXT[r.text][0]}</span>
