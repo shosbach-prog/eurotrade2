@@ -2,14 +2,15 @@ node_modules
 .next
 *.tsbuildinfo
 .env
-data/
-import/
-updates/
+/data/
+/import/
+/updates/
 Claude outputs/
 *.zip
 cookie-banner.png
-data/
+/data/
 788184
 .DS_Store
 *.xlsx
 Manufacturer-contact*.pdf
+Auslaufartikel*.csv
