@@ -45,6 +45,6 @@ export type Product = {
 export type Eol = { all: boolean; date: string | null; colors: Record<string, { sizes: string[] | null; date: string | null }> };
 
 /** Was der Browser sieht: Verkaufspreis statt Einkaufspreis */
-export type PublicProduct = Omit<Product, 'basePrice' | 'baseTiers'> & { price: number | null; priceGross: number | null; /** Staffelpreise netto (ab Menge) */ tiers: { min: number; price: number }[]; /** Kundenbewertung (nur freigegebene, verifizierte) */ rating?: { avg: number; count: number } | null; /** Schaufenster ohne Preise */ locked?: boolean; /** Filter-Eigenschaften (Nachhaltig, Schwere Qualität …) */ props?: string[]; /** alle Bilder auch als .webp vorhanden */ webp?: boolean; /** Sonderangebot: ursprünglicher Preis (netto) */ was?: number | null };
+export type PublicProduct = Omit<Product, 'basePrice' | 'baseTiers'> & { price: number | null; priceGross: number | null; /** Staffelpreise netto (ab Menge) */ tiers: { min: number; price: number }[]; /** Kundenbewertung (nur freigegebene, verifizierte) */ rating?: { avg: number; count: number } | null; /** Schaufenster ohne Preise */ locked?: boolean; /** Filter-Eigenschaften (Nachhaltig, Schwere Qualität …) */ props?: string[]; /** alle Bilder auch als .webp vorhanden */ webp?: boolean; /** alle Bilder auch als kleine .m.webp (480 px) vorhanden */ mid?: boolean; /** Sonderangebot: ursprünglicher Preis (netto) */ was?: number | null };
 
 export type Category = { name: string; slug: string; count: number };

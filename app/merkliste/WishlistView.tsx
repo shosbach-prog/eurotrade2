@@ -4,6 +4,7 @@ import Link from 'next/link';
 import ProductCard from '@/components/ProductCard';
 import { useWishlist } from '@/components/Wishlist';
 import type { PublicProduct } from '@/lib/types';
+import { PrintButton } from '@/components/PrintSheet';
 
 export default function WishlistView({ shared }: { shared: string[] | null }) {
   const { ids, clear, addAll } = useWishlist();
@@ -39,9 +40,9 @@ export default function WishlistView({ shared }: { shared: string[] | null }) {
             <h1 style={{ marginBottom: 4 }}>Geteilte Auswahl <span className="muted" style={{ fontWeight: 400, fontSize: 18 }}>({shown.length})</span></h1>
             <p className="muted" style={{ margin: 0 }}>Diese Artikel wurden für Sie zusammengestellt.</p>
           </div>
-          {missing.length > 0
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}><PrintButton items={shown} title="Artikelauswahl" />{missing.length > 0
             ? <button className="btn" onClick={() => addAll(missing)}>Alle auf meine Merkliste</button>
-            : <Link className="btn alt" href="/merkliste" style={{ display: 'inline-grid', placeItems: 'center' }}>Zu meiner Merkliste</Link>}
+            : <Link className="btn alt" href="/merkliste" style={{ display: 'inline-grid', placeItems: 'center' }}>Zu meiner Merkliste</Link>}</div>
         </div>
         {shown.length ? <div className="grid">{shown.map((p) => <ProductCard key={p.id} p={p} />)}</div> : <p className="muted">Die Artikel dieser Auswahl sind nicht mehr verfügbar.</p>}
       </>
@@ -61,6 +62,7 @@ export default function WishlistView({ shared }: { shared: string[] | null }) {
         <h1>Merkliste <span className="muted" style={{ fontWeight: 400, fontSize: 18 }}>({shown.length})</span></h1>
         <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
           <button type="button" className="btn" onClick={share}>{copied ? '✓ Link kopiert' : 'Auswahl teilen'}</button>
+          <PrintButton items={shown} title="Ihre Artikelauswahl" />
           <button type="button" className="linkbtn" onClick={() => { if (confirm('Merkliste wirklich leeren?')) clear(); }}>Liste leeren</button>
         </div>
       </div>

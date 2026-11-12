@@ -11,6 +11,7 @@ import { overridesMtime, readOverrides } from './artikel';
 import { productSlug, slugify } from './format';
 import { pictosFor } from './picto';
 import { applyEol, auslaufMtime } from './auslauf';
+import { kindOf } from './copy';
 
 const LIVE = path.join(process.cwd(), 'data', 'products.json');
 const SEED = path.join(process.cwd(), 'seed', 'products.json');
@@ -66,6 +67,22 @@ const webpOk = (src?: string) => {
   if (v === undefined) { v = fs.existsSync(path.join(process.cwd(), 'public', src.replace(/\.jpe?g$/i, '.webp'))); webpExists.set(src, v); }
   return v;
 };
+const midCache = new WeakMap<Product, boolean>();
+const midExists = new Map<string, boolean>();
+function hasMid(p: Product) {
+  let v = midCache.get(p);
+  if (v === undefined) {
+    const all = [...p.images, ...p.colors.flatMap((c) => [c.image, ...(c.images ?? [])])].filter((x): x is string => !!x);
+    v = all.length > 0 && all.every((src) => {
+      if (!src.startsWith('/p/') || !/\.jpe?g$/i.test(src)) return false;
+      let e = midExists.get(src);
+      if (e === undefined) { e = fs.existsSync(path.join(process.cwd(), 'public', src.replace(/\.jpe?g$/i, '.m.webp'))); midExists.set(src, e); }
+      return e;
+    });
+    midCache.set(p, v);
+  }
+  return v;
+}
 function hasWebp(p: Product) {
   let v = webpCache.get(p);
   if (v === undefined) { v = p.images.length > 0 && [...p.images, ...p.colors.flatMap((c) => [c.image, ...(c.images ?? [])])].every(webpOk); webpCache.set(p, v); }
@@ -92,7 +109,7 @@ export function toPublic(p: Product, ctx?: Ctx): PublicProduct {
   const off = p.sale?.pct && p.sale.pct > 0 && p.sale.pct < 90 && price != null ? (100 - p.sale.pct) / 100 : null;
   const sp = off != null ? Math.round(price! * off * 100) / 100 : price;
   const st = off != null ? tiers.map((t) => ({ min: t.min, price: Math.round(t.price * off * 100) / 100 })) : tiers;
-  return { ...rest, colors: sortColors(p.colors), price: sp, priceGross: sp != null ? gross(sp) : null, tiers: st, ...(off != null ? { was: price } : {}), rating: ratingFor(p.id), props: pictosFor(p).props, ...(hasWebp(p) ? { webp: true } : {}), ...(ctx?.locked ? { locked: true } : {}) };
+  return { ...rest, colors: sortColors(p.colors), price: sp, priceGross: sp != null ? gross(sp) : null, tiers: st, ...(off != null ? { was: price } : {}), rating: ratingFor(p.id), props: pictosFor(p).props, ...(hasWebp(p) ? { webp: true } : {}), ...(hasMid(p) ? { mid: true } : {}), ...(ctx?.locked ? { locked: true } : {}) };
 }
 
 const skuSet = (ctx: Ctx) => new Set((ctx?.skus ?? []).map((x) => x.toUpperCase()));
@@ -213,7 +230,12 @@ const baseName = (n: string) => n.replace(VARIANT_WORDS, ' ').replace(/[^a-z0-9�
 const PAIRS: Record<string, string[]> = {
   'T-Shirts': ['Sweatshirts', 'Caps & Mützen', 'Jacken'], Sweatshirts: ['T-Shirts', 'Jacken', 'Hosen'], Jacken: ['Sweatshirts', 'Caps & Mützen', 'Hosen'],
   Poloshirts: ['Jacken', 'Sweatshirts', 'Caps & Mützen'], Hosen: ['Sweatshirts', 'T-Shirts', 'Jacken'], 'Hemden & Blusen': ['Jacken', 'Hosen', 'Poloshirts'],
-  'Caps & Mützen': ['T-Shirts', 'Sweatshirts', 'Jacken'], Accessoires: ['T-Shirts', 'Sweatshirts', 'Caps & Mützen'],
+  'Caps & Mützen': ['Caps & Mützen', 'T-Shirts', 'Sweatshirts', 'Jacken'], Accessoires: ['T-Shirts', 'Sweatshirts', 'Caps & Mützen'],
+  'Taschen & Rucksäcke': ['Taschen & Rucksäcke', 'Caps & Mützen', 'T-Shirts', 'Schirme'], Schirme: ['Schirme', 'Taschen & Rucksäcke', 'Handtücher', 'Decken'],
+  'Gastro & Küche': ['Gastro & Küche', 'Poloshirts', 'Hemden & Blusen', 'Caps & Mützen'], Warnschutz: ['Warnschutz', 'Arbeitskleidung', 'Jacken', 'Caps & Mützen'],
+  Arbeitskleidung: ['Warnschutz', 'Jacken', 'Sweatshirts', 'T-Shirts'], Handtücher: ['Handtücher', 'Decken', 'Taschen & Rucksäcke', 'Plüsch & Spielzeug'],
+  Decken: ['Decken', 'Handtücher', 'Caps & Mützen', 'Plüsch & Spielzeug'], 'Plüsch & Spielzeug': ['Plüsch & Spielzeug', 'Decken', 'Handtücher', 'Taschen & Rucksäcke'],
+  Werbeartikel: ['Taschen & Rucksäcke', 'Schirme', 'Caps & Mützen'], Kleider: ['Jacken', 'Sweatshirts', 'Accessoires'], Unterwäsche: ['T-Shirts', 'Hosen', 'Accessoires'],
 };
 export function matchingFor(id: string, ctx?: Ctx): { variants: PublicProduct[]; combos: PublicProduct[] } {
   const all = products(ctx);
@@ -228,8 +250,13 @@ export function matchingFor(id: string, ctx?: Ctx): { variants: PublicProduct[];
   const used = new Set([p.id, ...variants.map((x) => x.id)]);
   const combos: Product[] = [];
   for (const cat of PAIRS[p.category] ?? ['T-Shirts', 'Sweatshirts', 'Caps & Mützen']) {
-    const pool = all.filter((x) => !used.has(x.id) && x.category === cat);
-    const pick = pool.find((x) => x.brand === p.brand && (x.gender ?? 'Unisex') === (p.gender ?? 'Unisex')) ?? pool.find((x) => x.brand === p.brand) ?? (cat === 'Caps & Mützen' ? pool[0] : undefined);
+    // gleiche Kategorie nur mit anderer Artikelart (z. B. Cap → Beanie, Schürze → Kochjacke)
+    const pool = all.filter((x) => !used.has(x.id) && x.category === cat && x.images.length && (cat !== p.category || kindOf(x) !== kindOf(p)));
+    const g = (x: Product) => (x.gender ?? 'Unisex') === (p.gender ?? 'Unisex') || (x.gender ?? 'Unisex') === 'Unisex';
+    // ohne gleiche Marke: abwechslungsreich, aber pro Artikel stabil auswählen
+    const h = [...p.id + cat].reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) >>> 0, 7);
+    const fit = pool.filter(g);
+    const pick = pool.find((x) => x.brand === p.brand && g(x)) ?? pool.find((x) => x.brand === p.brand) ?? (fit.length ? fit[h % Math.min(fit.length, 40)] : pool[h % Math.max(1, Math.min(pool.length, 40))]);
     if (pick) { combos.push(pick); used.add(pick.id); }
   }
   return { variants: variants.map((x) => toPublic(x, ctx)), combos: combos.slice(0, 4).map((x) => toPublic(x, ctx)) };

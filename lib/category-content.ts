@@ -1,3 +1,4 @@
+import { SUB_TEXT, T_MORE } from './category-content-more';
 // Texte für Kategorieseiten (Einleitung, SEO-Text, FAQ) – je Kategorie anpassbar
 type C = { intro: string; seo: string[]; faq: [string, string][] };
 const T: Record<string, Partial<C>> = {
@@ -12,8 +13,10 @@ const T: Record<string, Partial<C>> = {
   decken: { intro: 'Kuscheldecken als hochwertiges Präsent für Kunden, Mitarbeitende und Vereinsmitglieder.', seo: ['Decken sind ein Geschenk mit langer Lebensdauer – ob für Stadion, Sofa oder Babyzimmer. Mit Stick oder Patch werden sie zum persönlichen Präsent.'] },
   arbeitskleidung: { intro: 'Arbeitskleidung, Kittel und Kasacks für Praxis, Pflege, Küche und Handwerk – robust und industriewäschetauglich.', seo: ['Berufsbekleidung muss viel aushalten. Achten Sie auf Waschtemperatur und Industriewäsche-Eignung; für Logos auf Arbeitskleidung empfehlen wir Stick.'] },
 };
-export function categoryContent(slug: string, name: string): C {
-  const t = T[slug] ?? {};
+export function categoryContent(slug: string, name: string, sub?: string): C {
+  const base = T[slug] ?? T_MORE[slug] ?? {};
+  const st = sub ? SUB_TEXT[sub] : undefined;
+  const t: Partial<C> = st ? { ...base, intro: st.intro, seo: [...(st.seo ? [st.seo] : []), ...(base.seo ?? [])] } : base;
   return {
     intro: t.intro ?? `${name} für Verein, Team und Firma – schon ab 1 Stück, auf Wunsch mit Ihrem Logo bedruckt oder bestickt.`,
     seo: t.seo ?? [`In unserer Kategorie ${name} finden Sie Markenqualität für Vereine, Unternehmen und Events. Alle Artikel sind schon ab 1 Stück erhältlich und lassen sich mit Logo, Text oder Namen veredeln.`],

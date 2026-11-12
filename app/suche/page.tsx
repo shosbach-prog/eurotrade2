@@ -1,3 +1,4 @@
+import { logMiss } from '@/lib/search-log';
 import { catPath } from '@/lib/format';
 import Link from 'next/link';
 import FilterGrid from '@/components/FilterGrid';
@@ -12,6 +13,7 @@ export default async function SearchPage({ searchParams }: { searchParams: { q?:
   const ctx = await getCustomer();
   const q = (searchParams.q ?? '').trim();
   const res = q ? search(q, 200, ctx) : [];
+  if (q && !res.length) logMiss(q);
   const sug = q && !res.length ? didYouMean(q, ctx) : null;
   return (
     <>

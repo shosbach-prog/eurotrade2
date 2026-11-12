@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const h = sb ? sb.sub.title ?? sb.sub.label : c?.name;
   if (!h) return { title: 'Kategorie' };
   const hg = g ? `${h} ${gLabel(g)}` : h;
-  return { title: `${hg} mit Logo bedrucken & besticken`, description: sb || g ? `${hg} bekannter Marken – bedruckt oder bestickt mit Ihrem Logo, schon ab 1 Stück. Staffelpreise ab 10 Stück, Angebot in 24 h.` : categoryContent(c!.slug, c!.name).intro, alternates: { canonical: catUrl(base, g) } };
+  return { title: `${hg} mit Logo bedrucken & besticken`, description: sb ? `${categoryContent(sb.cat, h, sb.sub.key).intro} Ab 1 Stück, Staffelpreise ab 10 Stück.` : g ? `${hg} bekannter Marken – bedruckt oder bestickt mit Ihrem Logo, schon ab 1 Stück. Staffelpreise ab 10 Stück, Angebot in 24 h.` : categoryContent(c!.slug, c!.name).intro, alternates: { canonical: catUrl(base, g) } };
 }
 
 export default async function CategoryView({ params, searchParams = {} }: { params: { slug: string }; searchParams?: SP }) {
@@ -84,7 +84,7 @@ export default async function CategoryView({ params, searchParams = {} }: { para
   const subs = (SUBTYPES[cat.slug] ?? []).map((s) => ({ ...s, n: allG.filter((p) => matchSub(s, p.name)).length })).filter((s) => s.n >= 1 && s.n < allG.length && all.filter((p) => matchSub(s, p.name)).length >= 2);
   const gens = GEN.map((x) => ({ g: x, n: inSub.filter(forG(x)).length })).filter((x) => x.n > 0);
   const title = sub ? sub.title ?? sub.label : cat.name;
-  const txt = categoryContent(cat.slug, cat.name);
+  const txt = categoryContent(cat.slug, cat.name, sub?.key);
   const rated = items.filter((p) => p.rating);
   const catRating = rated.length ? { avg: rated.reduce((s, p) => s + p.rating!.avg * p.rating!.count, 0) / rated.reduce((s, p) => s + p.rating!.count, 0), count: rated.reduce((s, p) => s + p.rating!.count, 0) } : null;
   const heroImgs = (g ? [...items.filter((p) => p.gender === g), ...items.filter((p) => p.gender !== g)] : items).flatMap((p) => p.images.slice(0, 1)).slice(0, 3);
@@ -119,7 +119,7 @@ export default async function CategoryView({ params, searchParams = {} }: { para
       <RefStrip refs={refsFor({ category: cat.name, categorySlug: cat.slug })} title={`${cat.name} mit Logo – Beispiele unserer Kunden`} />
       <ReviewStrip reviews={latestReviews(6, items.map((p) => p.id))} overall={catRating} title={`Bewertungen zu ${cat.name}`} />
       <section className="cat-seo">
-        <div><h2>{cat.name} mit Ihrem Logo</h2>{txt.seo.map((x) => <p key={x}>{x}</p>)}<p><Link className="alink" href="/druck-stick">Druck & Stick im Vergleich →</Link></p></div>
+        <div><h2>{sub ? title : cat.name} mit Ihrem Logo</h2>{txt.seo.map((x) => <p key={x}>{x}</p>)}<p><Link className="alink" href="/druck-stick">Druck & Stick im Vergleich →</Link></p></div>
         <div className="faq"><h2>Häufige Fragen</h2>{txt.faq.map(([q, a]) => <details key={q} className="box"><summary>{q}</summary><p>{a}</p></details>)}</div>
       </section>
     </>

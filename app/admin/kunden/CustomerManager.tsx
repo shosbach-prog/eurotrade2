@@ -1,18 +1,19 @@
 'use client';
+import ArticlePicker, { PickedStrip, type PickGroup, type PickItem } from '@/components/ArticlePicker';
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { AccessRequest, Customer as Cust } from '@/lib/store';
 import { parseTiers } from '@/lib/tiers';
 
 type Customer = Omit<Cust, 'pw'> & { hasPw?: boolean; _orig?: string };
-type P = { sku: string; name: string; brand: string };
-type Props = { initial: Customer[]; envCodes: { code: string; name: string }[]; products: P[]; defaultMarkup: number; defaultTiers: string; requests: AccessRequest[]; mail?: boolean };
+type P = PickItem;
+type Props = { initial: Customer[]; envCodes: { code: string; name: string }[]; products: P[]; groups: PickGroup[]; defaultMarkup: number; defaultTiers: string; requests: AccessRequest[]; mail?: boolean };
 
 const gen = () => Array.from(crypto.getRandomValues(new Uint8Array(6)), (b) => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[b % 32]).join('');
 const blank = (): Customer => ({ code: gen(), name: '', email: null, markup: null, tiers: null, skus: [], exclusive: false, active: true, note: '' });
 type Filter = 'alle' | 'aktiv' | 'gesperrt' | 'ohne-login';
 
-export default function CustomerManager({ initial, envCodes, products, defaultMarkup, defaultTiers, requests: req0, mail }: Props) {
+export default function CustomerManager({ initial, envCodes, products, groups, defaultMarkup, defaultTiers, requests: req0, mail }: Props) {
   const [list, setList] = useState<Customer[]>(initial);
   const [requests, setRequests] = useState(req0);
   const [q, setQ] = useState('');
@@ -140,7 +141,7 @@ export default function CustomerManager({ initial, envCodes, products, defaultMa
         </details>
       )}
 
-      {edit && <Drawer key={edit.c._orig ?? edit.c.code} state={edit} products={products} defaultMarkup={defaultMarkup} defaultTiers={defaultTiers} mail={mail}
+      {edit && <Drawer key={edit.c._orig ?? edit.c.code} state={edit} products={products} groups={groups} defaultMarkup={defaultMarkup} defaultTiers={defaultTiers} mail={mail}
         onClose={() => setEdit(null)} onSaved={saved} onRemoved={removed} say={say} />}
       {toast && <div className={`cm-toast ${toast.ok ? 'ok' : 'err'}`} role="status">{toast.t}</div>}
     </div>
@@ -148,8 +149,8 @@ export default function CustomerManager({ initial, envCodes, products, defaultMa
 }
 
 /* ---------- Bearbeiten-Panel ---------- */
-function Drawer({ state, products, defaultMarkup, defaultTiers, mail, onClose, onSaved, onRemoved, say }: {
-  state: { c: Customer; isNew: boolean; reqId?: string }; products: P[]; defaultMarkup: number; defaultTiers: string; mail?: boolean;
+function Drawer({ state, products, groups, defaultMarkup, defaultTiers, mail, onClose, onSaved, onRemoved, say }: {
+  state: { c: Customer; isNew: boolean; reqId?: string }; products: P[]; groups: PickGroup[]; defaultMarkup: number; defaultTiers: string; mail?: boolean;
   onClose: () => void; onSaved: (c: Customer, isNew: boolean, orig?: string, reqId?: string) => void; onRemoved: (code: string, name: string) => void; say: (ok: boolean, t: string) => void;
 }) {
   const { isNew, reqId } = state;
@@ -158,7 +159,6 @@ function Drawer({ state, products, defaultMarkup, defaultTiers, mail, onClose, o
   const [dirty, setDirty] = useState(isNew);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
-  const [pick, setPick] = useState('');
   const upd = (p: Partial<Customer>) => { setC((x) => ({ ...x, ...p })); setDirty(true); setErr(''); };
 
   // Konditionen-Modus
@@ -202,15 +202,12 @@ function Drawer({ state, products, defaultMarkup, defaultTiers, mail, onClose, o
     const d = await r.json().catch(() => ({}));
     if (r.ok) upd({ logoId: d.id, logoName: d.name }); else setErr(d.error ?? 'Upload fehlgeschlagen');
   }
-  function addSku() {
-    const t = pick.trim().toUpperCase();
-    if (!t) return;
-    const p = products.find((x) => x.sku.toUpperCase() === t.split(' ')[0]) ?? products.find((x) => `${x.sku} ${x.name}`.toUpperCase().includes(t));
-    if (!p) { setErr('Artikel nicht gefunden.'); return; }
-    if (!(c.skus ?? []).includes(p.sku.toUpperCase())) upd({ skus: [...(c.skus ?? []), p.sku.toUpperCase()] });
-    setPick('');
-  }
-  const pname = (sku: string) => products.find((p) => p.sku.toUpperCase() === sku)?.name ?? '(nicht im Katalog)';
+  // Kollektion wird als Art.-Nr. gespeichert – die Auswahl arbeitet mit Artikel-IDs
+  const [picker, setPicker] = useState(false);
+  const bySku = new Map(products.map((p) => [p.sku.toUpperCase(), p.id]));
+  const byPid = new Map(products.map((p) => [p.id, p.sku.toUpperCase()]));
+  const skuIds = (c.skus ?? []).map((s) => bySku.get(s) ?? s);
+  const setSkuIds = (ids: string[]) => upd({ skus: ids.map((id) => byPid.get(id) ?? id.toUpperCase()) });
   const inviteText = () => `Guten Tag,\n\nIhr persönlicher Zugang zu unserem Textil-Shop ist freigeschaltet:\n\n${window.location.origin}/zugang\n${c.email ? `Anmeldung mit Ihrer E-Mail-Adresse (${c.email}) – das Passwort legen Sie über „Passwort vergessen“ selbst fest.\nOder mit Zugangscode: ${c.code}` : `Zugangscode: ${c.code}`}\n\nDort finden Sie Ihre Konditionen${c.skus?.length ? ' und Ihre eigene Kollektion' : ''}, können Logos hochladen und erhalten Ihr Angebot innerhalb von 24 Stunden.\n\nMit freundlichen Grüßen\nEuro-Trade`;
 
   // Portal an <body>: unabhängig von Layout/Transform der Seite immer bildschirmfüllend
@@ -301,12 +298,8 @@ function Drawer({ state, products, defaultMarkup, defaultTiers, mail, onClose, o
           <section className="ds">
             <h3>Eigene Kollektion <span className="muted" style={{ fontWeight: 400, fontSize: 13 }}>(optional)</span></h3>
             <p className="ds-hint" style={{ marginTop: 0 }}>Diese Artikel sieht der Kunde zuerst.</p>
-            {!!c.skus?.length && <div className="chips">{c.skus.map((s) => <span key={s} className="chip">{s} – {pname(s)} <button type="button" className="x" onClick={() => upd({ skus: c.skus!.filter((x) => x !== s) })} aria-label="entfernen">×</button></span>)}</div>}
-            <div className="ds-inline" style={{ marginTop: 8 }}>
-              <input list="cm-products" value={pick} onChange={(e) => setPick(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSku())} placeholder="Artikelnummer oder Name …" />
-              <button type="button" className="btn alt sm" onClick={addSku}>Hinzufügen</button>
-            </div>
-            <datalist id="cm-products">{products.map((p) => <option key={p.sku} value={`${p.sku} ${p.name}`}>{p.brand}</option>)}</datalist>
+            <PickedStrip items={products} value={skuIds} onOpen={() => setPicker(true)} onRemove={(id) => setSkuIds(skuIds.filter((x) => x !== id))} />
+            {picker && <ArticlePicker items={products} groups={groups} value={skuIds} onChange={setSkuIds} title={`Kollektion für ${c.name || 'den Kunden'}`} onClose={() => setPicker(false)} />}
             {!!c.skus?.length && <label className="ds-check"><input type="checkbox" checked={!!c.exclusive} onChange={(e) => upd({ exclusive: e.target.checked })} /> Nur diese Artikel anzeigen (restlicher Katalog ausgeblendet)</label>}
           </section>
 

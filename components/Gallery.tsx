@@ -4,7 +4,7 @@ import ProductImage from './ProductImage';
 import type { PublicProduct } from '@/lib/types';
 
 /** L-Shop: 665px-Vorschau -> Originalbild für den Zoom */
-import { webp } from '@/lib/img';
+import { mid, webp } from '@/lib/img';
 export const hiRes = (src: string) => src.replace(/\/generated\/product\/(\d+)\/\d+_\d+_\d+\//, '/master/product/$1/');
 const Z = 2.6; // Zoomfaktor
 
@@ -13,10 +13,13 @@ type Props = { p: PublicProduct; hex?: string; overlay?: ReactNode };
 /** Produktgalerie wie bei Amazon: Thumbnails per Hover, Lupe mit Zoomfenster neben dem Bild, Vollbild per Klick */
 export default function Gallery({ p, hex, overlay }: Props) {
   const imgs = p.webp ? p.images.map((x) => webp(x, true)!) : p.images;
+  const thumbs = p.images.map((x) => mid(x, p.mid, p.webp)!);
   const [i, setI] = useState(0);
   const [zoom, setZoom] = useState<{ lx: number; ly: number; lw: number; lh: number; bx: number; by: number; bw: number; bh: number } | null>(null);
   const [full, setFull] = useState(false);
   const box = useRef<HTMLDivElement>(null);
+  const touch = useRef<{ x: number; y: number; moved: boolean } | null>(null);
+  const swiped = useRef(0);
   const src = imgs[i];
 
   // Hi-Res vorladen, damit der Zoom sofort scharf ist
@@ -56,13 +59,20 @@ export default function Gallery({ p, hex, overlay }: Props) {
           <div className="gal-thumbs">
             {imgs.map((t, k) => (
               <button key={t} className={k === i ? 'on' : ''} onMouseEnter={() => setI(k)} onFocus={() => setI(k)} onClick={() => setI(k)} aria-label={`Bild ${k + 1}`}>
-                <img src={t} alt="" loading="lazy" />
+                <img src={thumbs[k] ?? t} alt="" loading="lazy" decoding="async" />
               </button>
             ))}
           </div>
         )}
-        <div ref={box} className={`gallery ${src ? 'zoomable' : ''}`} onMouseMove={src ? move : undefined} onMouseLeave={() => setZoom(null)} onClick={() => src && setFull(true)}>
-          <ProductImage p={p} src={src} hex={hex} />
+        <div ref={box} className={`gallery ${src ? 'zoomable' : ''}`} onMouseMove={src ? move : undefined} onMouseLeave={() => setZoom(null)}
+          onTouchStart={(e) => { const t = e.touches[0]; touch.current = { x: t.clientX, y: t.clientY, moved: false }; }}
+          onTouchEnd={(e) => {
+            const s = touch.current; touch.current = null; if (!s || imgs.length < 2) return;
+            const t = e.changedTouches[0]; const dx = t.clientX - s.x, dy = t.clientY - s.y;
+            if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3) { e.preventDefault(); setI((x) => (x + (dx < 0 ? 1 : -1) + imgs.length) % imgs.length); swiped.current = Date.now(); }
+          }}
+          onClick={() => src && Date.now() - swiped.current > 400 && setFull(true)}>
+          <ProductImage p={p} src={src} hex={hex} priority={i === 0} />
           {overlay}
           {imgs.length > 1 && <>
             <button type="button" className="gal-nav l" aria-label="Vorheriges Bild" onClick={(e) => { e.stopPropagation(); setZoom(null); setI((x) => (x - 1 + imgs.length) % imgs.length); }} onMouseMove={(e) => { e.stopPropagation(); setZoom(null); }}>‹</button>
@@ -76,7 +86,9 @@ export default function Gallery({ p, hex, overlay }: Props) {
       {src && <p className="gal-hint">{imgs.length > 1 ? 'Mit der Maus über Bild fahren zum Vergrößern · Klick für Vollbild' : 'Mit der Maus über Bild fahren zum Vergrößern'}</p>}
 
       {full && src && (
-        <div className="lightbox" onClick={() => setFull(false)} role="dialog" aria-modal="true">
+        <div className="lightbox" onClick={() => Date.now() - swiped.current > 400 && setFull(false)} role="dialog" aria-modal="true"
+          onTouchStart={(e) => { const t = e.touches[0]; touch.current = { x: t.clientX, y: t.clientY, moved: false }; }}
+          onTouchEnd={(e) => { const s = touch.current; touch.current = null; if (!s || imgs.length < 2) return; const t = e.changedTouches[0]; const dx = t.clientX - s.x; if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(t.clientY - s.y)) { setI((x) => (x + (dx < 0 ? 1 : -1) + imgs.length) % imgs.length); swiped.current = Date.now(); } }}>
           <button className="lb-x" aria-label="Schließen">×</button>
           {imgs.length > 1 && <button className="lb-nav l" aria-label="Vorheriges Bild" onClick={(e) => { e.stopPropagation(); setI((x) => (x - 1 + imgs.length) % imgs.length); }}>‹</button>}
           <img src={hiRes(src)} alt={p.name} onClick={(e) => e.stopPropagation()} onError={(e) => { (e.target as HTMLImageElement).src = src; }} />

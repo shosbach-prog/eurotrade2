@@ -1700,3 +1700,25 @@ a.mm-h:hover{color:var(--brand)}
 .gal-nav:hover{opacity:1;transform:translateY(-50%) scale(1.06)}
 .gal-nav.l{left:10px}.gal-nav.r{right:10px}
 .gal-count{position:absolute;bottom:10px;right:12px;z-index:5;background:rgba(15,23,42,.6);color:#fff;font-size:12px;padding:3px 8px;border-radius:999px;pointer-events:none}
+.sm-box{margin:14px 0}.sm-head{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;padding:0;font-size:16px;cursor:pointer;text-align:left}
+.gal .gallery{touch-action:pan-y}
+/* Druckansicht Merkliste */
+.print-sheet{display:none}
+@media print{
+  body.printing > *:not(.print-sheet){display:none !important}
+  body.printing{background:#fff}
+  body.printing .print-sheet{display:block;color:#111;font-size:11px}
+  body.printing .print-sheet,body.printing .print-sheet *{visibility:visible}
+  .ps-head,.ps-t th{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  @page{size:A4;margin:14mm}
+}
+.ps-head{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #0a5cf0;padding-bottom:8px;margin-bottom:10px}
+.ps-logo b{font-size:22px;color:#0a3fa8}.ps-logo b span{color:#f5a400}.ps-logo small{display:block;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:#555}
+.ps-meta{text-align:right}.ps-meta b{display:block;font-size:16px}.ps-meta span{color:#555}
+.ps-t{width:100%;border-collapse:collapse}
+.ps-t th{text-align:left;font-size:9px;text-transform:uppercase;color:#666;border-bottom:1px solid #ccc;padding:4px}
+.ps-t td{border-bottom:1px solid #e5e5e5;padding:6px 4px;vertical-align:top;page-break-inside:avoid}
+.ps-t .r{text-align:right;white-space:nowrap}
+.ps-img{width:62px}.ps-img img{width:56px;height:56px;object-fit:contain}
+.ps-s{color:#555;font-size:10px}.ps-l{color:#0a5cf0;word-break:break-all}
+.ps-foot{margin-top:14px;font-size:10px;color:#444;border-top:1px solid #ccc;padding-top:8px}

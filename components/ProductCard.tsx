@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { webp } from '@/lib/img';
+import { mid } from '@/lib/img';
 import type { PublicProduct } from '@/lib/types';
 import { eur } from '@/lib/format';
 import ProductImage from './ProductImage';
@@ -31,7 +31,7 @@ export default function ProductCard({ p }: { p: PublicProduct }) {
   return (
     <Link href={productPath(p)} className="card">
       <div className="img">
-        <ProductImage p={p} />{p.images[1] && <img className="pimg img2" src={webp(p.images[1], p.webp)} alt="" loading="lazy" aria-hidden />}
+        <ProductImage p={p} />{p.images[1] && <img className="pimg img2" src={mid(p.images[1], p.mid, p.webp)} alt="" loading="lazy" aria-hidden />}
         <div className="badges">{badges(p).map((x) => <span key={x.t} className={`badge-p ${x.c}`}>{x.t}</span>)}</div>
         <WishButton id={p.id} />
       </div>

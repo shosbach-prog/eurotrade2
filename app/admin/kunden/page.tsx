@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import AdminNav from '@/components/AdminNav';
 import CustomerManager from './CustomerManager';
-import { allProductsBrief } from '@/lib/catalog';
+import { pickData } from '@/lib/pick';
 import { allCustomers, listAccessRequests, publicCustomer } from '@/lib/store';
 import { mailEnabled } from '@/lib/mail';
 import { defaultTiers } from '@/lib/pricing';
@@ -14,7 +14,7 @@ export default function Kunden() {
   return (
     <>
       <AdminNav active="kunden" />
-      <CustomerManager initial={list.filter((c) => c.source === 'admin' && !(c.pending && c.active === false)).map((c) => ({ ...publicCustomer(c), _orig: c.code }))} mail={mailEnabled()} envCodes={list.filter((c) => c.source === 'env').map((c) => ({ code: c.code, name: c.name }))} products={allProductsBrief()} defaultMarkup={Number(process.env.MARKUP_PERCENT ?? 35)} defaultTiers={tiersToString(defaultTiers())} requests={listAccessRequests().filter((r) => !r.done).reverse()} />
+      <CustomerManager initial={list.filter((c) => c.source === 'admin' && !(c.pending && c.active === false)).map((c) => ({ ...publicCustomer(c), _orig: c.code }))} mail={mailEnabled()} envCodes={list.filter((c) => c.source === 'env').map((c) => ({ code: c.code, name: c.name }))} {...(() => { const d = pickData(); return { products: d.items, groups: d.groups }; })()} defaultMarkup={Number(process.env.MARKUP_PERCENT ?? 35)} defaultTiers={tiersToString(defaultTiers())} requests={listAccessRequests().filter((r) => !r.done).reverse()} />
     </>
   );
 }

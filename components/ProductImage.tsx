@@ -1,10 +1,11 @@
 import type { PublicProduct } from '@/lib/types';
-import { webp } from '@/lib/img';
+import { mid } from '@/lib/img';
 
 /** Echtes Bild aus L-Shop – oder neutraler Platzhalter in der ersten Produktfarbe */
-export default function ProductImage({ p, src, hex }: { p: Pick<PublicProduct, 'name' | 'images' | 'colors' | 'category'> & { webp?: boolean }; src?: string; hex?: string }) {
-  const img = src ?? webp(p.images[0], p.webp);
-  if (img) return <img className="pimg" src={img} alt={p.name} loading="lazy" />;
+export default function ProductImage({ p, src, hex, priority }: { p: Pick<PublicProduct, 'name' | 'images' | 'colors' | 'category'> & { webp?: boolean; mid?: boolean }; src?: string; hex?: string; priority?: boolean }) {
+  // ohne src: Kachel/Vorschau → kleine 480-px-Fassung
+  const img = src ?? mid(p.images[0], p.mid, p.webp);
+  if (img) return <img className="pimg" src={img} alt={p.name} loading={priority ? 'eager' : 'lazy'} {...(priority ? { fetchPriority: 'high' as const } : {})} decoding="async" />;
   const fill = hex ?? p.colors[0]?.hex ?? '#cfd6df';
   const c = p.category.toLowerCase();
   const shape = c.includes('tasche')
