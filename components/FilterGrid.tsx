@@ -25,6 +25,9 @@ export default function FilterGrid({ items, initialGenders }: { items: PublicPro
   const [sort, setSort] = useState<Sort>('empfohlen');
   const [open, setOpen] = useState(false);
   const [dd, setDd] = useState<string | null>(null);
+  // Desktop-Seitenleiste: Gruppen einklappbar
+  const [shut, setShut] = useState<string[]>([]);
+  const wide = () => typeof window !== 'undefined' && window.matchMedia('(min-width:1100px)').matches;
   const [limit, setLimit] = useState(24);
   // Lazy Load: weitere Artikel automatisch nachladen, sobald das Ende der Liste in Sicht kommt
   const more = useRef<HTMLDivElement>(null);
@@ -76,8 +79,8 @@ export default function FilterGrid({ items, initialGenders }: { items: PublicPro
   const reset = () => { setBrands([]); setFams([]); setSizes([]); setGenders([]); setProps([]); setMaxP(null); };
 
   const grp = (id: string, label: string, n: number, body: React.ReactNode) => (
-    <div className={`f-group ${dd === id ? 'open' : ''} ${n ? 'act' : ''}`}>
-      <button type="button" className="f-btn" onClick={() => setDd(dd === id ? null : id)} aria-expanded={dd === id}>{label}{n ? <span className="f-n">{n}</span> : null}<span className="f-car">▾</span></button>
+    <div className={`f-group ${dd === id ? 'open' : ''} ${n ? 'act' : ''} ${shut.includes(id) ? 'shut' : ''}`}>
+      <button type="button" className="f-btn" onClick={() => (wide() ? setShut((x) => (x.includes(id) ? x.filter((y) => y !== id) : [...x, id])) : setDd(dd === id ? null : id))} aria-expanded={dd === id}>{label}{n ? <span className="f-n">{n}</span> : null}<span className="f-car">▾</span></button>
       <div className="f-pop">{body}</div>
     </div>
   );

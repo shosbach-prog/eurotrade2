@@ -6,6 +6,9 @@ import { listInquiries } from '@/lib/store';
 import { mailLog, senderAddress } from '@/lib/mail';
 import { licenseInfo } from '@/lib/license';
 import { reviewDays } from '@/lib/review-mail';
+import { listCartReminders } from '@/lib/cart-remind';
+import { getPricing } from '@/lib/deco-pricing-store';
+import CartReminders from './CartReminders';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'System', robots: { index: false, follow: false } };
@@ -57,6 +60,11 @@ export default function System() {
         <section className="box">
           <h2>Letzte E-Mails</h2>
           {!log.length ? <p className="muted">Noch keine E-Mails versendet (oder seit dem Update).</p> : <ul className="mail-log">{log.map((m, k) => <li key={k} className={m.ok ? '' : 'bad'}><span>{m.ok ? '✓' : '✗'}</span><div><b>{m.subject}</b><small>{new Date(m.date).toLocaleString('de-DE')} · an {m.to}{m.port ? ` · Port ${m.port}` : ''}</small>{m.error && <code>{m.error}</code>}</div></li>)}</ul>}
+        </section>
+        <section className="box" id="warenkoerbe">
+          <h2>Gemerkte Warenkörbe</h2>
+          {(() => { const r = getPricing().remind; return <p className="muted" style={{ marginTop: 0 }}>Kunden, die im Warenkorb „merken und erinnern“ angehakt haben. {!r?.cart ? <b>Erinnerungen sind ausgeschaltet.</b> : r.cartApprove ? <>Versand nach ca. 24 h <b>erst nach Ihrer Freigabe</b>.</> : <>Versand automatisch nach ca. 24 h.</>} Einstellung unter <a className="alink" href="/admin/veredelung">Veredelung → Angebot & Erinnerungen</a>.</p>; })()}
+          <CartReminders rows={listCartReminders()} approve={getPricing().remind?.cartApprove === true} />
         </section>
         <section className="box" id="lizenz">
           <h2>Bildlizenz L-SHOP</h2>

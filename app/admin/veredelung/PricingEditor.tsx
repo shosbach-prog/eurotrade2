@@ -117,6 +117,7 @@ export default function PricingEditor({ initial, defaults }: { initial: DecoPric
             <label className="pe-lbl">Rabatt bei Annahme bis Ablauf<span className="pe-cell"><N v={p.remind?.expiryPct ?? 0} set={(n) => { setP((x) => ({ ...x, remind: { ...x.remind, expiryPct: n } })); setDirty(true); }} /><span>%</span></span></label>
           </div>
           <label className="ds-check" style={{ marginTop: 10 }}><input type="checkbox" checked={p.remind?.cart !== false} onChange={(e) => { setP((x) => ({ ...x, remind: { ...x.remind, cart: e.target.checked } })); setDirty(true); }} /> Warenkorb-Erinnerung nach 24 Stunden (nur mit Einwilligung des Kunden)</label>
+          <label className="ds-check" style={{ marginTop: 4 }}><input type="checkbox" checked={p.remind?.cartApprove === true} onChange={(e) => { setP((x) => ({ ...x, remind: { ...x.remind, cartApprove: e.target.checked } })); setDirty(true); }} /> Warenkorb-Erinnerung erst nach meiner Freigabe senden (Liste unter System)</label>
           <p className="muted" style={{ fontSize: 13 }}>Versand landet automatisch im Angebotsentwurf. Der Rabatt wird bei der Ablauf-Erinnerung als eigene Position ins Angebot übernommen (0 % = nur Erinnerung).</p>
         </div>
         <div className="box pe-box">

@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import ProductCard from './ProductCard';
+import BestsellerRail from './BestsellerRail';
 import type { PublicProduct } from '@/lib/types';
 
 const KEY = 'et-recent-v1';
@@ -13,7 +13,7 @@ export function RecentTracker({ id }: { id: string }) {
 }
 
 /** „Zuletzt angesehen“ – ohne aktuellen Artikel */
-export function RecentlyViewed({ exclude, title = 'Zuletzt angesehen' }: { exclude?: string; title?: string }) {
+export function RecentlyViewed({ exclude, title = 'Zuletzt angesehen.' }: { exclude?: string; title?: string }) {
   const [items, setItems] = useState<PublicProduct[]>([]);
   useEffect(() => {
     const ids = read().filter((x) => x !== exclude).slice(0, 8);
@@ -21,5 +21,5 @@ export function RecentlyViewed({ exclude, title = 'Zuletzt angesehen' }: { exclu
     fetch(`/api/produkte?ids=${encodeURIComponent(ids.join(','))}`).then((r) => r.json()).then(setItems).catch(() => {});
   }, [exclude]);
   if (!items.length) return null;
-  return <><h2>{title}</h2><div className="grid recent">{items.map((p) => <ProductCard key={p.id} p={p} />)}</div></>;
+  return <BestsellerRail items={items} title={title} sub="Schnell zurück zu Ihren Artikeln." />;
 }

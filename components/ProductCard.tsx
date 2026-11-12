@@ -9,6 +9,7 @@ import Stars from './Stars';
 import BrandLogo from './BrandLogo';
 import { productPath } from '@/lib/format';
 import { Money } from './PriceMode';
+import CardDots, { QuickBtn } from './CardDots';
 
 /** echte Merkmale als Badges – keine erfundenen Labels */
 function badges(p: PublicProduct): { t: string; c: string }[] {
@@ -34,15 +35,13 @@ export default function ProductCard({ p }: { p: PublicProduct }) {
         <ProductImage p={p} />{p.images[1] && <img className="pimg img2" src={mid(p.images[1], p.mid, p.webp)} alt="" loading="lazy" aria-hidden />}
         <div className="badges">{badges(p).map((x) => <span key={x.t} className={`badge-p ${x.c}`}>{x.t}</span>)}</div>
         <WishButton id={p.id} />
+        {!p.locked && <QuickBtn id={p.id} />}
       </div>
       <div className="b">
         {p.rating ? <div className="card-rating"><Stars value={p.rating.avg} size={13} count={p.rating.count} /></div> : null}
         <div className="name">{p.name}</div>
         <div className="brand"><BrandLogo name={p.brand} h={16} />{p.sizes.length > 0 && <span>{sizeRange(p.sizes)}</span>}</div>
-        <div className="dots">
-          {p.colors.slice(0, 7).map((c) => <span key={c.name} className="dot" title={c.name} style={{ background: swatchBg(c) }} />)}
-          {p.colors.length > 7 && <span className="dots-more">+{p.colors.length - 7}</span>}
-        </div>
+        <CardDots colors={p.colors.slice(0, 7).map((c) => { const src = c.images?.[0] ?? c.image; return { name: c.name, bg: swatchBg(c), ...(src && src !== p.images[0] ? { img: mid(src, p.mid, p.webp) } : {}) }; })} more={Math.max(0, p.colors.length - 7)} />
         <div className="price">{p.locked ? <small className="lock-p">🔒 Preise nach Anmeldung</small> : min != null ? <>{p.was != null && <span className="price-was"><Money net={p.was} /></span>}<Money net={p.price!} label />{min! < p.price! && <span className="tier-hint">ab {p.tiers[p.tiers.length - 1].min} Stk. <Money net={min!} /></span>}</> : <small style={{ fontSize: 14, color: 'var(--brand)', fontWeight: 600 }}>Preis auf Anfrage</small>}</div>
       </div>
     </Link>

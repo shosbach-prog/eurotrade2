@@ -1,3 +1,5 @@
+import BestsellerRail from '@/components/BestsellerRail';
+import { bestsellersIn } from '@/lib/bestseller';
 import { catPath } from '@/lib/format';
 import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
@@ -115,6 +117,7 @@ export default async function CategoryView({ params, searchParams = {} }: { para
         <Link href={catUrl(sub?.key ?? cat.slug)} className={!g ? 'on' : ''}>Alle <span>{inSub.length}</span></Link>
         {gens.map((x) => <Link key={x.g} href={catUrl(sub?.key ?? cat.slug, x.g)} className={g === x.g ? 'on' : ''}>{x.g} <span>{x.n}</span></Link>)}
       </nav>}
+      {items.length >= 16 && <BestsellerRail items={bestsellersIn(items, 10).map(slimCard)} title={`Beliebt in ${title}${g ? ` ${gLabel(g)}` : ''}.`} sub="Die meistgefragten Artikel dieser Kategorie." />}
       <FilterGrid key={params.slug} items={items.map(slimCard)} />
       <RefStrip refs={refsFor({ category: cat.name, categorySlug: cat.slug })} title={`${cat.name} mit Logo – Beispiele unserer Kunden`} />
       <ReviewStrip reviews={latestReviews(6, items.map((p) => p.id))} overall={catRating} title={`Bewertungen zu ${cat.name}`} />

@@ -8,6 +8,7 @@ import LogoutLink from '@/components/LogoutLink';
 import Contact from '@/components/Contact';
 import TrustBadge from '@/components/TrustBadge';
 import { CartProvider } from '@/components/CartContext';
+import QuickView from '@/components/QuickView';
 import { WishlistProvider } from '@/components/Wishlist';
 import SiteHeader from '@/components/SiteHeader';
 import { menuData } from '@/lib/menu';
@@ -114,6 +115,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </footer>
           {!path.startsWith('/admin') && <Consent tools={{ ga: process.env.GA_ID || undefined, gads: process.env.GOOGLE_ADS_ID || undefined, meta: process.env.META_PIXEL_ID || undefined }} />}
           {!path.startsWith('/admin') && <TrustBadge />}
+          {!path.startsWith('/admin') && <QuickView />}
           {!path.startsWith('/admin') && <Contact whatsapp={process.env.CONTACT_WHATSAPP ?? '491732648097'} phone={process.env.BERATUNG_TELEFON ?? '030 40719258'} email={process.env.CONTACT_EMAIL ?? 'info@euro-trade.com'} />}
         </WishlistProvider></CartProvider></PriceModeProvider>
       </body>

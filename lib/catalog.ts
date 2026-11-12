@@ -93,7 +93,7 @@ export function slimCard(p: PublicProduct): PublicProduct {
   const { description: _d, features, specs, composition: _c, stockBy: _s, sizeChart: _sc, tags: _t, ...r } = p;
   const cert = specs?.['Zertifizierung'];
   const pend = (features ?? []).filter((x) => /in arbeit/i.test(x));
-  return { ...r, eol: p.eol?.all ? { all: true, date: p.eol.date, colors: {} } : undefined, description: '', images: p.images.slice(0, 2), colors: p.colors.map((c) => ({ name: c.name, hex: c.hex, swatch: c.swatch })), ...(cert ? { specs: { Zertifizierung: cert } } : {}), ...(pend.length ? { features: pend } : {}) };
+  return { ...r, eol: p.eol?.all ? { all: true, date: p.eol.date, colors: {} } : undefined, description: '', images: p.images.slice(0, 2), colors: p.colors.map((c) => ({ name: c.name, hex: c.hex, swatch: c.swatch, ...((c.images?.[0] ?? c.image) ? { image: c.images?.[0] ?? c.image } : {}) })), ...(cert ? { specs: { Zertifizierung: cert } } : {}), ...(pend.length ? { features: pend } : {}) };
 }
 /** Piktogramme für die Artikelseite */
 export const pictosOf = (id: string) => { const p = load().byId.get(id); return p ? pictosFor(p) : { features: [], care: [], props: [] }; };
