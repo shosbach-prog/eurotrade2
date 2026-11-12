@@ -15,6 +15,10 @@ export const RESERVED_TOP = ['admin', 'agb', 'aktion', 'angebot', 'api', 'bewert
 /** Artikel-URL: /<kategorie>/<artikelname>, z. B. /jacken/windbreaker-zweifarbig-herren-by129 */
 export const productPath = (p: { name: string; sku: string; id?: string; categorySlug?: string }) =>
   p.categorySlug && !RESERVED_TOP.includes(p.categorySlug) ? `/${p.categorySlug}/${productSlug(p)}` : `/produkt/${productSlug(p)}`;
+/** Kategorie-/Unterkategorie-URL ohne Präfix: /t-shirts, /sweatjacken, /t-shirts-herren */
+export const catPath = (slug: string) => (RESERVED_TOP.includes(slug) ? `/kategorie/${slug}` : `/${slug}`);
+/** Sieht die Adresse wie eine Kategorie-URL aus? (/kategorie/x oder /<slug>) */
+export const isCategoryUrl = (path: string) => path.startsWith('/kategorie/') || (/^\/[a-z0-9-]+\/?$/.test(path) && !RESERVED_TOP.includes(path.replace(/\//g, '')));
 /** Sieht die Adresse wie eine Artikel-URL aus? (/produkt/x oder /<kategorie>/<artikel>) */
 export const isProductUrl = (path: string) => {
   if (path.startsWith('/produkt/')) return true;

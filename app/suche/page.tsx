@@ -1,3 +1,4 @@
+import { catPath } from '@/lib/format';
 import Link from 'next/link';
 import FilterGrid from '@/components/FilterGrid';
 import { didYouMean, getCategories, search, slimCard } from '@/lib/catalog';
@@ -20,7 +21,7 @@ export default async function SearchPage({ searchParams }: { searchParams: { q?:
           {sug ? <p style={{ marginTop: 0, fontSize: 17 }}>Meinten Sie <Link className="alink" href={`/suche?q=${encodeURIComponent(sug)}`}>„{sug}“</Link>?</p>
             : <p style={{ marginTop: 0 }}>Leider nichts gefunden.</p>}
           <p className="muted">Probieren Sie einen allgemeineren Begriff oder stöbern Sie in den Kategorien:</p>
-          <div className="chips">{getCategories(ctx).map((c) => <Link key={c.slug} className="chip" href={`/kategorie/${c.slug}`}>{c.name}</Link>)}</div>
+          <div className="chips">{getCategories(ctx).map((c) => <Link key={c.slug} className="chip" href={catPath(c.slug)}>{c.name}</Link>)}</div>
         </div>
       )}
     </>

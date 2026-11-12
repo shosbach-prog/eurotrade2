@@ -9,7 +9,7 @@ import { CartButton } from './CartContext';
 import { WishlistButton } from './Wishlist';
 import { PriceToggle } from './PriceMode';
 import MegaMenu from './MegaMenu';
-import { isProductUrl } from '@/lib/format';
+import { isCategoryUrl, isProductUrl } from '@/lib/format';
 import type { Menu } from '@/lib/menu-defs';
 
 /** Kopfzeile + Kategorien – entscheidet anhand der AKTUELLEN Adresse (bleibt bei Seitenwechseln ohne Neuladen korrekt) */
@@ -20,7 +20,7 @@ export default function SiteHeader({ ok, customerName, admin, menu, shop, domain
   const isAdminPath = path.startsWith('/admin');
   const authPath = ['/zugang', '/passwort', '/registrieren'].some((p) => path.startsWith(p));
   const showShop = ok && !authPath && !isAdminPath;
-  const showcase = !ok && (path.startsWith('/kategorie/') || isProductUrl(path));
+  const showcase = !ok && (isCategoryUrl(path) || isProductUrl(path));
   return (
     <>
       <header className="hdr">

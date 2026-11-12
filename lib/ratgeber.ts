@@ -19,7 +19,7 @@ export const GUIDES: Guide[] = [
       { h: 'Was kostet die Veredelung?', p: ['Beim Stick fällt einmalig ein Stickprogramm für Ihr Logo an, danach zahlen Sie pro Teil nach Stichzahl. Bei Nachbestellungen nutzen wir das Programm erneut. Beim Siebdruck gibt es einmalige Sieb- und Einrichtekosten pro Farbe. Digitaltransfer wird nach Motivgröße berechnet und hat praktisch keine Einrichtekosten. Alle Kosten stehen transparent als eigene Positionen in Ihrem Angebot.'] },
     ],
     faq: [['Kann ich Stick und Druck kombinieren?', 'Ja, sehr beliebt: Logo als Stick auf der Brust, großes Motiv oder Namen als Druck auf dem Rücken.'], ['Ab wie vielen Teilen lohnt sich Stick?', 'Stick ist ab 1 Stück möglich. Wegen des einmaligen Stickprogramms wird er ab etwa 10 Teilen pro Stück deutlich günstiger.'], ['Welche Datei brauche ich?', 'Am besten eine Vektordatei (AI, EPS, PDF oder SVG). Eine gut aufgelöste PNG-Datei funktioniert für Digitaltransfer meist auch.']],
-    links: [['/druck-stick', 'Alle Verfahren im Vergleich'], ['/kategorie/poloshirts', 'Poloshirts zum Besticken'], ['/kontakt', 'Beratung anfragen']],
+    links: [['/druck-stick', 'Alle Verfahren im Vergleich'], ['/poloshirts', 'Poloshirts zum Besticken'], ['/kontakt', 'Beratung anfragen']],
   },
   {
     slug: 'logo-datei-vorbereiten', icon: '🎨', minutes: 3,
@@ -46,7 +46,7 @@ export const GUIDES: Guide[] = [
       { h: 'Der richtige Artikel für den Einsatz', p: ['Für ein Sommerfest reicht ein leichtes T-Shirt. Für Teamkleidung, die jeden Tag getragen und oft gewaschen wird, lohnt sich eine schwerere Qualität oder ein Mischgewebe. In Handwerk und Gastronomie zahlen sich industriewäschetaugliche Artikel aus.'] },
     ],
     faq: [['Läuft Baumwolle beim Waschen ein?', 'Vorgeschrumpfte Qualitäten kaum. Waschen Sie veredelte Textilien auf links und bei der angegebenen Temperatur.'], ['Was bedeutet ringgesponnen?', 'Die Fasern werden zusätzlich verdreht. Das Garn ist feiner und glatter – das Shirt fühlt sich weicher an und lässt sich schärfer bedrucken.']],
-    links: [['/kategorie/t-shirts', 'T-Shirts ansehen'], ['/kategorie/sweatshirts', 'Sweatshirts & Hoodies'], ['/kategorie/poloshirts', 'Poloshirts']],
+    links: [['/t-shirts', 'T-Shirts ansehen'], ['/sweatshirts', 'Sweatshirts & Hoodies'], ['/poloshirts', 'Poloshirts']],
   },
   {
     slug: 'teamkleidung-bestellen', icon: '👕', minutes: 4,
@@ -73,7 +73,7 @@ export const GUIDES: Guide[] = [
       { h: 'Einheitlicher Auftritt', p: ['Ein Logo, eine Farbe, wiedererkennbar auf jedem Teil: Legen Sie eine kleine Kollektion fest, die jederzeit nachbestellt werden kann. In Ihrem persönlichen Kundenzugang hinterlegen wir Logo und Artikel – neue Mitarbeitende sind in wenigen Klicks ausgestattet.'] },
     ],
     faq: [['Ist bedruckte Kleidung als Arbeitskleidung steuerlich absetzbar?', 'Das hängt vom Einzelfall ab – bitte sprechen Sie dazu mit Ihrem Steuerberater.'], ['Gibt es Warnschutzkleidung?', 'Fragen Sie uns gerne an – wir prüfen die Verfügbarkeit passender Artikel.']],
-    links: [['/fuer/handwerk', 'Für Handwerk'], ['/fuer/gastronomie', 'Für Gastronomie'], ['/kategorie/arbeitskleidung', 'Arbeitskleidung ansehen']],
+    links: [['/fuer/handwerk', 'Für Handwerk'], ['/fuer/gastronomie', 'Für Gastronomie'], ['/arbeitskleidung', 'Arbeitskleidung ansehen']],
   },
 ];
 

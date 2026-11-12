@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { PublicProduct } from '@/lib/types';
-import { eur } from '@/lib/format';
+import { eur, catPath } from '@/lib/format';
 import ProductImage from './ProductImage';
 import { productPath } from '@/lib/format';
 import { usePrice } from './PriceMode';
@@ -66,7 +66,7 @@ export default function SearchBar() {
       {open && q.trim().length >= 2 && (
         <div className="sugg">
           {(cats.length > 0 || brands.length > 0) && <div className="sugg-groups">
-            {cats.map((c) => <a key={c.slug} href={`/kategorie/${c.slug}`} className="sg-chip"><span>Kategorie</span><b>{c.name}</b><small>{c.count}</small></a>)}
+            {cats.map((c) => <a key={c.slug} href={catPath(c.slug)} className="sg-chip"><span>Kategorie</span><b>{c.name}</b><small>{c.count}</small></a>)}
             {brands.map((b) => <a key={b.slug} href={`/marken/${b.slug}`} className="sg-chip">{b.logo ? <img src={`/brands/${b.logo}`} alt="" /> : <span>Marke</span>}<b>{b.name}</b><small>{b.count}</small></a>)}
           </div>}
           {items.length === 0 ? <div className="empty">Keine Treffer für „{q}“{suggest && <> – meinten Sie <button type="button" className="linkbtn alink" onMouseDown={(e) => { e.preventDefault(); setQ(suggest); }}>„{suggest}“</button>?</>}<div style={{ marginTop: 8 }}>Nicht dabei? <a className="alink" href={`/kontakt?artikel=${encodeURIComponent(q.trim())}`}>Wir besorgen es Ihnen →</a></div></div> : items.map((p, i) => (

@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { isProductUrl } from '@/lib/format';
+import { isCategoryUrl, isProductUrl } from '@/lib/format';
 import { ACCESS_COOKIE, ADMIN_COOKIE, isAdminToken, previewMode, shopClosed, verifyCodeToken } from '@/lib/access';
 
 // Immer erreichbar: Zugang, Pflichtseiten, Angebots-Links aus der E-Mail, Admin-Login
@@ -39,7 +39,7 @@ export async function middleware(req: NextRequest) {
     return pass();
   }
   // Schaufenster: Kategorien und Artikel öffentlich – ohne Preise (nicht im Vorschau-Modus)
-  if (!previewMode() && (pathname.startsWith('/kategorie/') || isProductUrl(pathname))) {
+  if (!previewMode() && (isCategoryUrl(pathname) || isProductUrl(pathname))) {
     headers.set('x-showcase', '1');
     return pass();
   }

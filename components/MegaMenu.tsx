@@ -1,10 +1,11 @@
 'use client';
+import { catPath, isCategoryUrl } from '@/lib/format';
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { Menu } from '@/lib/menu-defs';
 
-const catHref = (slug: string, q?: string) => `/kategorie/${slug}${q ? `?${q}` : ''}`;
+const catHref = (slug: string, q?: string) => `${catPath(slug)}${q ? `?${q}` : ''}`;
 
 /** Mega-Menü: Hauptgruppen → Kategorien → Artikeltypen, dazu Damen/Herren/Kinder, Marken & Branchen */
 export default function MegaMenu({ menu }: { menu: Menu }) {
@@ -25,7 +26,7 @@ export default function MegaMenu({ menu }: { menu: Menu }) {
   const enter = (k: string) => { if (!hover.current) return; clearTimeout(timer.current); timer.current = setTimeout(() => setOpen(k), open ? 60 : 160); };
   const leave = () => { if (!hover.current) return; clearTimeout(timer.current); timer.current = setTimeout(() => setOpen(null), 220); };
   const close = () => setOpen(null);
-  const activeCat = path.startsWith('/kategorie/') ? path.split('/')[2] : null;
+  const activeCat = isCategoryUrl(path) ? path.split('/').filter(Boolean).pop()!.replace(/-(damen|herren|kinder)$/, '') : null;
 
   const tabs: { key: string; label: string; on: boolean }[] = [
     ...menu.groups.map((g) => ({ key: g.key, label: g.label, on: !!activeCat && g.cats.some((c) => c.slug === activeCat) })),
@@ -45,7 +46,7 @@ export default function MegaMenu({ menu }: { menu: Menu }) {
               <li><Link href={catHref(c.slug)} className="mm-all" onClick={close}>Alle {c.name} →</Link></li>
             </ul>
             <div className="mm-for">
-              {(['Damen', 'Herren', 'Kinder'] as const).filter((x) => c.g[x]).map((x) => <Link key={x} href={`/kategorie/${c.slug}-${x.toLowerCase()}`} onClick={close}>{x}</Link>)}
+              {(['Damen', 'Herren', 'Kinder'] as const).filter((x) => c.g[x]).map((x) => <Link key={x} href={catHref(`${c.slug}-${x.toLowerCase()}`)} onClick={close}>{x}</Link>)}
             </div>
           </div>
         ))}
@@ -57,7 +58,7 @@ export default function MegaMenu({ menu }: { menu: Menu }) {
         {menu.genders.map((ge) => (
           <div key={ge.label} className="mm-col">
             <span className="mm-h">{ge.label}{ge.label !== 'Kinder' && <small>inkl. Unisex</small>}</span>
-            <ul>{ge.cats.map((c) => <li key={c.slug}><Link href={`/kategorie/${c.slug}-${ge.label.toLowerCase()}`} onClick={close}>{c.name} <span>{c.count}</span></Link></li>)}</ul>
+            <ul>{ge.cats.map((c) => <li key={c.slug}><Link href={catHref(`${c.slug}-${ge.label.toLowerCase()}`)} onClick={close}>{c.name} <span>{c.count}</span></Link></li>)}</ul>
           </div>
         ))}
         <MegaPromo deals={menu.deals} close={close} />
@@ -99,7 +100,7 @@ export default function MegaMenu({ menu }: { menu: Menu }) {
             {t.label}<span className="mm-car" aria-hidden>▾</span>
           </button>
         ))}
-        {menu.deals > 0 && <Link href="/kategorie/sonderangebote" className={`mm-tab deal ${path === '/kategorie/sonderangebote' ? 'on' : ''}`} onMouseEnter={leave}>Sonderangebote</Link>}
+        {menu.deals > 0 && <Link href={catHref('sonderangebote')} className={`mm-tab deal ${path === catHref('sonderangebote') ? 'on' : ''}`} onMouseEnter={leave}>Sonderangebote</Link>}
       </div>
       {open && <div className="mm-panel" onMouseEnter={() => clearTimeout(timer.current)}><div className="wrap">{panel(open)}</div></div>}
     </nav>
@@ -111,7 +112,7 @@ function MegaPromo({ deals, close }: { deals: number; close: () => void }) {
     <div className="mm-promo">
       <b>Mit Ihrem Logo – ab 1 Stück</b>
       <p>Bedruckt oder bestickt, Staffelpreise ab 10 Stück.</p>
-      {deals > 0 && <Link href="/kategorie/sonderangebote" className="mm-deal" onClick={close}>Sonderangebote ansehen ({deals}) →</Link>}
+      {deals > 0 && <Link href={catHref('sonderangebote')} className="mm-deal" onClick={close}>Sonderangebote ansehen ({deals}) →</Link>}
       <a href="tel:+493040719258" className="mm-tel">Produktberatung: 030 40719258</a>
     </div>
   );

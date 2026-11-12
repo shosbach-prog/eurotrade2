@@ -1,3 +1,4 @@
+import { catPath } from '@/lib/format';
 import Link from 'next/link';
 
 export type Tile = { slug: string; name: string; count: number; image?: string };
@@ -6,7 +7,7 @@ export default function CategoryTiles({ tiles, link }: { tiles: Tile[]; link: bo
   return (
     <div className="ct-grid">
       {tiles.map((t) => (
-        <Link key={t.slug} href={link ? `/kategorie/${t.slug}` : '#preis'} className="ct">
+        <Link key={t.slug} href={link ? catPath(t.slug) : '#preis'} className="ct">
           {t.image ? <img src={t.image} alt="" loading="lazy" /> : <span className="ct-ph" />}
           <span className="ct-label"><b>{t.name}</b><span>{t.count} {t.count === 1 ? 'Artikel' : 'Artikel'} →</span></span>
         </Link>

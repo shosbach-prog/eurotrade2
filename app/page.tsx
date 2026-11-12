@@ -1,3 +1,4 @@
+import { catPath } from '@/lib/format';
 import Link from 'next/link';
 import ProductCard from '@/components/ProductCard';
 import { getCategories, getCollection, getFeatured, productCount } from '@/lib/catalog';
@@ -23,7 +24,7 @@ export default async function Home() {
         <div className="hero-text">
           <h1>{ctx ? <>Willkommen, {ctx.name}</> : 'Markentextilien ab 1 Stück'}</h1>
           <p>{productCount(ctx).toLocaleString('de-DE')} Artikel · schon ab 1 Stück · auf Wunsch mit Druck oder Stick</p>
-          <div className="chips">{cats.map((c) => <Link key={c.slug} className="chip" href={`/kategorie/${c.slug}`}>{c.name}</Link>)}</div>
+          <div className="chips">{cats.map((c) => <Link key={c.slug} className="chip" href={catPath(c.slug)}>{c.name}</Link>)}</div>
         </div>
         {hero.length > 0 && <HeroProducts items={hero} />}
       </section>
