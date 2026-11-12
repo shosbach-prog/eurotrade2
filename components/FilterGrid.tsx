@@ -14,12 +14,12 @@ const minPrice = (p: PublicProduct) => (p.price == null ? null : p.tiers.length 
 type Sort = 'empfohlen' | 'preis' | 'preis-ab' | 'name';
 
 /** Produktliste mit Filtern: Marke, Farbe, Größe, Schnitt, Preis + Sortierung */
-export default function FilterGrid({ items }: { items: PublicProduct[] }) {
+export default function FilterGrid({ items, initialGenders }: { items: PublicProduct[]; initialGenders?: string[] }) {
   const pr = usePrice();
   const [brands, setBrands] = useState<string[]>([]);
   const [fams, setFams] = useState<string[]>([]);
   const [sizes, setSizes] = useState<string[]>([]);
-  const [genders, setGenders] = useState<string[]>([]);
+  const [genders, setGenders] = useState<string[]>(initialGenders ?? []);
   const [props, setProps] = useState<string[]>([]);
   const [maxP, setMaxP] = useState<number | null>(null);
   const [sort, setSort] = useState<Sort>('empfohlen');

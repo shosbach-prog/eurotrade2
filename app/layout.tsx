@@ -10,8 +10,8 @@ import TrustBadge from '@/components/TrustBadge';
 import { CartProvider } from '@/components/CartContext';
 import { WishlistProvider } from '@/components/Wishlist';
 import SiteHeader from '@/components/SiteHeader';
+import { menuData } from '@/lib/menu';
 import Consent, { ConsentLink } from '@/components/Consent';
-import { getCategories, dealCount } from '@/lib/catalog';
 import { previewMode, shopClosed } from '@/lib/access';
 import { isAdmin, shopAccess } from '@/lib/customer';
 import { PriceModeProvider } from '@/components/PriceMode';
@@ -61,7 +61,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <a href="#inhalt" className="skip">Zum Inhalt springen</a>
         <PriceModeProvider initial={cookies().get('et_price')?.value === 'brutto' ? 'brutto' : 'netto'} vat={VAT}><CartProvider><WishlistProvider>
           {previewMode() && ok && !path.startsWith('/start') && <div className="preview-bar">Vorschau-Modus – nur für Sie sichtbar. Preise sind Platzhalter. Kunden-Codes sind gesperrt, bis Sie <code>SHOP_PREVIEW=false</code> setzen.</div>}
-          <SiteHeader ok={ok} customerName={customer?.name ?? null} admin={admin} cats={(ok ? getCategories(customer) : getCategories()).map((c) => ({ name: c.name, slug: c.slug }))} shop={SHOP} domain={process.env.SHOP_DOMAIN ?? 'euro-trade.com'} deals={dealCount(ok ? customer : undefined)} />
+          <SiteHeader ok={ok} customerName={customer?.name ?? null} admin={admin} menu={menuData(ok ? customer : undefined)} shop={SHOP} domain={process.env.SHOP_DOMAIN ?? 'euro-trade.com'} />
           <main className="wrap" id="inhalt" tabIndex={-1}>{children}</main>
           <footer className="ft">
             <div className="wrap ft-grid">

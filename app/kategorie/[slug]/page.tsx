@@ -10,6 +10,10 @@ import { categoryContent } from '@/lib/category-content';
 import { latestReviews } from '@/lib/reviews';
 import { refsFor } from '@/lib/store';
 import RefStrip from '@/components/RefStrip';
+import { SUBTYPES, matchSub, subOf } from '@/lib/menu-defs';
+
+type SP = { typ?: string; g?: string };
+const GEN = ['Damen', 'Herren', 'Kinder'];
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   if (params.slug === 'sonderangebote') return { title: 'Sonderangebote & Auslaufartikel – Markentextilien mit Logo', description: 'Auslaufartikel und Restposten bekannter Marken – solange Vorrat, bedruckt oder bestickt mit Ihrem Logo ab 1 Stück.', alternates: { canonical: '/kategorie/sonderangebote' } };
@@ -17,7 +21,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   return { title: c ? `${c.name} mit Logo bedrucken & besticken` : 'Kategorie', description: c ? categoryContent(c.slug, c.name).intro : undefined, alternates: c ? { canonical: `/kategorie/${c.slug}` } : undefined };
 }
 
-export default async function CategoryPage({ params }: { params: { slug: string } }) {
+export default async function CategoryPage({ params, searchParams = {} }: { params: { slug: string }; searchParams?: SP }) {
   const ctx = await viewCtx();
   if (params.slug === 'sonderangebote') {
     const deals = dealProducts(ctx);
@@ -38,7 +42,11 @@ export default async function CategoryPage({ params }: { params: { slug: string 
   }
   const cat = getCategories(ctx).find((x) => x.slug === params.slug);
   if (!cat) notFound();
-  const items = getByCategory(params.slug, ctx);
+  const all = getByCategory(params.slug, ctx);
+  const sub = subOf(cat.slug, searchParams.typ);
+  const items = sub ? all.filter((p) => matchSub(sub, p.name)) : all;
+  const g = GEN.includes(searchParams.g ?? '') ? searchParams.g! : null;
+  const subs = (SUBTYPES[cat.slug] ?? []).map((s) => ({ ...s, n: all.filter((p) => matchSub(s, p.name)).length })).filter((s) => s.n >= 2 && s.n < all.length);
   const txt = categoryContent(cat.slug, cat.name);
   const rated = items.filter((p) => p.rating);
   const catRating = rated.length ? { avg: rated.reduce((s, p) => s + p.rating!.avg * p.rating!.count, 0) / rated.reduce((s, p) => s + p.rating!.count, 0), count: rated.reduce((s, p) => s + p.rating!.count, 0) } : null;
@@ -47,10 +55,10 @@ export default async function CategoryPage({ params }: { params: { slug: string 
     <>
       <JsonLd data={crumbSchema([['Start', '/'], [cat.name, `/kategorie/${cat.slug}`]])} />
       <JsonLd data={faqSchema(txt.faq)} />
-      <div className="crumbs"><Link href="/">Start</Link> › {cat.name}</div>
+      <div className="crumbs"><Link href="/">Start</Link> › {sub ? <><Link href={`/kategorie/${cat.slug}`}>{cat.name}</Link> › {sub.label}</> : cat.name}</div>
       <section className="cat-hero">
         <div className="cat-hero-text">
-          <h1>{cat.name}</h1>
+          <h1>{sub ? sub.label : cat.name}{g && <small className="h1-g"> · {g}</small>}</h1>
           {catRating && <div className="cat-rating"><Stars value={catRating.avg} size={16} showValue count={catRating.count} /></div>}
           <p>{txt.intro}</p>
         </div>
@@ -62,7 +70,11 @@ export default async function CategoryPage({ params }: { params: { slug: string 
         <li><b>Vorschau</b> vor jeder Produktion</li>
         <li><b>Angebot in 24 h</b></li>
       </ul>
-      <FilterGrid items={items.map(slimCard)} />
+      {subs.length > 0 && <nav className="subchips" aria-label="Artikeltyp">
+        <Link href={`/kategorie/${cat.slug}${g ? `?g=${g}` : ''}`} className={!sub ? 'on' : ''}>Alle {cat.name} <span>{all.length}</span></Link>
+        {subs.map((s) => <Link key={s.key} href={`/kategorie/${cat.slug}?typ=${s.key}${g ? `&g=${g}` : ''}`} className={sub?.key === s.key ? 'on' : ''}>{s.label} <span>{s.n}</span></Link>)}
+      </nav>}
+      <FilterGrid key={`${sub?.key ?? ''}|${g ?? ''}`} items={items.map(slimCard)} initialGenders={g ? (g === 'Kinder' ? [g] : [g, 'Unisex']) : undefined} />
       <RefStrip refs={refsFor({ category: cat.name, categorySlug: cat.slug })} title={`${cat.name} mit Logo – Beispiele unserer Kunden`} />
       <ReviewStrip reviews={latestReviews(6, items.map((p) => p.id))} overall={catRating} title={`Bewertungen zu ${cat.name}`} />
       <section className="cat-seo">

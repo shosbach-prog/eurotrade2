@@ -53,7 +53,7 @@ export function WishlistButton() {
   return (
     <a href="/merkliste" className="cart-btn" aria-label="Merkliste">
       <Heart filled={ids.length > 0} size={22} />
-      <span className="hide-sm">Merkliste</span>
+      <span className="hide-sm hide-lg">Merkliste</span>
       {ids.length > 0 && <span className="badge">{ids.length}</span>}
     </a>
   );

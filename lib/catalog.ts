@@ -220,4 +220,5 @@ export function matchingFor(id: string, ctx?: Ctx): { variants: PublicProduct[];
 }
 
 /** Alle sichtbaren Artikel (für Aktionsseiten) */
+export const visibleProducts = (ctx?: Ctx) => products(ctx);
 export const allPublic = (ctx?: Ctx) => products(ctx).map((p) => toPublic(p, ctx));

@@ -8,10 +8,12 @@ import UserMenu from './UserMenu';
 import { CartButton } from './CartContext';
 import { WishlistButton } from './Wishlist';
 import { PriceToggle } from './PriceMode';
+import MegaMenu from './MegaMenu';
+import type { Menu } from '@/lib/menu-defs';
 
 /** Kopfzeile + Kategorien – entscheidet anhand der AKTUELLEN Adresse (bleibt bei Seitenwechseln ohne Neuladen korrekt) */
-export default function SiteHeader({ ok, customerName, admin, cats, shop, domain, deals = 0 }: {
-  deals?: number; ok: boolean; customerName: string | null; admin: boolean; cats: { name: string; slug: string }[]; shop: string; domain: string;
+export default function SiteHeader({ ok, customerName, admin, menu, shop, domain }: {
+  menu: Menu; ok: boolean; customerName: string | null; admin: boolean; shop: string; domain: string;
 }) {
   const path = usePathname() ?? '/';
   const isAdminPath = path.startsWith('/admin');
@@ -25,9 +27,10 @@ export default function SiteHeader({ ok, customerName, admin, cats, shop, domain
           <Link href="/" className="logo" aria-label={`${shop} – Startseite`}><Logo domain={domain} /></Link>
           {showShop ? <>
             <Suspense fallback={<div className="search" />}><SearchBar /></Suspense>
-            <div className="hdr-actions">{(showShop || showcase) && <PriceToggle />}<WishlistButton /><CartButton /><UserMenu name={customerName} admin={admin} /></div>
+            <div className="hdr-actions"><PriceToggle /><WishlistButton /><CartButton /><UserMenu name={customerName} admin={admin} /></div>
           </> : isAdminPath ? null : (
             <nav className="pub-nav">
+              {showcase && <PriceToggle className="pub-pt" />}
               <Link href="/druck-stick" className="hide-sm">Druck & Stick</Link>
               <Link href="/#ablauf" className="hide-sm">So funktioniert’s</Link>
               <Link href="/kontakt">Kontakt</Link>
@@ -39,10 +42,7 @@ export default function SiteHeader({ ok, customerName, admin, cats, shop, domain
           )}
         </div>
       </header>
-      {(showShop || showcase) && cats.length > 0 && <nav className="catnav"><div className="wrap">
-        {cats.map((c) => <Link key={c.slug} href={`/kategorie/${c.slug}`} className={path === `/kategorie/${c.slug}` ? 'on' : undefined}>{c.name}</Link>)}
-        {deals > 0 && <Link href="/kategorie/sonderangebote" className={`deal ${path === '/kategorie/sonderangebote' ? 'on' : ''}`}>Sonderangebote</Link>}
-      </div></nav>}
+      {(showShop || showcase) && menu.groups.length > 0 && <MegaMenu menu={menu} />}
     </>
   );
 }
