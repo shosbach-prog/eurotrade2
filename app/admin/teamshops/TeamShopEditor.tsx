@@ -1,14 +1,14 @@
 'use client';
 import { useState } from 'react';
 import type { TeamShop } from '@/lib/teamshop';
-import ArticlePicker, { PickedStrip, type PickItem } from '@/components/ArticlePicker';
+import ArticlePicker, { PickedStrip, type PickGroup, type PickItem } from '@/components/ArticlePicker';
 
 type Orders = { inquiries: number; items: { sku: string; name: string; color: string; sizes: Record<string, number>; total: number }[]; people: { no: string; name: string; email: string; date: string; pieces: number; status: string; personal: string[] }[] };
 type Shop = TeamShop & { orders: Orders };
 type Brief = PickItem;
 const empty = (): Partial<TeamShop> => ({ name: '', active: true, items: [], method: 'Stick', positions: ['Brust links'], personalize: 'aus', deadline: '', note: '', contact: '' });
 
-export default function TeamShopEditor({ shops: initial, products, methods, positions, base }: { shops: Shop[]; products: Brief[]; methods: string[]; positions: string[]; base: string }) {
+export default function TeamShopEditor({ shops: initial, products, groups, methods, positions, base }: { shops: Shop[]; products: Brief[]; groups: PickGroup[]; methods: string[]; positions: string[]; base: string }) {
   const [shops, setShops] = useState(initial);
   const [edit, setEdit] = useState<Partial<TeamShop> | null>(null);
   const [picker, setPicker] = useState(false);
@@ -100,7 +100,7 @@ export default function TeamShopEditor({ shops: initial, products, methods, posi
             <label>Hinweis auf der Shop-Seite</label><textarea rows={2} value={edit.note ?? ''} onChange={(e) => setEdit({ ...edit, note: e.target.value })} placeholder="z. B. Abholung beim Training am 12.12." />
             <label>Artikel ({edit.items?.length ?? 0})</label>
             <PickedStrip items={products} value={edit.items ?? []} onOpen={() => setPicker(true)} onRemove={(id) => setEdit({ ...edit, items: edit.items!.filter((x) => x !== id) })} />
-            {picker && <ArticlePicker items={products} value={edit.items ?? []} onChange={(ids) => setEdit((e) => ({ ...e!, items: ids }))} title={`Artikel für ${edit.name || 'den Team-Shop'}`} onClose={() => setPicker(false)} />}
+            {picker && <ArticlePicker items={products} groups={groups} value={edit.items ?? []} onChange={(ids) => setEdit((e) => ({ ...e!, items: ids }))} title={`Artikel für ${edit.name || 'den Team-Shop'}`} onClose={() => setPicker(false)} />}
             <label className="ds-check"><input type="checkbox" checked={edit.active !== false} onChange={(e) => setEdit({ ...edit, active: e.target.checked })} /> Shop ist aktiv</label>
             <div className="deco-row" style={{ marginTop: 10 }}>
               <button className="btn" disabled={busy || !edit.name?.trim()} onClick={save}>{busy ? 'Speichert …' : 'Speichern'}</button>
