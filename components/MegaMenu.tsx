@@ -31,7 +31,7 @@ export default function MegaMenu({ menu }: { menu: Menu }) {
   const tabs: { key: string; label: string; on: boolean }[] = [
     ...menu.groups.map((g) => ({ key: g.key, label: g.label, on: !!activeCat && g.cats.some((c) => c.slug === activeCat) })),
     ...(menu.genders.length ? [{ key: 'wer', label: 'Damen · Herren · Kinder', on: false }] : []),
-    { key: 'mehr', label: 'Marken & mehr', on: path.startsWith('/marken') || path.startsWith('/fuer/') || path.startsWith('/aktion/') },
+    { key: 'mehr', label: 'Marken', on: path.startsWith('/marken') || path.startsWith('/fuer/') || path.startsWith('/aktion/') },
   ];
 
   const panel = (k: string) => {

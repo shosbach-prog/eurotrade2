@@ -33,13 +33,40 @@ export const SUBTYPES: Record<string, SubDef[]> = {
     { key: 'arbeitshosen', label: 'Arbeits- & Stoffhosen', re: /workwear|cargohose|arbeits|anzughose|chino/i },
   ],
   accessoires: [
-    { key: 'socken', label: 'Socken', re: /socke/i },
-    { key: 'schals', label: 'Schals & Tücher', re: /schal|tuch/i },
+    { key: 'socken', label: 'Socken & Stulpen', re: /socke|stulpe/i },
+    { key: 'schals', label: 'Schals & Tücher', re: /schal|tuch|sturmhaube|halswärmer/i },
+    { key: 'handschuhe', label: 'Handschuhe', re: /handschuh/i },
+    { key: 'krawatten', label: 'Krawatten & Fliegen', re: /krawatte|fliege|hosenträger/i },
     { key: 'taschen', label: 'Taschen', re: /tasche|beutel|rucksack/i },
   ],
   'caps-muetzen': [
-    { key: 'muetzen', label: 'Mützen & Beanies', re: /mütze|beanie/i },
-    { key: 'caps', label: 'Caps', re: /cap\b|caps|kappe/i },
+    { key: 'caps', label: 'Caps', re: /cap\b|caps|kappe|snapback|visor|dad hat/i },
+    { key: 'muetzen', label: 'Mützen & Beanies', re: /mütze|beanie|stirnband/i },
+    { key: 'huete', label: 'Hüte & Fischerhüte', re: /hut\b|fischerhut|sonnenhut|strohhut|cowboyhut/i },
+  ],
+  'taschen-rucksaecke': [
+    { key: 'rucksaecke', label: 'Rucksäcke', re: /rucksack/i, not: /überzug|kühl/i },
+    { key: 'einkaufstaschen', label: 'Einkaufs- & Stofftaschen', re: /shopper|einkaufstasche|jute|baumwolltasche|tragetasche|canvas-tasche|canvas-trage|stofftasche|zuziehbeutel|turnbeutel|geschenktasche|netz-einkauf|matchsack|denim-tasche|tasche premier|flaschentasche|große tasche/i },
+    { key: 'reisetaschen', label: 'Reise- & Sporttaschen', re: /reisetasche|sporttasche|trolley|teamtasche|multisport|handgepäck|kleidersack|seesack|duffle/i },
+    { key: 'laptoptaschen', label: 'Laptop- & Dokumententaschen', re: /laptop|tablet|notebook|dokumententasche|büchertasche/i, not: /rucksack/i },
+    { key: 'kuehltaschen', label: 'Kühltaschen', re: /kühl/i },
+    { key: 'kleintaschen', label: 'Hüft-, Kultur- & Kleintaschen', re: /hüfttasche|gürteltasche|kulturbeutel|kulturtasche|kosmetik|organizer|reißverschlusstasche|geldbörse|brieftasche|handytasche|crossbag|crossbody|umhängetasche|aufbewahrung|einleg|rahmentasche/i },
+  ],
+  'gastro-kueche': [
+    { key: 'schuerzen', label: 'Schürzen', re: /schürze|vorbinder/i },
+    { key: 'kochjacken', label: 'Koch- & Servicekleidung', re: /kochjacke|kochhose|prep-hemd/i },
+  ],
+  warnschutz: [
+    { key: 'warnwesten', label: 'Warnwesten', re: /warnweste/i },
+    { key: 'warnschutzkleidung', label: 'Warnschutzkleidung', re: /warnschutz-(poloshirt|t-shirt|sweatshirt|kapuzen|regen|hybrid|thermo)|warnschutzjacke|warnschutz-thermo|zweifarbige warnschutz/i },
+  ],
+  'pluesch-spielzeug': [
+    { key: 'quietscheenten', label: 'Quietsche-Enten', re: /ente/i },
+    { key: 'plueschtiere', label: 'Plüsch- & Knautschtiere', re: /plüsch|minifeet|schmoozies|squeezies|teddy|pinguin|elch|elefant/i, not: /ente/i },
+  ],
+  schirme: [
+    { key: 'stockschirme', label: 'Stock- & Gästeschirme', re: /stockschirm|gästeschirm|portierschirm|golf/i },
+    { key: 'taschenschirme', label: 'Taschenschirme', re: /taschenschirm/i },
   ],
 };
 
@@ -51,10 +78,12 @@ export const matchSub = (s: SubDef, name: string) => s.re.test(name) && !(s.not 
 /** Hauptgruppen der Navigation; nicht zugeordnete Kategorien landen in der letzten Gruppe */
 export const GROUPS: { key: string; label: string; cats: string[] }[] = [
   { key: 'shirts', label: 'Shirts & Polos', cats: ['t-shirts', 'poloshirts', 'hemden-blusen'] },
-  { key: 'sweats', label: 'Pullover & Sweats', cats: ['sweatshirts'] },
-  { key: 'jacken', label: 'Jacken & Westen', cats: ['jacken'] },
-  { key: 'hosen', label: 'Hosen & Kleider', cats: ['hosen', 'kleider', 'unterwaesche', 'arbeitskleidung'] },
-  { key: 'acc', label: 'Mützen & Accessoires', cats: ['caps-muetzen', 'accessoires', 'decken'] },
+  { key: 'sweats', label: 'Pullover', cats: ['sweatshirts'] },
+  { key: 'jacken', label: 'Jacken', cats: ['jacken'] },
+  { key: 'hosen', label: 'Hosen & Kleider', cats: ['hosen', 'kleider', 'unterwaesche'] },
+  { key: 'arbeit', label: 'Arbeit & Gastro', cats: ['arbeitskleidung', 'warnschutz', 'gastro-kueche'] },
+  { key: 'acc', label: 'Caps & Zubehör', cats: ['caps-muetzen', 'accessoires'] },
+  { key: 'taschen', label: 'Taschen & Werbemittel', cats: ['taschen-rucksaecke', 'schirme', 'handtuecher', 'decken', 'pluesch-spielzeug', 'werbeartikel'] },
 ];
 export const GENDERS = ['Damen', 'Herren', 'Kinder'] as const;
 
