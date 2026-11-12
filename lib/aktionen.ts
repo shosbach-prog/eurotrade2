@@ -7,6 +7,8 @@ export type Aktion = {
   deadline?: string; deadlineLabel?: string;
   points: [string, string][]; faq: [string, string][]; example: string; refMatch: string[];
   pick: (p: PublicProduct) => number; // 0 = nicht zeigen, höher = weiter vorn
+  /** optional: Empfehlungen in Themenblöcken */
+  groups?: { title: string; text: string; pick: (p: PublicProduct) => boolean }[];
 };
 const txt = (p: PublicProduct) => `${p.name} ${p.category} ${(p.tags ?? []).join(' ')}`.toLowerCase();
 
@@ -22,13 +24,19 @@ export const AKTIONEN: Aktion[] = [
   },
   {
     slug: 'weihnachtsgeschenke-mitarbeiter', nav: 'Weihnachtsgeschenke', kicker: 'Weihnachten', title: 'Weihnachtsgeschenke für Mitarbeiter mit Firmenlogo',
-    desc: 'Hoodies, Decken, Mützen und Jacken mit Firmenlogo als Weihnachtsgeschenk für Mitarbeiter und Kunden – bestickt oder bedruckt, rechtzeitig vor Weihnachten geliefert.',
-    h1: 'Weihnachtsgeschenke mit Ihrem Logo', lead: 'Ein Geschenk, das getragen wird: kuschelige Hoodies, Sherpa-Decken und Beanies mit Ihrem Logo – für Mitarbeiter, Kunden und Partner.',
+    desc: 'Weihnachtsgeschenke mit Firmenlogo: Decken, Mützen, Hoodies, Schirme, Plüschfiguren und Handtücher für Mitarbeiter und Kunden – bestickt oder bedruckt, rechtzeitig vor Weihnachten geliefert.',
+    h1: 'Weihnachtsgeschenke mit Ihrem Logo', lead: 'Geschenke, die benutzt werden: kuschelige Decken, Beanies und Hoodies für Ihr Team, Schirme, Handtücher und Plüschfiguren für Kunden und Partner – alles mit Ihrem Logo.',
     deadline: '12-23', deadlineLabel: 'Lieferung vor Weihnachten',
     points: [['Wird wirklich genutzt', 'Hoodies, Decken und Mützen landen nicht in der Schublade, sondern im Alltag.'], ['Mit Namen', 'Auf Wunsch mit dem Vornamen jedes Mitarbeiters – einfach als Liste mitschicken.'], ['Ab 1 Stück', 'Für kleine Teams genauso wie für große Belegschaften.'], ['Termin im Blick', 'Wir nennen Ihnen beim Angebot verbindlich, bis wann die Freigabe nötig ist.']],
     faq: [['Bis wann muss ich bestellen?', 'Entscheidend ist die Freigabe der Vorschau. Den spätesten Termin sehen Sie oben auf dieser Seite und im Warenkorb.'], ['Kann jeder Mitarbeiter eine andere Größe bekommen?', 'Ja. Tragen Sie die Größen einfach ein oder nutzen Sie „Gesamtmenge auf Größen verteilen“.'], ['Gibt es Geschenkverpackung?', 'Fragen Sie gern im Anfrageformular – wir prüfen, was möglich ist.']],
     example: 'z. B. 30 Hoodies mit Logo und Vornamen', refMatch: ['weihnachten', 'geschenk'],
     pick: (p) => { const t = txt(p); return /decke|blanket/.test(t) ? 3 : /beanie|mütze|muetze/.test(t) ? 2 : /hood|kapuze|sweat/.test(t) ? 1 : 0; },
+    groups: [
+      { title: 'Kuschelig warm: Decken & Kissen', text: 'Das Lieblingsgeschenk für gemütliche Abende – mit eingesticktem Logo ein Präsent, das jeden Winter wieder hervorgeholt wird.', pick: (p) => /decke|plaid|kissen|blanket/.test(txt(p)) },
+      { title: 'Mützen, Schals & Handschuhe', text: 'Wärmt auf dem Weihnachtsmarkt, beim Wintertraining und auf dem Weg ins Büro – gestickt besonders edel.', pick: (p) => /beanie|mütze|muetze|schal|handschuh|handwärmer|stirnband/.test(txt(p)) && !/cap\b/.test(txt(p)) },
+      { title: 'Hoodies & Sweatshirts', text: 'Das Teil, das Mitarbeitende wirklich tragen – auf Wunsch mit Vornamen auf dem Ärmel.', pick: (p) => /hood|kapuze|sweatshirt|sweatjacke|pullover/.test(txt(p)) },
+      { title: 'Für Kunden & Partner', text: 'Schirme, Handtücher, Plüschfiguren und Taschen: Präsente, die im Alltag genutzt werden und lange an Sie erinnern.', pick: (p) => /schirm|plüsch|quietsche|teddy|handtuch|badetuch|kühltasche|lunch|rucksack|minifeet|schmoozies/.test(txt(p)) },
+    ],
   },
   {
     slug: 'vereinsausstattung', nav: 'Vereinsausstattung', kicker: 'Für Vereine', title: 'Vereinsausstattung zur neuen Saison – mit Logo, Namen & Nummern',

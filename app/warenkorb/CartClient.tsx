@@ -83,6 +83,14 @@ export default function CartClient({ share, contact, remind }: { share: string |
   // Staffelpreis gilt für die Gesamtmenge je Artikel (alle Farben/Größen)
   const perProduct = lines.reduce<Record<string, number>>((m, l) => ({ ...m, [l.id]: (m[l.id] ?? 0) + l.qty }), {});
   const unit = (l: (typeof lines)[number]) => unitFor(l.tiers, perProduct[l.id], l.price);
+  // Staffel-Hinweise: wie viele Stück fehlen je Artikel bis zum nächsten Staffelpreis (nur lohnende Sprünge)
+  const tierTips = [...new Map(lines.filter((l) => !l.sample && l.price != null && l.tiers?.length).map((l) => [l.id, l])).values()].map((l) => {
+    const have = perProduct[l.id] ?? 0; const now = unit(l)!;
+    const nx = [...l.tiers!].sort((a, b) => a.min - b.min).find((t) => t.min > have && t.price < now);
+    if (!nx) return null;
+    const missing = nx.min - have;
+    return missing <= Math.max(10, have) ? { id: l.id, name: l.name, missing, at: nx.min, price: nx.price, save: (now - nx.price) * nx.min } : null;
+  }).filter((x): x is NonNullable<typeof x> => !!x).sort((a, b) => a.missing - b.missing).slice(0, 3);
   const net = lines.reduce((s, l) => s + (unit(l) ?? 0) * l.qty, 0);
   const anyOpen = lines.some((l) => l.price == null);
   // Vorschläge „gleiche Veredelung“: ohne Teamliste/Vorschaubilder vergleichen und übertragen
@@ -144,6 +152,10 @@ export default function CartClient({ share, contact, remind }: { share: string |
       {(shareMsg || shareUrl) && <div className="note share-out">{shareMsg}{shareUrl && <input readOnly value={shareUrl} onFocus={(e) => e.target.select()} aria-label="Link zum Warenkorb" />}</div>}
       <div className="cart">
         <div className="box">
+          {tierTips.length > 0 && <div className="tier-tips">
+            {tierTips.map((t) => <div key={t.id}>💡 Noch <b>{t.missing} Stück</b> {t.name}, dann gilt der Staffelpreis ab {t.at} Stk.: <b>{pr.p(t.price)}</b>/Stk.{t.save > 0.5 && <> – Ersparnis auf {t.at} Stück ca. {pr.p(t.save)}</>}</div>)}
+            <small className="muted">Staffelpreise gelten je Artikel über alle Farben und Größen hinweg.</small>
+          </div>}
           {lines.map((l) => (
             <div className="line cline" key={l.key}>
               <div style={{ width: 64, height: 64 }}><ProductImage p={{ name: l.name, images: l.image ? [l.image] : [], colors: [{ name: l.color ?? '', hex: l.hex }], category: l.category }} /></div>

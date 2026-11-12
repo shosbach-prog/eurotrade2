@@ -1,194 +1,554 @@
 {
-  "aq010": {
-    "headline": "Das Polo, das immer passt",
-    "intro": "Das Classic Fit Polo von Asquith & Fox ist ein echter Klassiker: festes Piqué mit 200 g/m² aus ringgesponnener, gekämmter Baumwolle und ein angenehm weiches Finish. Der normale Schnitt mit Seitenschlitzen sitzt bequem, ohne zu weit zu sein. Mit 38 Farben in den Größen S bis 5XL findet jedes Team seinen Ton, für Logos auf der Brust ist es wie gemacht.",
-    "highlights": [
-      "Festes Piqué, 200 g/m², 100 % gekämmte Baumwolle (Uni-Farben)",
-      "38 Farben, Größen S bis 5XL",
-      "OEKO-TEX® STANDARD 100",
-      "Ideal für Stick, Siebdruck und Transferdruck",
-      "Bei 30 °C waschbar, Bügeln erlaubt"
-    ],
-    "idealFor": "Teamkleidung, Empfang & Service, Messe, Vereinspolo"
-  },
-  "arb931": {
-    "headline": "Weich gestrickt, liebevoll verschenkt",
-    "intro": "Die Babiezz® Soft Knitted Blanket von ARTG ist eine kompakte Strickdecke im Format 80 × 100 cm. Das atmungsaktive Acrylgarn mit 250 g/m² fühlt sich sanft an und lässt sich bei 40 °C waschen. Als Geschenk zur Geburt, für Kita oder Kinderzimmer ist sie eine schöne Aufmerksamkeit, in vier ruhigen Farben.",
-    "highlights": [
-      "Strick mit 250 g/m², 100 % Polyacryl",
-      "Format 80 × 100 cm",
-      "Atmungsaktives Garn mit sanfter Haptik",
-      "4 Farben",
-      "Bei 40 °C waschbar"
-    ],
-    "idealFor": "Geschenk zur Geburt, Kita, Kundenpräsent"
-  },
-  "ars1745": {
-    "headline": "Kuschelfaktor de luxe",
-    "intro": "Außen glatt, innen flauschig: Die Originalzz® Sherpa Fleece Blanket DeLuxe kombiniert eine besonders glatte Vorderseite aus Micro-Mink-Polyester mit superweichem Sherpa-Futter. Im großzügigen Format 127 × 152 cm wärmt sie auf dem Sofa ebenso wie auf der Tribüne. Die Vorderseite lässt sich vollflächig per Sublimationsdruck gestalten, alternativ ist Stick möglich.",
-    "highlights": [
-      "Glatte Micro-Mink-Vorderseite, Sherpa-Rückseite",
-      "Großes Format 127 × 152 cm",
-      "Vollflächiger Sublimationsdruck möglich",
-      "Auch bestickbar",
-      "Trocknergeeignet"
-    ],
-    "idealFor": "Fan-Artikel, Kundengeschenk, Vereinsmerch, Weihnachtspräsent"
-  },
-  "bcwu620": {
-    "headline": "Der Hoodie für jeden Tag",
-    "intro": "Der Hooded Sweat von B&C ist ein robuster Allrounder mit 280 g/m² aus ringgesponnener, gekämmter Baumwolle und recyceltem Polyester. Die gefütterte Kapuze mit Kordelzug und Metallösen, Bündchen aus 1×1 Ripp mit Elasthan und eine Kängurutasche mit verstärkten Nähten sorgen für Komfort und Langlebigkeit. Flatlock-Nähte an Schultern und Armausschnitten runden den zeitgemäßen Schnitt ab.",
-    "highlights": [
-      "280 g/m², 80 % Baumwolle / 20 % Polyester (recycelt)",
-      "Gefütterte Kapuze mit Metallösen",
-      "Kängurutasche mit verstärkten Nähten",
-      "Größen XXS bis 3XL, 6 Farben",
-      "Für Stick, Siebdruck, Digital- und Transferdruck"
-    ],
-    "idealFor": "Vereinshoodie, Crew-Merch, Schul- und Abschlusskleidung"
-  },
-  "cb336b": {
-    "headline": "Warme Ohren, starker Auftritt",
-    "intro": "Die Kids Deep Cuffed Tonal Patch Beanie von Beechfield ist doppellagig aus geripptem Strick gefertigt und hat eine speziell entwickelte Krone für guten Sitz. Der breite Umschlag bietet viel Fläche für Ihr Logo, ein tonfarbener Baumwoll-Twill-Aufnäher setzt einen dezenten Akzent. Das Material enthält zertifiziertes recyceltes Polyester, das Etikett lässt sich für eigenes Branding abtrennen.",
-    "highlights": [
-      "Doppellagiger Rippstrick, 100 % Polyester (recycelt)",
-      "Breiter Umschlag für Veredelung",
-      "Tonfarbener Twill-Aufnäher",
-      "Kindergröße 3–8 Jahre, 7 Farben",
-      "Abtrennbares Etikett für eigenes Branding"
-    ],
-    "idealFor": "Jugendmannschaft, Kita & Schule, Winter-Merch"
-  },
-  "hrm801": {
-    "headline": "Tailliert, schwer und richtig edel",
-    "intro": "Die Women’s Hooded Jacket von HRM überzeugt mit 320 g/m² weichem Mischgewebe: außen sehr glatt, innen angeraut. Der leicht taillierte Schnitt sitzt figurbetont, Details wie die mittig bestickte Kontrast-Kordel, je drei HRM-Metallösen, ein verstärktes Nackenband und ein hochwertiger Reißverschluss mit Metallschieber machen den Unterschied. 2×2-Rippbündchen an Saum, Taschen und Ärmeln halten die Form.",
-    "highlights": [
-      "320 g/m², außen glatt, innen angeraut",
-      "Leicht taillierter Damenschnitt",
-      "Hochwertiger Reißverschluss mit Metallschieber",
-      "14 Farben, Größen XS bis 5XL",
-      "Trocknergeeignet, 40 °C waschbar"
-    ],
-    "idealFor": "Damenteams, Firmenbekleidung mit Stil, Vereins-Zipper"
-  },
-  "jn8046": {
-    "headline": "Clevere Taschen, starke Qualität",
-    "intro": "Der Men’s Hoodie Interlock von Daiber setzt auf eine hochwertige Interlock-Qualität mit 360 g/m² aus Bio-Baumwolle, recyceltem Polyester und etwas Elasthan für Bewegungsfreiheit. Neben der Kängurutasche gibt es eine zusätzliche Reißverschlusstasche und eine Reißverschlusstasche am linken Ärmel, eingefasst mit modischem Tape. Der schmalere Schnitt wirkt modern und aufgeräumt.",
-    "highlights": [
-      "360 g/m² Interlock mit Bio-Baumwolle und Elasthan",
-      "Reißverschlusstaschen an Front und Ärmel",
-      "Schmaler Schnitt (Slim)",
-      "Größen S bis 3XL, 4 Farben",
-      "Für Stick und Transferdruck"
-    ],
-    "idealFor": "Teamwear für unterwegs, Coaches & Trainer, Firmen-Hoodie"
-  },
-  "mv470064": {
-    "headline": "Bügelfrei durch den Arbeitstag",
-    "intro": "Das Men’s Shirt Modern Fit von Marvelis ist bügelfrei und dadurch ideal für alle, die viel unterwegs sind. Der New-Kent-Kragen und die Brusttasche geben ihm einen klassischen Look, der moderne Schnitt sitzt schlank, ohne einzuengen. Je nach Farbe aus Popeline oder Chambray, 100 % Baumwolle, OEKO-TEX® STANDARD 100 zertifiziert. Weiß ist bis 60 °C waschbar.",
-    "highlights": [
-      "Bügelfrei, Modern Fit",
-      "100 % Baumwolle (Popeline bzw. Chambray)",
-      "New-Kent-Kragen und Brusttasche",
-      "Kragenweite 38 bis 48",
-      "OEKO-TEX® STANDARD 100, trocknergeeignet"
-    ],
-    "idealFor": "Büro, Empfang, Außendienst, Hotellerie"
-  },
-  "my111": {
-    "headline": "Länger geschnitten, lässig getragen",
-    "intro": "Das my mate Men’s Long Tee von Miners mate hat eine klassische, längere Passform und Raglan-Ärmel. Single Jersey aus ringgesponnener Baumwolle mit 160 g/m² ist vorgeschrumpft sowie enzym- und silikongewaschen und fühlt sich dadurch besonders weich an. Ein neutrales, seitlich versetztes Größenetikett und das entfernbare Markenlabel machen es zur perfekten Basis für Ihr eigenes Merch.",
-    "highlights": [
-      "Längere Passform mit Raglan-Ärmeln",
-      "160 g/m² Single Jersey, vorgeschrumpft",
-      "Enzym- und silikongewaschen für weichen Griff",
-      "Entfernbares Label für eigenes Branding",
-      "Größen S bis 3XL, 8 Farben"
-    ],
-    "idealFor": "Band- und Vereinsmerch, Streetwear-Look, Events"
-  },
-  "nn310": {
-    "headline": "Bewegungsfreiheit für lange Schichten",
-    "intro": "Die Invincible Women’s Onna-Stretch Tunic ist für den Arbeitsalltag in Praxis, Pflege und Beauty gemacht. Vier-Wege-Stretch sorgt für Bewegungsfreiheit und Tragekomfort den ganzen Tag, das Material ist atmungsaktiv, strapazierfähig, knitterfrei und pflegeleicht. V-Ausschnitt, zwei Vordertaschen, Abnäher am Rücken und Seitenschlitze geben eine moderne Passform. Enthält 33 % zertifiziertes recyceltes Polyester.",
-    "highlights": [
-      "Vier-Wege-Stretch, atmungsaktiv",
-      "Knitterfrei und pflegeleicht, bis 60 °C waschbar",
-      "V-Ausschnitt mit zwei Vordertaschen",
-      "Größen XS bis 5XL, 7 Farben",
-      "33 % recyceltes Polyester"
-    ],
-    "idealFor": "Praxis & Pflege, Kosmetik, Wellness, Service"
-  },
-  "p04": {
-    "headline": "Essential, aber alles andere als basic",
-    "intro": "Der Essential Hoodie von Mantis verbindet 280 g/m² gebürstetes Fleece mit durchdachten Details: doppellagige Kapuze, runde Kordeln mit Metallenden, Metallösen, Fischgrät-Nackenband und Ripp-Strick an Saum und Bündchen. Ein bedruckbarer Einsatz im Nacken und das abreißbare Etikett machen ihn zur idealen Basis für eigenes Branding. Das Pflegeetikett mit QR-Code macht die Lieferkette nachvollziehbar; die Bio-Zertifizierung der Baumwolle ist laut Hersteller in Arbeit.",
-    "highlights": [
-      "280 g/m² gebürstetes Fleece, 81 % Baumwolle / 19 % Polyester",
-      "Doppellagige Kapuze, Metallösen",
-      "Bedruckbarer Nackeneinsatz, abreißbares Etikett",
-      "Unisex, Größen XS bis 3XL, 7 Farben",
-      "Für Stick, Siebdruck, Digital- und Transferdruck"
-    ],
-    "idealFor": "Merch & Brand-Kollektionen, Vereinshoodie, Team-Outfit"
-  },
-  "rt234j": {
-    "headline": "Warm, wind- und wetterfest für kleine Helden",
-    "intro": "Der Junior Soft Padded Bodywarmer von Result Core ist wasserabweisend und winddicht, die 160-g/m²-Polyesterfüllung hält warm, ohne einzuengen. Reflektierende Details seitlich im Hüftbereich sorgen für mehr Sichtbarkeit, Reißverschlusstaschen halten Kleinigkeiten sicher. Praktisch für die Veredelung: Ein Zugang mit Reißverschluss innen auf der linken Brustseite und ein neutrales Etikett im Kragen.",
-    "highlights": [
-      "Wasserabweisend und winddicht",
-      "Wattierung 160 g/m²",
-      "Reflektierende Details",
-      "Veredelungszugang innen links",
-      "Kindergrößen 2/3 bis 9/10 Jahre"
-    ],
-    "idealFor": "Jugendmannschaft, Kita & Schule, Outdoor-Events"
-  },
-  "tj9120": {
-    "headline": "Gebaut für draußen",
-    "intro": "Die Mountain Fleece von Tee Jays kombiniert Antipilling-Fleece mit 344 g/m² und Ripstop-Einsätzen an beanspruchten Stellen. Zwei Fronttaschen und eine Brusttasche mit SBS-Reißverschlüssen, elastische Ärmelabschlüsse, ein verstellbarer Saum mit Kordelstopper und ein längeres Rückenteil machen sie zur zuverlässigen Begleiterin bei Wind und Wetter. OEKO-TEX® STANDARD 100 zertifiziert.",
-    "highlights": [
-      "344 g/m² Antipilling-Fleece mit Ripstop-Verstärkungen",
-      "SBS-Reißverschlüsse, drei Taschen",
-      "Verstellbarer Saum, längeres Rückenteil",
-      "Größen XS bis 5XL",
-      "OEKO-TEX® STANDARD 100, ideal für Stick"
-    ],
-    "idealFor": "Outdoor-Teams, Handwerk & Bau, Trainer und Betreuer"
-  },
-  "tr510": {
-    "headline": "Nahtlos stark beim Sport",
-    "intro": "Der Women’s Recycled Seamless ‘3D Fit’ Multi-Sport Flex Bra von TriDri® ist nahtlos gearbeitet und bietet mittlere Stützkraft. Das feuchtigkeitstransportierende Material aus recyceltem Nylon, Polyester und Elasthan sitzt figurbetont, Rippdetails an Seiten und Rücken unterstützen die Form. Mit herausnehmbaren Polstern und verstellbaren Trägern lässt er sich individuell anpassen.",
-    "highlights": [
-      "Nahtlos, mittlere Stützkraft",
-      "Feuchtigkeitstransportierend, recyceltes Nylon",
-      "Herausnehmbare Polster, verstellbare Träger",
-      "Größen XS bis XL, 6 Farben",
-      "Für Stick, Sieb- und Transferdruck"
-    ],
-    "idealFor": "Fitness- und Laufteams, Studio-Merch, Sportvereine"
-  },
-  "sd-01-001000": {
-    "headline": "Das schwarze Hemd, das einfach sitzt",
-    "intro": "Das Regular Business Hemd von Seidensticker ist ein Klassiker für Büro, Empfang und Veranstaltungen. Die Popeline aus 100 % Baumwolle ist dicht gewebt und bügelfrei ausgerüstet, so kommen Sie ohne Bügeleisen gepflegt durch den Tag. Die Regular-Passform sitzt bequem, ohne weit zu wirken, Kentkragen, weitenverstellbare Manschetten und eine aufgesetzte Brusttasche runden den Business-Look ab.\n\nIn Schwarz wirkt das Hemd elegant und lässt sich mit einem dezent gestickten Logo oder Monogramm zur stilvollen Teamkleidung machen. Erhältlich in den Kragenweiten 38 bis 54.",
-    "highlights": [
-      "100 % Baumwolle, Popeline, bügelfrei",
-      "Regular Fit mit Kentkragen",
-      "Weitenverstellbare Manschetten, Brusttasche",
-      "Kragenweite 38 bis 54",
-      "Schonwaschgang 40 °C, trocknergeeignet bei niedriger Temperatur"
-    ],
-    "idealFor": "Büro & Empfang, Service & Gastronomie, Events, Business-Teamkleidung"
-  },
-  "sd-01-852485": {
-    "headline": "Lässig geschnitten, edel im Material",
-    "intro": "Die Oversized Suit Pants aus der Studio-Seidensticker-Kollektion verbinden eine moderne, weite Passform mit klassischem Material: Flanell aus 100 % Schurwolle in Twill-Webart, warm, atmungsaktiv und mit dezenter Struktur. So entsteht eine Anzughose, die im Büro ebenso funktioniert wie zu smarten Freizeit-Outfits.\n\nDie Hose ist in Grau in den Größen XXS bis XL erhältlich. Zur Pflege bitte chemisch reinigen lassen, nicht waschen.",
-    "highlights": [
-      "100 % Schurwolle, Flanell in Twill-Webart",
-      "Moderne Oversized-Passform",
-      "Knopfverschluss, volle Länge",
-      "Größen XXS bis XL",
-      "Chemische Reinigung, nicht waschen"
-    ],
-    "idealFor": "Business-Outfits, Empfang & Repräsentation, Events"
-  }
+ "aq010": {
+  "headline": "Das Polo, das immer passt",
+  "intro": "Das Classic Fit Polo von Asquith & Fox ist ein echter Klassiker: festes Piqué mit 200 g/m² aus ringgesponnener, gekämmter Baumwolle und ein angenehm weiches Finish. Der normale Schnitt mit Seitenschlitzen sitzt bequem, ohne zu weit zu sein. Mit 38 Farben in den Größen S bis 5XL findet jedes Team seinen Ton, für Logos auf der Brust ist es wie gemacht.",
+  "highlights": [
+   "Festes Piqué, 200 g/m², 100 % gekämmte Baumwolle (Uni-Farben)",
+   "38 Farben, Größen S bis 5XL",
+   "OEKO-TEX® STANDARD 100",
+   "Ideal für Stick, Siebdruck und Transferdruck",
+   "Bei 30 °C waschbar, Bügeln erlaubt"
+  ],
+  "idealFor": "Teamkleidung, Empfang & Service, Messe, Vereinspolo"
+ },
+ "arb931": {
+  "headline": "Weich gestrickt, liebevoll verschenkt",
+  "intro": "Die Babiezz® Soft Knitted Blanket von ARTG ist eine kompakte Strickdecke im Format 80 × 100 cm. Das atmungsaktive Acrylgarn mit 250 g/m² fühlt sich sanft an und lässt sich bei 40 °C waschen. Als Geschenk zur Geburt, für Kita oder Kinderzimmer ist sie eine schöne Aufmerksamkeit, in vier ruhigen Farben.",
+  "highlights": [
+   "Strick mit 250 g/m², 100 % Polyacryl",
+   "Format 80 × 100 cm",
+   "Atmungsaktives Garn mit sanfter Haptik",
+   "4 Farben",
+   "Bei 40 °C waschbar"
+  ],
+  "idealFor": "Geschenk zur Geburt, Kita, Kundenpräsent"
+ },
+ "ars1745": {
+  "headline": "Kuschelfaktor de luxe",
+  "intro": "Außen glatt, innen flauschig: Die Originalzz® Sherpa Fleece Blanket DeLuxe kombiniert eine besonders glatte Vorderseite aus Micro-Mink-Polyester mit superweichem Sherpa-Futter. Im großzügigen Format 127 × 152 cm wärmt sie auf dem Sofa ebenso wie auf der Tribüne. Die Vorderseite lässt sich vollflächig per Sublimationsdruck gestalten, alternativ ist Stick möglich.",
+  "highlights": [
+   "Glatte Micro-Mink-Vorderseite, Sherpa-Rückseite",
+   "Großes Format 127 × 152 cm",
+   "Vollflächiger Sublimationsdruck möglich",
+   "Auch bestickbar",
+   "Trocknergeeignet"
+  ],
+  "idealFor": "Fan-Artikel, Kundengeschenk, Vereinsmerch, Weihnachtspräsent"
+ },
+ "bcwu620": {
+  "headline": "Der Hoodie für jeden Tag",
+  "intro": "Der Hooded Sweat von B&C ist ein robuster Allrounder mit 280 g/m² aus ringgesponnener, gekämmter Baumwolle und recyceltem Polyester. Die gefütterte Kapuze mit Kordelzug und Metallösen, Bündchen aus 1×1 Ripp mit Elasthan und eine Kängurutasche mit verstärkten Nähten sorgen für Komfort und Langlebigkeit. Flatlock-Nähte an Schultern und Armausschnitten runden den zeitgemäßen Schnitt ab.",
+  "highlights": [
+   "280 g/m², 80 % Baumwolle / 20 % Polyester (recycelt)",
+   "Gefütterte Kapuze mit Metallösen",
+   "Kängurutasche mit verstärkten Nähten",
+   "Größen XXS bis 3XL, 6 Farben",
+   "Für Stick, Siebdruck, Digital- und Transferdruck"
+  ],
+  "idealFor": "Vereinshoodie, Crew-Merch, Schul- und Abschlusskleidung"
+ },
+ "cb336b": {
+  "headline": "Warme Ohren, starker Auftritt",
+  "intro": "Die Kids Deep Cuffed Tonal Patch Beanie von Beechfield ist doppellagig aus geripptem Strick gefertigt und hat eine speziell entwickelte Krone für guten Sitz. Der breite Umschlag bietet viel Fläche für Ihr Logo, ein tonfarbener Baumwoll-Twill-Aufnäher setzt einen dezenten Akzent. Das Material enthält zertifiziertes recyceltes Polyester, das Etikett lässt sich für eigenes Branding abtrennen.",
+  "highlights": [
+   "Doppellagiger Rippstrick, 100 % Polyester (recycelt)",
+   "Breiter Umschlag für Veredelung",
+   "Tonfarbener Twill-Aufnäher",
+   "Kindergröße 3–8 Jahre, 7 Farben",
+   "Abtrennbares Etikett für eigenes Branding"
+  ],
+  "idealFor": "Jugendmannschaft, Kita & Schule, Winter-Merch"
+ },
+ "hrm801": {
+  "headline": "Tailliert, schwer und richtig edel",
+  "intro": "Die Women’s Hooded Jacket von HRM überzeugt mit 320 g/m² weichem Mischgewebe: außen sehr glatt, innen angeraut. Der leicht taillierte Schnitt sitzt figurbetont, Details wie die mittig bestickte Kontrast-Kordel, je drei HRM-Metallösen, ein verstärktes Nackenband und ein hochwertiger Reißverschluss mit Metallschieber machen den Unterschied. 2×2-Rippbündchen an Saum, Taschen und Ärmeln halten die Form.",
+  "highlights": [
+   "320 g/m², außen glatt, innen angeraut",
+   "Leicht taillierter Damenschnitt",
+   "Hochwertiger Reißverschluss mit Metallschieber",
+   "14 Farben, Größen XS bis 5XL",
+   "Trocknergeeignet, 40 °C waschbar"
+  ],
+  "idealFor": "Damenteams, Firmenbekleidung mit Stil, Vereins-Zipper"
+ },
+ "jn8046": {
+  "headline": "Clevere Taschen, starke Qualität",
+  "intro": "Der Men’s Hoodie Interlock von Daiber setzt auf eine hochwertige Interlock-Qualität mit 360 g/m² aus Bio-Baumwolle, recyceltem Polyester und etwas Elasthan für Bewegungsfreiheit. Neben der Kängurutasche gibt es eine zusätzliche Reißverschlusstasche und eine Reißverschlusstasche am linken Ärmel, eingefasst mit modischem Tape. Der schmalere Schnitt wirkt modern und aufgeräumt.",
+  "highlights": [
+   "360 g/m² Interlock mit Bio-Baumwolle und Elasthan",
+   "Reißverschlusstaschen an Front und Ärmel",
+   "Schmaler Schnitt (Slim)",
+   "Größen S bis 3XL, 4 Farben",
+   "Für Stick und Transferdruck"
+  ],
+  "idealFor": "Teamwear für unterwegs, Coaches & Trainer, Firmen-Hoodie"
+ },
+ "mv470064": {
+  "headline": "Bügelfrei durch den Arbeitstag",
+  "intro": "Das Men’s Shirt Modern Fit von Marvelis ist bügelfrei und dadurch ideal für alle, die viel unterwegs sind. Der New-Kent-Kragen und die Brusttasche geben ihm einen klassischen Look, der moderne Schnitt sitzt schlank, ohne einzuengen. Je nach Farbe aus Popeline oder Chambray, 100 % Baumwolle, OEKO-TEX® STANDARD 100 zertifiziert. Weiß ist bis 60 °C waschbar.",
+  "highlights": [
+   "Bügelfrei, Modern Fit",
+   "100 % Baumwolle (Popeline bzw. Chambray)",
+   "New-Kent-Kragen und Brusttasche",
+   "Kragenweite 38 bis 48",
+   "OEKO-TEX® STANDARD 100, trocknergeeignet"
+  ],
+  "idealFor": "Büro, Empfang, Außendienst, Hotellerie"
+ },
+ "my111": {
+  "headline": "Länger geschnitten, lässig getragen",
+  "intro": "Das my mate Men’s Long Tee von Miners mate hat eine klassische, längere Passform und Raglan-Ärmel. Single Jersey aus ringgesponnener Baumwolle mit 160 g/m² ist vorgeschrumpft sowie enzym- und silikongewaschen und fühlt sich dadurch besonders weich an. Ein neutrales, seitlich versetztes Größenetikett und das entfernbare Markenlabel machen es zur perfekten Basis für Ihr eigenes Merch.",
+  "highlights": [
+   "Längere Passform mit Raglan-Ärmeln",
+   "160 g/m² Single Jersey, vorgeschrumpft",
+   "Enzym- und silikongewaschen für weichen Griff",
+   "Entfernbares Label für eigenes Branding",
+   "Größen S bis 3XL, 8 Farben"
+  ],
+  "idealFor": "Band- und Vereinsmerch, Streetwear-Look, Events"
+ },
+ "nn310": {
+  "headline": "Bewegungsfreiheit für lange Schichten",
+  "intro": "Die Invincible Women’s Onna-Stretch Tunic ist für den Arbeitsalltag in Praxis, Pflege und Beauty gemacht. Vier-Wege-Stretch sorgt für Bewegungsfreiheit und Tragekomfort den ganzen Tag, das Material ist atmungsaktiv, strapazierfähig, knitterfrei und pflegeleicht. V-Ausschnitt, zwei Vordertaschen, Abnäher am Rücken und Seitenschlitze geben eine moderne Passform. Enthält 33 % zertifiziertes recyceltes Polyester.",
+  "highlights": [
+   "Vier-Wege-Stretch, atmungsaktiv",
+   "Knitterfrei und pflegeleicht, bis 60 °C waschbar",
+   "V-Ausschnitt mit zwei Vordertaschen",
+   "Größen XS bis 5XL, 7 Farben",
+   "33 % recyceltes Polyester"
+  ],
+  "idealFor": "Praxis & Pflege, Kosmetik, Wellness, Service"
+ },
+ "p04": {
+  "headline": "Essential, aber alles andere als basic",
+  "intro": "Der Essential Hoodie von Mantis verbindet 280 g/m² gebürstetes Fleece mit durchdachten Details: doppellagige Kapuze, runde Kordeln mit Metallenden, Metallösen, Fischgrät-Nackenband und Ripp-Strick an Saum und Bündchen. Ein bedruckbarer Einsatz im Nacken und das abreißbare Etikett machen ihn zur idealen Basis für eigenes Branding. Das Pflegeetikett mit QR-Code macht die Lieferkette nachvollziehbar; die Bio-Zertifizierung der Baumwolle ist laut Hersteller in Arbeit.",
+  "highlights": [
+   "280 g/m² gebürstetes Fleece, 81 % Baumwolle / 19 % Polyester",
+   "Doppellagige Kapuze, Metallösen",
+   "Bedruckbarer Nackeneinsatz, abreißbares Etikett",
+   "Unisex, Größen XS bis 3XL, 7 Farben",
+   "Für Stick, Siebdruck, Digital- und Transferdruck"
+  ],
+  "idealFor": "Merch & Brand-Kollektionen, Vereinshoodie, Team-Outfit"
+ },
+ "rt234j": {
+  "headline": "Warm, wind- und wetterfest für kleine Helden",
+  "intro": "Der Junior Soft Padded Bodywarmer von Result Core ist wasserabweisend und winddicht, die 160-g/m²-Polyesterfüllung hält warm, ohne einzuengen. Reflektierende Details seitlich im Hüftbereich sorgen für mehr Sichtbarkeit, Reißverschlusstaschen halten Kleinigkeiten sicher. Praktisch für die Veredelung: Ein Zugang mit Reißverschluss innen auf der linken Brustseite und ein neutrales Etikett im Kragen.",
+  "highlights": [
+   "Wasserabweisend und winddicht",
+   "Wattierung 160 g/m²",
+   "Reflektierende Details",
+   "Veredelungszugang innen links",
+   "Kindergrößen 2/3 bis 9/10 Jahre"
+  ],
+  "idealFor": "Jugendmannschaft, Kita & Schule, Outdoor-Events"
+ },
+ "tj9120": {
+  "headline": "Gebaut für draußen",
+  "intro": "Die Mountain Fleece von Tee Jays kombiniert Antipilling-Fleece mit 344 g/m² und Ripstop-Einsätzen an beanspruchten Stellen. Zwei Fronttaschen und eine Brusttasche mit SBS-Reißverschlüssen, elastische Ärmelabschlüsse, ein verstellbarer Saum mit Kordelstopper und ein längeres Rückenteil machen sie zur zuverlässigen Begleiterin bei Wind und Wetter. OEKO-TEX® STANDARD 100 zertifiziert.",
+  "highlights": [
+   "344 g/m² Antipilling-Fleece mit Ripstop-Verstärkungen",
+   "SBS-Reißverschlüsse, drei Taschen",
+   "Verstellbarer Saum, längeres Rückenteil",
+   "Größen XS bis 5XL",
+   "OEKO-TEX® STANDARD 100, ideal für Stick"
+  ],
+  "idealFor": "Outdoor-Teams, Handwerk & Bau, Trainer und Betreuer"
+ },
+ "tr510": {
+  "headline": "Nahtlos stark beim Sport",
+  "intro": "Der Women’s Recycled Seamless ‘3D Fit’ Multi-Sport Flex Bra von TriDri® ist nahtlos gearbeitet und bietet mittlere Stützkraft. Das feuchtigkeitstransportierende Material aus recyceltem Nylon, Polyester und Elasthan sitzt figurbetont, Rippdetails an Seiten und Rücken unterstützen die Form. Mit herausnehmbaren Polstern und verstellbaren Trägern lässt er sich individuell anpassen.",
+  "highlights": [
+   "Nahtlos, mittlere Stützkraft",
+   "Feuchtigkeitstransportierend, recyceltes Nylon",
+   "Herausnehmbare Polster, verstellbare Träger",
+   "Größen XS bis XL, 6 Farben",
+   "Für Stick, Sieb- und Transferdruck"
+  ],
+  "idealFor": "Fitness- und Laufteams, Studio-Merch, Sportvereine"
+ },
+ "sd-01-001000": {
+  "headline": "Das schwarze Hemd, das einfach sitzt",
+  "intro": "Das Regular Business Hemd von Seidensticker ist ein Klassiker für Büro, Empfang und Veranstaltungen. Die Popeline aus 100 % Baumwolle ist dicht gewebt und bügelfrei ausgerüstet, so kommen Sie ohne Bügeleisen gepflegt durch den Tag. Die Regular-Passform sitzt bequem, ohne weit zu wirken, Kentkragen, weitenverstellbare Manschetten und eine aufgesetzte Brusttasche runden den Business-Look ab.\n\nIn Schwarz wirkt das Hemd elegant und lässt sich mit einem dezent gestickten Logo oder Monogramm zur stilvollen Teamkleidung machen. Erhältlich in den Kragenweiten 38 bis 54.",
+  "highlights": [
+   "100 % Baumwolle, Popeline, bügelfrei",
+   "Regular Fit mit Kentkragen",
+   "Weitenverstellbare Manschetten, Brusttasche",
+   "Kragenweite 38 bis 54",
+   "Schonwaschgang 40 °C, trocknergeeignet bei niedriger Temperatur"
+  ],
+  "idealFor": "Büro & Empfang, Service & Gastronomie, Events, Business-Teamkleidung"
+ },
+ "sd-01-852485": {
+  "headline": "Lässig geschnitten, edel im Material",
+  "intro": "Die Oversized Suit Pants aus der Studio-Seidensticker-Kollektion verbinden eine moderne, weite Passform mit klassischem Material: Flanell aus 100 % Schurwolle in Twill-Webart, warm, atmungsaktiv und mit dezenter Struktur. So entsteht eine Anzughose, die im Büro ebenso funktioniert wie zu smarten Freizeit-Outfits.\n\nDie Hose ist in Grau in den Größen XXS bis XL erhältlich. Zur Pflege bitte chemisch reinigen lassen, nicht waschen.",
+  "highlights": [
+   "100 % Schurwolle, Flanell in Twill-Webart",
+   "Moderne Oversized-Passform",
+   "Knopfverschluss, volle Länge",
+   "Größen XXS bis XL",
+   "Chemische Reinigung, nicht waschen"
+  ],
+  "idealFor": "Business-Outfits, Empfang & Repräsentation, Events"
+ },
+ "fx6089ms": {
+  "headline": "Der Snapback-Klassiker im Melange-Look",
+  "intro": "Diese Snapback von FLEXFIT hat alles, was eine richtige Snapback ausmacht: die typische hohe Form, einen flachen schwarzen Schirm und den klickenden Snapback-Verschluss hinten. Das melierte Material der Krone sorgt für einen lässigen Zweifarb-Look, der deutlich mehr Charakter hat als eine einfarbige Cap.\n\nGeliefert wird jede Cap im Hartschalenetui – damit ist sie auch als Geschenk oder als Merch-Artikel sofort präsentationsfertig. Die Mischung aus Baumwolle und Elasthan gibt der Krone Form und Sitz.\n\nAuf der großen Frontfläche wirkt ein 3D-Stick besonders stark: plastisch, edel und langlebig. Ideal für Streetwear-Labels, Vereins-Merch, Crew-Caps oder als Fanartikel. Schon ab 1 Stück, ab 10 Stück zu Staffelpreisen.",
+  "highlights": [
+   "Klassische Snapback-Form mit flachem Schirm",
+   "Melange-Krone im Zweifarb-Look, Schirm schwarz",
+   "Snapback-Verschluss, One Size",
+   "Im Hartschalenetui geliefert",
+   "Ideal für 3D-Stick auf der Front"
+  ],
+  "idealFor": "Merchandise, Streetwear, Verein, Crew"
+ },
+ "rh25p": {
+  "headline": "Schwere Baumwolle, sportlicher Auftritt",
+  "intro": "Diese Cap von Result Headwear ist aus schwerem, gebürstetem Baumwoll-Drill mit 350 g/m² gemacht – das spürt man sofort: fest, wertig und formstabil. Sechs Segmente, eine innen beschichtete Verstärkung der Front und ein vorgebogener Schirm mit acht Steppnähten geben ihr die klassische Baseball-Silhouette.\n\nDer Hingucker ist der Sandwich-Schirm in Kontrastfarbe (Black/Red oder Navy/Natural). Hinten wird die Größe über ein Stoffband mit Antik-Messingschnalle eingestellt – ein Detail, das man sonst eher bei Premium-Caps findet.\n\nDie verstärkte Front ist wie gemacht für einen Logo-Stick. Perfekt für Handwerksbetriebe, Golfturniere, Vereine und alle, die eine robuste Cap mit Stil suchen.",
+  "highlights": [
+   "Schwerer, gebürsteter Baumwoll-Drill, 350 g/m²",
+   "Sandwich-Schirm in Kontrastfarbe",
+   "Messingschnalle zur Größenverstellung",
+   "Verstärkte Front – ideal zum Besticken",
+   "2 Farbkombinationen"
+  ],
+  "idealFor": "Handwerk, Golf, Verein, Team"
+ },
+ "at401": {
+  "headline": "Flacher Schirm, klare Kante",
+  "intro": "Diese 5-Panel Snapback von Atlantis ist für alle, die es geradlinig mögen: strukturiertes Frontsegment, flacher Schirm mit sechs Ziernähten und ein PVC-Schnappverschluss hinten. Vier gestickte Ösen sorgen für Luftzirkulation.\n\nDas durchgehende Frontsegment ist der große Vorteil dieser Bauform: Ohne Mittelnaht lässt sich ein Logo besonders sauber besticken oder bedrucken – auch breite Schriftzüge kommen perfekt zur Geltung.\n\nIn Black, Navy und Red erhältlich und damit schnell passend zu Teamfarben. Atlantis ist ein italienischer Cap-Spezialist – entsprechend sauber ist die Verarbeitung. Ideal für Promotion-Teams, Festivals, Vereine und Merchandise.",
+  "highlights": [
+   "5-Panel mit durchgehendem Frontsegment",
+   "Flacher Schirm mit 6 Ziernähten",
+   "Snapback-Verschluss, One Size",
+   "Ideal für breite Logos und Schriftzüge",
+   "Black, Navy, Red"
+  ],
+  "idealFor": "Promotion, Festival, Verein, Merchandise"
+ },
+ "rt933": {
+  "headline": "Warm wie doppelt – und aus Flaschen gemacht",
+  "intro": "Diese Beanie von Result Recycled hält richtig warm: doppelte Strickstärke, ein Thermofutter und eine 3M™ Thinsulate™-Isolierung. Der Soft-Touch-Strick fühlt sich angenehm weich an, und die volle Größe mit tiefem Umschlag schützt auch die Ohren.\n\nDas Besondere: Das Garn wird zur Hälfte aus recyceltem Polyester aus Plastikflaschen gewonnen. So wird aus dem Wintergeschenk ein Artikel mit nachvollziehbarem Umweltplus.\n\nPflegeleicht und schnell trocknend – ideal für Outdoor-Teams, Baustelle, Wintertraining oder als Weihnachtsgeschenk für Mitarbeitende. Ein Stick auf dem Umschlag wirkt besonders hochwertig.",
+  "highlights": [
+   "3M™ Thinsulate™-Isolierung mit Thermofutter",
+   "Doppelte Strickstärke, Soft-Touch",
+   "Anteilig aus recycelten Plastikflaschen",
+   "Pflegeleicht, schnell trocknend",
+   "Black, Charcoal, Navy"
+  ],
+  "idealFor": "Wintergeschenk, Outdoor, Baustelle, Team"
+ },
+ "cb540": {
+  "headline": "Das Logo zum Wechseln",
+  "intro": "Bei dieser Thinsulate™ Beanie von Beechfield ist das Logo nicht fest aufgestickt, sondern sitzt auf einem austauschbaren Rip-Strip™-Patch aus Baumwoll-Twill (6,5 × 10 cm). Das heißt: Patches können separat bestickt oder bedruckt und einfach angebracht werden – praktisch für wechselnde Motive, Events oder Saisonaktionen.\n\nDie Mütze selbst ist doppellagig gestrickt aus weichem Polyacryl und mit Thinsulate™ gefüttert – richtig warm an kalten Tagen. Ein Abreißetikett erleichtert das Umlabeln für eigene Marken.\n\nIn Black, French Navy, Graphite Grey und Military Green. Ideal für Merchandise, Outdoor-Teams und Firmen, die mehrere Motive mit einer Mütze abdecken wollen.",
+  "highlights": [
+   "Austauschbarer Patch (6,5 × 10 cm) zur Veredelung",
+   "Thinsulate™-Futter, doppellagig",
+   "Weiches Polyacryl, Soft Touch",
+   "Abreißetikett für eigenes Label",
+   "4 Farben"
+  ],
+  "idealFor": "Merchandise, Outdoor, Event, Winter"
+ },
+ "bg185": {
+  "headline": "Der Rucksack für jeden Tag – recycelt",
+  "intro": "Dieser Premium-Rucksack von BagBase ist aus recyceltem 600D-Polyester gefertigt und komplett mit recyceltem Futter ausgekleidet – PVC-frei. Mit rund 20 Litern ist er groß genug für Laptop, Lunch und Sportsachen und dabei schlank genug für den Alltag.\n\nDurchdacht bis ins Detail: Hauptfach mit Reißverschluss, Einstecktasche innen, Reißverschlusstaschen vorne und auf der Rückseite, Seitentaschen, gepolsterter Rücken und verstellbare, gepolsterte Schultergurte. Ein Abreißetikett ermöglicht das Umlabeln.\n\nIn fünf ruhigen Farben von Black bis Natural Stone. Perfekt als Onboarding-Geschenk, Mitarbeiter-Ausstattung oder Merchandise – Ihr Logo kommt auf der Fronttasche groß raus.",
+  "highlights": [
+   "Recyceltes 600D-Polyester, PVC-frei",
+   "Ca. 20 Liter, 45 × 31 × 16 cm",
+   "Gepolsterter Rücken und Schultergurte",
+   "Mehrere Reißverschlusstaschen",
+   "5 Farben, Abreißetikett"
+  ],
+  "idealFor": "Onboarding, Mitarbeiter, Merchandise, Uni"
+ },
+ "hf8016": {
+  "headline": "Rechteckig, praktisch, Lieblingsrucksack",
+  "intro": "Der Laptoprucksack Daily von Halfar hat eine charmante, rechteckige Form und ein Obermaterial aus rPET. Das geräumige Hauptfach mit 2-Wege-Reißverschluss nimmt alles für den Arbeitstag auf, das gepolsterte Notebookfach schützt den Laptop.\n\nClever: Die seitlichen Steckschnallen machen das Öffnen bequem und lassen sich zu einem Tragegriff verbinden. Dazu kommen eine große Vortasche, zwei Seitenfächer für Trinkflaschen und ein gepolstertes Tragesystem. Volumen: rund 16 Liter.\n\nIn Anthracite, Black, Green, Navy und Red. Die große Vortasche ist ideal für Ihr Logo – ein starkes Geschenk für Team, Azubis oder Kunden.",
+  "highlights": [
+   "Obermaterial aus rPET",
+   "Gepolstertes Notebookfach",
+   "Steckschnallen als Griff kombinierbar",
+   "Ca. 16 Liter, 30 × 42 × 12 cm",
+   "5 Farben"
+  ],
+  "idealFor": "Büro, Azubis, Kundengeschenk, Uni"
+ },
+ "qd968": {
+  "headline": "Business-Rucksack mit Ordnungssystem",
+  "intro": "Der Tungsten™ Laptoprucksack von Quadra ist aus robustem 1680D-Polyester – einem besonders widerstandsfähigen Gewebe für den täglichen Einsatz. Das gepolsterte Laptopfach passt für Geräte bis 15,6 Zoll.\n\nVorne wartet ein Organizer-Bereich für Kabel, Stifte und Kleinkram, dazu kommen eine Media-Tasche mit Kopfhöreranschluss, ein Wasserflaschenhalter und seitliche Reißverschlusstaschen. Mit 23 Litern Volumen ist er auch für die Dienstreise geeignet.\n\nIn Black/Dark Graphite wirkt er seriös und hochwertig – ideal für Außendienst, Vertrieb und Management. Ein Stick auf der Front setzt Ihr Logo dezent und edel in Szene.",
+  "highlights": [
+   "Robustes 1680D-Polyester",
+   "Laptopfach bis 15,6 Zoll",
+   "Organizer, Media-Tasche, Kopfhöreranschluss",
+   "Ca. 23 Liter",
+   "Black/Dark Graphite"
+  ],
+  "idealFor": "Außendienst, Vertrieb, Dienstreise, Management"
+ },
+ "wm408": {
+  "headline": "Natur pur – und ganz schön groß",
+  "intro": "Der Jute-Shopper Jumbo von Westford Mill fasst rund 29 Liter und ist damit der ideale Begleiter für den Wocheneinkauf, den Markt oder die Messe. Die beschichtete Jute ist robust und formstabil, die Henkel aus Baumwolle (ca. 37 cm) liegen angenehm in der Hand.\n\nJute ist ein Naturmaterial: Struktur und Farbe variieren leicht – jede Tasche ist ein kleines Unikat mit natürlichem Charme. Genau das macht Jutetaschen zu einem der sympathischsten Werbeträger überhaupt.\n\nDie große Vorderseite (45 × 39 cm) ist ideal für Siebdruck oder Transferdruck. Perfekt für Hofläden, Einzelhandel, Stadtmarketing und nachhaltige Giveaways.",
+  "highlights": [
+   "Beschichtete Jute, natürliche Optik",
+   "Ca. 29 Liter, 45 × 39 × 21 cm",
+   "Henkel aus Baumwolle, ca. 37 cm",
+   "Große Druckfläche",
+   "Farbe Natural"
+  ],
+  "idealFor": "Hofladen, Einzelhandel, Messe, Stadtmarketing"
+ },
+ "xt001": {
+  "headline": "Die Baumwolltasche, die jeder kennt",
+  "intro": "Die Baumwolltasche Premium von Printwear ist der Klassiker unter den Stofftaschen: 100 % Baumwolle mit 144 g/m², OEKO-TEX® zertifiziert, im Format ca. 38 × 42 cm mit kurzen Henkeln (ca. 35 cm) zum Tragen in der Hand.\n\nDie Nähte sind innen verkettelt und die Henkel mit Kreuznähten befestigt – so hält die Tasche auch schwerere Einkäufe aus. Die naturbelassene Baumwolle bringt Druckfarben besonders schön zur Geltung.\n\nIdeal als Messetasche, Giveaway, Tagungstasche oder Merch-Artikel. Gerade bei größeren Stückzahlen lohnt sich der Siebdruck – fragen Sie nach unseren Staffelpreisen.",
+  "highlights": [
+   "100 % Baumwolle, 144 g/m²",
+   "OEKO-TEX® STANDARD 100",
+   "Ca. 38 × 42 cm, kurze Henkel",
+   "Kreuznähte an den Henkeln",
+   "Farbe Natural"
+  ],
+  "idealFor": "Messe, Giveaway, Tagung, Merchandise"
+ },
+ "qs270n": {
+  "headline": "Die Teamtasche für Profis",
+  "intro": "Die Pro Team Reisetasche von Quadra ist für den harten Sportalltag gebaut: zertifiziert recyceltes 450D-Polyester mit TPE-Rücken, gepolsterte Bodenplatte mit abwischbarem Material und ein separater Schuhkanal für feuchte Sachen.\n\nInnen und außen gibt es Netzfächer, Reißverschluss-Endtaschen und eine Wertsachentasche. Getragen wird sie am gepolsterten Griff oder am abnehmbaren, gepolsterten Schultergurt. Die Vortasche ist speziell für die Veredelung gestaltet.\n\nIn Black sowie Navy, Red und Royal mit Schwarz – passend zu den meisten Vereinsfarben. Mit Vereinswappen und Spielername wird sie zur Lieblingstasche jedes Teams.",
+  "highlights": [
+   "Recyceltes 450D-Polyester mit TPE-Rücken",
+   "Schuhkanal / Feuchtigkeitsfach",
+   "Gepolsterte, abwischbare Bodenplatte",
+   "Vortasche für einfache Veredelung",
+   "4 Farben"
+  ],
+  "idealFor": "Sportverein, Team, Fitness, Reisen"
+ },
+ "rg762": {
+  "headline": "Softshell mit Fleece-Wärme",
+  "intro": "Die Ascender Softshelljacke von Regatta Professional verbindet zwei Lagen: außen ein mechanisch dehnbares, wind- und wasserabweisendes Softshell, innen ein warmes Fleecefutter. Das Ergebnis ist eine Jacke, die Bewegungsfreiheit bietet und an kühlen Tagen zuverlässig schützt.\n\nZwei tief sitzende Reißverschlusstaschen halten die Hände warm, die Reißverschluss-Abdeckung innen sorgt für einen sauberen Abschluss. Gefertigt ist sie aus recycelten Materialien – mit 270 g/m² angenehm robust.\n\nDas Außenmaterial ist bedruckbar, für Logos auf der Brust empfehlen wir einen Stick. Ideal für Außendienst, Handwerk, Trainer und alle Teams, die viel draußen sind.",
+  "highlights": [
+   "2-Lagen-Softshell mit Fleecefutter",
+   "Wind- und wasserabweisend, dehnbar",
+   "Aus recycelten Materialien, 270 g/m²",
+   "Bedruckbares Außenmaterial",
+   "S bis 3XL, 3 Farben"
+  ],
+  "idealFor": "Außendienst, Handwerk, Trainer, Outdoor"
+ },
+ "rg1300": {
+  "headline": "Drei Jacken in einer",
+  "intro": "Die Defender III von Regatta Professional ist eine echte 3-in-1-Jacke: eine wasserdichte Außenjacke aus Hydrafort-Polyester mit getapten Nähten und eine herausnehmbare Fleecejacke (220er Symmetry-Fleece mit Antipilling). Einzeln oder zusammen getragen deckt sie jedes Wetter von Frühjahr bis Winter ab.\n\nDetails für den Einsatz draußen: integrierte, verstellbare Kapuze, Windschutzleiste mit Klett, verstellbarer Saum und Ärmelabschlüsse, Fleece-Bündchen und Mesh-Innenfutter.\n\nBesonders praktisch für die Veredelung: Ein verdeckter Reißverschluss im Futter ermöglicht das Besticken, ohne das Futter mitzunähen. Ideal für Außendienst, Haustechnik, Bau und Security.",
+  "highlights": [
+   "3-in-1: wasserdichte Jacke + Fleecejacke",
+   "Getapte Nähte, integrierte Kapuze",
+   "Antipilling-Fleece, 220 g/m²",
+   "Stickzugang im Futter",
+   "S bis 3XL, 3 Farben"
+  ],
+  "idealFor": "Außendienst, Bau, Haustechnik, Security"
+ },
+ "el39305": {
+  "headline": "Leicht wie eine Feder, warm wie Daune",
+  "intro": "Die Scotia von Elevate Life ist eine leichte Daunenjacke mit hochwertiger Füllung aus 90 % Daune und 10 % Federn. Das Obermaterial aus Nylon hat eine wasserabweisende Dull-Cire-Beschichtung – edel matt und praktisch bei Nieselregen.\n\nWindschutz mit Kinnschutz, Brust- und Seitentaschen mit Reißverschluss, elastische Bündchen und ein zweites Set Zipper-Puller in Anthrazit gehören dazu. Eine Ärmeltasche mit Reißverschluss bietet sich ideal für ein kleines Logo an.\n\nOEKO-TEX® zertifiziert und in Black und Navy erhältlich. Als Incentive, Mitarbeiterjacke oder hochwertiges Kundengeschenk eine Jacke, die gern und lange getragen wird.",
+  "highlights": [
+   "Füllung 90 % Daune / 10 % Federn",
+   "Nylon mit wasserabweisender Beschichtung",
+   "Ärmeltasche ideal für Logo",
+   "OEKO-TEX® STANDARD 100",
+   "Black, Navy"
+  ],
+  "idealFor": "Incentive, Mitarbeiter, Kundengeschenk, Außendienst"
+ },
+ "tj9124": {
+  "headline": "Fleece mit Outdoor-Genen",
+  "intro": "Die Mountain von Tee Jays ist eine Kapuzen-Fleecejacke mit 344 g/m², die deutlich robuster daherkommt als klassisches Fleece: Ripstop-Einsätze an den beanspruchten Stellen, SBS-Reißverschlüsse und ein Antipilling-Fleece, das lange gut aussieht.\n\nDie fixierte Kapuze, der verstellbare Saum mit Kordelstopper und elastische Ärmelabschlüsse halten Wind und Kälte draußen. Eine Innentasche nimmt Handy oder Schlüssel auf. Ein Anteil Elasthan sorgt für Bewegungsfreiheit.\n\nIn Asphalt/Black ein starker Look für Outdoor-Teams, Garten- und Landschaftsbau, Forst oder Vereine. Mit gesticktem Logo auf der Brust ein echtes Lieblingsstück.",
+  "highlights": [
+   "Antipilling-Fleece, 344 g/m²",
+   "Ripstop-Verstärkungen",
+   "SBS-Reißverschlüsse",
+   "Fixierte Kapuze, verstellbarer Saum",
+   "XS bis 3XL"
+  ],
+  "idealFor": "Outdoor, Gartenbau, Forst, Verein"
+ },
+ "jz700m": {
+  "headline": "Kuschelweich und nachhaltig",
+  "intro": "Der Eco® Premium Blend Hoodie von JERZEES verbindet gekämmte, ringgesponnene Baumwolle mit 100 % recyceltem Polyester. Das baumwollreiche 3-Enden-Fleece mit 288 g/m² ist besonders weich und hat eine hohe Maschendichte – das ergibt eine glatte Fläche, auf der Drucke gestochen scharf aussehen.\n\nDie Kapuze ist doppellagig mit Jersey gefüttert, dazu kommen Kängurutasche, Ösen und eine flache, farblich passende Zugkordel. Schulter-zu-Schulter-Tape und Rippbündchen sorgen für Formstabilität.\n\nZehn Farben von Black Ink bis Blush Pink, Größen S bis 3XL. Ideal für Merchandise, Teamwear und Abschlussjahrgänge.",
+  "highlights": [
+   "3-Enden-Fleece, 288 g/m²",
+   "Baumwolle + 100 % recyceltes Polyester",
+   "Glatte Druckfläche",
+   "Doppellagige Kapuze",
+   "10 Farben, S bis 3XL"
+  ],
+  "idealFor": "Merchandise, Teamwear, Abschluss, Verein"
+ },
+ "bl4739": {
+  "headline": "Der schwere Zip-Hoodie mit Vintage-Charme",
+  "intro": "Diese Kapuzensweatjacke von Bella+Canvas ist mit 350 g/m² ein echtes Schwergewicht. Das Airlume-Vlies aus gekämmter, ringgesponnener Baumwolle und Polyester ist innen gebürstet und fühlt sich entsprechend kuschelig an.\n\nDer antik-silberne Reißverschluss gibt ihr einen hochwertigen Vintage-Touch, auf Zugschnüre wird bewusst verzichtet – das wirkt clean und modern. Die Größen reichen von XS bis 4XL.\n\nIn Asphalt, Black, Dust und Navy. Für Streetwear-Merch, Agenturen, Start-ups und Bands genau das richtige Teil – mit Stick auf der Brust und großem Rückendruck.",
+  "highlights": [
+   "Schweres Airlume-Vlies, 350 g/m²",
+   "Innen gebürstet",
+   "Antik-silberner Reißverschluss",
+   "Ohne Zugschnüre",
+   "XS bis 4XL, 4 Farben"
+  ],
+  "idealFor": "Streetwear, Agentur, Start-up, Band-Merch"
+ },
+ "jh020": {
+  "headline": "Der Hoodie mit Extras",
+  "intro": "Der Street Hoodie von Just Hoods ist ein schwerer Kapuzenpullover mit 330 g/m² und gebürstetem Innenvlies – außen 100 % Baumwolle, damit Drucke und Stick sauber aussehen. Die bequeme Passform macht ihn zum Alltagsliebling.\n\nDie Details machen den Unterschied: doppellagige Kapuze mit drei Segmenten, Daumenlöcher in den Bündchen, eine versteckte Handytasche in der Kängurutasche mit Kopfhörer-Öffnung und Kopfhörer-Schlaufen, V-Einsatz, Halbmondpasse im Nacken und ein Abreißetikett.\n\nIn Heather Grey, Jet Black und New French Navy. Ideal für Abschlussjahrgänge, Vereine, Gaming-Teams und Merchandise.",
+  "highlights": [
+   "Schwerer Hoodie, 330 g/m²",
+   "Daumenlöcher, versteckte Handytasche",
+   "Doppellagige 3-Segment-Kapuze",
+   "Außen 100 % Baumwolle",
+   "Abreißetikett"
+  ],
+  "idealFor": "Abschluss, Verein, Gaming, Merchandise"
+ },
+ "ea041": {
+  "headline": "Bio-Hoodie mit cleanem Look",
+  "intro": "Der Corcovado von Ecologie ist ein Kapuzenpullover aus 100 % Bio-Baumwolle mit angerauter Fleece-Innenseite und 270 g/m². OEKO-TEX® zertifiziert und konsequent gedacht: Alle Etiketten bestehen aus recyceltem Polyester, und es gibt nur ein Größenetikett.\n\nDer Slim-Fit-Schnitt, der schmale gerippte Saum und abgeschrägte Ärmelbündchen geben ihm eine moderne, cleane Silhouette. Auf einen Kordelzug wird verzichtet.\n\nIn Heather Grey, Jet Black und Navy, Größen XS bis XXL. Für Unternehmen und Marken, die Nachhaltigkeit ernst meinen – mit Ihrem Logo ein Merch-Teil mit gutem Gewissen.",
+  "highlights": [
+   "100 % Bio-Baumwolle, 270 g/m²",
+   "OEKO-TEX® STANDARD 100",
+   "Slim Fit, ohne Kordelzug",
+   "Etiketten aus recyceltem Polyester",
+   "XS bis XXL, 3 Farben"
+  ],
+  "idealFor": "Nachhaltiges Merch, Unternehmen, Agentur"
+ },
+ "jt099": {
+  "headline": "Jedes Shirt ein Unikat",
+  "intro": "Das Washed T von Just Ts hat die angesagte Washed-out-Optik: Durch die Waschung sieht jedes Shirt ein wenig anders aus – jedes ist ein Unikat. Das macht es zum perfekten Basis-Shirt für Streetwear, Band- und Festival-Merch.\n\nRinggesponnene Baumwolle im Single Jersey mit 165 g/m², Standard-Passform, gerippter Rundhals, Nackenband und Zwillingsnadelnähte. Statt eines großen Labels gibt es nur ein Größenetikett – ideal für eigene Marken.\n\nIn Washed Charcoal und Washed Jet Black, Größen XS bis 3XL, OEKO-TEX® zertifiziert. Helle Drucke wirken auf dem verwaschenen Grund besonders stark.",
+  "highlights": [
+   "Washed-out-Optik, jedes Shirt ein Unikat",
+   "Ringgesponnene Baumwolle, 165 g/m²",
+   "Nur Größenetikett",
+   "OEKO-TEX® STANDARD 100",
+   "XS bis 3XL"
+  ],
+  "idealFor": "Streetwear, Band-Merch, Festival, Label"
+ },
+ "s9630": {
+  "headline": "Das Shirt mit Stretch-Komfort",
+  "intro": "Das Stretch-T Relaxed von Stedman® verbindet Baumwolle, Viskose und Elasthan zu einem besonders weichen, fließenden Single Jersey mit 170 g/m². Der Stoff gibt bei jeder Bewegung nach und bleibt trotzdem in Form.\n\nNormal Fit, schmaler Kragen aus T-Shirt-Stoff, schmaler Ärmelsaum und verstärkte Schulternähte – ein Shirt, das gepflegt aussieht und den ganzen Tag bequem bleibt. Das Pflegeetikett sitzt in der Seitennaht, im Nacken nur ein kleines Größenetikett.\n\nSechs Farben von Grey Heather bis Salmon, Größen S bis XXL, OEKO-TEX® zertifiziert. Ideal für Service, Empfang, Studios und Agenturen.",
+  "highlights": [
+   "Baumwolle/Viskose/Elasthan, 170 g/m²",
+   "Weich fließend mit Stretch",
+   "Schmaler Kragen, verstärkte Schultern",
+   "OEKO-TEX® STANDARD 100",
+   "6 Farben"
+  ],
+  "idealFor": "Service, Empfang, Studio, Agentur"
+ },
+ "nh503": {
+  "headline": "Feines Piqué für den gepflegten Auftritt",
+  "intro": "Das Piqué-Poloshirt von Nath ist aus halbgekämmter Baumwolle in feinem Mikro-Piqué mit 200 g/m² gefertigt – eine Struktur, die edel aussieht und angenehm atmungsaktiv ist.\n\nGestrickter Kragen und Armbündchen, eine 3-Knopf-Leiste mit Ton-in-Ton-Knöpfen, Necktape und Seitenschlitze machen es zu einem klassisch-sauberen Polo, das auch im Kundenkontakt eine gute Figur macht.\n\nOEKO-TEX® zertifiziert. Ein gesticktes Brustlogo ist hier die erste Wahl – ideal für Empfang, Service, Gastronomie und Handwerk.",
+  "highlights": [
+   "Feines Mikro-Piqué, 200 g/m²",
+   "100 % halbgekämmte Baumwolle",
+   "Gestrickter Kragen und Bündchen",
+   "3-Knopf-Leiste Ton in Ton",
+   "OEKO-TEX® STANDARD 100"
+  ],
+  "idealFor": "Empfang, Service, Gastronomie, Handwerk"
+ },
+ "w100": {
+  "headline": "Das Polo, das die Form hält",
+  "intro": "Das klassische Piqué-Poloshirt von Henbury ist aus 100 % Baumwolle mit 225 g/m² – ein kräftiges, formstabiles Piqué, das auch nach vielen Wäschen gut aussieht. Der Stehkragen ist auf Formbeständigkeit ausgelegt.\n\nDie Knopfleiste mit drei Knöpfen in Horn-Optik, gesäumte Ärmel und Seitenschlitze geben ihm den zeitlosen Polo-Look. Produziert wird WRAP-zertifiziert, das Shirt ist OEKO-TEX® zertifiziert.\n\nIn Black, Heather Grey, Navy, Purple und White, Größen XS bis 3XL. Der Allrounder für Teamkleidung im Büro, im Verkauf und auf Messen – am besten mit gesticktem Logo.",
+  "highlights": [
+   "Baumwoll-Piqué, 225 g/m²",
+   "Formstabiler Kragen",
+   "Knöpfe in Horn-Optik",
+   "WRAP-zertifizierte Produktion",
+   "XS bis 3XL, 5 Farben"
+  ],
+  "idealFor": "Büro, Verkauf, Messe, Team"
+ },
+ "x989": {
+  "headline": "Jeans-Look für Küche und Theke",
+  "intro": "Die Jeans-Kochschürze von Link Kitchen Wear im Format 100 × 70 cm bringt Werkstatt-Charme in Küche, Bar und Barbecue. Das Gewebe aus Baumwolle und Polyester mit 300 g/m² in Köperbindung ist vorgeschrumpft, reaktiv gefärbt und an den Belastungspunkten verstärkt.\n\nDer durchgehende Gürtel aus Schürzenstoff hält sicher, die Schürze ist pflegeleicht und bis 40 °C waschbar. In Black und Denim Blue passt sie zu jedem Gastro-Konzept.\n\nMit gesticktem Logo auf dem Latz wird sie zum Markenzeichen Ihres Teams – oder mit einem Spruch zum Lieblingsgeschenk für Hobbyköche und Grillmeister.",
+  "highlights": [
+   "Jeans-Optik, 300 g/m²",
+   "100 × 70 cm, durchgehender Gürtel",
+   "Verstärkt an Belastungspunkten",
+   "Pflegeleicht, bis 40 °C",
+   "Black, Denim Blue"
+  ],
+  "idealFor": "Gastronomie, Bar, Grill-Geschenk, Café"
+ },
+ "lf011": {
+  "headline": "Kochjacke, die cool bleibt",
+  "intro": "Die Staycool-Kochjacke von Le Chef ist leicht (160 g/m²) und mit dem Staycool-System auf Belüftung ausgelegt – genau richtig für heiße Küchen. Die Raglanärmel sorgen für Bewegungsfreiheit am Herd.\n\nPraktisch: eine Reißverschlusstasche und eine Stifttasche am Ärmel. Die Oberfläche ist bügelleicht und knitterfrei, die abgedeckten Knöpfe sind waschbar. Geschnitten unisex von XXS bis XXL.\n\nIn White, Black sowie White mit schwarzen oder grauen Akzenten. Ein gesticktes Logo auf der Brust und der Name des Kochs machen daraus Profikleidung mit Wiedererkennungswert.",
+  "highlights": [
+   "Leicht, 160 g/m², Staycool-System",
+   "Raglanärmel für Bewegungsfreiheit",
+   "Stift- und Reißverschlusstasche am Ärmel",
+   "Bügelleicht, knitterfrei",
+   "XXS bis XXL, 4 Farben"
+  ],
+  "idealFor": "Profiküche, Restaurant, Catering, Hotel"
+ },
+ "rg2550": {
+  "headline": "Warnweste, gemacht für Ihr Logo",
+  "intro": "Die Essential Easy Print von Regatta High Visibility ist eine leichte Warnweste aus Polyester-Strick, zertifiziert nach EN ISO 20471, Klasse 2. Sie ist ausdrücklich zum Bedrucken gedacht – Rücken und Brust bieten freie Flächen für Firmenname oder Aufdrucke wie „Ordner“.\n\nDer Klettverschluss macht das An- und Ausziehen schnell, die Größen reichen von S bis 3XL. Gefertigt wird sie aus recycelten Materialien. Die orange Variante entspricht zusätzlich dem britischen Bahnstandard RIS-3279.\n\nIn Yellow und Orange. Ideal für Bau, Logistik, Event-Security, Vereine und Kfz-Ausstattung.",
+  "highlights": [
+   "EN ISO 20471, Klasse 2",
+   "Easy Print: freie Druckflächen",
+   "Aus recycelten Materialien",
+   "Klettverschluss",
+   "S bis 3XL, Yellow/Orange"
+  ],
+  "idealFor": "Bau, Logistik, Ordnerdienst, Events"
+ },
+ "fa2986": {
+  "headline": "Großer Schirm, große Bühne",
+  "intro": "Der Fibermatic® XL von FARE ist ein Golf- und Gästeschirm mit 130 cm Durchmesser – genug Platz für zwei Personen und eine riesige Werbefläche. Die Automatik öffnet ihn auf Knopfdruck.\n\nDas Windproof-System mit flexiblen Fiberglasschienen macht ihn bei stärkeren Böen besonders widerstandsfähig, der Stock ist ebenfalls aus stabilem Fiberglas. Ein gerader Softgriff liegt angenehm in der Hand.\n\nSechs Farben, die Variante White eignet sich sogar für Sublimationsdruck. Ideal für Hotels, Golfclubs, Autohäuser und als hochwertiges Kundengeschenk.",
+  "highlights": [
+   "Ø 130 cm, Automatik",
+   "Windproof-System, Fiberglasschienen",
+   "Stabiler Fiberglasstock",
+   "White für Sublimation geeignet",
+   "6 Farben"
+  ],
+  "idealFor": "Hotel, Golf, Autohaus, Kundengeschenk"
+ },
+ "tc035": {
+  "headline": "Badetuch mit eingebauter Werbefläche",
+  "intro": "Das bedruckbare Badetuch von Towel City hat einen 12 cm breiten, glatten Rand, der speziell für den Druck gemacht ist. So kommt Ihr Logo oder Schriftzug gestochen scharf auf das Frottee.\n\n100 % Baumwolle mit 550 g/m² – dicht, saugstark und trotzdem schnell trocknend. Eine Aufhängeschlaufe in der Mitte der Oberkante macht es alltagstauglich. Format 70 × 140 cm, OEKO-TEX® zertifiziert.\n\nIn Black, Navy und White. Ideal für Fitnessstudios, Sportvereine, Hotels und Spa – oder als Geschenk mit Namen.",
+  "highlights": [
+   "Druckfähiger Rand, 12 cm",
+   "100 % Baumwolle, 550 g/m²",
+   "70 × 140 cm, Aufhängeschlaufe",
+   "OEKO-TEX® STANDARD 100",
+   "Black, Navy, White"
+  ],
+  "idealFor": "Fitness, Sportverein, Hotel, Spa"
+ },
+ "mm16": {
+  "headline": "Ein Teddy wie früher",
+  "intro": "Der klassische Teddybär von Mumbles ist ein Bär, wie man ihn sich vorstellt: hellbraun, mit beweglichen Armen und Beinen, gestickter Nase und kontrastfarbigen Tatzen und Füßen.\n\nEr entspricht der europäischen Spielzeugnorm EN71, ist OEKO-TEX® zertifiziert und für Kinder aller Altersgruppen geeignet. In zwei Größen erhältlich.\n\nAls Geschenk zur Geburt, für Kinderarztpraxen, Kitas, Spendenaktionen oder als Maskottchen ist er ein Sympathieträger, den niemand weglegt – mit einem kleinen Shirt oder Halstuch mit Ihrem Logo wird er zu Ihrem Botschafter.",
+  "highlights": [
+   "Gelenk-Arme und -Beine",
+   "Gestickte Nase",
+   "EN71, OEKO-TEX® STANDARD 100",
+   "Für Kinder aller Altersgruppen",
+   "2 Größen"
+  ],
+  "idealFor": "Geburt, Kinderarzt, Spendenaktion, Maskottchen"
+ },
+ "rt939": {
+  "headline": "Kuschelwärme aus 40 Flaschen",
+  "intro": "Die Fleecedecke von Result Recycled ist aus 100 % recyceltem Polyester gefertigt – für eine Decke werden rund 40 Plastikflaschen wiederverwertet. Das kompakte, dichte Strickmaterial mit 280 g/m² hält gut warm und trocknet schnell.\n\nMit 175 × 140 cm ist sie groß genug zum Einkuscheln auf dem Sofa, im Stadion oder beim Picknick. Der Rand ist Ton in Ton vernäht, die Haptik weich und hochwertig.\n\nFünf Farben von Forest Green bis Royal. Ein gestickter Schriftzug in der Ecke macht sie zum Weihnachtsgeschenk, das jeden Winter wieder hervorgeholt wird.",
+  "highlights": [
+   "100 % recyceltes Polyester",
+   "Ca. 40 Plastikflaschen je Decke",
+   "175 × 140 cm, 280 g/m²",
+   "Weiche, dichte Qualität",
+   "5 Farben"
+  ],
+  "idealFor": "Weihnachten, Kundengeschenk, Stadion, Picknick"
+ }
 }

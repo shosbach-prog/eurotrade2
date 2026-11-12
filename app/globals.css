@@ -1633,3 +1633,12 @@ a.mm-h:hover{color:var(--brand)}
 .b-sale{background:#c2410c;color:#fff}
 @media (max-width:600px){.mm-offers{grid-template-columns:1fr}}
 .tag.tag-sale{background:#fff4ed;color:#c2410c;border-color:#fdba74}
+.season{display:flex;align-items:center;gap:16px;margin:18px 0 6px;padding:16px 20px;border-radius:14px;background:linear-gradient(110deg,#7f1d1d,#b91c1c 55%,#166534);color:#fff;text-decoration:none;box-shadow:var(--shadow)}
+.season:hover{filter:brightness(1.06)}
+.season-ic{font-size:30px}
+.season-t{display:flex;flex-direction:column;gap:2px;flex:1}
+.season-t>b{font-size:17px}.season-t>span{font-size:14px;opacity:.95}
+.season-go{background:#fff;color:#7f1d1d;font-weight:700;padding:9px 14px;border-radius:10px;white-space:nowrap;font-size:14px}
+@media (max-width:700px){.season{flex-wrap:wrap}.season-go{width:100%;text-align:center}}
+.home-sec{margin-top:34px}.home-h{margin-bottom:12px}.home-h h2{margin:0}.home-h p{margin:4px 0 0}
+.tier-tips{background:#f0f9f2;border:1px solid #b7e1c1;border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;flex-direction:column;gap:5px;font-size:14px}

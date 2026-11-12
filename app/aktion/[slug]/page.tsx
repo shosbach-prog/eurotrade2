@@ -21,7 +21,8 @@ export default async function Aktion({ params }: { params: { slug: string } }) {
   const a = aktion(params.slug);
   if (!a) notFound();
   const ctx = await viewCtx();
-  const items = allPublic(ctx).map((p) => [p, a.pick(p)] as const).filter(([, s]) => s > 0).sort((x, y) => y[1] - x[1]).slice(0, 16).map(([p]) => slimCard(p));
+  const all = allPublic(ctx).filter((p) => p.images.length);
+  const items = all.map((p) => [p, a.pick(p)] as const).filter(([, s]) => s > 0).sort((x, y) => y[1] - x[1]).slice(0, 16).map(([p]) => slimCard(p));
   const refs = listReferences().filter((r) => r.imageId && a.refMatch.some((m) => `${r.tag} ${r.match} ${r.title}`.toLowerCase().includes(m))).slice(0, 3);
   // Stichtag: späteste Freigabe = Liefertermin − Produktion − Versand
   let dl: { date: Date; approve: Date } | null = null;
@@ -50,7 +51,13 @@ export default async function Aktion({ params }: { params: { slug: string } }) {
         {items[0] && <div className="z-hero-img">{items.slice(0, 3).filter((p) => p.images[0]).map((p) => <img key={p.id} src={p.images[0]} alt="" />)}</div>}
       </section>
       <section className="l-feats">{a.points.map(([t, x]) => <div key={t} className="l-feat box"><h3>{t}</h3><p>{x}</p></div>)}</section>
-      {items.length > 0 && <section className="l-section" id="artikel"><h2>Unsere Empfehlungen</h2><div className="grid">{items.map((p) => <ProductCard key={p.id} p={p} />)}</div></section>}
+      {a.groups ? <div id="artikel">{a.groups.map((g) => {
+        const used = new Set<string>();
+        const list = all.filter((p) => g.pick(p) && !used.has(p.id)).slice(0, 8);
+        list.forEach((p) => used.add(p.id));
+        return list.length ? <section key={g.title} className="l-section"><h2>{g.title}</h2><p className="muted" style={{ marginTop: -6, maxWidth: 760 }}>{g.text}</p><div className="grid">{list.map((p) => <ProductCard key={p.id} p={slimCard(p)} />)}</div></section> : null;
+      })}</div>
+      : items.length > 0 && <section className="l-section" id="artikel"><h2>Unsere Empfehlungen</h2><div className="grid">{items.map((p) => <ProductCard key={p.id} p={p} />)}</div></section>}
       <RefStrip refs={refs} />
       <section className="l-section">
         <h2>Häufige Fragen</h2>

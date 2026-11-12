@@ -234,5 +234,14 @@ export function matchingFor(id: string, ctx?: Ctx): { variants: PublicProduct[];
 }
 
 /** Alle sichtbaren Artikel (für Aktionsseiten) */
+/** Neu im Sortiment: je Kategorie abwechselnd ein Artikel mit Bild (Tag „Neu …“) */
+export function newArrivals(n = 12, ctx?: Ctx): PublicProduct[] {
+  const neu = products(ctx).filter((p) => (p.tags ?? []).some((t) => /^neu\b/i.test(t)) && p.images.length);
+  const by = new Map<string, Product[]>();
+  for (const p of neu) { const l = by.get(p.categorySlug) ?? []; l.push(p); by.set(p.categorySlug, l); }
+  const out: Product[] = []; const lists = [...by.values()];
+  for (let i = 0; out.length < n && lists.some((l) => l[i]); i++) for (const l of lists) if (l[i] && out.length < n) out.push(l[i]);
+  return out.map((p) => toPublic(p, ctx));
+}
 export const visibleProducts = (ctx?: Ctx) => products(ctx);
 export const allPublic = (ctx?: Ctx) => products(ctx).map((p) => toPublic(p, ctx));
