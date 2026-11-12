@@ -402,7 +402,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
             {copy.idealFor && <div className="ideal"><span>Ideal für:</span>{copy.idealFor.split(',').map((x) => <b key={x}>{x.trim()}</b>)}</div>}
           </div>
         )}
-        <details className="pdetails" open={!copy}>
+        <details className="pdetails" open>
           <summary>Produktdetails & Material</summary>
           {p.features?.length ? <ul className="feat">{p.features.map((f) => <li key={f}>{f}</li>)}</ul> : <p style={{ marginTop: 12 }}>{p.description}</p>}
         <dl className="specs">
