@@ -1618,3 +1618,5 @@ a.mm-h:hover{color:var(--brand)}
 .catnav.mm a.mm-tab.deal{color:#c2410c}
 @media (max-width:1180px){.catnav.mm .mm-tab{padding:12px 10px;font-size:14px}}
 @media (min-width:1181px){.catnav.mm .mm-tab{font-size:14px;padding:12px 11px}}
+.gchips{margin-top:-6px}
+.gchips a{font-size:13px;padding:5px 11px}

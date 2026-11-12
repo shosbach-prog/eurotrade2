@@ -14,13 +14,27 @@ import { SUBTYPES, matchSub, subBySlug, subOf } from '@/lib/menu-defs';
 
 type SP = { typ?: string; g?: string };
 const GEN = ['Damen', 'Herren', 'Kinder'];
+const cap = (s: string) => s[0].toUpperCase() + s.slice(1);
+/** /kategorie/t-shirts-herren → Basis „t-shirts“ + Zielgruppe „Herren“ (auch für Unterkategorien) */
+function parseSlug(slug: string, cats: { slug: string }[]) {
+  const m = slug.match(/^(.+)-(damen|herren|kinder)$/);
+  if (m && (subBySlug(m[1]) || cats.some((c) => c.slug === m[1]))) return { base: m[1], g: cap(m[2]) };
+  return { base: slug, g: null as string | null };
+}
+const catUrl = (base: string, g?: string | null) => `/kategorie/${base}${g ? `-${g.toLowerCase()}` : ''}`;
+const forG = (g: string | null) => (p: { gender?: string }) => !g || p.gender === g || (g !== 'Kinder' && (p.gender ?? 'Unisex') === 'Unisex');
+const gLabel = (g: string) => (g === 'Kinder' ? 'für Kinder' : `für ${g}`);
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   if (params.slug === 'sonderangebote') return { title: 'Sonderangebote & Auslaufartikel – Markentextilien mit Logo', description: 'Auslaufartikel und Restposten bekannter Marken – solange Vorrat, bedruckt oder bestickt mit Ihrem Logo ab 1 Stück.', alternates: { canonical: '/kategorie/sonderangebote' } };
-  const sb = subBySlug(params.slug);
-  if (sb) { const h = sb.sub.title ?? sb.sub.label; return { title: `${h} mit Logo bedrucken & besticken`, description: `${h} bekannter Marken – bedruckt oder bestickt mit Ihrem Logo, schon ab 1 Stück. Staffelpreise ab 10 Stück, Angebot in 24 h.`, alternates: { canonical: `/kategorie/${sb.sub.key}` } }; }
-  const c = getCategories(await viewCtx()).find((x) => x.slug === params.slug);
-  return { title: c ? `${c.name} mit Logo bedrucken & besticken` : 'Kategorie', description: c ? categoryContent(c.slug, c.name).intro : undefined, alternates: c ? { canonical: `/kategorie/${c.slug}` } : undefined };
+  const cats = getCategories(await viewCtx());
+  const { base, g } = parseSlug(params.slug, cats);
+  const sb = subBySlug(base);
+  const c = cats.find((x) => x.slug === base);
+  const h = sb ? sb.sub.title ?? sb.sub.label : c?.name;
+  if (!h) return { title: 'Kategorie' };
+  const hg = g ? `${h} ${gLabel(g)}` : h;
+  return { title: `${hg} mit Logo bedrucken & besticken`, description: sb || g ? `${hg} bekannter Marken – bedruckt oder bestickt mit Ihrem Logo, schon ab 1 Stück. Staffelpreise ab 10 Stück, Angebot in 24 h.` : categoryContent(c!.slug, c!.name).intro, alternates: { canonical: catUrl(base, g) } };
 }
 
 export default async function CategoryPage({ params, searchParams = {} }: { params: { slug: string }; searchParams?: SP }) {
@@ -42,30 +56,37 @@ export default async function CategoryPage({ params, searchParams = {} }: { para
       </>
     );
   }
-  const sb = subBySlug(params.slug);
-  const cat = getCategories(ctx).find((x) => x.slug === (sb ? sb.cat : params.slug));
+  const cats = getCategories(ctx);
+  const ps = parseSlug(params.slug, cats);
+  const sb = subBySlug(ps.base);
+  const cat = cats.find((x) => x.slug === (sb ? sb.cat : ps.base));
   if (!cat) notFound();
-  const g0 = GEN.includes(searchParams.g ?? '') ? searchParams.g! : null;
-  // alte Adresse /kategorie/sweatshirts?typ=sweatjacken → /kategorie/sweatjacken
+  // alte Adressen (?typ=…, ?g=…) dauerhaft auf die sprechende URL umleiten
+  const qg = GEN.includes(searchParams.g ?? '') ? searchParams.g! : null;
   const old = !sb && searchParams.typ ? subOf(cat.slug, searchParams.typ) : null;
-  if (old) permanentRedirect(`/kategorie/${old.key}${g0 ? `?g=${g0}` : ''}`);
-  const all = getByCategory(cat.slug, ctx);
+  if (old || qg) permanentRedirect(catUrl(old?.key ?? ps.base, qg ?? ps.g));
+  const g = ps.g;
   const sub = sb?.sub ?? null;
-  const items = sub ? all.filter((p) => matchSub(sub, p.name)) : all;
-  const g = g0;
-  const subs = (SUBTYPES[cat.slug] ?? []).map((s) => ({ ...s, n: all.filter((p) => matchSub(s, p.name)).length })).filter((s) => s.n >= 2 && s.n < all.length);
+  const all = getByCategory(cat.slug, ctx);
+  const inSub = sub ? all.filter((p) => matchSub(sub, p.name)) : all;
+  const items = inSub.filter(forG(g));
+  if (!items.length && g) notFound();
+  const allG = all.filter(forG(g));
+  const subs = (SUBTYPES[cat.slug] ?? []).map((s) => ({ ...s, n: allG.filter((p) => matchSub(s, p.name)).length })).filter((s) => s.n >= 1 && s.n < allG.length && all.filter((p) => matchSub(s, p.name)).length >= 2);
+  const gens = GEN.map((x) => ({ g: x, n: inSub.filter(forG(x)).length })).filter((x) => x.n > 0);
+  const title = sub ? sub.title ?? sub.label : cat.name;
   const txt = categoryContent(cat.slug, cat.name);
   const rated = items.filter((p) => p.rating);
   const catRating = rated.length ? { avg: rated.reduce((s, p) => s + p.rating!.avg * p.rating!.count, 0) / rated.reduce((s, p) => s + p.rating!.count, 0), count: rated.reduce((s, p) => s + p.rating!.count, 0) } : null;
-  const heroImgs = items.flatMap((p) => p.images.slice(0, 1)).slice(0, 3);
+  const heroImgs = (g ? [...items.filter((p) => p.gender === g), ...items.filter((p) => p.gender !== g)] : items).flatMap((p) => p.images.slice(0, 1)).slice(0, 3);
   return (
     <>
-      <JsonLd data={crumbSchema([['Start', '/'], [cat.name, `/kategorie/${cat.slug}`], ...(sub ? [[sub.title ?? sub.label, `/kategorie/${sub.key}`] as [string, string]] : [])])} />
+      <JsonLd data={crumbSchema([['Start', '/'], [cat.name, `/kategorie/${cat.slug}`], ...(sub ? [[title, `/kategorie/${sub.key}`] as [string, string]] : []), ...(g ? [[`${title} ${gLabel(g)}`, catUrl(sub?.key ?? cat.slug, g)] as [string, string]] : [])])} />
       <JsonLd data={faqSchema(txt.faq)} />
-      <div className="crumbs"><Link href="/">Start</Link> › {sub ? <><Link href={`/kategorie/${cat.slug}`}>{cat.name}</Link> › {sub.title ?? sub.label}</> : cat.name}</div>
+      <div className="crumbs"><Link href="/">Start</Link> › {sub || g ? <Link href={`/kategorie/${cat.slug}`}>{cat.name}</Link> : cat.name}{sub && <> › {g ? <Link href={`/kategorie/${sub.key}`}>{title}</Link> : title}</>}{g && <> › {g}</>}</div>
       <section className="cat-hero">
         <div className="cat-hero-text">
-          <h1>{sub ? sub.title ?? sub.label : cat.name}{g && <small className="h1-g"> · {g}</small>}</h1>
+          <h1>{title}{g && <> {gLabel(g)}</>}</h1>
           {catRating && <div className="cat-rating"><Stars value={catRating.avg} size={16} showValue count={catRating.count} /></div>}
           <p>{txt.intro}</p>
         </div>
@@ -78,10 +99,14 @@ export default async function CategoryPage({ params, searchParams = {} }: { para
         <li><b>Angebot in 24 h</b></li>
       </ul>
       {subs.length > 0 && <nav className="subchips" aria-label="Artikeltyp">
-        <Link href={`/kategorie/${cat.slug}${g ? `?g=${g}` : ''}`} className={!sub ? 'on' : ''}>Alle {cat.name} <span>{all.length}</span></Link>
-        {subs.map((s) => <Link key={s.key} href={`/kategorie/${s.key}${g ? `?g=${g}` : ''}`} className={sub?.key === s.key ? 'on' : ''}>{s.label} <span>{s.n}</span></Link>)}
+        <Link href={catUrl(cat.slug, g)} className={!sub ? 'on' : ''}>Alle {cat.name} <span>{allG.length}</span></Link>
+        {subs.map((s) => <Link key={s.key} href={catUrl(s.key, g)} className={sub?.key === s.key ? 'on' : ''}>{s.label} <span>{s.n}</span></Link>)}
       </nav>}
-      <FilterGrid key={`${sub?.key ?? ''}|${g ?? ''}`} items={items.map(slimCard)} initialGenders={g ? (g === 'Kinder' ? [g] : [g, 'Unisex']) : undefined} />
+      {gens.length > 1 && <nav className="subchips gchips" aria-label="Zielgruppe">
+        <Link href={catUrl(sub?.key ?? cat.slug)} className={!g ? 'on' : ''}>Alle <span>{inSub.length}</span></Link>
+        {gens.map((x) => <Link key={x.g} href={catUrl(sub?.key ?? cat.slug, x.g)} className={g === x.g ? 'on' : ''}>{x.g} <span>{x.n}</span></Link>)}
+      </nav>}
+      <FilterGrid key={params.slug} items={items.map(slimCard)} />
       <RefStrip refs={refsFor({ category: cat.name, categorySlug: cat.slug })} title={`${cat.name} mit Logo – Beispiele unserer Kunden`} />
       <ReviewStrip reviews={latestReviews(6, items.map((p) => p.id))} overall={catRating} title={`Bewertungen zu ${cat.name}`} />
       <section className="cat-seo">

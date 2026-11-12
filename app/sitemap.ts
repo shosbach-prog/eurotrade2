@@ -31,6 +31,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...pages,
     ...getCategories().map((c) => ({ url: `${base}/kategorie/${c.slug}`, priority: 0.8, changeFrequency: 'weekly' as const, lastModified: now })),
     ...Object.entries(SUBTYPES).flatMap(([cat, list]) => { const ps = visibleProducts().filter((p) => p.categorySlug === cat); return list.filter((x) => { const n = ps.filter((p) => matchSub(x, p.name)).length; return n >= 2 && n < ps.length; }).map((x) => ({ url: `${base}/kategorie/${x.key}`, priority: 0.7, changeFrequency: 'weekly' as const, lastModified: now })); }),
+    ...getCategories().flatMap((c) => { const ps = visibleProducts().filter((p) => p.categorySlug === c.slug); return ['Damen', 'Herren', 'Kinder'].filter((g) => { const n = ps.filter((p) => p.gender === g || (g !== 'Kinder' && (p.gender ?? 'Unisex') === 'Unisex')).length; return n >= 3 && n < ps.length; }).map((g) => ({ url: `${base}/kategorie/${c.slug}-${g.toLowerCase()}`, priority: 0.6, changeFrequency: 'weekly' as const, lastModified: now })); }),
     ...allProductsBrief().map((p) => ({ url: `${base}${productPath(p)}`, priority: 0.6, changeFrequency: 'weekly' as const, lastModified: now })),
   ];
 }

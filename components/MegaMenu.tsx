@@ -45,7 +45,7 @@ export default function MegaMenu({ menu }: { menu: Menu }) {
               <li><Link href={catHref(c.slug)} className="mm-all" onClick={close}>Alle {c.name} →</Link></li>
             </ul>
             <div className="mm-for">
-              {(['Damen', 'Herren', 'Kinder'] as const).filter((x) => c.g[x]).map((x) => <Link key={x} href={catHref(c.slug, `g=${x}`)} onClick={close}>{x}</Link>)}
+              {(['Damen', 'Herren', 'Kinder'] as const).filter((x) => c.g[x]).map((x) => <Link key={x} href={`/kategorie/${c.slug}-${x.toLowerCase()}`} onClick={close}>{x}</Link>)}
             </div>
           </div>
         ))}
@@ -57,7 +57,7 @@ export default function MegaMenu({ menu }: { menu: Menu }) {
         {menu.genders.map((ge) => (
           <div key={ge.label} className="mm-col">
             <span className="mm-h">{ge.label}{ge.label !== 'Kinder' && <small>inkl. Unisex</small>}</span>
-            <ul>{ge.cats.map((c) => <li key={c.slug}><Link href={catHref(c.slug, `g=${ge.label}`)} onClick={close}>{c.name} <span>{c.count}</span></Link></li>)}</ul>
+            <ul>{ge.cats.map((c) => <li key={c.slug}><Link href={`/kategorie/${c.slug}-${ge.label.toLowerCase()}`} onClick={close}>{c.name} <span>{c.count}</span></Link></li>)}</ul>
           </div>
         ))}
         <MegaPromo deals={menu.deals} close={close} />
