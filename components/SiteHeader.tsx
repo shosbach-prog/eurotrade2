@@ -7,6 +7,7 @@ import Logo from './Logo';
 import UserMenu from './UserMenu';
 import { CartButton } from './CartContext';
 import { WishlistButton } from './Wishlist';
+import { PriceToggle } from './PriceMode';
 
 /** Kopfzeile + Kategorien – entscheidet anhand der AKTUELLEN Adresse (bleibt bei Seitenwechseln ohne Neuladen korrekt) */
 export default function SiteHeader({ ok, customerName, admin, cats, shop, domain, deals = 0 }: {
@@ -24,7 +25,7 @@ export default function SiteHeader({ ok, customerName, admin, cats, shop, domain
           <Link href="/" className="logo" aria-label={`${shop} – Startseite`}><Logo domain={domain} /></Link>
           {showShop ? <>
             <Suspense fallback={<div className="search" />}><SearchBar /></Suspense>
-            <div className="hdr-actions"><WishlistButton /><CartButton /><UserMenu name={customerName} admin={admin} /></div>
+            <div className="hdr-actions">{(showShop || showcase) && <PriceToggle />}<WishlistButton /><CartButton /><UserMenu name={customerName} admin={admin} /></div>
           </> : isAdminPath ? null : (
             <nav className="pub-nav">
               <Link href="/druck-stick" className="hide-sm">Druck & Stick</Link>

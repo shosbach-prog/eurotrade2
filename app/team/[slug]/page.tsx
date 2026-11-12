@@ -6,6 +6,7 @@ import { getTeamShop, isOpen } from '@/lib/teamshop';
 import ProductImage from '@/components/ProductImage';
 import { eur } from '@/lib/format';
 import { productPath } from '@/lib/format';
+import { Money } from '@/components/PriceMode';
 
 export const dynamic = 'force-dynamic';
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
@@ -39,7 +40,7 @@ export default function TeamShopPage({ params }: { params: { slug: string } }) {
             <div className="body">
               <div className="name">{p.name}</div>
               <div className="muted" style={{ fontSize: 13 }}>{p.colors.length} Farben · {p.sizes.length ? `${p.sizes[0]}–${p.sizes[p.sizes.length - 1]}` : ''}</div>
-              <div className="price">{p.price != null ? <>{eur(p.price)} <small>netto</small></> : <small style={{ fontSize: 14, color: 'var(--brand)', fontWeight: 600 }}>Preis auf Anfrage</small>}</div>
+              <div className="price">{p.price != null ? <Money net={p.price} label /> : <small style={{ fontSize: 14, color: 'var(--brand)', fontWeight: 600 }}>Preis auf Anfrage</small>}</div>
             </div>
           </Link>
         ))}

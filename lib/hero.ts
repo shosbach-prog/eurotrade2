@@ -13,6 +13,7 @@ export function heroItems(list: PublicProduct[], opts: { link: boolean; n?: numb
       colors: p.colors.map((c) => c.hex).filter((h): h is string => !!h).slice(0, 6), colorCount: p.colors.length,
       label: p.locked ? '🔒 Preis nach Anmeldung' : from != null && Number.isFinite(from) ? `${eur(from)} / Stück` : 'Preis auf Anfrage',
       href: opts.link ? productPath(p) : '#preis',
+      price: p.locked ? null : p.price,
     };
   });
 }

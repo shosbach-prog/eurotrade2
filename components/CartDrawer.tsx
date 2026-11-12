@@ -6,10 +6,12 @@ import ProductImage from './ProductImage';
 import { eur } from '@/lib/format';
 import { decoLabel } from '@/lib/deco';
 import { unitFor } from '@/lib/tiers';
+import { usePrice } from './PriceMode';
 
 /** Seitenleiste: öffnet sich nach „In den Warenkorb“ */
 export default function CartDrawer() {
   const { lines, drawer, closeDrawer, remove, lastAdded, count } = useCart();
+  const pr = usePrice();
   const path = usePathname();
   useEffect(() => { closeDrawer(); }, [path]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
@@ -43,7 +45,7 @@ export default function CartDrawer() {
                 {l.deco && <div className="deco-tag">✦ {decoLabel(l.deco)}</div>}
               </div>
               <div style={{ textAlign: 'right' }}>
-                <div style={{ fontWeight: 700, fontSize: 14 }}>{l.price != null ? eur(unit(l)! * l.qty) : '–'}</div>
+                <div style={{ fontWeight: 700, fontSize: 14 }}>{l.price != null ? pr.pq(unit(l)!, l.qty) : '–'}</div>
                 <button className="linkbtn muted" style={{ fontSize: 12 }} onClick={() => remove(l.key)}>entfernen</button>
               </div>
             </div>
@@ -51,7 +53,7 @@ export default function CartDrawer() {
         </div>
         {lines.length > 0 && (
           <div className="drawer-foot">
-            <div className="tot big" style={{ marginTop: 0, borderTop: 0, paddingTop: 0 }}><span>{count} Stück · netto</span><span>{eur(net)}</span></div>
+            <div className="tot big" style={{ marginTop: 0, borderTop: 0, paddingTop: 0 }}><span>{count} Stück · {pr.label}</span><span>{eur(lines.reduce((s, l) => s + pr.cq(unit(l) ?? 0, l.qty), 0))}</span></div>
             <a className="btn" href="/warenkorb" style={{ display: 'grid', placeItems: 'center' }}>Zum Warenkorb & Angebot anfordern</a>
             <button className="btn alt" onClick={closeDrawer}>Weiter einkaufen</button>
           </div>

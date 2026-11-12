@@ -5,8 +5,10 @@ import type { PublicProduct } from '@/lib/types';
 import { eur } from '@/lib/format';
 import ProductImage from './ProductImage';
 import { productPath } from '@/lib/format';
+import { usePrice } from './PriceMode';
 
 export default function SearchBar() {
+  const pr = usePrice();
   const router = useRouter();
   const params = useSearchParams();
   const [q, setQ] = useState(params.get('q') ?? '');
@@ -71,7 +73,7 @@ export default function SearchBar() {
             <a key={p.id} href={productPath(p)} className={i === active ? 'on' : ''} onMouseEnter={() => setActive(i)}>
               <div className="thumb"><ProductImage p={p} /></div>
               <div><div className="t">{p.name}</div><div className="s">{p.brand} · {p.category} · {p.sku}</div></div>
-              <div className="p">{p.price != null ? `${eur(p.price)}` : ''}</div>
+              <div className="p">{p.price != null ? pr.p(p.price) : ''}</div>
             </a>
           ))}
           {total > items.length && <a className="all" href={`/suche?q=${encodeURIComponent(q.trim())}`}>Alle {total} Treffer anzeigen →</a>}

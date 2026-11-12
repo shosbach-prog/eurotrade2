@@ -10,12 +10,14 @@ import { unitFor } from '@/lib/tiers';
 import { saveMyInquiry } from '@/lib/mine';
 import { fmtDate, leadCheck } from '@/lib/leadtime';
 import { productPath } from '@/lib/format';
+import { usePrice } from '@/components/PriceMode';
 
 const FORM_KEY = 'et-form-v1';
 const FIELDS = ['name', 'company', 'email', 'phone', 'street', 'city'] as const;
 
 export default function CartClient({ share, contact, remind }: { share: string | null; contact?: ReactNode; remind?: boolean }) {
   const { lines, setQty, update, remove, clear, decoToAll, addMany } = useCart();
+  const pr = usePrice();
   const router = useRouter();
   const [more, setMore] = useState(false);
   // Warenkorb-Erinnerung (Opt-in): beim Anhaken, beim Verlassen der E-Mail und beim Schließen der Seite speichern
@@ -152,7 +154,7 @@ export default function CartClient({ share, contact, remind }: { share: string |
                   {l.sizes && l.sizes.length > 1
                     ? <select value={l.size ?? ''} onChange={(e) => update(l.key, { size: e.target.value })} aria-label="Größe ändern">{l.sizes.map((s) => <option key={s}>{s}</option>)}</select>
                     : l.size && <span>{l.size}</span>}
-                  {l.price != null && <span>{eur(unit(l))}/Stk.{unit(l)! < l.price && <span className="ok"> (Staffel)</span>}</span>}
+                  {l.price != null && <span>{pr.p(unit(l))}/Stk.{unit(l)! < l.price && <span className="ok"> (Staffel)</span>}</span>}
                 </div>
                 {l.deco && <div className="deco-tag">✦ {decoLabel(l.deco)} <button className="linkbtn" onClick={() => update(l.key, { deco: null })}>entfernen</button></div>}
                 {l.deco?.team?.rows.length ? <div className="muted" style={{ fontSize: 12.5 }}>{l.deco.team.rows.map((r) => [r.name, r.nr && `#${r.nr}`].filter(Boolean).join(' ')).join(', ')}</div> : null}
@@ -164,7 +166,7 @@ export default function CartClient({ share, contact, remind }: { share: string |
                 <button type="button" onClick={() => setQty(l.key, l.qty + 1)} aria-label="mehr">+</button>
               </div>}
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-end' }}>
-                <strong>{l.price != null ? eur(unit(l)! * l.qty) : '—'}</strong>
+                <strong>{l.price != null ? pr.pq(unit(l)!, l.qty) : '—'}</strong>
                 <button className="x" onClick={() => remove(l.key)} aria-label="Entfernen">×</button>
               </div>
             </div>
@@ -180,10 +182,10 @@ export default function CartClient({ share, contact, remind }: { share: string |
             <button type="button" className="btn alt" onClick={checkCode}>Einlösen</button>
           </div>
           {codeInfo && !codeInfo.ok && <div className="note err" style={{ marginTop: 6 }}>Dieser Code ist ungültig oder wurde bereits eingelöst.</div>}
-          {pct > 0 && <div className="tot"><span className="ok">Willkommensrabatt {pct} %</span><span className="ok">−{eur(Math.round(net * pct) / 100)}</span></div>}
+          {pct > 0 && <div className="tot"><span className="ok">Willkommensrabatt {pct} %</span><span className="ok">−{pr.p(Math.round(net * pct) / 100)}</span></div>}
           {codeInfo?.ok && pct === 0 && nextT && <div className="note muted" style={{ marginTop: 6 }}>Code gültig – ab {eur(nextT.min)} Warenwert erhalten Sie {nextT.pct} % Rabatt.</div>}
           {codeInfo?.ok && pct > 0 && nextT && <div className="note muted" style={{ marginTop: 2 }}>Noch {eur(nextT.min - net)} bis {nextT.pct} % Rabatt.</div>}
-          {net > 0 && <div className="tot big"><span>Summe netto (Richtwert){anyOpen ? ' *' : ''}</span><span>{eur(net - Math.round(net * pct) / 100)}</span></div>}
+          {net > 0 && <div className="tot big"><span>Summe {pr.label} (Richtwert){anyOpen ? ' *' : ''}</span><span>{eur(lines.reduce((s, l) => s + pr.cq(unit(l) ?? 0, l.qty), 0) * (1 - pct / 100))}</span></div>}
           <p className="muted" style={{ fontSize: 13, margin: '6px 0 0' }}>Endpreis inkl. Versand und ggf. Veredelung erhalten Sie mit dem Angebot.</p>
         </div>
 

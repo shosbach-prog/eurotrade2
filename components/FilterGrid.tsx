@@ -5,6 +5,7 @@ import { brandLogo } from '@/lib/brands';
 import type { PublicProduct } from '@/lib/types';
 import { FAMILY_HEX, colorFamily } from '@/lib/colors';
 import { eur } from '@/lib/format';
+import { usePrice } from './PriceMode';
 
 const SIZE_ORDER = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '6XL'];
 const sizeRank = (s: string) => { const i = SIZE_ORDER.indexOf(s); return i >= 0 ? i : 100 + (parseFloat(s) || 0); };
@@ -14,6 +15,7 @@ type Sort = 'empfohlen' | 'preis' | 'preis-ab' | 'name';
 
 /** Produktliste mit Filtern: Marke, Farbe, Größe, Schnitt, Preis + Sortierung */
 export default function FilterGrid({ items }: { items: PublicProduct[] }) {
+  const pr = usePrice();
   const [brands, setBrands] = useState<string[]>([]);
   const [fams, setFams] = useState<string[]>([]);
   const [sizes, setSizes] = useState<string[]>([]);
@@ -88,11 +90,11 @@ export default function FilterGrid({ items }: { items: PublicProduct[] }) {
       {facets.gender.length > 1 && grp('gender', 'Schnitt', genders.length, <>{facets.gender.map(([g, n]) => <label key={g} className="f-check"><input type="checkbox" checked={genders.includes(g)} onChange={() => tog(setGenders, g)} />{g}<span>{n}</span></label>)}</>)}
       {facets.props.length > 0 && grp('props', 'Eigenschaften', props.length, <>{facets.props.map(([g, n]) => <label key={g} className="f-check"><input type="checkbox" checked={props.includes(g)} onChange={() => tog(setProps, g)} />{g}<span>{n}</span></label>)}</>)}
       {facets.brand.length > 1 && grp('brand', 'Marke', brands.length, <>{facets.brand.map(([b, n]) => <label key={b} className="f-check"><input type="checkbox" checked={brands.includes(b)} onChange={() => tog(setBrands, b)} />{brandLogo(b) && <img className="f-blogo" src={brandLogo(b)!} alt="" loading="lazy" />}{b}<span>{n}</span></label>)}</>)}
-      {facets.max > facets.min && grp('price', 'Preis', maxP != null ? 1 : 0, <><b style={{ fontSize: 13 }}>bis {eur(maxP ?? facets.max)}</b><input type="range" min={facets.min} max={facets.max} step={1} value={maxP ?? facets.max} onChange={(e) => setMaxP(Number(e.target.value) >= facets.max ? null : Number(e.target.value))} /></>)}
+      {facets.max > facets.min && grp('price', 'Preis', maxP != null ? 1 : 0, <><b style={{ fontSize: 13 }}>bis {pr.p(maxP ?? facets.max)}</b><input type="range" min={facets.min} max={facets.max} step={1} value={maxP ?? facets.max} onChange={(e) => setMaxP(Number(e.target.value) >= facets.max ? null : Number(e.target.value))} /></>)}
       <button className="btn f-apply" onClick={() => setOpen(false)}>{shown.length} Artikel anzeigen</button>
     </aside>
   );
-  const chips = [...fams.map((x) => ({ l: x, f: () => tog(setFams, x) })), ...sizes.map((x) => ({ l: `Größe ${x}`, f: () => tog(setSizes, x) })), ...genders.map((x) => ({ l: x, f: () => tog(setGenders, x) })), ...props.map((x) => ({ l: x, f: () => tog(setProps, x) })), ...brands.map((x) => ({ l: x, f: () => tog(setBrands, x) })), ...(maxP != null ? [{ l: `bis ${eur(maxP)}`, f: () => setMaxP(null) }] : [])];
+  const chips = [...fams.map((x) => ({ l: x, f: () => tog(setFams, x) })), ...sizes.map((x) => ({ l: `Größe ${x}`, f: () => tog(setSizes, x) })), ...genders.map((x) => ({ l: x, f: () => tog(setGenders, x) })), ...props.map((x) => ({ l: x, f: () => tog(setProps, x) })), ...brands.map((x) => ({ l: x, f: () => tog(setBrands, x) })), ...(maxP != null ? [{ l: `bis ${pr.p(maxP)}`, f: () => setMaxP(null) }] : [])];
 
   return (
     <div className="fg">

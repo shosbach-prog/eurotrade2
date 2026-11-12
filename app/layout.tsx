@@ -1,6 +1,6 @@
 import './globals.css';
 import Link from 'next/link';
-import { headers } from 'next/headers';
+import { headers, cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
 import Logo from '@/components/Logo';
@@ -14,6 +14,8 @@ import Consent, { ConsentLink } from '@/components/Consent';
 import { getCategories, dealCount } from '@/lib/catalog';
 import { previewMode, shopClosed } from '@/lib/access';
 import { isAdmin, shopAccess } from '@/lib/customer';
+import { PriceModeProvider } from '@/components/PriceMode';
+import { VAT } from '@/lib/pricing';
 
 const SHOP = process.env.SHOP_NAME ?? 'Euro-Trade';
 export async function generateMetadata(): Promise<Metadata> {
@@ -57,7 +59,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema()) }} />
         <a href="#inhalt" className="skip">Zum Inhalt springen</a>
-        <CartProvider><WishlistProvider>
+        <PriceModeProvider initial={cookies().get('et_price')?.value === 'brutto' ? 'brutto' : 'netto'} vat={VAT}><CartProvider><WishlistProvider>
           {previewMode() && ok && !path.startsWith('/start') && <div className="preview-bar">Vorschau-Modus – nur für Sie sichtbar. Preise sind Platzhalter. Kunden-Codes sind gesperrt, bis Sie <code>SHOP_PREVIEW=false</code> setzen.</div>}
           <SiteHeader ok={ok} customerName={customer?.name ?? null} admin={admin} cats={(ok ? getCategories(customer) : getCategories()).map((c) => ({ name: c.name, slug: c.slug }))} shop={SHOP} domain={process.env.SHOP_DOMAIN ?? 'euro-trade.com'} deals={dealCount(ok ? customer : undefined)} />
           <main className="wrap" id="inhalt" tabIndex={-1}>{children}</main>
@@ -113,7 +115,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           {!path.startsWith('/admin') && <Consent tools={{ ga: process.env.GA_ID || undefined, gads: process.env.GOOGLE_ADS_ID || undefined, meta: process.env.META_PIXEL_ID || undefined }} />}
           {!path.startsWith('/admin') && <TrustBadge />}
           {!path.startsWith('/admin') && <Contact whatsapp={process.env.CONTACT_WHATSAPP ?? '491732648097'} phone={process.env.BERATUNG_TELEFON ?? '030 40719258'} email={process.env.CONTACT_EMAIL ?? 'info@euro-trade.com'} />}
-        </WishlistProvider></CartProvider>
+        </WishlistProvider></CartProvider></PriceModeProvider>
       </body>
     </html>
   );

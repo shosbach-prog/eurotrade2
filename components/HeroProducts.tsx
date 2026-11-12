@@ -1,11 +1,13 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { usePrice } from './PriceMode';
 
-export type HeroItem = { id: string; name: string; brand: string; image: string; colors: string[]; colorCount: number; label: string; href: string };
+export type HeroItem = { id: string; name: string; brand: string; image: string; colors: string[]; colorCount: number; label: string; href: string; price?: number | null };
 
 /** Produktbühne im Hero: wechselt automatisch, pausiert bei Hover, Pfeile + Punkte */
 export default function HeroProducts({ items, interval = 4500 }: { items: HeroItem[]; interval?: number }) {
+  const pr = usePrice();
   const [i, setI] = useState(0);
   const [pause, setPause] = useState(false);
   const n = items.length;
@@ -37,7 +39,7 @@ export default function HeroProducts({ items, interval = 4500 }: { items: HeroIt
           <b className="hs-name">{p.name}</b>
           <span className="hs-sw">{p.colors.map((c) => <i key={c} style={{ background: c }} />)}{p.colorCount > p.colors.length && <em>+{p.colorCount - p.colors.length}</em>}</span>
         </div>
-        <span className="hs-price">{p.label}<span>Ansehen →</span></span>
+        <span className="hs-price">{p.price != null ? `${pr.p(p.price)} / Stück` : p.label}<span>Ansehen →</span></span>
       </Link>
       {n > 1 && <div className="hs-dots">{items.map((x, k) => <button key={x.id} type="button" className={k === i ? 'on' : ''} onClick={() => setI(k)} aria-label={`Artikel ${k + 1}`} />)}</div>}
     </div>
