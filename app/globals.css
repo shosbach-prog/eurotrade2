@@ -1722,3 +1722,30 @@ a.mm-h:hover{color:var(--brand)}
 .ps-img{width:62px}.ps-img img{width:56px;height:56px;object-fit:contain}
 .ps-s{color:#555;font-size:10px}.ps-l{color:#0a5cf0;word-break:break-all}
 .ps-foot{margin-top:14px;font-size:10px;color:#444;border-top:1px solid #ccc;padding-top:8px}
+/* Bestseller-Leiste (randlos, wischbar) */
+html,body{overflow-x:clip}
+.bs{margin:34px 0 10px}
+.bs .bs-head h2{font-size:clamp(26px,3.4vw,40px);font-weight:800;letter-spacing:-.02em;margin:0}
+.bs .bs-head p{margin:6px 0 18px;color:var(--muted);font-size:16px}
+.bs-wrap{position:relative;width:100vw;margin-left:calc(50% - 50vw)}
+.bs-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;cursor:grab;overscroll-behavior-x:contain}
+.bs-track::-webkit-scrollbar{display:none}
+.bs-track.dragging{cursor:grabbing;scroll-snap-type:none;user-select:none}
+.bs-track.dragging .bs-tile{pointer-events:none}
+.bs-tile{flex:0 0 clamp(260px,22vw,420px);scroll-snap-align:start;color:var(--ink);text-decoration:none;display:flex;flex-direction:column}
+.bs-img{position:relative;display:block;aspect-ratio:1;background:#ecebe9;overflow:hidden}
+.bs-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .35s,transform .6s}
+.bs-img .bs-img2{opacity:0}
+@media (hover:hover){.bs-tile:hover .bs-img2{opacity:1}.bs-tile:hover .bs-img img:first-child{transform:scale(1.03)}}
+.bs-wish{position:absolute;top:10px;right:10px;z-index:2}
+.bs-badge{position:absolute;left:12px;top:12px;z-index:2;background:#fff;color:#c2410c;font-size:12px;font-weight:700;padding:4px 9px;border-radius:999px}
+.bs-badge.sale{background:#c2410c;color:#fff}
+.bs-info{display:flex;flex-direction:column;gap:5px;padding:16px 20px 6px}
+.bs-info b{font-size:18px;font-weight:700;line-height:1.25}
+.bs-sub{color:#444;font-size:15px}
+.bs-rate{display:flex;align-items:center;gap:6px;font-size:14px;color:#444}
+.bs-price{font-size:15px;color:#222}.bs-price s{color:var(--muted);margin-right:4px}.bs-price small{color:var(--ok);font-weight:600}
+.bs-nav{position:absolute;top:calc(clamp(260px,22vw,420px) / 2);transform:translateY(-50%);z-index:3;width:48px;height:48px;border-radius:50%;border:0;background:rgba(255,255,255,.92);box-shadow:0 6px 18px rgba(0,0,0,.15);font-size:30px;line-height:1;padding:0 0 4px;cursor:pointer;color:#111}
+.bs-nav.l{left:16px}.bs-nav.r{right:16px}
+@media (max-width:700px){.bs-tile{flex-basis:76vw}.bs-nav{display:none}.bs-info{padding:12px 14px 4px}.bs-info b{font-size:16px}}
+.bs .bs-head{display:block;text-align:left}.bs .bs-head p{text-align:left}.bs-img{background:#fff}

@@ -4,6 +4,8 @@ import ProductCard from '@/components/ProductCard';
 import { categoryTiles, getCategories, getCollection, getFeatured, newArrivals, productCount, slimCard } from '@/lib/catalog';
 import CategoryTiles from '@/components/CategoryTiles';
 import SeasonBanner from '@/components/SeasonBanner';
+import BestsellerRail from '@/components/BestsellerRail';
+import { bestsellers } from '@/lib/bestseller';
 import { getCustomer } from '@/lib/customer';
 import { RecentlyViewed } from '@/components/Recent';
 import NewsletterBox from './start/NewsletterBox';
@@ -36,8 +38,9 @@ export default async function Home() {
         <h2>Ihre Kollektion</h2>
         <div className="grid">{collection.map((p) => <ProductCard key={p.id} p={p} />)}</div>
       </>}
-      {!(ctx?.exclusive && collection.length) && <>
-        <h2>{collection.length ? 'Weitere Artikel' : 'Beliebte Artikel'}</h2>
+      {!(ctx?.exclusive && collection.length) && <BestsellerRail items={bestsellers(12, ctx)} />}
+      {!(ctx?.exclusive && collection.length) && collection.length > 0 && <>
+        <h2>Weitere Artikel</h2>
         <div className="grid">{getFeatured(16, ctx).filter((p) => !collection.some((c) => c.id === p.id)).map((p) => <ProductCard key={p.id} p={p} />)}</div>
       </>}
       {!ctx?.exclusive && (() => {
