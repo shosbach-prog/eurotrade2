@@ -1,6 +1,7 @@
+import { SUBTYPES, matchSub } from '@/lib/menu-defs';
 import type { MetadataRoute } from 'next';
 import { previewMode } from '@/lib/access';
-import { getCategories, allProductsBrief } from '@/lib/catalog';
+import { getCategories, allProductsBrief, visibleProducts } from '@/lib/catalog';
 import { ZIELGRUPPEN } from '@/lib/zielgruppen';
 import { AKTIONEN } from '@/lib/aktionen';
 import { GUIDES } from '@/lib/ratgeber';
@@ -29,6 +30,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     ...pages,
     ...getCategories().map((c) => ({ url: `${base}/kategorie/${c.slug}`, priority: 0.8, changeFrequency: 'weekly' as const, lastModified: now })),
+    ...Object.entries(SUBTYPES).flatMap(([cat, list]) => { const ps = visibleProducts().filter((p) => p.categorySlug === cat); return list.filter((x) => { const n = ps.filter((p) => matchSub(x, p.name)).length; return n >= 2 && n < ps.length; }).map((x) => ({ url: `${base}/kategorie/${x.key}`, priority: 0.7, changeFrequency: 'weekly' as const, lastModified: now })); }),
     ...allProductsBrief().map((p) => ({ url: `${base}${productPath(p)}`, priority: 0.6, changeFrequency: 'weekly' as const, lastModified: now })),
   ];
 }

@@ -1,34 +1,34 @@
 /** Unterkategorien (Artikeltyp) je Kategorie – Erkennung über den Artikelnamen */
-export type SubDef = { key: string; label: string; re: RegExp; not?: RegExp };
+export type SubDef = { key: string; label: string; title?: string; re: RegExp; not?: RegExp };
 
 export const SUBTYPES: Record<string, SubDef[]> = {
   't-shirts': [
-    { key: 'kurzarm', label: 'T-Shirts kurzarm', re: /t-?shirt/i, not: /long|langarm|tank|crop|oversize|boxy|heavy/i },
-    { key: 'langarm', label: 'Langarm & Long-Shirts', re: /long|langarm/i },
+    { key: 't-shirts-kurzarm', label: 'T-Shirts kurzarm', re: /t-?shirt/i, not: /long|langarm|tank|crop|oversize|boxy|heavy/i },
+    { key: 'langarmshirts', label: 'Langarm & Long-Shirts', re: /long|langarm/i },
     { key: 'tanktops', label: 'Tanktops & Tops', re: /tank|\btop\b|neckholder/i },
-    { key: 'cropped', label: 'Cropped Shirts', re: /crop/i },
-    { key: 'oversize', label: 'Oversize & Heavy', re: /oversize|boxy|heavy/i },
+    { key: 'cropped-shirts', label: 'Cropped Shirts', re: /crop/i },
+    { key: 'oversize-t-shirts', label: 'Oversize & Heavy', title: 'Oversize & Heavy T-Shirts', re: /oversize|boxy|heavy/i },
   ],
   poloshirts: [
-    { key: 'klassisch', label: 'Klassische Polos', re: /polo/i, not: /oversize|boxy|heavy/i },
-    { key: 'oversize', label: 'Oversize & Heavy', re: /oversize|boxy|heavy/i },
+    { key: 'klassische-poloshirts', label: 'Klassische Polos', re: /polo/i, not: /oversize|boxy|heavy/i },
+    { key: 'oversize-poloshirts', label: 'Oversize & Heavy', title: 'Oversize & Heavy Poloshirts', re: /oversize|boxy|heavy/i },
   ],
   sweatshirts: [
-    { key: 'hoodies', label: 'Kapuzenpullover', re: /kapuzen(pullover|-?sweatshirt)|hoodie/i, not: /jacke/i },
+    { key: 'kapuzenpullover', label: 'Kapuzenpullover', re: /kapuzen(pullover|-?sweatshirt)|hoodie/i, not: /jacke/i },
     { key: 'sweatjacken', label: 'Sweatjacken', re: /sweatjacke|zip-?jacke|parka/i },
-    { key: 'rundhals', label: 'Sweatshirts Rundhals', re: /sweatshirt|rundhals|college/i, not: /kapuze/i },
-    { key: 'oversize', label: 'Oversize & Cropped', re: /oversize|cropped|heavy/i },
+    { key: 'sweatshirts-rundhals', label: 'Sweatshirts Rundhals', re: /sweatshirt|rundhals|college/i, not: /kapuze/i },
+    { key: 'oversize-sweatshirts', label: 'Oversize & Cropped', title: 'Oversize & Cropped Sweatshirts', re: /oversize|cropped|heavy/i },
   ],
   jacken: [
-    { key: 'fleece', label: 'Fleecejacken', re: /fleece/i, not: /weste/i },
+    { key: 'fleecejacken', label: 'Fleecejacken', re: /fleece/i, not: /weste/i },
     { key: 'westen', label: 'Westen & Bodywarmer', re: /weste|bodywarmer/i },
-    { key: 'stepp', label: 'Stepp- & Winterjacken', re: /stepp|padded|winter|parka/i, not: /weste|sweat/i },
+    { key: 'steppjacken', label: 'Stepp- & Winterjacken', re: /stepp|padded|winter|parka/i, not: /weste|sweat/i },
     { key: 'windbreaker', label: 'Windbreaker & Regenjacken', re: /windbreaker|regen|schlupf|coach|softshell/i },
-    { key: 'college', label: 'College- & Bomberjacken', re: /college|bomber|pilot/i },
+    { key: 'collegejacken', label: 'College- & Bomberjacken', re: /college|bomber|pilot/i },
   ],
   hosen: [
     { key: 'jogginghosen', label: 'Jogging- & Sweathosen', re: /jogging|sweathose|trainingshose/i },
-    { key: 'shorts', label: 'Shorts', re: /shorts|radler/i },
+    { key: 'shorts', label: 'Shorts', title: 'Shorts & Radlerhosen', re: /shorts|radler/i },
     { key: 'leggings', label: 'Leggings', re: /leggings/i },
     { key: 'arbeitshosen', label: 'Arbeits- & Stoffhosen', re: /workwear|cargohose|arbeits|anzughose|chino/i },
   ],
@@ -44,6 +44,8 @@ export const SUBTYPES: Record<string, SubDef[]> = {
 };
 
 export const subOf = (cat: string, key?: string | null) => (key ? SUBTYPES[cat]?.find((s) => s.key === key) ?? null : null);
+/** Unterkategorie über ihren eigenen Slug (/kategorie/sweatjacken) */
+export const subBySlug = (slug: string) => { for (const [cat, list] of Object.entries(SUBTYPES)) { const s = list.find((x) => x.key === slug); if (s) return { cat, sub: s }; } return null; };
 export const matchSub = (s: SubDef, name: string) => s.re.test(name) && !(s.not && s.not.test(name));
 
 /** Hauptgruppen der Navigation; nicht zugeordnete Kategorien landen in der letzten Gruppe */

@@ -41,7 +41,7 @@ export default function MegaMenu({ menu }: { menu: Menu }) {
           <div key={c.slug} className="mm-col">
             <Link href={catHref(c.slug)} className="mm-h" onClick={close}>{c.name} <span>{c.count}</span></Link>
             <ul>
-              {c.subs.map((s) => <li key={s.key}><Link href={catHref(c.slug, `typ=${s.key}`)} onClick={close}>{s.label} <span>{s.count}</span></Link></li>)}
+              {c.subs.map((s) => <li key={s.key}><Link href={catHref(s.key)} onClick={close}>{s.label} <span>{s.count}</span></Link></li>)}
               <li><Link href={catHref(c.slug)} className="mm-all" onClick={close}>Alle {c.name} →</Link></li>
             </ul>
             <div className="mm-for">

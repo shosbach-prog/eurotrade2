@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import FilterGrid from '@/components/FilterGrid';
 import { ReviewStrip } from '@/components/ProductReviews';
 import Stars from '@/components/Stars';
@@ -10,13 +10,15 @@ import { categoryContent } from '@/lib/category-content';
 import { latestReviews } from '@/lib/reviews';
 import { refsFor } from '@/lib/store';
 import RefStrip from '@/components/RefStrip';
-import { SUBTYPES, matchSub, subOf } from '@/lib/menu-defs';
+import { SUBTYPES, matchSub, subBySlug, subOf } from '@/lib/menu-defs';
 
 type SP = { typ?: string; g?: string };
 const GEN = ['Damen', 'Herren', 'Kinder'];
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   if (params.slug === 'sonderangebote') return { title: 'Sonderangebote & Auslaufartikel – Markentextilien mit Logo', description: 'Auslaufartikel und Restposten bekannter Marken – solange Vorrat, bedruckt oder bestickt mit Ihrem Logo ab 1 Stück.', alternates: { canonical: '/kategorie/sonderangebote' } };
+  const sb = subBySlug(params.slug);
+  if (sb) { const h = sb.sub.title ?? sb.sub.label; return { title: `${h} mit Logo bedrucken & besticken`, description: `${h} bekannter Marken – bedruckt oder bestickt mit Ihrem Logo, schon ab 1 Stück. Staffelpreise ab 10 Stück, Angebot in 24 h.`, alternates: { canonical: `/kategorie/${sb.sub.key}` } }; }
   const c = getCategories(await viewCtx()).find((x) => x.slug === params.slug);
   return { title: c ? `${c.name} mit Logo bedrucken & besticken` : 'Kategorie', description: c ? categoryContent(c.slug, c.name).intro : undefined, alternates: c ? { canonical: `/kategorie/${c.slug}` } : undefined };
 }
@@ -40,12 +42,17 @@ export default async function CategoryPage({ params, searchParams = {} }: { para
       </>
     );
   }
-  const cat = getCategories(ctx).find((x) => x.slug === params.slug);
+  const sb = subBySlug(params.slug);
+  const cat = getCategories(ctx).find((x) => x.slug === (sb ? sb.cat : params.slug));
   if (!cat) notFound();
-  const all = getByCategory(params.slug, ctx);
-  const sub = subOf(cat.slug, searchParams.typ);
+  const g0 = GEN.includes(searchParams.g ?? '') ? searchParams.g! : null;
+  // alte Adresse /kategorie/sweatshirts?typ=sweatjacken → /kategorie/sweatjacken
+  const old = !sb && searchParams.typ ? subOf(cat.slug, searchParams.typ) : null;
+  if (old) permanentRedirect(`/kategorie/${old.key}${g0 ? `?g=${g0}` : ''}`);
+  const all = getByCategory(cat.slug, ctx);
+  const sub = sb?.sub ?? null;
   const items = sub ? all.filter((p) => matchSub(sub, p.name)) : all;
-  const g = GEN.includes(searchParams.g ?? '') ? searchParams.g! : null;
+  const g = g0;
   const subs = (SUBTYPES[cat.slug] ?? []).map((s) => ({ ...s, n: all.filter((p) => matchSub(s, p.name)).length })).filter((s) => s.n >= 2 && s.n < all.length);
   const txt = categoryContent(cat.slug, cat.name);
   const rated = items.filter((p) => p.rating);
@@ -53,12 +60,12 @@ export default async function CategoryPage({ params, searchParams = {} }: { para
   const heroImgs = items.flatMap((p) => p.images.slice(0, 1)).slice(0, 3);
   return (
     <>
-      <JsonLd data={crumbSchema([['Start', '/'], [cat.name, `/kategorie/${cat.slug}`]])} />
+      <JsonLd data={crumbSchema([['Start', '/'], [cat.name, `/kategorie/${cat.slug}`], ...(sub ? [[sub.title ?? sub.label, `/kategorie/${sub.key}`] as [string, string]] : [])])} />
       <JsonLd data={faqSchema(txt.faq)} />
-      <div className="crumbs"><Link href="/">Start</Link> › {sub ? <><Link href={`/kategorie/${cat.slug}`}>{cat.name}</Link> › {sub.label}</> : cat.name}</div>
+      <div className="crumbs"><Link href="/">Start</Link> › {sub ? <><Link href={`/kategorie/${cat.slug}`}>{cat.name}</Link> › {sub.title ?? sub.label}</> : cat.name}</div>
       <section className="cat-hero">
         <div className="cat-hero-text">
-          <h1>{sub ? sub.label : cat.name}{g && <small className="h1-g"> · {g}</small>}</h1>
+          <h1>{sub ? sub.title ?? sub.label : cat.name}{g && <small className="h1-g"> · {g}</small>}</h1>
           {catRating && <div className="cat-rating"><Stars value={catRating.avg} size={16} showValue count={catRating.count} /></div>}
           <p>{txt.intro}</p>
         </div>
@@ -72,7 +79,7 @@ export default async function CategoryPage({ params, searchParams = {} }: { para
       </ul>
       {subs.length > 0 && <nav className="subchips" aria-label="Artikeltyp">
         <Link href={`/kategorie/${cat.slug}${g ? `?g=${g}` : ''}`} className={!sub ? 'on' : ''}>Alle {cat.name} <span>{all.length}</span></Link>
-        {subs.map((s) => <Link key={s.key} href={`/kategorie/${cat.slug}?typ=${s.key}${g ? `&g=${g}` : ''}`} className={sub?.key === s.key ? 'on' : ''}>{s.label} <span>{s.n}</span></Link>)}
+        {subs.map((s) => <Link key={s.key} href={`/kategorie/${s.key}${g ? `?g=${g}` : ''}`} className={sub?.key === s.key ? 'on' : ''}>{s.label} <span>{s.n}</span></Link>)}
       </nav>}
       <FilterGrid key={`${sub?.key ?? ''}|${g ?? ''}`} items={items.map(slimCard)} initialGenders={g ? (g === 'Kinder' ? [g] : [g, 'Unisex']) : undefined} />
       <RefStrip refs={refsFor({ category: cat.name, categorySlug: cat.slug })} title={`${cat.name} mit Logo – Beispiele unserer Kunden`} />
