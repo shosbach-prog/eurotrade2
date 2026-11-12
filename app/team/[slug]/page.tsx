@@ -39,7 +39,7 @@ export default function TeamShopPage({ params }: { params: { slug: string } }) {
             <div className="body">
               <div className="name">{p.name}</div>
               <div className="muted" style={{ fontSize: 13 }}>{p.colors.length} Farben · {p.sizes.length ? `${p.sizes[0]}–${p.sizes[p.sizes.length - 1]}` : ''}</div>
-              <div className="price">{p.price != null ? <><span className="ab">ab</span> {eur(p.price)} <small>netto</small></> : <small style={{ fontSize: 14, color: 'var(--brand)', fontWeight: 600 }}>Preis auf Anfrage</small>}</div>
+              <div className="price">{p.price != null ? <>{eur(p.price)} <small>netto</small></> : <small style={{ fontSize: 14, color: 'var(--brand)', fontWeight: 600 }}>Preis auf Anfrage</small>}</div>
             </div>
           </Link>
         ))}

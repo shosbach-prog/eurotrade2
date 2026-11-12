@@ -17,6 +17,7 @@ import { cmFor, spotsFor } from '@/lib/deco-layout';
 import { nextTier, unitFor } from '@/lib/tiers';
 import { calcDeco, type DecoPricing } from '@/lib/deco-pricing';
 import SizeAdvisor from '@/components/SizeAdvisor';
+import SizeTable from '@/components/SizeTable';
 import { canDistribute, distribute } from '@/lib/sizing';
 import { productPath } from '@/lib/format';
 
@@ -25,7 +26,7 @@ type Logo = { id: string; name: string };
 export type TeamCtx = { slug: string; name: string; logoId?: string | null; logoName?: string | null; method: string; positions: string[]; personalize: 'aus' | 'name' | 'nummer' | 'beides'; deadline?: string | null; open: boolean };
 type PText = { headline: string; intro: string; highlights: string[]; idealFor: string };
 type Pic = { src: string; label: string };
-export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fits, anchors, admin, team, pictos, gpsr }: { gpsr?: { firma: string; adresse: string[]; kontakt: string[] } | null; pictos?: { features: Pic[]; care: Pic[] }; p: PublicProduct; fits?: Record<string, number[]>; anchors?: Record<string, Record<string, [number, number, number, number]>>; admin?: boolean; team?: TeamCtx | null; customerLogo?: Logo | null; delivery?: string; copy?: PText; pricing?: DecoPricing | null }) {
+export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fits, anchors, admin, team, pictos, gpsr, sizeTable }: { sizeTable?: { sizes: string[]; head?: string; rows: [string, string, (number | string)[]][]; note?: string; shape?: 'hoodie' | 'tshirt' } | null; gpsr?: { firma: string; adresse: string[]; kontakt: string[] } | null; pictos?: { features: Pic[]; care: Pic[] }; p: PublicProduct; fits?: Record<string, number[]>; anchors?: Record<string, Record<string, [number, number, number, number]>>; admin?: boolean; team?: TeamCtx | null; customerLogo?: Logo | null; delivery?: string; copy?: PText; pricing?: DecoPricing | null }) {
   const { addMany } = useCart();
   const [color, setColor] = useState(p.colors[0]);
   // Mengen je Farbe + Größe ("Black|M" -> 5) – mehrere Farben in einem Schritt möglich
@@ -216,7 +217,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
           {!p.eol?.all && eolC(cname) && <p className="hint eol-hint">⏳ {cname}{eolC(cname)!.sizes ? ` in ${eolC(cname)!.sizes!.join(', ')}` : ''} läuft aus – lieferbar solange Vorrat{eolC(cname)!.date ? ` (voraussichtlich bis ${fmtD(eolC(cname)!.date!)})` : ''}.</p>}
         </>}
 
-        <div className="opt opt-row"><span>{sizes.length > 1 ? <>Größen & Mengen{p.colors.length > 0 && <span className="muted" style={{ fontWeight: 400 }}> für <span className="dot-inline" style={{ background: color ? swatchBg(color) : '#ddd' }} />{cname}</span>}</> : 'Menge'}</span>{p.sizeChart && <a href={p.sizeChart} target="_blank" rel="noreferrer" className="sz-link">Größentabelle</a>}{!p.locked && <SizeAdvisor name={p.name} gender={p.gender} sizes={p.sizes} extra={`${p.description ?? ''} ${(p.features ?? []).join(' ')}`} chart={p.sizeChart} onPick={(s) => { setQ(s, Math.max(1, qty[k(cname, s)] || 0)); setTimeout(() => (document.querySelector(`[aria-label="Menge ${s}"]`) as HTMLInputElement | null)?.focus(), 50); }} />}</div>
+        <div className="opt opt-row"><span>{sizes.length > 1 ? <>Größen & Mengen{p.colors.length > 0 && <span className="muted" style={{ fontWeight: 400 }}> für <span className="dot-inline" style={{ background: color ? swatchBg(color) : '#ddd' }} />{cname}</span>}</> : 'Menge'}</span>{sizeTable && <SizeTable t={sizeTable} name={p.name} sku={p.sku} brand={p.brand} />}{!p.locked && <SizeAdvisor name={p.name} gender={p.gender} sizes={p.sizes} extra={`${p.description ?? ''} ${(p.features ?? []).join(' ')}`} chart={undefined} onPick={(s) => { setQ(s, Math.max(1, qty[k(cname, s)] || 0)); setTimeout(() => (document.querySelector(`[aria-label="Menge ${s}"]`) as HTMLInputElement | null)?.focus(), 50); }} />}</div>
         {p.locked ? (
           <>
             <div className="sizes-ro">{p.sizes.map((x) => <span key={x}>{x}</span>)}</div>
@@ -383,7 +384,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
           <WishButton id={p.id} variant="full" />
         </div>
         <div className={`mbar ${total ? 'has' : ''}`}>
-          <div className="mbar-info">{total ? <><b>{total} Stk.</b>{p.price != null && <span> · {est ? 'ca. ' : ''}{eur(unitFor(p.tiers, total, p.price)! * total + (est ? est.perPiece * total + est.setupTotal : 0))} netto{est ? ' inkl. Veredelung' : ''}</span>}</> : <span className="muted">{p.price != null ? `ab ${eur(p.tiers.length ? p.tiers[p.tiers.length - 1].price : p.price)}` : 'Preis auf Anfrage'}</span>}</div>
+          <div className="mbar-info">{total ? <><b>{total} Stk.</b>{p.price != null && <span> · {est ? 'ca. ' : ''}{eur(unitFor(p.tiers, total, p.price)! * total + (est ? est.perPiece * total + est.setupTotal : 0))} netto{est ? ' inkl. Veredelung' : ''}</span>}</> : <span className="muted">{p.price != null ? `${eur(p.price)} / Stück` : 'Preis auf Anfrage'}</span>}</div>
           <button className="btn" disabled={(!!total && !decoOk) || busy || teamClosed} onClick={() => (total ? onAdd() : document.querySelector('.szgrid')?.scrollIntoView({ behavior: 'smooth', block: 'center' }))}>
             {!total ? 'Größe wählen' : !decoOk ? 'Veredelung prüfen' : 'In den Warenkorb'}
           </button>
@@ -409,9 +410,17 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
           {p.sizes.length > 0 && <><dt>Größen</dt><dd>{p.sizes.join(', ')}</dd></>}
           {specs.map(([key, v]) => <Fragment key={key}><dt>{key}</dt><dd>{v}</dd></Fragment>)}
         </dl>
-        {gpsr && <div className="gpsr"><b>Herstellerangaben (GPSR)</b><p>{gpsr.firma}<br />{gpsr.adresse.join(', ')}<br />{gpsr.kontakt.map((k, n) => <span key={k}>{n > 0 && ' · '}{k.includes('@') ? <a className="alink" href={`mailto:${k}`}>{k}</a> : <a className="alink" href={k.startsWith('http') ? k : `https://${k}`} target="_blank" rel="noreferrer nofollow">{k.replace(/^https?:\/\//, '').replace(/\/$/, '')}</a>}</span>)}</p></div>}
         {!!pictos?.care.length && <div className="care"><b>Pflegehinweise</b><ul>{pictos.care.map((x) => <li key={x.src}><img src={`/picto/${x.src}.png`} alt="" width={34} height={34} loading="lazy" /><span>{x.label}</span></li>)}</ul></div>}
         </details>
+        <section className="gpsr" aria-labelledby="gpsr-h">
+          <h3 id="gpsr-h">Hersteller & Produktsicherheit</h3>
+          <dl>
+            <dt>Produkt</dt><dd>{p.name} · {p.brand} · Art.-Nr. {p.sku}</dd>
+            {gpsr && <><dt>Hersteller</dt><dd>{gpsr.firma}<br />{gpsr.adresse.join(', ')}{gpsr.kontakt.length > 0 && <><br />{gpsr.kontakt.map((k, n) => <span key={k}>{n > 0 && ' · '}{k.includes('@') ? <a className="alink" href={`mailto:${k}`}>{k}</a> : <a className="alink" href={k.startsWith('http') ? k : `https://${k}`} target="_blank" rel="noreferrer nofollow">{k.replace(/^https?:\/\//, '').replace(/\/$/, '')}</a>}</span>)}</>}</dd></>}
+            <dt>Händler</dt><dd>Euro-Trade · Sebastian Hosbach, Seehang 28, 44263 Dortmund · <a className="alink" href="mailto:info@euro-trade.com">info@euro-trade.com</a> · <a className="alink" href="tel:+493040719258">030 40719258</a></dd>
+            <dt>Sicherheit</dt><dd>Bitte die Pflege- und Gebrauchshinweise auf dem Etikett beachten. Fragen oder Hinweise zur Produktsicherheit: <a className="alink" href="/produktsicherheit">Produktsicherheit (GPSR)</a></dd>
+          </dl>
+        </section>
       </div>
     </div>
   );

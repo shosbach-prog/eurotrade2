@@ -5,6 +5,7 @@ import { getPricing } from '@/lib/deco-pricing-store';
 import { anchorsFor, fitsFor } from '@/lib/image-fit';
 import { isAdmin } from '@/lib/customer';
 import { gpsrFor } from '@/lib/gpsr';
+import { sizeTableFor } from '@/lib/groessen';
 import { getTeamShop, isOpen } from '@/lib/teamshop';
 import ProductCard from '@/components/ProductCard';
 import { getByCategory, getProduct, matchingFor, pictosOf } from '@/lib/catalog';
@@ -39,7 +40,7 @@ export default async function ProductPage({ params, searchParams }: { params: { 
   return (
     <>
       <div className="crumbs">{team ? <><Link href={`/team/${team.slug}`}>← Team-Shop {team.name}</Link></> : <><Link href="/">Start</Link> › <Link href={`/kategorie/${p.categorySlug}`}>{p.category}</Link> › {p.name}</>}</div>
-      <AddToCart p={p} team={team} pictos={pictosOf(p.id)} gpsr={gpsrFor(p.brand)} fits={fitsFor(p)} anchors={anchorsFor(p)} admin={await isAdmin()} pricing={(() => { const pr = getPricing(); return pr.showEstimate && !p.locked ? pr : null; })()} customerLogo={ctx && 'code' in ctx && ctx.logoId ? { id: ctx.logoId, name: ctx.logoName ?? 'Ihr Logo' } : null} copy={getText(p).text} delivery={process.env.DELIVERY_TEXT ?? 'Lieferung ca. 3–5 Werktage · mit Veredelung ca. 7–14 Werktage nach Freigabe'} />
+      <AddToCart p={p} team={team} pictos={pictosOf(p.id)} gpsr={gpsrFor(p.brand)} sizeTable={sizeTableFor(p.sku)} fits={fitsFor(p)} anchors={anchorsFor(p)} admin={await isAdmin()} pricing={(() => { const pr = getPricing(); return pr.showEstimate && !p.locked ? pr : null; })()} customerLogo={ctx && 'code' in ctx && ctx.logoId ? { id: ctx.logoId, name: ctx.logoName ?? 'Ihr Logo' } : null} copy={getText(p).text} delivery={process.env.DELIVERY_TEXT ?? 'Lieferung ca. 3–5 Werktage · mit Veredelung ca. 7–14 Werktage nach Freigabe'} />
       <JsonLd data={crumbSchema([['Start', '/'], [p.category, `/kategorie/${p.categorySlug}`], [p.name, productPath(p)]])} />
       {!p.rating && <JsonLd data={{ '@context': 'https://schema.org', '@type': 'Product', name: p.name, sku: p.sku, brand: { '@type': 'Brand', name: p.brand }, image: p.images.slice(0, 4).map((u) => (u.startsWith('/') ? `${(process.env.SHOP_URL ?? 'https://euro-trade.com').replace(/\/$/, '')}${u}` : u)), description: getText(p).text.intro, color: p.colors.map((c) => c.name).join(', '), material: p.composition || p.material }} />}
       {match.variants.length > 0 && <><h2>Gleicher Artikel – anderer Schnitt</h2><p className="muted" style={{ marginTop: -8 }}>Ideal für gemischte Teams: Damen-, Herren- und Kinder-Variante im gleichen Look.</p><div className="grid">{match.variants.map((r) => <ProductCard key={r.id} p={r} />)}</div></>}

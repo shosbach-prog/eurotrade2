@@ -18,3 +18,4 @@ export function gpsrFor(brand: string): Gpsr | null {
   const k = Object.keys(d).find((x) => x.toLowerCase() === b) ?? Object.keys(d).filter((x) => b.includes(x.toLowerCase())).sort((a, c) => c.length - a.length)[0];
   return k ? d[k] : null;
 }
+export const allGpsr = () => gpsrFor;

@@ -4,7 +4,8 @@ txt=subprocess.run(['pdftotext','-layout',sys.argv[1],'-'],capture_output=True,t
 out={}; cur=None; ca=cw=None
 for line in txt.split('\n'):
     if 'Marke' in line and 'Adresse' in line: ca=line.index('Adresse'); cw=line.index('WWW'); continue
-    if ca is None or not line.strip() or 'Herstellerangaben' in line: continue
+    if ca is None or not line.strip() or 'Herstellerangaben' in line or re.search(r'Copyright|L-SHOP-TEAM|l-shop-team|Otto-Hahn-Stra|^\s*\d{2}\.\d{2}\.\d{4}', line): continue
+    if re.match(r'\s*Marke\s', line): continue
     b=a=w=''
     for mt in re.finditer(r'\S(?:.*?\S)?(?=\s{2,}|$)', line):
         st=mt.start(); seg=mt.group(0)

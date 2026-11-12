@@ -41,7 +41,7 @@ export default function ProductCard({ p }: { p: PublicProduct }) {
           {p.colors.slice(0, 7).map((c) => <span key={c.name} className="dot" title={c.name} style={{ background: swatchBg(c) }} />)}
           {p.colors.length > 7 && <span className="dots-more">+{p.colors.length - 7}</span>}
         </div>
-        <div className="price">{p.locked ? <small className="lock-p">🔒 Preise nach Anmeldung</small> : min != null ? <><span className="ab">ab</span> {eur(min)} <small>netto</small></> : <small style={{ fontSize: 14, color: 'var(--brand)', fontWeight: 600 }}>Preis auf Anfrage</small>}</div>
+        <div className="price">{p.locked ? <small className="lock-p">🔒 Preise nach Anmeldung</small> : min != null ? <>{eur(p.price!)} <small>netto</small>{min! < p.price! && <span className="tier-hint">ab {p.tiers[p.tiers.length - 1].min} Stk. {eur(min!)}</span>}</> : <small style={{ fontSize: 14, color: 'var(--brand)', fontWeight: 600 }}>Preis auf Anfrage</small>}</div>
       </div>
     </Link>
   );
