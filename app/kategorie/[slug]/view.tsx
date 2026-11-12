@@ -73,7 +73,7 @@ export default async function CategoryView({ params, searchParams = {} }: { para
   // alte Adressen (?typ=…, ?g=…) dauerhaft auf die sprechende URL umleiten
   const qg = GEN.includes(searchParams.g ?? '') ? searchParams.g! : null;
   const old = !sb && searchParams.typ ? subOf(cat.slug, searchParams.typ) : null;
-  if (old || qg) permanentRedirect(catUrl(old?.key ?? ps.base, qg ?? ps.g));
+  if (old || qg || sb?.old) permanentRedirect(catUrl(old?.key ?? sb?.sub.key ?? ps.base, qg ?? ps.g));
   const g = ps.g;
   const sub = sb?.sub ?? null;
   const all = getByCategory(cat.slug, ctx);

@@ -1,5 +1,5 @@
 /** Unterkategorien (Artikeltyp) je Kategorie – Erkennung über den Artikelnamen */
-export type SubDef = { key: string; label: string; title?: string; re: RegExp; not?: RegExp };
+export type SubDef = { key: string; label: string; title?: string; re: RegExp; not?: RegExp; /** frühere Adressen (werden umgeleitet) */ alias?: string[] };
 
 export const SUBTYPES: Record<string, SubDef[]> = {
   't-shirts': [
@@ -10,7 +10,7 @@ export const SUBTYPES: Record<string, SubDef[]> = {
     { key: 'oversize-t-shirts', label: 'Oversize & Heavy', title: 'Oversize & Heavy T-Shirts', re: /oversize|boxy|heavy/i },
   ],
   poloshirts: [
-    { key: 'klassische-poloshirts', label: 'Klassische Polos', re: /polo/i, not: /oversize|boxy|heavy/i },
+    { key: 'klassische-poloshirts', label: 'Klassische Polos', title: 'Klassische Poloshirts', re: /polo/i, not: /oversize|boxy|heavy/i },
     { key: 'oversize-poloshirts', label: 'Oversize & Heavy', title: 'Oversize & Heavy Poloshirts', re: /oversize|boxy|heavy/i },
   ],
   sweatshirts: [
@@ -70,9 +70,15 @@ export const SUBTYPES: Record<string, SubDef[]> = {
   ],
 };
 
-export const subOf = (cat: string, key?: string | null) => (key ? SUBTYPES[cat]?.find((s) => s.key === key) ?? null : null);
+/** Adresse = sichtbarer Name: „Oversize & Cropped Sweatshirts“ → oversize-cropped-sweatshirts (alte Kurz-Slugs bleiben als Umleitung) */
+const slugOf = (s: string) => s.toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss').replace(/&/g, ' ').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+for (const list of Object.values(SUBTYPES)) for (const s of list) {
+  const k = slugOf(s.title ?? s.label);
+  if (k !== s.key) { s.alias = [...(s.alias ?? []), s.key]; s.key = k; }
+}
+export const subOf = (cat: string, key?: string | null) => (key ? SUBTYPES[cat]?.find((s) => s.key === key || s.alias?.includes(key)) ?? null : null);
 /** Unterkategorie über ihren eigenen Slug (/kategorie/sweatjacken) */
-export const subBySlug = (slug: string) => { for (const [cat, list] of Object.entries(SUBTYPES)) { const s = list.find((x) => x.key === slug); if (s) return { cat, sub: s }; } return null; };
+export const subBySlug = (slug: string) => { for (const [cat, list] of Object.entries(SUBTYPES)) { const s = list.find((x) => x.key === slug || x.alias?.includes(slug)); if (s) return { cat, sub: s, old: s.key !== slug }; } return null; };
 export const matchSub = (s: SubDef, name: string) => s.re.test(name) && !(s.not && s.not.test(name));
 
 /** Hauptgruppen der Navigation; nicht zugeordnete Kategorien landen in der letzten Gruppe */
