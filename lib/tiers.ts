@@ -17,5 +17,10 @@ export function unitFor(tiers: PriceTier[] | undefined, qty: number, fallback: n
   for (const t of tiers ?? []) if (qty >= t.min) p = t.price;
   return p;
 }
+/** Stückpreis inkl. Größenaufpreis (z. B. 3XL) */
+export function sizeUnit(tiers: PriceTier[] | undefined, qty: number, fallback: number | null, ups?: Record<string, number>, size?: string | null): number | null {
+  const u = unitFor(tiers, qty, fallback);
+  return u == null ? null : Math.round((u + ((size && ups?.[size]) || 0)) * 100) / 100;
+}
 /** nächste Staffel, die noch nicht erreicht ist */
 export const nextTier = (tiers: PriceTier[] | undefined, qty: number) => (tiers ?? []).find((t) => t.min > qty) ?? null;

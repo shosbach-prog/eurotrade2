@@ -81,6 +81,8 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
   const setQ = (s: string, v: number) => setQty((q) => ({ ...q, [k(cname, s)]: Math.max(0, Math.min(99999, Math.floor(v) || 0)) }));
   const entries = Object.entries(qty).filter(([, v]) => v > 0);
   const total = entries.reduce((s, [, v]) => s + v, 0);
+  // Größenaufpreise der gewählten Mengen (z. B. 3XL)
+  const upSum = entries.reduce((s, [key, v]) => s + (p.sizeUp?.[key.split('|')[1]] ?? 0) * v, 0);
   const colorTotals = useMemo(() => {
     const m: Record<string, number> = {};
     for (const [key, v] of entries) { const c = key.split('|')[0]; m[c] = (m[c] ?? 0) + v; }
@@ -127,7 +129,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
       const col = p.colors.find((x) => x.name === c);
       const rows = deco && teamOn && c === cname ? rowsFor(s, own[0]?.[0] === key) : [];
       const d = deco && rows.length ? { ...deco, team: { rows, pos: teamPos, what: teamWhat } } : deco;
-      return { id: p.id, sku: p.sku, name: p.name, color: c || undefined, hex: col?.hex, size: s || undefined, qty: n, price: p.price, category: p.category, image: col?.image ?? p.images[0], deco: d, tiers: p.tiers, sizes: p.sizes, ...(team ? { team: team.slug } : {}) };
+      return { id: p.id, sku: p.sku, name: p.name, color: c || undefined, hex: col?.hex, size: s || undefined, qty: n, price: p.price, ...(p.sizeUp ? { ups: p.sizeUp } : {}), category: p.category, image: col?.image ?? p.images[0], deco: d, tiers: p.tiers, sizes: p.sizes, ...(team ? { team: team.slug } : {}) };
     });
     addMany(items);
     setBusy(false);
@@ -237,7 +239,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
             const out = st === 0;
             return (
               <div key={s} className={`sz ${v ? 'on' : ''} ${out ? 'out' : ''}`}>
-                {s && <span className="sz-l">{s}</span>}
+                {s && <span className="sz-l">{s}{p.sizeUp?.[s] ? <small className="sz-up">+{pr.p(p.sizeUp[s])}</small> : null}</span>}
                 <div className="step">
                   <button type="button" onClick={() => setQ(s, v - 1)} disabled={!v} aria-label={`${s} weniger`}>−</button>
                   <input type="number" inputMode="numeric" min={0} placeholder="0" value={v || ''} onChange={(e) => setQ(s, Number(e.target.value))} onFocus={(e) => e.target.select()} aria-label={`Menge ${s}`} />
@@ -374,9 +376,10 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
               const prev = [...p.tiers].reverse().find((t) => t.min <= total)?.min ?? 1;
               return <div className="sel-foot">
                 <div className="sel-sum"><span>Textil: {total} Stück × {pr.p(u)}</span><b>{pr.pq(u, total)} <small>{pr.label}</small></b></div>
+                {upSum > 0 && <div className="sel-sum sub"><span>Größenaufpreis</span><b>{pr.p(upSum)}</b></div>}
                 {est && <div className="sel-sum sub"><span>Veredelung ca. {total} × {pr.p(est.perPiece)}</span><b>{pr.p(total * est.perPiece)}</b></div>}
                 {est && est.setupTotal > 0 && <div className="sel-sum sub"><span>einmalig ({est.method})</span><b>{pr.p(est.setupTotal)}</b></div>}
-                {est && <div className="sel-sum grand"><span>Gesamt ca.</span><b>{pr.p(total * u + total * est.perPiece + est.setupTotal)} <small>{pr.label}</small></b></div>}
+                {est && <div className="sel-sum grand"><span>Gesamt ca.</span><b>{pr.p(total * u + upSum + total * est.perPiece + est.setupTotal)} <small>{pr.label}</small></b></div>}
                 {u < p.price && <div className="ok" style={{ fontSize: 13 }}>Staffelpreis aktiv – Sie sparen {pr.p((p.price - u) * total)}</div>}
                 {nx && <div className="tier-prog"><div className="bar"><i style={{ width: `${Math.min(100, ((total - prev) / (nx.min - prev)) * 100)}%` }} /></div><span>Noch <b>{nx.min - total} Stück</b> bis {pr.p(nx.price)} pro Stück</span></div>}
               </div>;
@@ -390,7 +393,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
           <WishButton id={p.id} variant="full" />
         </div>
         <div className={`mbar ${total ? 'has' : ''}`}>
-          <div className="mbar-info">{total ? <><b>{total} Stk.</b>{p.price != null && <span> · {est ? 'ca. ' : ''}{pr.p(unitFor(p.tiers, total, p.price)! * total + (est ? est.perPiece * total + est.setupTotal : 0))} {pr.label}{est ? ' inkl. Veredelung' : ''}</span>}</> : <span className="muted">{p.price != null ? `${pr.p(p.price)} / Stück` : 'Preis auf Anfrage'}</span>}</div>
+          <div className="mbar-info">{total ? <><b>{total} Stk.</b>{p.price != null && <span> · {est ? 'ca. ' : ''}{pr.p(unitFor(p.tiers, total, p.price)! * total + upSum + (est ? est.perPiece * total + est.setupTotal : 0))} {pr.label}{est ? ' inkl. Veredelung' : ''}</span>}</> : <span className="muted">{p.price != null ? `${pr.p(p.price)} / Stück` : 'Preis auf Anfrage'}</span>}</div>
           <button className="btn" disabled={(!!total && !decoOk) || busy || teamClosed} onClick={() => (total ? onAdd() : document.querySelector('.szgrid')?.scrollIntoView({ behavior: 'smooth', block: 'center' }))}>
             {!total ? 'Größe wählen' : !decoOk ? 'Veredelung prüfen' : 'In den Warenkorb'}
           </button>

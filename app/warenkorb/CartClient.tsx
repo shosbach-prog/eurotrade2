@@ -6,7 +6,7 @@ import { useCart } from '@/components/CartContext';
 import ProductImage from '@/components/ProductImage';
 import { eur } from '@/lib/format';
 import { decoLabel } from '@/lib/deco';
-import { unitFor } from '@/lib/tiers';
+import { sizeUnit, unitFor } from '@/lib/tiers';
 import { saveMyInquiry } from '@/lib/mine';
 import { fmtDate, leadCheck } from '@/lib/leadtime';
 import { productPath } from '@/lib/format';
@@ -82,7 +82,7 @@ export default function CartClient({ share, contact, remind }: { share: string |
 
   // Staffelpreis gilt für die Gesamtmenge je Artikel (alle Farben/Größen)
   const perProduct = lines.reduce<Record<string, number>>((m, l) => ({ ...m, [l.id]: (m[l.id] ?? 0) + l.qty }), {});
-  const unit = (l: (typeof lines)[number]) => unitFor(l.tiers, perProduct[l.id], l.price);
+  const unit = (l: (typeof lines)[number]) => sizeUnit(l.tiers, perProduct[l.id], l.price, l.ups, l.size);
   // Staffel-Hinweise: wie viele Stück fehlen je Artikel bis zum nächsten Staffelpreis (nur lohnende Sprünge)
   const tierTips = [...new Map(lines.filter((l) => !l.sample && l.price != null && l.tiers?.length).map((l) => [l.id, l])).values()].map((l) => {
     const have = perProduct[l.id] ?? 0; const now = unit(l)!;
@@ -166,7 +166,7 @@ export default function CartClient({ share, contact, remind }: { share: string |
                   {l.sizes && l.sizes.length > 1
                     ? <select value={l.size ?? ''} onChange={(e) => update(l.key, { size: e.target.value })} aria-label="Größe ändern">{l.sizes.map((s) => <option key={s}>{s}</option>)}</select>
                     : l.size && <span>{l.size}</span>}
-                  {l.price != null && <span>{pr.p(unit(l))}/Stk.{unit(l)! < l.price && <span className="ok"> (Staffel)</span>}</span>}
+                  {l.price != null && <span>{pr.p(unit(l))}/Stk.{unitFor(l.tiers, perProduct[l.id], l.price)! < l.price && <span className="ok"> (Staffel)</span>}</span>}
                 </div>
                 {l.deco && <div className="deco-tag">✦ {decoLabel(l.deco)} <button className="linkbtn" onClick={() => update(l.key, { deco: null })}>entfernen</button></div>}
                 {l.deco?.team?.rows.length ? <div className="muted" style={{ fontSize: 12.5 }}>{l.deco.team.rows.map((r) => [r.name, r.nr && `#${r.nr}`].filter(Boolean).join(' ')).join(', ')}</div> : null}

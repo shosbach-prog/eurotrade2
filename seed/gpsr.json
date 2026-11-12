@@ -1714,5 +1714,85 @@
   "kontakt": [
    "sales@yokointernational.co.uk"
   ]
+ },
+ "Carson Classic Workwear": {
+  "firma": "Carson Company GmbH",
+  "adresse": [
+   "Fritz-Winter-Straße 38",
+   "86911 Diessen",
+   "Germany"
+  ],
+  "kontakt": [
+   "info@carson-company.de, https://www.carson-company.de/contact/"
+  ]
+ },
+ "Carson Classic Casuals": {
+  "firma": "Carson Company GmbH",
+  "adresse": [
+   "Fritz-Winter-Straße 38",
+   "86911 Diessen",
+   "Germany"
+  ],
+  "kontakt": [
+   "info@carson-company.de, https://www.carson-company.de/contact/"
+  ]
+ },
+ "SOL'S": {
+  "firma": "SOLO INVEST FRANCE SAS",
+  "adresse": [
+   "92 rue réaumur",
+   "75002 Paris",
+   "France"
+  ],
+  "kontakt": [
+   "contact@sologroup-paris.com"
+  ]
+ },
+ "Tiger Cotton by Neutral": {
+  "firma": "Neutral.com A/S",
+  "adresse": [
+   "Vesterbrogade 149",
+   "Building A - ground floor",
+   "1620 Cph V",
+   "Denmark"
+  ],
+  "kontakt": [
+   "neutral@neutral.com"
+  ]
+ },
+ "Result Winter Essentials": {
+  "firma": "Result Clothing Ltd",
+  "adresse": [
+   "Narcisova 1",
+   "821 01 Bratislava",
+   "Slovakia"
+  ],
+  "kontakt": [
+   "sales@resultclothing.com"
+  ]
+ },
+ "Regatta Honestly Made": {
+  "firma": "REGATTA Polska sp 2.0.0",
+  "adresse": [
+   "UI Czestochowska 5",
+   "32085 Modlnica",
+   "Poland"
+  ],
+  "kontakt": [
+   "germansalesadmin@regatta.com"
+  ]
+ },
+ "Russell Athletic Collection": {
+  "firma": "Fruit of the Loom International Ltd.",
+  "adresse": [
+   "Unit 6",
+   "Lsfannon Business Centre",
+   "Buncrana",
+   "Donegal",
+   "Ireland F93Y2NA"
+  ],
+  "kontakt": [
+   "fruitbrands@fotlinc.com, https://www.russelleurope.com/s/?language=en_GB"
+  ]
  }
 }

@@ -90,7 +90,7 @@ function hasWebp(p: Product) {
 }
 /** Schlanke Fassung für Produktlisten (ohne lange Texte) – spart Datenmenge im Browser */
 export function slimCard(p: PublicProduct): PublicProduct {
-  const { description: _d, features, specs, composition: _c, stockBy: _s, sizeChart: _sc, tags: _t, ...r } = p;
+  const { description: _d, features, specs, composition: _c, stockBy: _s, sizeChart: _sc, tags: _t, sizeUp: _u, ...r } = p;
   const cert = specs?.['Zertifizierung'];
   const pend = (features ?? []).filter((x) => /in arbeit/i.test(x));
   return { ...r, eol: p.eol?.all ? { all: true, date: p.eol.date, colors: {} } : undefined, description: '', images: p.images.slice(0, 2), colors: p.colors.map((c) => ({ name: c.name, hex: c.hex, swatch: c.swatch, ...((c.images?.[0] ?? c.image) ? { image: c.images?.[0] ?? c.image } : {}) })), ...(cert ? { specs: { Zertifizierung: cert } } : {}), ...(pend.length ? { features: pend } : {}) };
@@ -99,17 +99,24 @@ export function slimCard(p: PublicProduct): PublicProduct {
 export const pictosOf = (id: string) => { const p = load().byId.get(id); return p ? pictosFor(p) : { features: [], care: [], props: [] }; };
 
 export function toPublic(p: Product, ctx?: Ctx): PublicProduct {
-  const { basePrice, baseTiers, hidden: _h, custom: _c, ...rest } = p;
+  const { basePrice, baseTiers, sizeExtra, hidden: _h, custom: _c, ...rest } = p;
   const price = !ctx?.locked && basePrice != null && basePrice > 0 ? sellPrice(basePrice, p.categorySlug, ctx?.markup) : null;
   // Echte Staffel-EK von L-Shop haben Vorrang – sonst Rabattstaffel auf den Verkaufspreis
   const tiers = price == null ? []
     : baseTiers?.length && !ctx?.tiers
-      ? baseTiers.filter((t) => t.min > 1 && t.price > 0).sort((a, b) => a.min - b.min).map((t) => ({ min: t.min, price: sellPrice(t.price, p.categorySlug, ctx?.markup) })).filter((t) => t.price < price)
+      ? (() => {
+          // L-Shop-Karton-Staffeln, darunter die normale Mengenstaffel – Preise nur fallend
+          const ls = baseTiers.filter((t) => t.min > 1 && t.price > 0).sort((a, b) => a.min - b.min).map((t) => ({ min: t.min, price: sellPrice(t.price, p.categorySlug, ctx?.markup) }));
+          const all = [...priceTiers(price).filter((t) => t.min < ls[0].min), ...ls].sort((a, b) => a.min - b.min);
+          let last = price; return all.filter((t) => (t.price < last ? ((last = t.price), true) : false));
+        })()
       : priceTiers(price, ctx?.tiers);
   const off = p.sale?.pct && p.sale.pct > 0 && p.sale.pct < 90 && price != null ? (100 - p.sale.pct) / 100 : null;
   const sp = off != null ? Math.round(price! * off * 100) / 100 : price;
   const st = off != null ? tiers.map((t) => ({ min: t.min, price: Math.round(t.price * off * 100) / 100 })) : tiers;
-  return { ...rest, colors: sortColors(p.colors), price: sp, priceGross: sp != null ? gross(sp) : null, tiers: st, ...(off != null ? { was: price } : {}), rating: ratingFor(p.id), props: pictosFor(p).props, ...(hasWebp(p) ? { webp: true } : {}), ...(hasMid(p) ? { mid: true } : {}), ...(ctx?.locked ? { locked: true } : {}) };
+  // Größenaufpreis (z. B. 3XL–5XL): Differenz der Verkaufspreise, Rabatt anteilig
+  const ups = price != null && sizeExtra ? Object.fromEntries(Object.entries(sizeExtra).filter(([, e]) => e > 0).map(([s, e]) => [s, Math.round((sellPrice(basePrice! + e, p.categorySlug, ctx?.markup) - price) * (off ?? 1) * 100) / 100]).filter(([, u]) => (u as number) > 0)) : null;
+  return { ...rest, colors: sortColors(p.colors), price: sp, priceGross: sp != null ? gross(sp) : null, tiers: st, ...(ups && Object.keys(ups).length ? { sizeUp: ups } : {}), ...(off != null ? { was: price } : {}), rating: ratingFor(p.id), props: pictosFor(p).props, ...(hasWebp(p) ? { webp: true } : {}), ...(hasMid(p) ? { mid: true } : {}), ...(ctx?.locked ? { locked: true } : {}) };
 }
 
 const skuSet = (ctx: Ctx) => new Set((ctx?.skus ?? []).map((x) => x.toUpperCase()));

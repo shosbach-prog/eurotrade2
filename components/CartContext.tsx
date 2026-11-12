@@ -5,7 +5,7 @@ import CartDrawer from './CartDrawer';
 
 export type CartLine = {
   key: string; id: string; sku: string; name: string; color?: string; size?: string; qty: number; price: number | null;
-  hex?: string; category: string; image?: string; deco?: Deco | null; tiers?: { min: number; price: number }[];
+  hex?: string; /** Größenaufpreis netto je Größe */ ups?: Record<string, number>; category: string; image?: string; deco?: Deco | null; tiers?: { min: number; price: number }[];
   /** verfügbare Größen – für die Bearbeitung im Warenkorb */
   sizes?: string[];
   /** Musterteil (1 Stück, wird angerechnet) */

@@ -27,7 +27,7 @@ export async function GET(req: Request) {
     const p = getProduct(l.id, ctx);
     if (!p || p.locked) return [];
     const col = p.colors.find((c) => c.name === l.color);
-    return [{ id: p.id, sku: p.sku, name: p.name, color: l.color, hex: col?.hex, size: l.size, qty: l.sample ? 1 : l.qty, price: p.price, category: p.category, image: col?.image ?? p.images[0], deco: l.deco ?? null, tiers: p.tiers, sizes: p.sizes, ...(l.sample ? { sample: true } : {}), ...(l.team ? { team: l.team } : {}) }];
+    return [{ id: p.id, sku: p.sku, name: p.name, color: l.color, hex: col?.hex, size: l.size, qty: l.sample ? 1 : l.qty, price: p.price, ...(p.sizeUp ? { ups: p.sizeUp } : {}), category: p.category, image: col?.image ?? p.images[0], deco: l.deco ?? null, tiers: p.tiers, sizes: p.sizes, ...(l.sample ? { sample: true } : {}), ...(l.team ? { team: l.team } : {}) }];
   });
   return NextResponse.json({ ok: true, date: s.date, lines, missing: s.lines.length - lines.length });
 }

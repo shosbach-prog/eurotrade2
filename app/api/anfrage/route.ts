@@ -5,7 +5,7 @@ import { FONTS, METHODS, POSITIONS, TEAM_POS, TEXT_COLORS, decoLabel, teamLabel,
 import { getTeamShop } from '@/lib/teamshop';
 import { esc, sendMail, shopUrl } from '@/lib/mail';
 import { button, contactBlock, eur, h1, infoBox, itemsTable, layout, p, quote, signature, type MailLine } from '@/lib/mail-templates';
-import { unitFor } from '@/lib/tiers';
+import { sizeUnit } from '@/lib/tiers';
 import { discountFor, randomId, saveInquiry, validCode, type InqLine, type Inquiry } from '@/lib/store';
 import { cartDone } from '@/lib/cart-remind';
 
@@ -69,7 +69,7 @@ export async function POST(req: Request) {
   // Staffelpreis nach Gesamtmenge je Artikel
   const perProduct = raw.reduce((m: Record<string, number>, x) => ({ ...m, [x.p.id]: (m[x.p.id] ?? 0) + x.qty }), {});
   const lines: InqLine[] = raw.map(({ p, l, qty }) => {
-    const price = unitFor(p.tiers, perProduct[p.id], p.price);
+    const price = sizeUnit(p.tiers, perProduct[p.id], p.price, p.sizeUp, String(l.size ?? ''));
     const sample = !!l.sample;
     const ek = adminProduct(p.id).p?.basePrice ?? null;
     return { id: p.id, sku: p.sku, name: p.name, color: String(l.color ?? '').slice(0, 80), size: String(l.size ?? '').slice(0, 40), qty: sample ? 1 : qty, price, sum: Math.round((price ?? 0) * (sample ? 1 : qty) * 100) / 100, deco: cleanDeco(l.deco), ek, ...(sample ? { sample: true } : {}) };

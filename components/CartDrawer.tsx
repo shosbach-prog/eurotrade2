@@ -5,7 +5,7 @@ import { useCart } from './CartContext';
 import ProductImage from './ProductImage';
 import { eur } from '@/lib/format';
 import { decoLabel } from '@/lib/deco';
-import { unitFor } from '@/lib/tiers';
+import { sizeUnit, unitFor } from '@/lib/tiers';
 import { usePrice } from './PriceMode';
 
 /** Seitenleiste: öffnet sich nach „In den Warenkorb“ */
@@ -22,7 +22,7 @@ export default function CartDrawer() {
   }, [drawer]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const perProduct = lines.reduce<Record<string, number>>((m, l) => ({ ...m, [l.id]: (m[l.id] ?? 0) + l.qty }), {});
-  const unit = (l: (typeof lines)[number]) => unitFor(l.tiers, perProduct[l.id], l.price);
+  const unit = (l: (typeof lines)[number]) => sizeUnit(l.tiers, perProduct[l.id], l.price, l.ups, l.size);
   const net = lines.reduce((s, l) => s + (unit(l) ?? 0) * l.qty, 0);
   const added = lines.filter((l) => lastAdded.includes(l.key));
 
