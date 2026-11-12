@@ -16,19 +16,19 @@ import { RecentTracker, RecentlyViewed } from '@/components/Recent';
 import ProductReviews from '@/components/ProductReviews';
 import { getText } from '@/lib/content';
 import JsonLd, { crumbSchema } from '@/components/JsonLd';
-import { productPath, productSlug } from '@/lib/format';
+import { productPath } from '@/lib/format';
 
-export async function generateMetadata({ params }: { params: { id: string } }) {
+export async function generateMetadata({ params }: { params: { id: string; cat?: string } }) {
   const p = getProduct(decodeURIComponent(params.id), await viewCtx());
   return p ? { title: `${p.name} – ${p.brand}`, description: getText(p).text.intro.slice(0, 155), alternates: { canonical: productPath(p) }, openGraph: { title: `${p.name} – ${p.brand}`, images: p.images.slice(0, 1) } } : {};
 }
 
-export default async function ProductPage({ params, searchParams }: { params: { id: string }; searchParams?: { team?: string } }) {
+export default async function ProductPage({ params, searchParams }: { params: { id: string; cat?: string }; searchParams?: { team?: string } }) {
   const ctx = await viewCtx();
   const p0 = getProduct(decodeURIComponent(params.id), ctx);
   if (!p0) notFound();
   // alte/abweichende URLs (z. B. /produkt/bcpu427) dauerhaft auf die sprechende URL umleiten
-  if (decodeURIComponent(params.id) !== productSlug(p0)) permanentRedirect(`${productPath(p0)}${searchParams?.team ? `?team=${encodeURIComponent(String(searchParams.team))}` : ''}`);
+  if (`/${params.cat ?? 'produkt'}/${decodeURIComponent(params.id)}` !== productPath(p0)) permanentRedirect(`${productPath(p0)}${searchParams?.team ? `?team=${encodeURIComponent(String(searchParams.team))}` : ''}`);
   const ts = searchParams?.team ? getTeamShop(String(searchParams.team)) : null;
   // Team-Shop: Mitglieder sehen Preise auch ohne Zugangscode
   const p = ts && ts.items.includes(p0.id) && ctx && 'locked' in ctx ? getProduct(decodeURIComponent(params.id), null) ?? p0 : p0;

@@ -87,7 +87,7 @@ export default function InquiryPage({ params }: { params: { no: string } }) {
           <tbody>{i.lines.map((l, k) => (
             <tr key={k}>
               <td>{l.sku}</td>
-              <td>{ek[k].eol !== undefined && <span className="sample-tag eol-tag" title="laut L-Shop-Auslaufliste">läuft aus{ek[k].eol ? ` ${new Date(ek[k].eol + 'T12:00:00').toLocaleDateString('de-DE')}` : ''}</span>}{l.sample && <span className="sample-tag">Muster</span>}{l.id ? <Link href={`/produkt/${l.id}`} className="alink" target="_blank">{l.name}</Link> : l.name}{l.deco && <div className="deco-tag">✦ {decoLabel(l.deco)}{l.deco.note && <> – <i>{l.deco.note}</i></>}</div>}
+              <td>{ek[k].eol !== undefined && <span className="sample-tag eol-tag" title="laut L-Shop-Auslaufliste">läuft aus{ek[k].eol ? ` ${new Date(ek[k].eol + 'T12:00:00').toLocaleDateString('de-DE')}` : ''}</span>}{l.sample && <span className="sample-tag">Muster</span>}{l.id ? <Link href={`/produkt/${l.id}`} prefetch={false} className="alink" target="_blank">{l.name}</Link> : l.name}{l.deco && <div className="deco-tag">✦ {decoLabel(l.deco)}{l.deco.note && <> – <i>{l.deco.note}</i></>}</div>}
                 {l.deco?.team?.rows.length ? <div className="muted" style={{ fontSize: 12.5 }}>{l.deco.team.pos}: {teamLabel(l.deco.team.rows)}</div> : null}
                 {l.deco?.previews?.length ? <div className="cl-prev">{l.deco.previews.map((id) => <a key={id} href={`/api/upload/${id}`} target="_blank"><img src={`/api/upload/${id}`} alt="Vorschau" /></a>)}</div> : null}</td>
               <td>{l.color}</td><td>{l.size}</td><td>{l.qty}</td>
