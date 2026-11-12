@@ -47,6 +47,19 @@ export default function ArticlePicker({ items, groups = [], value, onChange, tit
   const toggle = (id: string) => onChange(sel.has(id) ? value.filter((x) => x !== id) : [...value, id]);
   const allOn = list.length > 0 && list.every((p) => sel.has(p.id));
   const toggleAll = () => onChange(allOn ? value.filter((id) => !list.some((p) => p.id === id)) : [...value, ...list.filter((p) => !sel.has(p.id)).map((p) => p.id)]);
+  // ganze Rubrik (Kategorie, Anlass, Branche …) mit einem Klick hinzufügen bzw. entfernen
+  const groupIds = (f: (p: PickItem) => boolean) => items.filter(f).map((p) => p.id);
+  const groupState = (ids: string[]) => { const n = ids.filter((id) => sel.has(id)).length; return { n, all: n === ids.length && n > 0 }; };
+  const toggleGroup = (ids: string[]) => { const st = groupState(ids); onChange(st.all ? value.filter((id) => !ids.includes(id)) : [...value, ...ids.filter((id) => !sel.has(id))]); };
+  const row = (key: string, label: string, count: number, on: boolean, open: () => void, ids: string[]) => {
+    const st = groupState(ids);
+    return (
+      <div key={key} className={`ap-row ${on ? 'on' : ''}`}>
+        <button type="button" className="ap-rl" onClick={open}>{label} <span>{st.n ? `${st.n}/${count}` : count}</span></button>
+        <button type="button" className={`ap-add ${st.all ? 'all' : st.n ? 'some' : ''}`} onClick={() => toggleGroup(ids)} title={st.all ? `Alle ${count} aus „${label}“ wieder entfernen` : `Alle ${count} aus „${label}“ auswählen`} aria-label={st.all ? `${label} entfernen` : `Alle aus ${label} auswählen`}>{st.all ? '✓' : '+'}</button>
+      </div>
+    );
+  };
   const move = (id: string, d: number) => { const i = value.indexOf(id), j = i + d; if (j < 0 || j >= value.length) return; const n = [...value]; [n[i], n[j]] = [n[j], n[i]]; onChange(n); };
 
   return (
@@ -61,10 +74,10 @@ export default function ArticlePicker({ items, groups = [], value, onChange, tit
           <aside className="ap-cats">
             <span className="ap-sh">Kategorien</span>
             <button type="button" className={!cat && !tag ? 'on' : ''} onClick={() => pickCat('')}>Alle Artikel <span>{items.length}</span></button>
-            {cats.map(([c, n]) => <button key={c} type="button" className={cat === c ? 'on' : ''} onClick={() => pickCat(c)}>{c} <span>{n}</span></button>)}
+            {cats.map(([c, n]) => row(c, c, n, cat === c, () => pickCat(c), groupIds((p) => p.category === c)))}
             {side.map((gr) => <div key={gr.title} className="ap-side">
               <span className="ap-sh">{gr.title}</span>
-              {gr.entries.map((e) => <button key={e.key} type="button" className={tag === e.key ? 'on' : ''} onClick={() => pickTag(e.key)}>{e.label} <span>{e.count}</span></button>)}
+              {gr.entries.map((e) => row(e.key, e.label, e.count, tag === e.key, () => pickTag(e.key), groupIds((p) => !!p.tags?.includes(e.key))))}
             </div>)}
             <button type="button" className={`ap-selbtn ${onlySel ? 'on' : ''}`} onClick={() => setOnlySel(!onlySel)}>✓ Ausgewählte <span>{value.length}</span></button>
           </aside>
@@ -84,7 +97,7 @@ export default function ArticlePicker({ items, groups = [], value, onChange, tit
             </div>}
             <div className="ap-bar">
               <span className="muted">{list.length} Artikel</span>
-              {list.length > 0 && <button type="button" className="linkbtn" onClick={toggleAll}>{allOn ? 'Auswahl im Filter aufheben' : `Alle ${list.length} auswählen`}</button>}
+              {list.length > 0 && <button type="button" className={`btn sm ${allOn ? 'alt' : ''}`} onClick={toggleAll}>{allOn ? `✓ Alle ${list.length} gewählt – wieder entfernen` : `+ Alle ${list.length} Artikel${tag || cat ? ` aus „${sub ? subs.find((e) => e.key === sub)?.label : tcat || cat || side.flatMap((x) => x.entries).find((e) => e.key === tag)?.label}“` : ''} auswählen`}</button>}
               {value.length > 0 && <button type="button" className="linkbtn" style={{ marginLeft: 'auto' }} onClick={() => onChange([])}>Auswahl leeren</button>}
             </div>
             <div className="ap-grid">
