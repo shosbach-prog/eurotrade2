@@ -11,7 +11,7 @@ import { CartProvider } from '@/components/CartContext';
 import { WishlistProvider } from '@/components/Wishlist';
 import SiteHeader from '@/components/SiteHeader';
 import Consent, { ConsentLink } from '@/components/Consent';
-import { getCategories } from '@/lib/catalog';
+import { getCategories, dealCount } from '@/lib/catalog';
 import { previewMode, shopClosed } from '@/lib/access';
 import { isAdmin, shopAccess } from '@/lib/customer';
 
@@ -59,7 +59,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <a href="#inhalt" className="skip">Zum Inhalt springen</a>
         <CartProvider><WishlistProvider>
           {previewMode() && ok && !path.startsWith('/start') && <div className="preview-bar">Vorschau-Modus – nur für Sie sichtbar. Preise sind Platzhalter. Kunden-Codes sind gesperrt, bis Sie <code>SHOP_PREVIEW=false</code> setzen.</div>}
-          <SiteHeader ok={ok} customerName={customer?.name ?? null} admin={admin} cats={(ok ? getCategories(customer) : getCategories()).map((c) => ({ name: c.name, slug: c.slug }))} shop={SHOP} domain={process.env.SHOP_DOMAIN ?? 'euro-trade.com'} />
+          <SiteHeader ok={ok} customerName={customer?.name ?? null} admin={admin} cats={(ok ? getCategories(customer) : getCategories()).map((c) => ({ name: c.name, slug: c.slug }))} shop={SHOP} domain={process.env.SHOP_DOMAIN ?? 'euro-trade.com'} deals={dealCount(ok ? customer : undefined)} />
           <main className="wrap" id="inhalt" tabIndex={-1}>{children}</main>
           <footer className="ft">
             <div className="wrap ft-grid">

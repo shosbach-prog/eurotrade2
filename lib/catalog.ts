@@ -137,9 +137,22 @@ export const imageInUse = (src: string) => load().all.some((p) => p.images.inclu
 /** Alle Artikel (Admin: Auswahl für Kollektionen) */
 export const allProductsBrief = () => load().products.map((p) => ({ id: p.id, sku: p.sku, name: p.name, brand: p.brand }));
 
+/* ---------- Sonderangebote = Auslaufartikel (ganz oder einzelne Farben/Größen) ---------- */
+export const DEAL_RE = /\b(auslauf\w*|sonder\w*|angebot\w*|restposten|abverkauf|sale|reduziert\w*|schn(?:ä|ae)ppchen\w*|deals?|rabatt\w*|aktion(?:en|sware)?)\b/gi;
+const dealList = (ctx?: Ctx) => products(ctx).filter((p) => p.eol).sort((a, b) => Number(!!b.eol!.all) - Number(!!a.eol!.all));
+export const dealProducts = (ctx?: Ctx) => dealList(ctx).map((p) => toPublic(p, ctx));
+export const dealCount = (ctx?: Ctx) => dealList(ctx).length;
+
 export function search(q: string, limit = 48, ctx?: Ctx): PublicProduct[] {
   const s = load();
   const ok = visible(ctx);
+  // „Auslaufartikel“, „Sonderangebote“, „Restposten“ … → Auslaufartikel, optional weiter eingegrenzt („sonderangebot hoodie“)
+  if (new RegExp(DEAL_RE.source, 'i').test(q)) {
+    const rest = q.replace(new RegExp(DEAL_RE.source, 'gi'), ' ').replace(/\b(und|&|oder)\b/gi, ' ').trim();
+    let list = dealList(ctx);
+    if (rest.length >= 2) { const ids = new Set(runSearch(s.index, rest, 500, s.skus)); const f = list.filter((p) => ids.has(p.id)); if (f.length) list = f; }
+    return list.slice(0, limit).map((p) => toPublic(p, ctx));
+  }
   return runSearch(s.index, q, limit * 2, s.skus).map((id) => s.byId.get(id)!).filter(ok).slice(0, limit).map((p) => toPublic(p, ctx));
 }
 

@@ -4,7 +4,7 @@ import FilterGrid from '@/components/FilterGrid';
 import { ReviewStrip } from '@/components/ProductReviews';
 import Stars from '@/components/Stars';
 import JsonLd, { crumbSchema, faqSchema } from '@/components/JsonLd';
-import { getByCategory, getCategories, slimCard } from '@/lib/catalog';
+import { dealProducts, getByCategory, getCategories, slimCard } from '@/lib/catalog';
 import { viewCtx } from '@/lib/customer';
 import { categoryContent } from '@/lib/category-content';
 import { latestReviews } from '@/lib/reviews';
@@ -12,12 +12,30 @@ import { refsFor } from '@/lib/store';
 import RefStrip from '@/components/RefStrip';
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
+  if (params.slug === 'sonderangebote') return { title: 'Sonderangebote & Auslaufartikel – Markentextilien mit Logo', description: 'Auslaufartikel und Restposten bekannter Marken – solange Vorrat, bedruckt oder bestickt mit Ihrem Logo ab 1 Stück.', alternates: { canonical: '/kategorie/sonderangebote' } };
   const c = getCategories(await viewCtx()).find((x) => x.slug === params.slug);
   return { title: c ? `${c.name} mit Logo bedrucken & besticken` : 'Kategorie', description: c ? categoryContent(c.slug, c.name).intro : undefined, alternates: c ? { canonical: `/kategorie/${c.slug}` } : undefined };
 }
 
 export default async function CategoryPage({ params }: { params: { slug: string } }) {
   const ctx = await viewCtx();
+  if (params.slug === 'sonderangebote') {
+    const deals = dealProducts(ctx);
+    return (
+      <>
+        <JsonLd data={crumbSchema([['Start', '/'], ['Sonderangebote', '/kategorie/sonderangebote']])} />
+        <div className="crumbs"><Link href="/">Start</Link> › Sonderangebote</div>
+        <section className="cat-hero deal-hero">
+          <div className="cat-hero-text">
+            <h1>Sonderangebote & Auslaufartikel</h1>
+            <p>Markentextilien, die beim Hersteller auslaufen – lieferbar solange Vorrat. Ideal für Aktionen, Events und Teams, die jetzt bestellen. Auch hier: bedruckt oder bestickt mit Ihrem Logo ab 1 Stück.</p>
+          </div>
+        </section>
+        {deals.length ? <FilterGrid items={deals.map(slimCard)} /> : <div className="box muted">Aktuell keine Sonderangebote – schauen Sie bald wieder vorbei.</div>}
+        <p className="muted" style={{ fontSize: 13 }}>„Läuft aus“ heißt: Der Hersteller produziert den Artikel bzw. die Farbe nicht mehr nach. Bei größeren Mengen prüfen wir die Verfügbarkeit vor dem Angebot.</p>
+      </>
+    );
+  }
   const cat = getCategories(ctx).find((x) => x.slug === params.slug);
   if (!cat) notFound();
   const items = getByCategory(params.slug, ctx);

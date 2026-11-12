@@ -1517,3 +1517,4 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .kalk-t td,.kalk-t th{padding:6px 8px}.kalk-t input{padding:6px 8px}
 .kalk-lim{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:14px}.kalk-lim label{display:flex;align-items:center;gap:6px}
 .kalk-test{background:#f5f8ff;border:1px solid #c9dafb;border-radius:10px;padding:10px 12px;margin:6px 0 12px;font-size:14px}
+.catnav a.deal{color:#c2410c;font-weight:700}.catnav a.deal.on{border-bottom-color:#c2410c}

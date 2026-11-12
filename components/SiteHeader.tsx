@@ -9,8 +9,8 @@ import { CartButton } from './CartContext';
 import { WishlistButton } from './Wishlist';
 
 /** Kopfzeile + Kategorien – entscheidet anhand der AKTUELLEN Adresse (bleibt bei Seitenwechseln ohne Neuladen korrekt) */
-export default function SiteHeader({ ok, customerName, admin, cats, shop, domain }: {
-  ok: boolean; customerName: string | null; admin: boolean; cats: { name: string; slug: string }[]; shop: string; domain: string;
+export default function SiteHeader({ ok, customerName, admin, cats, shop, domain, deals = 0 }: {
+  deals?: number; ok: boolean; customerName: string | null; admin: boolean; cats: { name: string; slug: string }[]; shop: string; domain: string;
 }) {
   const path = usePathname() ?? '/';
   const isAdminPath = path.startsWith('/admin');
@@ -40,6 +40,7 @@ export default function SiteHeader({ ok, customerName, admin, cats, shop, domain
       </header>
       {(showShop || showcase) && cats.length > 0 && <nav className="catnav"><div className="wrap">
         {cats.map((c) => <Link key={c.slug} href={`/kategorie/${c.slug}`} className={path === `/kategorie/${c.slug}` ? 'on' : undefined}>{c.name}</Link>)}
+        {deals > 0 && <Link href="/kategorie/sonderangebote" className={`deal ${path === '/kategorie/sonderangebote' ? 'on' : ''}`}>Sonderangebote</Link>}
       </div></nav>}
     </>
   );
