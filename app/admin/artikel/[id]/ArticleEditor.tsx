@@ -1,4 +1,5 @@
 'use client';
+import { shrinkImage } from '@/lib/shrink';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Color, Product } from '@/lib/types';
@@ -28,7 +29,7 @@ export default function ArticleEditor({ p, custom, changed, categories, markup }
     setBusy(true);
     const add: string[] = [];
     for (const file of Array.from(files)) {
-      const fd = new FormData(); fd.append('file', file);
+      const fd = new FormData(); fd.append('file', await shrinkImage(file, 1600));
       const r = await fetch('/api/upload', { method: 'POST', body: fd }); const d = await r.json().catch(() => ({}));
       if (r.ok) add.push(`/api/bild/${d.id}`); else setMsg({ ok: false, m: d.error ?? 'Upload fehlgeschlagen' });
     }

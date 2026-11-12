@@ -1,4 +1,5 @@
 'use client';
+import { shrinkImage } from '@/lib/shrink';
 import { useState } from 'react';
 import type { Reference } from '@/lib/store';
 
@@ -10,7 +11,7 @@ export default function RefEditor({ initial }: { initial: Reference[] }) {
   async function upload(k: number, f?: File | null) {
     if (!f) return;
     if (!/\.(png|jpe?g|webp)$/i.test(f.name)) { alert('Bitte ein Foto (JPG, PNG oder WebP) wählen.'); return; }
-    const fd = new FormData(); fd.append('file', f);
+    const fd = new FormData(); fd.append('file', await shrinkImage(f, 1400));
     const r = await fetch('/api/upload', { method: 'POST', body: fd }); const d = await r.json().catch(() => ({}));
     if (r.ok) upd(k, { imageId: d.id, imageName: d.name }); else alert(d.error ?? 'Upload fehlgeschlagen');
   }

@@ -38,7 +38,7 @@ export function TrustBlock() {
         <div className="box"><b>Vorschau vor der Produktion</b><p>Sie sehen Ihr Logo vorab und geben es frei. Erst dann wird gedruckt oder gestickt.</p></div>
         <div className="box"><b>Markenware ab 1 Stück</b><p>Originale Markentextilien, Staffelpreise ab 10 Stück, auch für Nachbestellungen.</p></div>
         <div className="box"><b>Angebot statt Überraschung</b><p>Sie erhalten ein verbindliches Angebot mit allen Kosten, bevor Sie sich entscheiden.</p></div>
-        <div className="box contact-card">{cp.photoId ? <img className="avatar" src={`/api/bild/${cp.photoId}`} alt={`Foto ${cp.name}`} style={{ objectFit: 'cover' }} /> : <span className="avatar" aria-hidden>{cp.name.split(/\s+/).map((x) => x[0]).join('').slice(0, 2).toUpperCase()}</span>}<div><b>{cp.role || 'Ihr Ansprechpartner'}</b><p>{cp.name}<br />{cp.phone && <><a className="alink" href={`tel:${cp.phone.replace(/[^\d+]/g, '').replace(/^0/, '+49')}`}>{cp.phone}</a> · </>}<a className="alink" href={`mailto:${cp.email}`}>{cp.email}</a></p></div></div>
+        <div className="box contact-card">{cp.photoId ? <img className="avatar" src={`/api/bild/${cp.photoId}`} alt={`Foto ${cp.name}`} width={64} height={64} loading="lazy" decoding="async" style={{ objectFit: 'cover' }} /> : <span className="avatar" aria-hidden>{cp.name.split(/\s+/).map((x) => x[0]).join('').slice(0, 2).toUpperCase()}</span>}<div><b>{cp.role || 'Ihr Ansprechpartner'}</b><p>{cp.name}<br />{cp.phone && <><a className="alink" href={`tel:${cp.phone.replace(/[^\d+]/g, '').replace(/^0/, '+49')}`}>{cp.phone}</a> · </>}<a className="alink" href={`mailto:${cp.email}`}>{cp.email}</a></p></div></div>
       </div>
     </section>
   );
