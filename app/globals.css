@@ -1749,3 +1749,4 @@ html,body{overflow-x:clip}
 .bs-nav.l{left:16px}.bs-nav.r{right:16px}
 @media (max-width:700px){.bs-tile{flex-basis:76vw}.bs-nav{display:none}.bs-info{padding:12px 14px 4px}.bs-info b{font-size:16px}}
 .bs .bs-head{display:block;text-align:left}.bs .bs-head p{text-align:left}.bs-img{background:#fff}
+.gal-tint{position:absolute;left:10px;bottom:10px;z-index:5;background:rgba(15,23,42,.72);color:#fff;font-size:12px;padding:4px 9px;border-radius:999px;pointer-events:none}

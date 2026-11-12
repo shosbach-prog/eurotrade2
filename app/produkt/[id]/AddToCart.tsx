@@ -158,6 +158,8 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
   // Galerie: Fotos der gewählten Farbe, danach Detailfotos des Artikels
   // Farbbild(er) zuerst, danach alle allgemeinen Ansichten (Rücken, Seite, Detail, Model) – keine Bilder anderer Farben
   const otherColorImgs = new Set(p.colors.filter((c) => c !== color).flatMap((c) => [c.image, ...(c.images ?? [])]).filter(Boolean) as string[]);
+  // Farbe ohne eigenes Foto (einfarbig): Hauptbild als Farbvorschau umfärben
+  const tint = color && !color.images?.length && !color.image && p.colors.length > 1 && color.hex && !/[\/+]|melange|heather|camo|stripe|multi/i.test(color.name) ? { hex: color.hex, name: color.name } : undefined;
   const galP = color?.images?.length ? { ...p, images: [...color.images, ...p.images.filter((x) => !color.images!.includes(x) && !otherColorImgs.has(x))] } : p;
   const textStyle = { fontFamily: fontCss(font), color: colorHex(tColor) };
 
@@ -169,9 +171,9 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
             <DecoStudio {...studioProps} />
             <button type="button" className="linkbtn ds-photos" onClick={() => setShowPhotos(true)}>Produktfotos ansehen</button>
           </div>
-          <div className="pd-gal-m"><Gallery key={cname} p={galP} hex={color?.hex} /></div>
+          <div className="pd-gal-m"><Gallery key={cname} p={galP} hex={color?.hex} tint={tint} /></div>
         </> : <>
-          <Gallery key={cname} p={galP} hex={color?.hex} />
+          <Gallery key={cname} p={galP} hex={color?.hex} tint={tint} />
           {decoOn && <button type="button" className="linkbtn ds-photos" onClick={() => setShowPhotos(false)}>← Zurück zur Live-Vorschau</button>}
         </>}
       </div>
