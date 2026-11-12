@@ -7,6 +7,10 @@ import { adminProducts } from '@/lib/catalog';
 import { readOverrides } from '@/lib/artikel';
 import { sellPrice } from '@/lib/pricing';
 import { getText } from '@/lib/content';
+import fs from 'node:fs';
+import path from 'node:path';
+import KalkEditor from './KalkEditor';
+import { getKalk } from '@/lib/kalkulation';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Artikel', robots: { index: false, follow: false } };
@@ -31,6 +35,7 @@ export default function Artikel() {
       </div>
       <p className="muted" style={{ marginTop: 0 }}>Suchen, filtern, mehrere Artikel auf einmal sichtbar schalten oder einer Kategorie zuordnen. Ihre Änderungen bleiben auch bei Katalog-Updates erhalten.</p>
       <ArticleImport placeholders={rows.filter((r) => r.placeholder).length} />
+      <KalkEditor initial={getKalk()} custom={fs.existsSync(path.join(process.cwd(), 'data', 'kalkulation.json'))} items={adminProducts().filter((p) => p.basePrice).map((p) => ({ sku: p.sku, name: p.name, ek: p.basePrice!, category: p.category }))} />
       <ArticleList rows={rows} categories={cats} />
     </>
   );

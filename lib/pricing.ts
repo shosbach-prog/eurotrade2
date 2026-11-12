@@ -2,16 +2,19 @@ const markup = Number(process.env.MARKUP_PERCENT ?? 35);
 const vat = Number(process.env.MWST_PERCENT ?? 19);
 const round99 = (process.env.PRICE_ROUND_99 ?? 'true') === 'true';
 import { parseTiers, type PriceTier, type Tier } from './tiers';
+import { curvePrice } from './kalkulation';
 
 let byCat: Record<string, number> = {};
 try { byCat = JSON.parse(process.env.MARKUP_BY_CATEGORY || '{}'); } catch { byCat = {}; }
 
-/** Standard-Aufschlag je Kategorie (Admin-Anzeige) */
+/** Standard-Aufschlag je Kategorie (Admin-Anzeige) – ohne Kategorie-Wert gilt die Preiskurve */
 export const markupFor = (categorySlug: string) => byCat[categorySlug] ?? markup;
 /** override = kundenspezifischer Aufschlag (Zugangscode) – hat Vorrang vor Kategorie und Standard */
 export function sellPrice(basePrice: number, categorySlug: string, override?: number | null): number {
-  const pct = override != null && Number.isFinite(override) ? override : byCat[categorySlug] ?? markup;
-  return roundPrice(basePrice * (1 + pct / 100));
+  // Kundenspezifischer Aufschlag (Zugangscode) bzw. fester Kategorie-Aufschlag aus .env haben Vorrang – sonst Preiskurve (Admin → Artikel → Kalkulation)
+  if (override != null && Number.isFinite(override)) return roundPrice(basePrice * (1 + override / 100));
+  if (byCat[categorySlug] != null) return roundPrice(basePrice * (1 + byCat[categorySlug] / 100));
+  return roundPrice(curvePrice(basePrice));
 }
 function roundPrice(p: number) {
   if (round99 && p >= 1) p = Math.ceil(p * 10) / 10 - 0.01; // z. B. 4,23 -> 4,29
