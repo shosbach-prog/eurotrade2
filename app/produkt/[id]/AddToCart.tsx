@@ -156,7 +156,9 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
   );
   const studioProps = { product: p, colorHex: color?.hex, photo: color?.image ?? null, fit: color?.image ? (fits?.[color.image] as FitT | undefined) ?? null : null, anchor: color?.image ? anchors?.[color.image] ?? null : null, admin, positions, active: activePos, setActive: setActivePos, place, setPlace, logoSrc: useLogo && logo && isImage(logo.name) ? `/api/upload/${logo.id}` : null, text: useText ? text : '', font, textColor: tColor, method };
   // Galerie: Fotos der gewählten Farbe, danach Detailfotos des Artikels
-  const galP = color?.images?.length ? { ...p, images: [...color.images, ...p.images.filter((x) => !color.images!.includes(x) && /detail/i.test(x))] } : p;
+  // Farbbild(er) zuerst, danach alle allgemeinen Ansichten (Rücken, Seite, Detail, Model) – keine Bilder anderer Farben
+  const otherColorImgs = new Set(p.colors.filter((c) => c !== color).flatMap((c) => [c.image, ...(c.images ?? [])]).filter(Boolean) as string[]);
+  const galP = color?.images?.length ? { ...p, images: [...color.images, ...p.images.filter((x) => !color.images!.includes(x) && !otherColorImgs.has(x))] } : p;
   const textStyle = { fontFamily: fontCss(font), color: colorHex(tColor) };
 
   return (

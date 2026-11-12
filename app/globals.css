@@ -1696,3 +1696,7 @@ a.mm-h:hover{color:var(--brand)}
 .ap-add.all{background:#16a34a;border-color:#16a34a;color:#fff}
 .ap-bar .btn{padding:7px 14px}
 .ap-cats .ap-rl span{white-space:nowrap}
+.gal-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:5;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.92);box-shadow:0 4px 14px rgba(15,23,42,.15);font-size:28px;line-height:1;color:var(--ink);cursor:pointer;display:grid;place-items:center;padding:0 0 4px;opacity:.85;transition:opacity .15s,transform .15s}
+.gal-nav:hover{opacity:1;transform:translateY(-50%) scale(1.06)}
+.gal-nav.l{left:10px}.gal-nav.r{right:10px}
+.gal-count{position:absolute;bottom:10px;right:12px;z-index:5;background:rgba(15,23,42,.6);color:#fff;font-size:12px;padding:3px 8px;border-radius:999px;pointer-events:none}

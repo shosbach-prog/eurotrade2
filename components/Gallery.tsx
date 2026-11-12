@@ -64,6 +64,11 @@ export default function Gallery({ p, hex, overlay }: Props) {
         <div ref={box} className={`gallery ${src ? 'zoomable' : ''}`} onMouseMove={src ? move : undefined} onMouseLeave={() => setZoom(null)} onClick={() => src && setFull(true)}>
           <ProductImage p={p} src={src} hex={hex} />
           {overlay}
+          {imgs.length > 1 && <>
+            <button type="button" className="gal-nav l" aria-label="Vorheriges Bild" onClick={(e) => { e.stopPropagation(); setZoom(null); setI((x) => (x - 1 + imgs.length) % imgs.length); }} onMouseMove={(e) => { e.stopPropagation(); setZoom(null); }}>‹</button>
+            <button type="button" className="gal-nav r" aria-label="Nächstes Bild" onClick={(e) => { e.stopPropagation(); setZoom(null); setI((x) => (x + 1) % imgs.length); }} onMouseMove={(e) => { e.stopPropagation(); setZoom(null); }}>›</button>
+            <span className="gal-count">{i + 1} / {imgs.length}</span>
+          </>}
           {zoom && <div className="gal-lens" style={{ left: zoom.lx, top: zoom.ly, width: zoom.lw, height: zoom.lh }} />}
         </div>
         {zoom && src && <div className="gal-zoom" style={{ backgroundImage: `url("${hiRes(src)}"), url("${src}")`, backgroundSize: `${zoom.bw}px ${zoom.bh}px`, backgroundPosition: `${zoom.bx}px ${zoom.by}px` }} />}
