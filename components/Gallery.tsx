@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import ProductImage from './ProductImage';
 import type { PublicProduct } from '@/lib/types';
 
@@ -86,7 +87,7 @@ export default function Gallery({ p, hex, overlay, tint }: Props) {
       </div>
       {src && <p className="gal-hint">{imgs.length > 1 ? 'Mit der Maus über Bild fahren zum Vergrößern · Klick für Vollbild' : 'Mit der Maus über Bild fahren zum Vergrößern'}</p>}
 
-      {full && src && (
+      {full && src && typeof document !== 'undefined' && createPortal(
         <div className="lightbox" onClick={() => Date.now() - swiped.current > 400 && setFull(false)} role="dialog" aria-modal="true"
           onTouchStart={(e) => { const t = e.touches[0]; touch.current = { x: t.clientX, y: t.clientY, moved: false }; }}
           onTouchEnd={(e) => { const s = touch.current; touch.current = null; if (!s || imgs.length < 2) return; const t = e.changedTouches[0]; const dx = t.clientX - s.x; if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(t.clientY - s.y)) { setI((x) => (x + (dx < 0 ? 1 : -1) + imgs.length) % imgs.length); swiped.current = Date.now(); } }}>
@@ -96,7 +97,7 @@ export default function Gallery({ p, hex, overlay, tint }: Props) {
           {imgs.length > 1 && <button className="lb-nav r" aria-label="Nächstes Bild" onClick={(e) => { e.stopPropagation(); setI((x) => (x + 1) % imgs.length); }}>›</button>}
           {imgs.length > 1 && <div className="lb-count">{i + 1} / {imgs.length}</div>}
         </div>
-      )}
+        , document.body)}
     </div>
   );
 }

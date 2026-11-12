@@ -1780,7 +1780,7 @@ html,body{overflow-x:clip}
 }
 /* Artikelseite: Galerie bleibt beim Scrollen stehen, Bildhöhe begrenzt */
 @media (min-width:901px){
-  .pd>div:first-child{position:sticky;top:88px;align-self:start}
+  .pd>div:first-child{position:sticky;top:88px;align-self:start;z-index:3}
   .pd .gal .gallery{max-width:min(100%,calc(100vh - 190px))}
   .pd .gal-main{justify-content:center}
 }
