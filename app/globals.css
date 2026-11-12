@@ -1504,3 +1504,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .ds-admin label{display:flex;align-items:center;gap:8px}.ds-admin input[type=range]{flex:1}
 .ds-ph{width:100%;aspect-ratio:2/1;display:grid;place-items:center;background:repeating-linear-gradient(45deg,rgba(255,200,0,.85),rgba(255,200,0,.85) 6px,rgba(255,180,0,.85) 6px,rgba(255,180,0,.85) 12px);color:#14181f;font-weight:800;font-size:clamp(8px,18cqw,22px);border-radius:3px}
 .ds-admin label{display:grid;grid-template-columns:78px 1fr auto;align-items:center;gap:8px}
+/* Auslaufartikel */
+.eol-box{margin:12px 0 0;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:8px 12px;font-size:13.5px;color:#7c2d12}
+.eol-hint{color:#9a3412}
+.sw.eol{position:relative;opacity:.75}.sw.eol::after{content:'';position:absolute;inset:3px;border-top:2px solid #ea580c;transform:rotate(-45deg);top:50%}
+.badge-p.b-eol{background:#ffedd5;color:#9a3412}
+.sample-tag.eol-tag{background:#ffedd5;color:#9a3412;margin-right:6px}
+.gpsr{margin-top:14px;font-size:13px}.gpsr p{margin:4px 0 0;color:var(--muted)}

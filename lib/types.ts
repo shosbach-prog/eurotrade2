@@ -27,6 +27,8 @@ export type Product = {
   /** Staffel-Einkaufspreise von L-Shop: ab Menge -> EK netto */
   baseTiers?: { min: number; price: number }[];
   tags?: string[];
+  /** Auslauf laut L-Shop-Liste (berechnet, nicht gespeichert) */
+  eol?: Eol;
   /** Passende Artikel (Art.-Nr.), z. B. Damen-/Herrenmodell */
   pairs?: string[];
   /** Admin: im Shop ausgeblendet */
@@ -36,6 +38,9 @@ export type Product = {
   /** Admin: selbst angelegter Artikel */
   custom?: boolean;
 };
+
+/** Auslaufartikel: ganzer Artikel (all) oder einzelne Farben/Größen (sizes null = alle Größen der Farbe), Datum JJJJ-MM-TT oder null = solange Vorrat */
+export type Eol = { all: boolean; date: string | null; colors: Record<string, { sizes: string[] | null; date: string | null }> };
 
 /** Was der Browser sieht: Verkaufspreis statt Einkaufspreis */
 export type PublicProduct = Omit<Product, 'basePrice' | 'baseTiers'> & { price: number | null; priceGross: number | null; /** Staffelpreise netto (ab Menge) */ tiers: { min: number; price: number }[]; /** Kundenbewertung (nur freigegebene, verifizierte) */ rating?: { avg: number; count: number } | null; /** Schaufenster ohne Preise */ locked?: boolean; /** Filter-Eigenschaften (Nachhaltig, Schwere Qualität …) */ props?: string[]; /** alle Bilder auch als .webp vorhanden */ webp?: boolean };

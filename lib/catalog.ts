@@ -10,6 +10,7 @@ import { ratingFor } from './reviews';
 import { overridesMtime, readOverrides } from './artikel';
 import { productSlug, slugify } from './format';
 import { pictosFor } from './picto';
+import { applyEol, auslaufMtime } from './auslauf';
 
 const LIVE = path.join(process.cwd(), 'data', 'products.json');
 const SEED = path.join(process.cwd(), 'seed', 'products.json');
@@ -21,12 +22,12 @@ let state: State | null = null;
 /** Lädt data/products.json neu, sobald der Sync die Datei aktualisiert hat – kein Neustart nötig */
 function load(): State {
   const FILE = file();
-  const mtime = `${fs.statSync(FILE).mtimeMs}|${overridesMtime()}`;
+  const mtime = `${fs.statSync(FILE).mtimeMs}|${overridesMtime()}|${auslaufMtime()}|${new Date().toISOString().slice(0, 10)}`;
   if (state && state.mtime === mtime) return state;
   const raw: Product[] = JSON.parse(fs.readFileSync(FILE, 'utf8'));
   const base = new Map(raw.map((p) => [p.id, p]));
   const ov = readOverrides();
-  const merged: Product[] = raw.map((p) => (ov[p.id] ? { ...p, ...ov[p.id], id: p.id, custom: false } : p));
+  const merged: Product[] = raw.map((p) => applyEol(ov[p.id] ? { ...p, ...ov[p.id], id: p.id, custom: false } : p));
   for (const [id, o] of Object.entries(ov)) if (o.custom && !base.has(id)) merged.push({ sku: id, name: 'Neuer Artikel', brand: '', category: 'Sonstiges', description: '', basePrice: null, images: [], colors: [], sizes: [], ...o, id } as Product);
   for (const p of merged) { p.categorySlug = p.categorySlug && !ov[p.id]?.category ? p.categorySlug : slugify(p.category || 'sonstiges'); }
   const all = merged.map((p, k) => [p, k] as const).sort((a, b) => Number(!!b[0].top) - Number(!!a[0].top) || a[1] - b[1]).map(([p]) => p);
@@ -75,7 +76,7 @@ export function slimCard(p: PublicProduct): PublicProduct {
   const { description: _d, features, specs, composition: _c, stockBy: _s, sizeChart: _sc, tags: _t, ...r } = p;
   const cert = specs?.['Zertifizierung'];
   const pend = (features ?? []).filter((x) => /in arbeit/i.test(x));
-  return { ...r, description: '', images: p.images.slice(0, 2), colors: p.colors.map((c) => ({ name: c.name, hex: c.hex, swatch: c.swatch })), ...(cert ? { specs: { Zertifizierung: cert } } : {}), ...(pend.length ? { features: pend } : {}) };
+  return { ...r, eol: p.eol?.all ? { all: true, date: p.eol.date, colors: {} } : undefined, description: '', images: p.images.slice(0, 2), colors: p.colors.map((c) => ({ name: c.name, hex: c.hex, swatch: c.swatch })), ...(cert ? { specs: { Zertifizierung: cert } } : {}), ...(pend.length ? { features: pend } : {}) };
 }
 /** Piktogramme für die Artikelseite */
 export const pictosOf = (id: string) => { const p = load().byId.get(id); return p ? pictosFor(p) : { features: [], care: [], props: [] }; };

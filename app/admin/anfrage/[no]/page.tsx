@@ -31,7 +31,8 @@ export default function InquiryPage({ params }: { params: { no: string } }) {
   const ek = i.lines.map((l) => {
     const p = l.id ? adminProduct(l.id).p : null, total = qtyBy[l.id ?? l.sku];
     const t = [...(p?.baseTiers ?? [])].filter((x) => x.price > 0).sort((a, b) => a.min - b.min).reverse().find((x) => total >= x.min);
-    return { unit: t?.price ?? l.ek ?? p?.basePrice ?? null, tier: t?.min ?? null, total };
+    const ec = p?.eol?.colors[l.color]; const eol = p?.eol?.all || (ec && (!ec.sizes || ec.sizes.includes(l.size))) ? (ec?.date ?? p?.eol?.date ?? null) : undefined;
+    return { unit: t?.price ?? l.ek ?? p?.basePrice ?? null, tier: t?.min ?? null, total, eol, gone: !p || !!p.hidden };
   });
   const ekSum = ek.reduce((x, e, k) => x + (e.unit ?? 0) * i.lines[k].qty, 0);
   return (
@@ -51,6 +52,7 @@ export default function InquiryPage({ params }: { params: { no: string } }) {
         if (i.lines.some((l) => l.deco?.method === 'Beratung gewünscht')) w.push('Kunde wünscht Beratung zur Veredelung');
         if (i.lines.some((l) => l.deco?.note)) w.push('Kunde hat Hinweise zur Veredelung notiert');
         if (i.customer.message) w.push('Kunde hat eine Nachricht geschrieben – bitte lesen');
+        if (ek.some((e) => e.eol !== undefined)) w.push('Auslaufartikel in der Anfrage – Verfügbarkeit bei L-Shop prüfen');
         if (!o.shipping) w.push('Versand 0 € – Pauschale unter Admin → Veredelung einstellen');
         const m = inquiryMargin({ ...i, offer: o });
         return <QuickOffer no={i.no} offer={o} gross={t.gross} net={t.net} margin={m} warnings={w} mail={mailEnabled()} email={i.customer.email} />;
@@ -85,7 +87,7 @@ export default function InquiryPage({ params }: { params: { no: string } }) {
           <tbody>{i.lines.map((l, k) => (
             <tr key={k}>
               <td>{l.sku}</td>
-              <td>{l.sample && <span className="sample-tag">Muster</span>}{l.id ? <Link href={`/produkt/${l.id}`} className="alink" target="_blank">{l.name}</Link> : l.name}{l.deco && <div className="deco-tag">✦ {decoLabel(l.deco)}{l.deco.note && <> – <i>{l.deco.note}</i></>}</div>}
+              <td>{ek[k].eol !== undefined && <span className="sample-tag eol-tag" title="laut L-Shop-Auslaufliste">läuft aus{ek[k].eol ? ` ${new Date(ek[k].eol + 'T12:00:00').toLocaleDateString('de-DE')}` : ''}</span>}{l.sample && <span className="sample-tag">Muster</span>}{l.id ? <Link href={`/produkt/${l.id}`} className="alink" target="_blank">{l.name}</Link> : l.name}{l.deco && <div className="deco-tag">✦ {decoLabel(l.deco)}{l.deco.note && <> – <i>{l.deco.note}</i></>}</div>}
                 {l.deco?.team?.rows.length ? <div className="muted" style={{ fontSize: 12.5 }}>{l.deco.team.pos}: {teamLabel(l.deco.team.rows)}</div> : null}
                 {l.deco?.previews?.length ? <div className="cl-prev">{l.deco.previews.map((id) => <a key={id} href={`/api/upload/${id}`} target="_blank"><img src={`/api/upload/${id}`} alt="Vorschau" /></a>)}</div> : null}</td>
               <td>{l.color}</td><td>{l.size}</td><td>{l.qty}</td>

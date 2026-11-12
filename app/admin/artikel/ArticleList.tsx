@@ -5,9 +5,9 @@ import { useMemo, useState } from 'react';
 export type Row = {
   id: string; name: string; sku: string; brand: string; category: string; ek: number | null; vk: number | null;
   hidden: boolean; top: boolean; changed: boolean; custom: boolean; text: 'eigen' | 'vorlage' | 'automatisch';
-  img: string | null; colors: number; placeholder: boolean;
+  img: string | null; colors: number; placeholder: boolean; eol?: string | null;
 };
-type Status = 'alle' | 'sichtbar' | 'aus' | 'ohne-preis' | 'platzhalter' | 'geaendert';
+type Status = 'alle' | 'sichtbar' | 'aus' | 'ohne-preis' | 'platzhalter' | 'geaendert' | 'auslauf';
 const PER = 50;
 const eur = (n: number | null) => (n == null ? '–' : n.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' }));
 const TXT = { eigen: ['Eigener Text', 'st-angenommen'], vorlage: ['Vorlage', 'st-angebot'], automatisch: ['Automatisch', 'st-neu'] } as const;
@@ -28,7 +28,7 @@ export default function ArticleList({ rows: init, categories }: { rows: Row[]; c
 
   const count = (s: Status) => rows.filter((r) => match(r, s)).length;
   function match(r: Row, s: Status) {
-    return s === 'alle' || (s === 'sichtbar' && !r.hidden) || (s === 'aus' && r.hidden) || (s === 'ohne-preis' && r.ek == null) || (s === 'platzhalter' && r.placeholder) || (s === 'geaendert' && (r.changed || r.custom));
+    return s === 'alle' || (s === 'sichtbar' && !r.hidden) || (s === 'aus' && r.hidden) || (s === 'ohne-preis' && r.ek == null) || (s === 'platzhalter' && r.placeholder) || (s === 'geaendert' && (r.changed || r.custom)) || (s === 'auslauf' && !!r.eol);
   }
   const filtered = useMemo(() => {
     const t = q.trim().toLowerCase();
@@ -71,7 +71,7 @@ export default function ArticleList({ rows: init, categories }: { rows: Row[]; c
         </select>
       </div>
       <div className="cm-filters al-filters" role="tablist">
-        {([['alle', 'Alle'], ['sichtbar', 'Sichtbar'], ['aus', 'Ausgeblendet'], ['ohne-preis', 'Ohne Preis'], ['platzhalter', 'Platzhalter'], ['geaendert', 'Bearbeitet']] as [Status, string][]).map(([s, l]) => (
+        {([['alle', 'Alle'], ['sichtbar', 'Sichtbar'], ['aus', 'Ausgeblendet'], ['ohne-preis', 'Ohne Preis'], ['platzhalter', 'Platzhalter'], ['geaendert', 'Bearbeitet'], ['auslauf', 'Auslauf']] as [Status, string][]).map(([s, l]) => (
           <button key={s} role="tab" aria-selected={status === s} className={status === s ? 'on' : ''} onClick={() => { setStatus(s); reset(); }}>{l} <span>{count(s)}</span></button>
         ))}
       </div>
@@ -106,6 +106,7 @@ export default function ArticleList({ rows: init, categories }: { rows: Row[]; c
               <span className="al-tags">
                 {r.top && <span className="tag tag-ok">★ Top</span>}
                 {r.placeholder && <span className="tag tag-warn">Platzhalter</span>}
+                {r.eol && <span className="tag tag-warn" title="laut L-Shop-Auslaufliste">⏳ {r.eol}</span>}
                 {r.custom ? <span className="tag">eigener Artikel</span> : r.changed && <span className="tag">bearbeitet</span>}
                 <span className={`st ${TXT[r.text][1]}`} style={{ fontSize: 11 }}>{TXT[r.text][0]}</span>
               </span>

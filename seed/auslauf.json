@@ -1,0 +1,3366 @@
+{
+ "stand": "11.11.2026",
+ "items": {
+  "BCTK300": {
+   "all": true,
+   "date": "2026-12-31",
+   "colors": {
+    "Apricot": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Ash (Heather)": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Atoll": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Azure": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Black": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Bottle Green": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Burgundy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Denim": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Fuchsia": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Gold": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Kelly Green": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Light Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Orange": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Red": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Royal Blue": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Sky Blue": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Sport Grey (Heather)": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "White": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Yellow": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCTK301": {
+   "all": true,
+   "date": "2026-12-31",
+   "colors": {
+    "Ash (Heather)": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Black": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Gold": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Indigo": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Kelly Green": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Orange": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Pacific Grey": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Pink Sixties": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Red": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Royal Blue": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Sky Blue": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Sorbet": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Swimming Pool": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "White": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCTM055": {
+   "all": true,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Heather Dark Grey": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Heather Forest": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Heather Light Grey": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Heather Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Heather Purple": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Heather Royal Blue": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Red": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "White": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCTM057": {
+   "all": true,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Heather Light Grey": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Heather Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Red": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "White": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCTM072": {
+   "all": true,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Cobalt Blue": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Fire Red": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Sport Grey (Heather)": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "White": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCTM200": {
+   "all": false,
+   "date": "2026-12-31",
+   "colors": {
+    "Navy": {
+     "sizes": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Red": {
+     "sizes": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Royal Blue": {
+     "sizes": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCTM201": {
+   "all": false,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Red": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Sport Grey (Heather)": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    },
+    "White": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCTM202": {
+   "all": false,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Dark Grey (Solid)": {
+     "sizes": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Sport Grey (Heather)": {
+     "sizes": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCTU006": {
+   "all": false,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Dark Grey (Solid)": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Red": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Royal Blue": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Sport Grey (Heather)": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    },
+    "White": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCTW056": {
+   "all": true,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Heather Dark Grey": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Heather Forest": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Heather Light Grey": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Heather Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Heather Purple": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Heather Royal Blue": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Red": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "White": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCTW058": {
+   "all": true,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Heather Light Grey": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Heather Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Red": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "White": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCTW073": {
+   "all": true,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Cobalt Blue": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Fire Red": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Sport Grey (Heather)": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "White": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCWK680": {
+   "all": false,
+   "date": "2026-12-31",
+   "colors": {
+    "Red": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Royal Blue": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "White": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCWK681": {
+   "all": false,
+   "date": "2026-12-31",
+   "colors": {
+    "Real Green": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Sorbet": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Very Turquoise": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "White": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCWM646": {
+   "all": true,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCFM717": {
+   "all": true,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Steel Grey (Solid)": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCFU703": {
+   "all": false,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Charcoal (Solid)": {
+     "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Red": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCFU704": {
+   "all": false,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Charcoal (Solid)": {
+     "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Red": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCFU705": {
+   "all": false,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Charcoal (Solid)": {
+     "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Red": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCFU749": {
+   "all": false,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Olive": {
+     "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Red": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCFUI50": {
+   "all": false,
+   "date": "2026-12-31",
+   "colors": {
+    "Atoll": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Forest Green": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Pumpkin Orange": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCFW752": {
+   "all": true,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Steel Grey (Solid)": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCFWI51": {
+   "all": false,
+   "date": "2026-12-31",
+   "colors": {
+    "Atoll": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Forest Green": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Pumpkin Orange": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCJK969": {
+   "all": false,
+   "date": "2026-12-31",
+   "colors": {
+    "Azure": {
+     "sizes": [
+      "5/6",
+      "7/8"
+     ],
+     "date": "2026-12-31"
+    },
+    "Black": {
+     "sizes": [
+      "5/6",
+      "7/8"
+     ],
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": [
+      "5/6",
+      "7/8"
+     ],
+     "date": "2026-12-31"
+    },
+    "Red": {
+     "sizes": [
+      "5/6",
+      "7/8"
+     ],
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCJM825": {
+   "all": true,
+   "date": "2026-12-31",
+   "colors": {
+    "Atoll / Warm Grey": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Black / Warm Grey": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Dark Grey (Solid) / Warm Grey": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Navy / Warm Grey": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Red / Warm Grey": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "White / White": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCJM930": {
+   "all": false,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Dark Grey (Solid)": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Red": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "White": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCJM940": {
+   "all": true,
+   "date": "2026-12-31",
+   "colors": {
+    "Black / Cobalt Blue": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Dark Grey (Solid) / Neon Orange": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Navy / Neon Green": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Red / Black": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Royal Blue / Neon Orange": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "White / Warm Grey": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCJM950": {
+   "all": true,
+   "date": "2026-12-31",
+   "colors": {
+    "Azure": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Black": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Dark Grey (Solid)": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Red": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "White": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCJM951": {
+   "all": true,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Deep Red": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "White": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCJM963": {
+   "all": true,
+   "date": "2026-12-31",
+   "colors": {
+    "Black / Cobalt Blue": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Navy / Neon Green": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Real Green / Neon Orange": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Red / Warm Grey": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Royal Blue / Neon Orange": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "White / White": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCJM970": {
+   "all": true,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Deep Red": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Orange": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Royal Blue": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "White": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCJU801": {
+   "all": false,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Bottle Green": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Dark Grey (Solid)": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Red": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Royal Blue": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Very Yellow": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    },
+    "White": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCJU824": {
+   "all": false,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Dark Grey (Solid)": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Red": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCJU873": {
+   "all": true,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Dark Grey (Solid)": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCJU880": {
+   "all": false,
+   "date": "2026-12-31",
+   "colors": {
+    "Beige": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Black": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Olive": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Red": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCJUC40": {
+   "all": false,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Brown": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Dark Grey (Solid)": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Red": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCJUC41": {
+   "all": false,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Dark Grey (Solid)": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCJUC42": {
+   "all": false,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Dark Grey (Solid)": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCJUI60": {
+   "all": false,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Dark Grey (Solid)": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Orange": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Red": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    },
+    "White": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCJUI62": {
+   "all": false,
+   "date": "2026-12-31",
+   "colors": {
+    "Atoll / Ghost Grey": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Black / Black": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Dark Grey (Solid) / Neon Orange": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Navy / Neon Green": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    },
+    "Red / Warm Grey": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    },
+    "White / White": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCJW826": {
+   "all": true,
+   "date": "2026-12-31",
+   "colors": {
+    "Atoll / Warm Grey": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Black / Warm Grey": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Dark Grey (Solid) / Warm Grey": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Navy / Warm Grey": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Red / Warm Grey": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "White / White": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCJW925": {
+   "all": true,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Deep Red": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Orange": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Royal Blue": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "White": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCJW935": {
+   "all": true,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Red": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "White": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCJW937": {
+   "all": true,
+   "date": "2026-12-31",
+   "colors": {
+    "Azure": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Black": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Dark Grey (Solid)": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Red": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "White": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCJW938": {
+   "all": true,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Deep Red": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "White": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCJW941": {
+   "all": true,
+   "date": "2026-12-31",
+   "colors": {
+    "Black / Cobalt Blue": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Dark Grey (Solid) / Neon Orange": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Navy / Neon Green": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Red / Black": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Royal Blue / Neon Orange": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "White / Warm Grey": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCJW964": {
+   "all": true,
+   "date": "2026-12-31",
+   "colors": {
+    "Black / Cobalt Blue": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Navy / Neon Green": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Real Green / Neon Orange": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Red / Warm Grey": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Royal Blue / Neon Orange": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "White / White": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCJWI61": {
+   "all": true,
+   "date": "2026-12-31",
+   "colors": {
+    "Black": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Dark Grey (Solid)": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Orange": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Red": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "White": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BCJWI63": {
+   "all": true,
+   "date": "2026-12-31",
+   "colors": {
+    "Atoll / Ghost Grey": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Black / Black": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Dark Grey (Solid) / Neon Orange": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Navy / Neon Green": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Red / Warm Grey": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "White / White": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "BY002": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Navy": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY004": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Frozen Yellow": {
+     "sizes": null,
+     "date": null
+    },
+    "Pink Marshmallow": {
+     "sizes": [
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY007": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Black / Charcoal (Heather)": {
+     "sizes": [
+      "S",
+      "M",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY008": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Heather Grey": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XXL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY012": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "City Red": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": null
+    },
+    "Grass Green": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": null
+    },
+    "Intense Blue": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY015": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Black / Red": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY016": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Dark Shadow / Dark Shadow": {
+     "sizes": null,
+     "date": null
+    },
+    "Red / White": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY021": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Bright Blue": {
+     "sizes": [
+      "XS",
+      "S",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    },
+    "Dimyellow": {
+     "sizes": null,
+     "date": null
+    },
+    "Forest Green": {
+     "sizes": null,
+     "date": null
+    },
+    "Fresh Green": {
+     "sizes": null,
+     "date": null
+    },
+    "Magic Salvia": {
+     "sizes": [
+      "XS",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    },
+    "Neo Mint": {
+     "sizes": [
+      "M",
+      "XXL"
+     ],
+     "date": null
+    },
+    "Ocean Blue": {
+     "sizes": [
+      "XS",
+      "S",
+      "M",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    },
+    "Pale Leaf": {
+     "sizes": [
+      "XS",
+      "M"
+     ],
+     "date": null
+    },
+    "Sand": {
+     "sizes": [
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    },
+    "Vintage Blue": {
+     "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY037": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Black": {
+     "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY042": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "City Red": {
+     "sizes": null,
+     "date": null
+    },
+    "Grey": {
+     "sizes": [
+      "XS",
+      "S",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    },
+    "Light Navy": {
+     "sizes": [
+      "XS",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    },
+    "Ocean Blue": {
+     "sizes": [
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    },
+    "Pale Olive": {
+     "sizes": null,
+     "date": null
+    },
+    "Pink": {
+     "sizes": [
+      "XS",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY044": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Dark Olive": {
+     "sizes": [
+      "XS",
+      "XL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY052": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Pink": {
+     "sizes": [
+      "XS",
+      "S",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY053": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Asphalt": {
+     "sizes": [
+      "S",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    },
+    "Darkgrey White": {
+     "sizes": null,
+     "date": null
+    },
+    "Grey Black": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY075": {
+   "all": false,
+   "date": "2026-11-06",
+   "colors": {
+    "City Red": {
+     "sizes": [
+      "XS",
+      "S",
+      "M",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-11-06"
+    },
+    "Grass Green": {
+     "sizes": null,
+     "date": null
+    },
+    "Intense Blue": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY080": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Charcoal (Heather)": {
+     "sizes": [
+      "S",
+      "M",
+      "XL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY096": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Olive": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY098": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Sand": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY101": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Dusk Rose": {
+     "sizes": null,
+     "date": null
+    },
+    "Lilac": {
+     "sizes": [
+      "XS",
+      "S",
+      "M",
+      "XXL"
+     ],
+     "date": null
+    },
+    "Soft Salvia": {
+     "sizes": null,
+     "date": null
+    },
+    "Soft Yellow": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY102": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Dark Blue": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": null
+    },
+    "Pale Moss": {
+     "sizes": [
+      "XS",
+      "S",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY115": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Pink": {
+     "sizes": [
+      "110/116",
+      "122/128",
+      "134/140",
+      "158/164"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY117": {
+   "all": false,
+   "date": "2026-10-27",
+   "colors": {
+    "Dusk Rose": {
+     "sizes": [
+      "110/116",
+      "122/128",
+      "158/164"
+     ],
+     "date": null
+    },
+    "Soft Salvia": {
+     "sizes": null,
+     "date": "2026-10-27"
+    }
+   }
+  },
+  "BY123": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "White": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY129": {
+   "all": true,
+   "date": null,
+   "colors": {
+    "Black / White": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY131": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Black": {
+     "sizes": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY137": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Black": {
+     "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY149": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "City Red": {
+     "sizes": null,
+     "date": null
+    },
+    "Dark Shadow": {
+     "sizes": null,
+     "date": null
+    },
+    "Sand": {
+     "sizes": null,
+     "date": null
+    },
+    "Soft Lilac": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY150": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Black": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY154": {
+   "all": true,
+   "date": null,
+   "colors": {
+    "Black": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY157": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Dark Olive": {
+     "sizes": [
+      "S",
+      "L",
+      "3XL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY162": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Ocean Blue": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY163": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Olive": {
+     "sizes": null,
+     "date": null
+    },
+    "U. Beige": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY181": {
+   "all": true,
+   "date": null,
+   "colors": {
+    "Black": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY183": {
+   "all": false,
+   "date": "2026-10-28",
+   "colors": {
+    "Black": {
+     "sizes": [
+      "XS",
+      "S",
+      "M",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-10-28"
+    }
+   }
+  },
+  "BY185": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "City Red": {
+     "sizes": null,
+     "date": null
+    },
+    "Grass Green": {
+     "sizes": null,
+     "date": null
+    },
+    "Heather Grey": {
+     "sizes": null,
+     "date": null
+    },
+    "Intense Blue": {
+     "sizes": null,
+     "date": null
+    },
+    "Navy": {
+     "sizes": [
+      "134/140",
+      "158/164"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY188": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "City Red": {
+     "sizes": null,
+     "date": null
+    },
+    "Grass Green": {
+     "sizes": null,
+     "date": null
+    },
+    "Intense Blue": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY192": {
+   "all": false,
+   "date": "2026-11-06",
+   "colors": {
+    "Olive": {
+     "sizes": [
+      "XS",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-11-06"
+    },
+    "U. Beige": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY194": {
+   "all": true,
+   "date": null,
+   "colors": {
+    "Asphalt": {
+     "sizes": null,
+     "date": null
+    },
+    "Black": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY198": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "White": {
+     "sizes": [
+      "XS",
+      "S",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY208": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "White": {
+     "sizes": [
+      "XS",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY209": {
+   "all": true,
+   "date": null,
+   "colors": {
+    "Black": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY211": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Pale Olive": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY212": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Light Navy": {
+     "sizes": null,
+     "date": null
+    },
+    "Ocean Blue": {
+     "sizes": null,
+     "date": null
+    },
+    "Pink": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY230": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Black": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY235": {
+   "all": false,
+   "date": "2026-10-28",
+   "colors": {
+    "Black": {
+     "sizes": [
+      "XS",
+      "S",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-10-28"
+    },
+    "White": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY237": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "White Sand": {
+     "sizes": [
+      "XS",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY245": {
+   "all": false,
+   "date": "2026-10-27",
+   "colors": {
+    "Black": {
+     "sizes": [
+      "XS",
+      "S",
+      "L",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-10-27"
+    }
+   }
+  },
+  "BY254": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Heather Grey": {
+     "sizes": [
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY259": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Red": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY261": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Black": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY265": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Heather Grey": {
+     "sizes": [
+      "XS",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY268": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Hibiskus Pink": {
+     "sizes": null,
+     "date": null
+    },
+    "Viola Blue": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY269": {
+   "all": true,
+   "date": null,
+   "colors": {
+    "Black / White": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY284": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "U. Beige": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY285": {
+   "all": false,
+   "date": "2026-11-06",
+   "colors": {
+    "Light Asphalt": {
+     "sizes": [
+      "XS",
+      "S",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-11-06"
+    },
+    "U. Beige": {
+     "sizes": null,
+     "date": null
+    },
+    "White": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY286": {
+   "all": false,
+   "date": "2026-10-28",
+   "colors": {
+    "Beryl Blue": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    },
+    "Chocolate Brown": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    },
+    "Light Asphalt": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-10-28"
+    },
+    "Pale Olive": {
+     "sizes": null,
+     "date": null
+    },
+    "Plum Purple": {
+     "sizes": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    },
+    "Powder Blue": {
+     "sizes": null,
+     "date": null
+    },
+    "Soft Pink": {
+     "sizes": [
+      "XXL"
+     ],
+     "date": null
+    },
+    "U. Beige": {
+     "sizes": null,
+     "date": null
+    },
+    "White Sand": {
+     "sizes": null,
+     "date": "2026-10-27"
+    },
+    "White": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY288": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Beryl Blue": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    },
+    "Light Asphalt": {
+     "sizes": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    },
+    "Plum Purple": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    },
+    "U. Beige": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    },
+    "White": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY289": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Pale Olive": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY290": {
+   "all": false,
+   "date": "2026-10-28",
+   "colors": {
+    "Chocolate Brown": {
+     "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XXL",
+      "3XL"
+     ],
+     "date": null
+    },
+    "Light Asphalt": {
+     "sizes": null,
+     "date": null
+    },
+    "Pale Olive": {
+     "sizes": null,
+     "date": null
+    },
+    "Plum Purple": {
+     "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XXL",
+      "3XL"
+     ],
+     "date": "2026-10-28"
+    },
+    "Powder Blue": {
+     "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XXL",
+      "3XL"
+     ],
+     "date": null
+    },
+    "White Sand": {
+     "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XXL",
+      "3XL"
+     ],
+     "date": null
+    },
+    "White": {
+     "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XXL",
+      "3XL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY291": {
+   "all": false,
+   "date": "2026-10-31",
+   "colors": {
+    "Chocolate Brown": {
+     "sizes": [
+      "XS",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    },
+    "Light Asphalt": {
+     "sizes": [
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    },
+    "Pale Olive": {
+     "sizes": null,
+     "date": null
+    },
+    "Plum Purple": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": "2026-10-31"
+    },
+    "Powder Blue": {
+     "sizes": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    },
+    "White Sand": {
+     "sizes": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    },
+    "White": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY294": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Magnet": {
+     "sizes": [
+      "XXL",
+      "3XL"
+     ],
+     "date": null
+    },
+    "Warm Khaki": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY295": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Warm Khaki": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY296": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Warm Khaki": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY300": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Magnet": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY302": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "White Sand": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY309": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Black": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    },
+    "Pale Olive": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY310": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Black": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": null
+    },
+    "White": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY312": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "New Light Blue Washed": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    },
+    "New Mid Blue Washed": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY362": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "Pale Olive": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY363": {
+   "all": false,
+   "date": null,
+   "colors": {
+    "White": {
+     "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL"
+     ],
+     "date": null
+    }
+   }
+  },
+  "BY367": {
+   "all": true,
+   "date": null,
+   "colors": {
+    "Black": {
+     "sizes": null,
+     "date": null
+    },
+    "Magnet": {
+     "sizes": null,
+     "date": null
+    },
+    "Navy": {
+     "sizes": null,
+     "date": null
+    },
+    "Pale Olive": {
+     "sizes": null,
+     "date": null
+    },
+    "White": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY368": {
+   "all": true,
+   "date": null,
+   "colors": {
+    "Black": {
+     "sizes": null,
+     "date": null
+    },
+    "Navy": {
+     "sizes": null,
+     "date": null
+    },
+    "White": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "BY383": {
+   "all": true,
+   "date": null,
+   "colors": {
+    "Black": {
+     "sizes": null,
+     "date": null
+    }
+   }
+  },
+  "JN8022": {
+   "all": false,
+   "date": "2026-12-31",
+   "colors": {
+    "Black Heather": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Lime Green": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Royal Heather": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "JN963": {
+   "all": true,
+   "date": "2026-12-31",
+   "colors": {
+    "Black / Grey Heather": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Cobalt / Grey Heather": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Dark Orange / Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Green / Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Grey Melange / Navy": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Navy / Cobalt": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Off White / Grey Heather": {
+     "sizes": null,
+     "date": "2026-12-31"
+    },
+    "Red / Grey Heather": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  },
+  "TR510": {
+   "all": false,
+   "date": "2026-12-31",
+   "colors": {
+    "Sage Green Melange": {
+     "sizes": null,
+     "date": "2026-12-31"
+    }
+   }
+  }
+ }
+}

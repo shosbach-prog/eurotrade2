@@ -25,7 +25,7 @@ type Logo = { id: string; name: string };
 export type TeamCtx = { slug: string; name: string; logoId?: string | null; logoName?: string | null; method: string; positions: string[]; personalize: 'aus' | 'name' | 'nummer' | 'beides'; deadline?: string | null; open: boolean };
 type PText = { headline: string; intro: string; highlights: string[]; idealFor: string };
 type Pic = { src: string; label: string };
-export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fits, anchors, admin, team, pictos }: { pictos?: { features: Pic[]; care: Pic[] }; p: PublicProduct; fits?: Record<string, number[]>; anchors?: Record<string, Record<string, [number, number, number, number]>>; admin?: boolean; team?: TeamCtx | null; customerLogo?: Logo | null; delivery?: string; copy?: PText; pricing?: DecoPricing | null }) {
+export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fits, anchors, admin, team, pictos, gpsr }: { gpsr?: { firma: string; adresse: string[]; kontakt: string[] } | null; pictos?: { features: Pic[]; care: Pic[] }; p: PublicProduct; fits?: Record<string, number[]>; anchors?: Record<string, Record<string, [number, number, number, number]>>; admin?: boolean; team?: TeamCtx | null; customerLogo?: Logo | null; delivery?: string; copy?: PText; pricing?: DecoPricing | null }) {
   const { addMany } = useCart();
   const [color, setColor] = useState(p.colors[0]);
   // Mengen je Farbe + Größe ("Black|M" -> 5) – mehrere Farben in einem Schritt möglich
@@ -71,6 +71,8 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
   const [distOpen, setDistOpen] = useState(false);
 
   const sizes = p.sizes.length ? p.sizes : [''];
+  const eolC = (c: string) => p.eol?.colors[c];
+  const fmtD = (d: string) => new Date(d + 'T12:00:00').toLocaleDateString('de-DE');
   const cname = color?.name ?? '';
   const k = (c: string, s: string) => `${c}|${s}`;
   const setQ = (s: string, v: number) => setQty((q) => ({ ...q, [k(cname, s)]: Math.max(0, Math.min(99999, Math.floor(v) || 0)) }));
@@ -198,6 +200,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
           <div className="vat">Schon ab 1 Stück · Ihren Preis erhalten Sie umgehend per E-Mail</div>
         </>}
 
+        {p.eol?.all && <div className="eol-box">⏳ <b>Auslaufartikel</b> – lieferbar solange Vorrat{p.eol.date ? `, voraussichtlich bis ${fmtD(p.eol.date)}` : ''}. Für Nachbestellungen später fragen Sie uns gern nach einem Nachfolger.</div>}
         {!!pictos?.features.length && <ul className="picto-row" aria-label="Eigenschaften">
           {pictos.features.map((x) => <li key={x.src}><img src={`/picto/${x.src}.png`} alt="" width={20} height={20} />{x.label}</li>)}
         </ul>}
@@ -205,11 +208,12 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
           <div className="opt">Farbe: <span className="muted">{cname}</span> {p.colors.length > 1 && <span className="muted" style={{ fontWeight: 400 }}>({p.colors.length} Farben)</span>}</div>
           <div className="swatches">
             {p.colors.map((c) => (
-              <button key={c.name} data-name={c.name} aria-label={`Farbe ${c.name}`} aria-pressed={c.name === cname} title={c.name} className={`sw ${c.name === cname ? 'on' : ''}`} style={{ background: swatchBg(c) }} onClick={() => setColor(c)}>
+              <button key={c.name} data-name={c.name} aria-label={`Farbe ${c.name}`} aria-pressed={c.name === cname} title={eolC(c.name) && !eolC(c.name)!.sizes ? `${c.name} – läuft aus` : c.name} className={`sw ${c.name === cname ? 'on' : ''} ${!p.eol?.all && eolC(c.name) && !eolC(c.name)!.sizes ? 'eol' : ''}`} style={{ background: swatchBg(c) }} onClick={() => setColor(c)}>
                 {colorTotals[c.name] ? <span className="sw-n">{colorTotals[c.name]}</span> : null}
               </button>
             ))}
           </div>
+          {!p.eol?.all && eolC(cname) && <p className="hint eol-hint">⏳ {cname}{eolC(cname)!.sizes ? ` in ${eolC(cname)!.sizes!.join(', ')}` : ''} läuft aus – lieferbar solange Vorrat{eolC(cname)!.date ? ` (voraussichtlich bis ${fmtD(eolC(cname)!.date!)})` : ''}.</p>}
         </>}
 
         <div className="opt opt-row"><span>{sizes.length > 1 ? <>Größen & Mengen{p.colors.length > 0 && <span className="muted" style={{ fontWeight: 400 }}> für <span className="dot-inline" style={{ background: color ? swatchBg(color) : '#ddd' }} />{cname}</span>}</> : 'Menge'}</span>{p.sizeChart && <a href={p.sizeChart} target="_blank" rel="noreferrer" className="sz-link">Größentabelle</a>}{!p.locked && <SizeAdvisor name={p.name} gender={p.gender} sizes={p.sizes} extra={`${p.description ?? ''} ${(p.features ?? []).join(' ')}`} chart={p.sizeChart} onPick={(s) => { setQ(s, Math.max(1, qty[k(cname, s)] || 0)); setTimeout(() => (document.querySelector(`[aria-label="Menge ${s}"]`) as HTMLInputElement | null)?.focus(), 50); }} />}</div>
@@ -232,6 +236,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
                   <input type="number" inputMode="numeric" min={0} placeholder="0" value={v || ''} onChange={(e) => setQ(s, Number(e.target.value))} onFocus={(e) => e.target.select()} aria-label={`Menge ${s}`} />
                   <button type="button" onClick={() => setQ(s, v + 1)} aria-label={`${s} mehr`}>+</button>
                 </div>
+                {st == null && !p.eol?.all && eolC(cname)?.sizes?.includes(s) && <span className="stock low">läuft aus</span>}
                 {st != null && <span className={`stock ${out ? 'no' : st < 10 ? 'low' : 'ok'}`}>{out ? 'nicht vorrätig' : st < 10 ? `nur ${st} Stk.` : 'auf Lager'}</span>}
                 {st != null && v > st && <span className="stock low">{out ? 'längere Lieferzeit' : `nur ${st} sofort`}</span>}
               </div>
@@ -404,6 +409,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
           {p.sizes.length > 0 && <><dt>Größen</dt><dd>{p.sizes.join(', ')}</dd></>}
           {specs.map(([key, v]) => <Fragment key={key}><dt>{key}</dt><dd>{v}</dd></Fragment>)}
         </dl>
+        {gpsr && <div className="gpsr"><b>Herstellerangaben (GPSR)</b><p>{gpsr.firma}<br />{gpsr.adresse.join(', ')}<br />{gpsr.kontakt.map((k, n) => <span key={k}>{n > 0 && ' · '}{k.includes('@') ? <a className="alink" href={`mailto:${k}`}>{k}</a> : <a className="alink" href={k.startsWith('http') ? k : `https://${k}`} target="_blank" rel="noreferrer nofollow">{k.replace(/^https?:\/\//, '').replace(/\/$/, '')}</a>}</span>)}</p></div>}
         {!!pictos?.care.length && <div className="care"><b>Pflegehinweise</b><ul>{pictos.care.map((x) => <li key={x.src}><img src={`/picto/${x.src}.png`} alt="" width={34} height={34} loading="lazy" /><span>{x.label}</span></li>)}</ul></div>}
         </details>
       </div>

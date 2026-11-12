@@ -12,6 +12,7 @@ import { productPath } from '@/lib/format';
 /** echte Merkmale als Badges – keine erfundenen Labels */
 function badges(p: PublicProduct): { t: string; c: string }[] {
   const b: { t: string; c: string }[] = [];
+  if (p.eol?.all) b.push({ t: 'Auslaufartikel', c: 'b-eol' });
   if (p.rating && p.rating.count >= 3 && p.rating.avg >= 4.5) b.push({ t: 'Top bewertet', c: 'b-top' });
   if (p.price != null && p.tiers.length) b.push({ t: `bis −${Math.round((1 - p.tiers[p.tiers.length - 1].price / p.price) * 100)} % Staffel`, c: 'b-deal' });
   // nur belegte Material-Labels (keine pauschalen Umweltaussagen)
