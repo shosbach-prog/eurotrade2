@@ -1,7 +1,6 @@
 'use client';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import ProductImage from './ProductImage';
-import TintedImage from './TintedImage';
 import type { PublicProduct } from '@/lib/types';
 
 /** L-Shop: 665px-Vorschau -> Originalbild für den Zoom */
@@ -9,11 +8,10 @@ import { mid, webp } from '@/lib/img';
 export const hiRes = (src: string) => src.replace(/\/generated\/product\/(\d+)\/\d+_\d+_\d+\//, '/master/product/$1/');
 const Z = 2.6; // Zoomfaktor
 
-type Props = { p: PublicProduct; hex?: string; overlay?: ReactNode; /** Farbe ohne eigenes Foto: Hauptbild im Browser umfärben */ tint?: { hex: string; name: string } };
+type Props = { p: PublicProduct; hex?: string; overlay?: ReactNode; /** Farbe ohne eigenes Foto: Hinweis mit Farbfeld, Foto bleibt unverändert */ tint?: { hex: string; name: string } };
 
 /** Produktgalerie wie bei Amazon: Thumbnails per Hover, Lupe mit Zoomfenster neben dem Bild, Vollbild per Klick */
 export default function Gallery({ p, hex, overlay, tint }: Props) {
-  const [tinted, setTinted] = useState(false);
   const imgs = p.webp ? p.images.map((x) => webp(x, true)!) : p.images;
   const thumbs = p.images.map((x) => mid(x, p.mid, p.webp)!);
   const [i, setI] = useState(0);
@@ -39,7 +37,6 @@ export default function Gallery({ p, hex, overlay, tint }: Props) {
   }, [full, imgs.length]);
 
   function move(e: React.MouseEvent) {
-    if (tint && tinted && i === 0) return; // umgefärbte Vorschau: kein Zoom auf das Originalfoto
     const el = box.current?.querySelector('img.pimg') as HTMLImageElement | null;
     if (!el || !el.naturalWidth || window.matchMedia('(hover: none), (max-width: 820px)').matches) return;
     const r = el.getBoundingClientRect();
@@ -75,8 +72,8 @@ export default function Gallery({ p, hex, overlay, tint }: Props) {
             if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3) { e.preventDefault(); setI((x) => (x + (dx < 0 ? 1 : -1) + imgs.length) % imgs.length); swiped.current = Date.now(); }
           }}
           onClick={() => src && Date.now() - swiped.current > 400 && setFull(true)}>
-          {tint && i === 0 && src ? <TintedImage src={src} hex={tint.hex} alt={p.name} colorName={tint.name} onState={setTinted} /> : <ProductImage p={p} src={src} hex={hex} priority={i === 0} />}
-          {tint && tinted && i === 0 && <span className="gal-tint">Farbvorschau „{tint.name}“ – Abbildung simuliert</span>}
+          <ProductImage p={p} src={src} hex={hex} priority={i === 0} />
+          {tint && <span className="gal-tint"><i style={{ background: tint.hex }} />{tint.name} – Foto zeigt eine andere Farbe</span>}
           {overlay}
           {imgs.length > 1 && <>
             <button type="button" className="gal-nav l" aria-label="Vorheriges Bild" onClick={(e) => { e.stopPropagation(); setZoom(null); setI((x) => (x - 1 + imgs.length) % imgs.length); }} onMouseMove={(e) => { e.stopPropagation(); setZoom(null); }}>‹</button>
