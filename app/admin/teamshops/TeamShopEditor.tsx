@@ -1,21 +1,20 @@
 'use client';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import type { TeamShop } from '@/lib/teamshop';
+import ArticlePicker, { PickedStrip, type PickItem } from '@/components/ArticlePicker';
 
 type Orders = { inquiries: number; items: { sku: string; name: string; color: string; sizes: Record<string, number>; total: number }[]; people: { no: string; name: string; email: string; date: string; pieces: number; status: string; personal: string[] }[] };
 type Shop = TeamShop & { orders: Orders };
-type Brief = { id: string; sku: string; name: string; brand: string };
+type Brief = PickItem;
 const empty = (): Partial<TeamShop> => ({ name: '', active: true, items: [], method: 'Stick', positions: ['Brust links'], personalize: 'aus', deadline: '', note: '', contact: '' });
 
 export default function TeamShopEditor({ shops: initial, products, methods, positions, base }: { shops: Shop[]; products: Brief[]; methods: string[]; positions: string[]; base: string }) {
   const [shops, setShops] = useState(initial);
   const [edit, setEdit] = useState<Partial<TeamShop> | null>(null);
-  const [q, setQ] = useState('');
+  const [picker, setPicker] = useState(false);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState('');
   const [open, setOpen] = useState<string | null>(null);
-  const byId = useMemo(() => new Map(products.map((p) => [p.id, p])), [products]);
-  const hits = useMemo(() => { const t = q.trim().toLowerCase(); return t.length < 2 ? [] : products.filter((p) => `${p.sku} ${p.name} ${p.brand}`.toLowerCase().includes(t)).slice(0, 12); }, [q, products]);
 
   async function upload(f?: File | null) {
     if (!f) return;
@@ -47,7 +46,7 @@ export default function TeamShopEditor({ shops: initial, products, methods, posi
 
   return (
     <div className="ts">
-      <div className="pe-top"><span style={{ flex: 1 }} /><button className="btn" onClick={() => { setEdit(empty()); setQ(''); }}>+ Neuer Team-Shop</button></div>
+      <div className="pe-top"><span style={{ flex: 1 }} /><button className="btn" onClick={() => { setEdit(empty()); }}>+ Neuer Team-Shop</button></div>
       {!shops.length && !edit && <div className="box muted">Noch kein Team-Shop. Lege den ersten an – z. B. für einen Fußballverein mit Hoodie, T-Shirt und Trainingsjacke.</div>}
       {shops.map((s) => {
         const url = `${base}/team/${s.slug}`;
@@ -64,7 +63,7 @@ export default function TeamShopEditor({ shops: initial, products, methods, posi
               <div className="ts-stats"><b>{s.orders.inquiries}</b><span>Anfragen</span></div>
               <div className="ts-stats"><b>{pieces}</b><span>Teile</span></div>
               <div className="ts-actions">
-                <button className="btn alt sm" onClick={() => { setEdit({ ...s }); setQ(''); }}>Bearbeiten</button>
+                <button className="btn alt sm" onClick={() => { setEdit({ ...s }); }}>Bearbeiten</button>
                 {s.orders.inquiries > 0 && <button className="btn alt sm" onClick={() => setOpen(open === s.slug ? null : s.slug)}>Sammelbestellung</button>}
               </div>
             </div>
@@ -100,9 +99,8 @@ export default function TeamShopEditor({ shops: initial, products, methods, posi
             </div>
             <label>Hinweis auf der Shop-Seite</label><textarea rows={2} value={edit.note ?? ''} onChange={(e) => setEdit({ ...edit, note: e.target.value })} placeholder="z. B. Abholung beim Training am 12.12." />
             <label>Artikel ({edit.items?.length ?? 0})</label>
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Artikel suchen: Name, Art.-Nr. oder Marke …" />
-            {hits.length > 0 && <div className="ts-hits">{hits.map((p) => <button key={p.id} type="button" disabled={edit.items?.includes(p.id)} onClick={() => setEdit({ ...edit, items: [...(edit.items ?? []), p.id] })}><b>{p.sku}</b> {p.name} <span className="muted">{p.brand}</span></button>)}</div>}
-            <div className="ts-sel">{(edit.items ?? []).map((id) => <span key={id}>{byId.get(id)?.sku ?? id} {byId.get(id)?.name}<button type="button" onClick={() => setEdit({ ...edit, items: edit.items!.filter((x) => x !== id) })}>×</button></span>)}</div>
+            <PickedStrip items={products} value={edit.items ?? []} onOpen={() => setPicker(true)} onRemove={(id) => setEdit({ ...edit, items: edit.items!.filter((x) => x !== id) })} />
+            {picker && <ArticlePicker items={products} value={edit.items ?? []} onChange={(ids) => setEdit((e) => ({ ...e!, items: ids }))} title={`Artikel für ${edit.name || 'den Team-Shop'}`} onClose={() => setPicker(false)} />}
             <label className="ds-check"><input type="checkbox" checked={edit.active !== false} onChange={(e) => setEdit({ ...edit, active: e.target.checked })} /> Shop ist aktiv</label>
             <div className="deco-row" style={{ marginTop: 10 }}>
               <button className="btn" disabled={busy || !edit.name?.trim()} onClick={save}>{busy ? 'Speichert …' : 'Speichern'}</button>

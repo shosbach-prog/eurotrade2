@@ -138,6 +138,8 @@ export const adminProducts = () => load().all;
 export const adminProduct = (id: string) => { const s = load(); return { p: s.all.find((x) => x.id === id) ?? null, original: s.base.get(id) ?? null }; };
 export const imageInUse = (src: string) => load().all.some((p) => p.images.includes(src) || p.colors.some((c) => c.image === src || c.images?.includes(src)));
 /** Alle Artikel (Admin: Auswahl für Kollektionen) */
+/** Admin-Artikelauswahl: kompakt mit Kategorie, Zielgruppe und Vorschaubild */
+export const pickItems = () => load().products.map((p) => ({ id: p.id, sku: p.sku, name: p.name, brand: p.brand, category: p.category, gender: p.gender ?? 'Unisex', image: p.images[0] ?? p.colors.find((c) => c.image)?.image ?? null, colors: p.colors.length }));
 export const allProductsBrief = () => load().products.map((p) => ({ id: p.id, sku: p.sku, name: p.name, brand: p.brand, categorySlug: p.categorySlug }));
 
 /* ---------- Sonderangebote = Auslaufartikel (ganz oder einzelne Farben/Größen) ---------- */
