@@ -2,6 +2,8 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { ImageResponse } from 'next/og';
+import { PNG } from 'pngjs';
+import jpeg from 'jpeg-js';
 import { getProduct } from '@/lib/catalog';
 import { getTeamShop, rankedMotifs, teamFixedPrice } from '@/lib/teamshop';
 import { DATA, UPLOADS, readJSON } from '@/lib/store';
@@ -27,11 +29,11 @@ export async function GET(_req: Request, { params }: { params: { slug: string } 
   if (!t) return new Response('Nicht gefunden', { status: 404 });
   const motifs = rankedMotifs(t);
   // Cache je Shop-Stand (Motive/Artikel/Name/Preis) – das Rendern großer Motive dauert
-  const key = JSON.stringify(['v2', t.name, t.price, motifs.slice(0, 6).map((m) => m.id), t.items.slice(0, 6), t.logoId]);
+  const key = JSON.stringify(['v3', t.name, t.price, motifs.slice(0, 6).map((m) => m.id), t.items.slice(0, 6), t.logoId]);
   const hash = crypto.createHash('sha1').update(key).digest('hex').slice(0, 12);
   const dir = path.join(DATA, 'og');
-  const file = path.join(dir, `team-${t.slug}-${hash}.png`);
-  const headers = { 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=3600' };
+  const file = path.join(dir, `team-${t.slug}-${hash}.jpg`);
+  const headers = { 'Content-Type': 'image/jpeg', 'Cache-Control': 'public, max-age=3600' };
   if (fs.existsSync(file)) return new Response(fs.readFileSync(file), { headers });
 
   // Cover-Modus: vollflächige Motive (JPG, z. B. Album-Cover) groß und randlos auf dunklem Grund
@@ -82,7 +84,9 @@ export async function GET(_req: Request, { params }: { params: { slug: string } 
     ),
     { width: W, height: H, fonts: [...(inter ? [{ name: 'Inter', data: inter, weight: 600 as const, style: 'normal' as const }] : []), ...(anton ? [{ name: 'Anton', data: anton, weight: 400 as const, style: 'normal' as const }] : [])] },
   );
-  const buf = Buffer.from(await img.arrayBuffer());
-  try { fs.mkdirSync(dir, { recursive: true }); for (const f of fs.readdirSync(dir)) if (f.startsWith(`team-${t.slug}-`)) fs.unlinkSync(path.join(dir, f)); fs.writeFileSync(file, buf); } catch {}
+  // Als JPEG ausliefern: WhatsApp zeigt Vorschaubilder nur bis ca. 600 KB zuverlässig (PNG mit Fotos wäre ~750 KB)
+  const png = PNG.sync.read(Buffer.from(await img.arrayBuffer()));
+  const buf = Buffer.from(jpeg.encode({ data: png.data, width: png.width, height: png.height }, 84).data);
+  try { fs.mkdirSync(dir, { recursive: true }); for (const f of fs.readdirSync(dir)) if (f.startsWith(`team-${t.slug}-`) && f !== path.basename(file)) fs.unlinkSync(path.join(dir, f)); fs.writeFileSync(file, buf); } catch {}
   return new Response(buf, { headers });
 }
