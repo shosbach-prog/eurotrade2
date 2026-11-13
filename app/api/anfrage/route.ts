@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { adminProduct, getProduct } from '@/lib/catalog';
 import { getCustomer } from '@/lib/customer';
 import { FONTS, METHODS, POSITIONS, TEAM_POS, TEXT_COLORS, decoLabel, teamLabel, type Deco } from '@/lib/deco';
-import { getTeamShop } from '@/lib/teamshop';
+import { getTeamShop, teamFixedPrice } from '@/lib/teamshop';
 import { esc, sendMail, shopUrl } from '@/lib/mail';
 import { button, contactBlock, eur, h1, infoBox, itemsTable, layout, p, quote, signature, type MailLine } from '@/lib/mail-templates';
 import { sizeUnit } from '@/lib/tiers';
@@ -66,13 +66,16 @@ export async function POST(req: Request) {
     const qty = Math.max(1, Math.min(100000, Math.floor(Number(l.qty) || 1)));
     return p ? [{ p, l, qty }] : [];
   });
+  // Motiv-/Team-Shop mit Festpreis inkl. Druck
+  const team = body.team ? getTeamShop(String(body.team)) : null;
   // Staffelpreis nach Gesamtmenge je Artikel
   const perProduct = raw.reduce((m: Record<string, number>, x) => ({ ...m, [x.p.id]: (m[x.p.id] ?? 0) + x.qty }), {});
   const lines: InqLine[] = raw.map(({ p, l, qty }) => {
-    const price = sizeUnit(p.tiers, perProduct[p.id], p.price, p.sizeUp, String(l.size ?? ''));
+    const fixed = teamFixedPrice(team, p.id);
+    const price = fixed != null ? Math.round((fixed + (p.sizeUp?.[String(l.size ?? '')] ?? 0)) * 100) / 100 : sizeUnit(p.tiers, perProduct[p.id], p.price, p.sizeUp, String(l.size ?? ''));
     const sample = !!l.sample;
     const ek = adminProduct(p.id).p?.basePrice ?? null;
-    return { id: p.id, sku: p.sku, name: p.name, color: String(l.color ?? '').slice(0, 80), size: String(l.size ?? '').slice(0, 40), qty: sample ? 1 : qty, price, sum: Math.round((price ?? 0) * (sample ? 1 : qty) * 100) / 100, deco: cleanDeco(l.deco), ek, ...(sample ? { sample: true } : {}) };
+    return { id: p.id, sku: p.sku, name: p.name, color: String(l.color ?? '').slice(0, 80), size: String(l.size ?? '').slice(0, 40), qty: sample ? 1 : qty, price, sum: Math.round((price ?? 0) * (sample ? 1 : qty) * 100) / 100, deco: cleanDeco(l.deco), ek, ...(sample ? { sample: true } : {}), ...(fixed != null && l.deco ? { incl: true } : {}) };
   });
   if (!lines.length) return NextResponse.json({ error: 'Warenkorb ist leer.' }, { status: 400 });
   const total = lines.reduce((s, l) => s + l.sum, 0);
@@ -81,7 +84,6 @@ export async function POST(req: Request) {
 
   const sub = body.code ? validCode(String(body.code)) : null;
   const discount = sub && discountFor(total) > 0 ? { code: sub.code!, pct: discountFor(total) } : null;
-  const team = body.team ? getTeamShop(String(body.team)) : null;
   const inq: Inquiry = { no, date: new Date().toISOString(), zugangscode: via, customer, lines, total, discount, status: 'neu', token: randomId(16), offer: null, team: team?.slug ?? null, history: [{ date: new Date().toISOString(), text: team ? `Anfrage über Team-Shop „${team.name}“ eingegangen` : 'Anfrage eingegangen' }] };
   saveInquiry(inq); // immer lokal sichern (auch wenn Mail ausfällt)
   try { cartDone(customer.email); } catch {}

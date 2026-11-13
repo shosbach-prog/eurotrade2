@@ -1828,3 +1828,22 @@ html,body{overflow-x:clip}
 .kond-t td.k-ok,.kond-t td.k-mid,.kond-t td.k-low{font-weight:600}
 .kond-ups{margin:6px 0 0;font-size:12px}
 @media (max-width:560px){.kond-kpi{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Motiv-Shop (z. B. Channel-Merch): Motiv-Galerie */
+.motif-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin:8px 0 28px}
+.motif-grid .motif{display:flex;flex-direction:column;gap:6px;align-items:center;padding:10px;border:2px solid #e5e7eb;border-radius:12px;background:#fff;cursor:pointer;text-align:center;font-size:13px;font-weight:600;color:var(--ink);transition:border-color .12s,transform .12s}
+.motif-grid .motif:hover{border-color:var(--brand);transform:translateY(-2px)}
+.motif-grid .motif.on{border-color:var(--brand);box-shadow:0 0 0 3px rgba(37,99,235,.18)}
+.motif-grid .motif img{width:100%;aspect-ratio:1;object-fit:contain;background:repeating-conic-gradient(#f3f4f6 0 25%,#fff 0 50%) 0 0/16px 16px;border-radius:8px}
+.motif-grid.sm{grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:6px;margin:8px 0 0;max-height:220px;overflow:auto;padding:2px}
+.motif-grid.sm .motif{padding:4px;border-radius:8px}
+.motif-pick{margin:14px 0;padding:12px;border:1px solid #e5e7eb;border-radius:12px;background:#fafafa}
+.motif-pick-h{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;font-size:14px}
+.mshop .card.dim{opacity:.75}
+.mshop .card .img{position:relative}
+.mshop .motif-on{position:absolute;left:50%;top:30%;width:28%;transform:translateX(-50%);object-fit:contain;pointer-events:none}
+.ts-motifs{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:8px}
+.ts-motif{display:flex;flex-direction:column;gap:4px;padding:6px;border:1px solid #e5e7eb;border-radius:8px;background:#fff}
+.ts-motif img{width:100%;aspect-ratio:1;object-fit:contain;background:repeating-conic-gradient(#f3f4f6 0 25%,#fff 0 50%) 0 0/12px 12px;border-radius:6px}
+.ts-motif input{font-size:12px;padding:4px 6px;height:auto}
+.ts-motif-a{display:flex;gap:6px;justify-content:space-between;font-size:12px}

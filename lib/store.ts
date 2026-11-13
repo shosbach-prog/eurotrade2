@@ -79,7 +79,7 @@ export const findCustomer = (code: string) => allCustomers().find((c) => c.code 
 import { posLabel, decoText, type Deco } from './deco';
 import { DEFAULT_PRICING, calcDeco, cleanPricing, teamUnit } from './deco-pricing';
 export type { Deco };
-export type InqLine = { id?: string; sku: string; name: string; color: string; size: string; qty: number; price: number | null; sum: number; deco?: Deco | null; /** Musterteil – wird bei Folgeauftrag angerechnet */ sample?: boolean; /** Einkaufspreis netto zum Zeitpunkt der Anfrage (für die Marge) */ ek?: number | null };
+export type InqLine = { id?: string; sku: string; name: string; color: string; size: string; qty: number; price: number | null; sum: number; deco?: Deco | null; /** Musterteil – wird bei Folgeauftrag angerechnet */ sample?: boolean; /** Einkaufspreis netto zum Zeitpunkt der Anfrage (für die Marge) */ ek?: number | null; /** Festpreis inkl. Veredelung (Motiv-/Team-Shop) – keine eigene Veredelungsposition */ incl?: boolean };
 export type OfferLine = { text: string; detail?: string; qty: number; price: number };
 export type Offer = { lines: OfferLine[]; shipping: number; note: string; validDays: number; createdAt: string; sentAt?: string | null; vat: number };
 export type Status = 'neu' | 'angebot' | 'angenommen' | 'bestellt' | 'geliefert' | 'abgelehnt';
@@ -138,11 +138,11 @@ export function offerTotals(o: Offer) {
 
 /** Angebot aus der Anfrage vorbelegen (Shoppreise + Veredelung als eigene Position) */
 export function draftOffer(i: Inquiry): Offer {
-  const lines: OfferLine[] = i.lines.map((l) => ({ text: `${l.sample ? 'MUSTER · ' : ''}${l.sku} ${l.name}`, detail: [l.color, l.size, l.sample ? 'Musterteil – wird bei Folgeauftrag angerechnet' : ''].filter(Boolean).join(', '), qty: l.qty, price: l.price ?? 0 }));
+  const lines: OfferLine[] = i.lines.map((l) => ({ text: `${l.sample ? 'MUSTER · ' : ''}${l.sku} ${l.name}`, detail: [l.color, l.size, l.sample ? 'Musterteil – wird bei Folgeauftrag angerechnet' : '', l.incl && l.deco ? `inkl. ${l.deco.method} ${l.deco.positions.join(', ')}${l.deco.logoName ? ` – ${l.deco.logoName}` : ''}` : ''].filter(Boolean).join(', '), qty: l.qty, price: l.price ?? 0 }));
   const decos = new Map<string, { d: Deco; qty: number }>();
   const teamRows: { what: string; pos: string; n: number; names: string }[] = [];
   for (const l of i.lines) if (l.deco?.team?.rows.length) teamRows.push({ what: l.deco.team.what, pos: l.deco.team.pos, n: l.deco.team.rows.length, names: l.deco.team.rows.map((r) => [r.name, r.nr && `#${r.nr}`].filter(Boolean).join(' ')).join(', ') });
-  for (const l of i.lines) if (l.deco) {
+  for (const l of i.lines) if (l.deco && !l.incl) {
     // gleiche Veredelung über Größen hinweg zusammenfassen (Teamliste und Vorschaubilder zählen nicht)
     const k = JSON.stringify({ ...l.deco, team: null, previews: null });
     const e = decos.get(k) ?? { d: l.deco, qty: 0 };
@@ -152,7 +152,7 @@ export function draftOffer(i: Inquiry): Offer {
   const raw = readJSON<unknown>(path.join(DATA, 'veredelung.json'), null);
   const pricing = raw ? cleanPricing(raw) : DEFAULT_PRICING;
   for (const { d, qty } of decos.values()) {
-    const motiv = [d.logoName ? `Logo: ${d.logoName}` : '', decoText(d)].filter(Boolean).join(' · ');
+    const motiv = [d.logoName ? (d.logoName.startsWith('Motiv: ') ? d.logoName : `Logo: ${d.logoName}`) : '', decoText(d)].filter(Boolean).join(' · ');
     const calc = calcDeco(pricing, d.method, d.positions.map((pos) => ({ pos, cm: d.sizes?.[pos] ?? 10 })), qty);
     if (!calc) { lines.push({ text: `Veredelung: ${d.method}`, detail: [posLabel(d), motiv].filter(Boolean).join(' · '), qty, price: 0 }); continue; }
     for (const c of calc.lines) {

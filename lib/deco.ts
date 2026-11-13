@@ -80,7 +80,7 @@ export const isImage = (name?: string | null) => /\.(png|jpe?g|webp|svg)$/i.test
 export const decoText = (d?: Deco | null) => (d?.text ? `Text „${d.text.replace(/\n/g, ' / ')}“ (${d.font ?? FONTS[0].id}, ${d.textColor ?? 'Schwarz'})` : '');
 /** „Brust links (ca. 9 cm), Rücken (ca. 28 cm)“ */
 export const posLabel = (d: Deco) => d.positions.map((p) => (d.sizes?.[p] ? `${p} (ca. ${d.sizes[p]} cm)` : p)).join(', ');
-export const decoLabel = (d?: Deco | null) => (d ? [`${d.method}: ${posLabel(d)}`, d.logoName ? `Logo: ${d.logoName}` : '', decoText(d), d.team?.rows.length ? `${d.team.what === 'nummer' ? 'Nummern' : d.team.what === 'name' ? 'Namen' : 'Namen + Nummern'} (${d.team.pos}): ${d.team.rows.length}×` : ''].filter(Boolean).join(' · ') : '');
+export const decoLabel = (d?: Deco | null) => (d ? [`${d.method}: ${posLabel(d)}`, d.logoName ? (d.logoName.startsWith('Motiv: ') ? d.logoName : `Logo: ${d.logoName}`) : '', decoText(d), d.team?.rows.length ? `${d.team.what === 'nummer' ? 'Nummern' : d.team.what === 'name' ? 'Namen' : 'Namen + Nummern'} (${d.team.pos}): ${d.team.rows.length}×` : ''].filter(Boolean).join(' · ') : '');
 
 /** Veredelung auf einen anderen Artikel übertragen: unpassende Positionen (z. B. „Brust links“ auf einer Cap) werden ersetzt */
 export function adaptDeco(d: Deco | null, p: { category?: string; name?: string }): Deco | null {

@@ -168,7 +168,7 @@ export default function CartClient({ share, contact, remind }: { share: string |
                     : l.size && <span>{l.size}</span>}
                   {l.price != null && <span>{pr.p(unit(l))}/Stk.{unitFor(l.tiers, perProduct[l.id], l.price)! < l.price && <span className="ok"> (Staffel)</span>}</span>}
                 </div>
-                {l.deco && <div className="deco-tag">✦ {decoLabel(l.deco)} <button className="linkbtn" onClick={() => update(l.key, { deco: null })}>entfernen</button></div>}
+                {l.deco && <div className="deco-tag">✦ {decoLabel(l.deco)} {!l.team && <button className="linkbtn" onClick={() => update(l.key, { deco: null })}>entfernen</button>}</div>}
                 {l.deco?.team?.rows.length ? <div className="muted" style={{ fontSize: 12.5 }}>{l.deco.team.rows.map((r) => [r.name, r.nr && `#${r.nr}`].filter(Boolean).join(' ')).join(', ')}</div> : null}
                 {l.deco?.previews?.length ? <div className="cl-prev">{l.deco.previews.map((id) => <img key={id} src={`/api/upload/${id}`} alt="Vorschau" />)}</div> : null}
               </div>
@@ -183,7 +183,7 @@ export default function CartClient({ share, contact, remind }: { share: string |
               </div>
             </div>
           ))}
-          {decos.length > 0 && lines.some((l) => (!l.deco && !l.sample) || decos.length > 1) && (
+          {decos.length > 0 && !lines.some((l) => l.team) && lines.some((l) => (!l.deco && !l.sample) || decos.length > 1) && (
             <div className="deco-all">
               <span>✦ Gleiche Veredelung für alle Positionen?</span>
               {decos.map((d) => <button key={JSON.stringify(d)} className="btn alt" style={{ height: 36 }} onClick={() => decoToAll(d)}>{decos.length > 1 ? `„${decoLabel(d)}“ übernehmen` : 'Auf alle übertragen'}</button>)}
