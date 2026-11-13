@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
@@ -11,7 +12,14 @@ import { Money } from '@/components/PriceMode';
 export const dynamic = 'force-dynamic';
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const t = getTeamShop(params.slug);
-  return { title: t ? `Team-Shop ${t.name}` : 'Team-Shop', robots: { index: false, follow: false } };
+  if (!t) return { title: 'Team-Shop', robots: { index: false, follow: false } };
+  const n = t.motifs?.length ?? 0;
+  const title = n ? `${t.name} – Shirts mit ${n} Motiven` : `Team-Shop ${t.name}`;
+  const description = n ? `${n} Motive zur Auswahl: Motiv wählen, Shirt wählen – gedruckt ab 1 Stück. Offizieller Shop von ${t.name} auf euro-trade.com.` : `Offizieller Team-Shop ${t.name}: Artikel mit Logo ${t.method === 'Stick' ? 'bestickt' : 'bedruckt'}, ab 1 Stück – bestellen auf euro-trade.com.`;
+  // Versionsnummer im Bild-Link, damit WhatsApp & Co. nach Änderungen das neue Bild laden
+  const v = crypto.createHash('sha1').update(JSON.stringify([t.name, t.price, (t.motifs ?? []).slice(0, 6).map((m) => m.id), t.items.slice(0, 6), t.logoId])).digest('hex').slice(0, 10);
+  const image = { url: `/team/${t.slug}/og.png?v=${v}`, width: 1200, height: 630, alt: title };
+  return { title, description, robots: { index: false, follow: false }, alternates: { canonical: `/team/${t.slug}` }, openGraph: { type: 'website', title, description, url: `/team/${t.slug}`, images: [image] }, twitter: { card: 'summary_large_image', title, description, images: [image.url] } };
 }
 
 export default function TeamShopPage({ params, searchParams }: { params: { slug: string }; searchParams?: { motiv?: string } }) {
