@@ -25,7 +25,7 @@ import { KondBox } from '@/components/AdminKond';
 
 type Logo = { id: string; name: string };
 
-export type TeamCtx = { slug: string; name: string; logoId?: string | null; logoName?: string | null; method: string; positions: string[]; personalize: 'aus' | 'name' | 'nummer' | 'beides'; deadline?: string | null; open: boolean; /** Motiv-Shop: Auswahl der Motive */ motifs?: { id: string; name: string }[]; /** Team-Shop: mehrere Vereinslogos zur Auswahl */ logos?: { id: string; name: string }[]; /** Festpreis inkl. Druck */ fixed?: boolean };
+export type TeamCtx = { slug: string; name: string; logoId?: string | null; logoName?: string | null; method: string; positions: string[]; personalize: 'aus' | 'name' | 'nummer' | 'beides'; deadline?: string | null; open: boolean; /** Motiv-Shop: Auswahl der Motive */ motifs?: { id: string; name: string }[]; /** Team-Shop: mehrere Vereinslogos zur Auswahl */ logos?: { id: string; name: string }[]; /** Festpreis inkl. Druck */ fixed?: boolean; /** Rückendruck als Zusatzoption: Shop-Logo groß auf dem Rücken */ back?: { price: number; id: string; name: string } | null };
 type PText = { headline: string; intro: string; highlights: string[]; idealFor: string };
 type Pic = { src: string; label: string };
 export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fits, anchors, admin, team, pictos, gpsr, sizeTable }: { sizeTable?: { sizes: string[]; head?: string; rows: [string, string, (number | string)[]][]; note?: string; shape?: 'hoodie' | 'tshirt' } | null; gpsr?: { firma: string; adresse: string[]; kontakt: string[] } | null; pictos?: { features: Pic[]; care: Pic[] }; p: PublicProduct; fits?: Record<string, number[]>; anchors?: Record<string, Record<string, [number, number, number, number]>>; admin?: boolean; team?: TeamCtx | null; customerLogo?: Logo | null; delivery?: string; copy?: PText; pricing?: DecoPricing | null }) {
@@ -65,8 +65,22 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
     return o;
   });
   const [editPos, setEditPos] = useState(positions[0]);
-  const usedPos = multi ? positions.filter((x) => posLogo[x]) : positions;
-  const firstLogo = multi ? posLogo[usedPos[0]] ?? null : logo;
+  // Rückendruck-Option (Motiv-Shop mit Festpreis): Shop-Logo groß auf dem Rücken gegen Aufpreis
+  const canBack = !!team?.back && posList.includes('Rücken') && !positions.includes('Rücken');
+  const [backOn, setBackOn] = useState(false);
+  const basePos = multi ? positions.filter((x) => posLogo[x]) : positions;
+  const usedPos = backOn && canBack ? [...basePos, 'Rücken'] : basePos;
+  const firstLogo = multi ? posLogo[basePos[0]] ?? null : logo;
+  const logoAt = (x: string): Logo | null => (x === 'Rücken' && backOn && canBack ? { id: team!.back!.id, name: team!.back!.name } : multi ? posLogo[x] ?? null : logo);
+  const perLogo = multi || (backOn && canBack);
+  const unitPrice = p.price != null && backOn && canBack ? Math.round((p.price + team!.back!.price) * 100) / 100 : p.price;
+  useEffect(() => {
+    if (!backOn || !canBack) return;
+    const im = new Image(); let off = false;
+    im.onload = () => { if (off || !im.naturalWidth) return; const m = maxPlace(p, 'Rücken', im.naturalWidth / im.naturalHeight) ?? defaultPlace(p, 'Rücken'); if (m) setPlace((pl) => ({ ...pl, Rücken: m })); };
+    im.src = `/api/upload/${team!.back!.id}`;
+    return () => { off = true; };
+  }, [backOn]); // eslint-disable-line react-hooks/exhaustive-deps
   const pickChoice = (m: { id: string; name: string }) => {
     if (multi) setPosLogo((o) => ({ ...o, [editPos]: { id: m.id, name: m.name } }));
     else setLogo({ id: m.id, name: m.name });
@@ -150,7 +164,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
     const kind = spotsFor(p).kind;
     const pl = Object.fromEntries(usedPos.filter((x) => place[x]).map((x) => [x, place[x]]));
     const sizes = Object.fromEntries(usedPos.filter((x) => place[x]).map((x) => [x, cmFor(kind, place[x].w)]));
-    let deco: Deco | null = decoOn ? { method, positions: usedPos, place: pl, sizes, motif, ...(multi ? { logos: Object.fromEntries(usedPos.map((x) => [x, posLogo[x]!])) } : {}), logoId: useLogo ? firstLogo?.id ?? null : null, logoName: useLogo ? firstLogo?.name ?? null : null, text: useText ? text.trim() : null, font: useText ? font : null, textColor: useText ? tColor : null, note: [useLogo && !logo ? 'Logo folgt per E-Mail' : '', note.trim()].filter(Boolean).join(' · ') } : null;
+    let deco: Deco | null = decoOn ? { method, positions: usedPos, place: pl, sizes, motif, ...(perLogo ? { logos: Object.fromEntries(usedPos.map((x) => [x, logoAt(x)!])) } : {}), logoId: useLogo ? firstLogo?.id ?? null : null, logoName: useLogo ? firstLogo?.name ?? null : null, text: useText ? text.trim() : null, font: useText ? font : null, textColor: useText ? tColor : null, note: [useLogo && !logo ? 'Logo folgt per E-Mail' : '', note.trim()].filter(Boolean).join(' · ') } : null;
     setBusy(true);
     // Live-Vorschau als Bild an die Anfrage hängen (Freigabe im Angebot)
     if (deco && (studioProps.logoSrc || studioProps.text.trim())) {
@@ -165,7 +179,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
       const col = p.colors.find((x) => x.name === c);
       const rows = deco && teamOn && c === cname ? rowsFor(s, own[0]?.[0] === key) : [];
       const d = deco && rows.length ? { ...deco, team: { rows, pos: teamPos, what: teamWhat } } : deco;
-      return { id: p.id, sku: p.sku, name: p.name, color: c || undefined, hex: col?.hex, size: s || undefined, qty: n, price: p.price, ...(p.sizeUp ? { ups: p.sizeUp } : {}), category: p.category, image: col?.image ?? p.images[0], deco: d, tiers: p.tiers, sizes: p.sizes, ...(team ? { team: team.slug } : {}) };
+      return { id: p.id, sku: p.sku, name: p.name, color: c || undefined, hex: col?.hex, size: s || undefined, qty: n, price: unitPrice, ...(p.sizeUp ? { ups: p.sizeUp } : {}), category: p.category, image: col?.image ?? p.images[0], deco: d, tiers: p.tiers, sizes: p.sizes, ...(team ? { team: team.slug } : {}) };
     });
     addMany(items);
     setBusy(false);
@@ -192,7 +206,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
       <small>{total > 0 ? `bei ${total} Stück, ${est.lines.map((l) => `${l.pos} ca. ${l.cm} cm`).join(', ')} · ${pr.label} · ` : `Menge wählen – ab mehr Stück wird es günstiger · ${pr.label} · `}verbindlich im Angebot</small>
     </div>
   );
-  const studioProps = { product: p, colorHex: color?.hex, photo: color?.image ?? null, fit: color?.image ? (fits?.[color.image] as FitT | undefined) ?? null : null, anchor: color?.image ? anchors?.[color.image] ?? null : null, admin, positions: usedPos, active: activePos, setActive: setActivePos, place, setPlace, logoSrc: useLogo && firstLogo && (isImage(firstLogo.name) || choices.some((c) => c.id === firstLogo.id)) ? `/api/upload/${firstLogo.id}` : null, logoFor: multi ? Object.fromEntries(usedPos.map((x) => [x, `/api/upload/${posLogo[x]!.id}`])) : null, text: useText ? text : '', font, textColor: tColor, method, aspect };
+  const studioProps = { product: p, colorHex: color?.hex, photo: color?.image ?? null, fit: color?.image ? (fits?.[color.image] as FitT | undefined) ?? null : null, anchor: color?.image ? anchors?.[color.image] ?? null : null, admin, positions: usedPos, active: activePos, setActive: setActivePos, place, setPlace, logoSrc: useLogo && firstLogo && (isImage(firstLogo.name) || choices.some((c) => c.id === firstLogo.id)) ? `/api/upload/${firstLogo.id}` : null, logoFor: perLogo ? Object.fromEntries(usedPos.map((x) => [x, `/api/upload/${logoAt(x)!.id}`])) : null, text: useText ? text : '', font, textColor: tColor, method, aspect };
   // Galerie: Fotos der gewählten Farbe, danach Detailfotos des Artikels
   // Farbbild(er) zuerst, danach alle allgemeinen Ansichten (Rücken, Seite, Detail, Model) – keine Bilder anderer Farben
   const otherColorImgs = new Set(p.colors.filter((c) => c !== color).flatMap((c) => [c.image, ...(c.images ?? [])]).filter(Boolean) as string[]);
@@ -261,7 +275,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
           <div className="vat">Schon ab 1 Stück · Ihren Preis erhalten Sie umgehend per E-Mail</div>
         </>}
 
-        <KondBox id={p.id} />
+        <KondBox id={p.id} team={team?.fixed ? team.slug : null} />
 
         {p.eol?.all && <div className="eol-box">⏳ <b>Auslaufartikel</b> – lieferbar solange Vorrat{p.eol.date ? `, voraussichtlich bis ${fmtD(p.eol.date)}` : ''}. Für Nachbestellungen später fragen Sie uns gern nach einem Nachfolger.</div>}
         {!!pictos?.features.length && <ul className="picto-row" aria-label="Eigenschaften">
@@ -335,6 +349,8 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
               </button>); })}
           </div>
           {multi && <small className="muted">Für jede Position ein eigenes {team.motifs ? 'Motiv' : 'Logo'} wählen – oder „ohne“.</small>}
+          {canBack && <label className="back-opt"><input type="checkbox" checked={backOn} onChange={(e) => { setBackOn(e.target.checked); if (e.target.checked) setActivePos('Rücken'); }} />
+            <img src={`/api/upload/${team.back!.id}`} alt="" /><span><b>+ Rückendruck</b> „{team.back!.name}“ groß auf dem Rücken <b>+{pr.p(team.back!.price)}</b></span></label>}
         </div>}
         {!team && <label className="deco-toggle">
           <input type="checkbox" checked={decoOn} onChange={(e) => setDecoOn(e.target.checked)} />
@@ -439,7 +455,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
               );
             })}
             {p.price != null && (() => {
-              const u = unitFor(p.tiers, total, p.price)!;
+              const u = unitFor(p.tiers, total, unitPrice)!;
               const nx = nextTier(p.tiers, total);
               const prev = [...p.tiers].reverse().find((t) => t.min <= total)?.min ?? 1;
               return <div className="sel-foot">
@@ -448,7 +464,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
                 {est && <div className="sel-sum sub"><span>Veredelung ca. {total} × {pr.p(est.perPiece)}</span><b>{pr.p(total * est.perPiece)}</b></div>}
                 {est && est.setupTotal > 0 && <div className="sel-sum sub"><span>einmalig ({est.method})</span><b>{pr.p(est.setupTotal)}</b></div>}
                 {est && <div className="sel-sum grand"><span>Gesamt ca.</span><b>{pr.p(total * u + upSum + total * est.perPiece + est.setupTotal)} <small>{pr.label}</small></b></div>}
-                {u < p.price && <div className="ok" style={{ fontSize: 13 }}>Staffelpreis aktiv – Sie sparen {pr.p((p.price - u) * total)}</div>}
+                {u < unitPrice! && <div className="ok" style={{ fontSize: 13 }}>Staffelpreis aktiv – Sie sparen {pr.p((unitPrice! - u) * total)}</div>}
                 {nx && <div className="tier-prog"><div className="bar"><i style={{ width: `${Math.min(100, ((total - prev) / (nx.min - prev)) * 100)}%` }} /></div><span>Noch <b>{nx.min - total} Stück</b> bis {pr.p(nx.price)} pro Stück</span></div>}
               </div>;
             })()}
@@ -461,7 +477,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
           <WishButton id={p.id} variant="full" />
         </div>
         <div className={`mbar ${total ? 'has' : ''}`}>
-          <div className="mbar-info">{total ? <><b>{total} Stk.</b>{p.price != null && <span> · {est ? 'ca. ' : ''}{pr.p(unitFor(p.tiers, total, p.price)! * total + upSum + (est ? est.perPiece * total + est.setupTotal : 0))} {pr.label}{est ? ' inkl. Veredelung' : ''}</span>}</> : <span className="muted">{p.price != null ? `${pr.p(p.price)} / Stück` : 'Preis auf Anfrage'}</span>}</div>
+          <div className="mbar-info">{total ? <><b>{total} Stk.</b>{p.price != null && <span> · {est ? 'ca. ' : ''}{pr.p(unitFor(p.tiers, total, unitPrice)! * total + upSum + (est ? est.perPiece * total + est.setupTotal : 0))} {pr.label}{est ? ' inkl. Veredelung' : ''}</span>}</> : <span className="muted">{p.price != null ? `${pr.p(p.price)} / Stück` : 'Preis auf Anfrage'}</span>}</div>
           <button className="btn" disabled={(!!total && !decoOk) || busy || teamClosed} onClick={() => (total ? onAdd() : document.querySelector('.szgrid')?.scrollIntoView({ behavior: 'smooth', block: 'center' }))}>
             {!total ? 'Größe wählen' : !decoOk ? 'Veredelung prüfen' : 'In den Warenkorb'}
           </button>

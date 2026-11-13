@@ -16,8 +16,10 @@ function clean(d: any, old?: TeamShop): TeamShop {
     personalize: ['aus', 'name', 'nummer', 'beides'].includes(d.personalize) ? d.personalize : 'aus',
     deadline: /^\d{4}-\d{2}-\d{2}$/.test(String(d.deadline ?? '')) ? String(d.deadline) : null,
     note: str(d.note, 1000), contact: str(d.contact, 120), color: /^#[0-9a-f]{6}$/i.test(String(d.color ?? '')) ? String(d.color) : undefined,
-    motifs: (Array.isArray(d.motifs) ? d.motifs : []).filter((m: any) => /^[a-f0-9]{24}$/.test(String(m?.id ?? ''))).map((m: any) => ({ id: String(m.id), name: str(m.name, 80) || 'Motiv' })).slice(0, 60),
+    motifs: (Array.isArray(d.motifs) ? d.motifs : []).filter((m: any) => /^[a-f0-9]{24}$/.test(String(m?.id ?? ''))).map((m: any) => ({ id: String(m.id), name: str(m.name, 80) || 'Motiv', ...(/^\d{4}-\d\d-\d\dT/.test(String(m.at ?? '')) ? { at: String(m.at) } : {}) })).slice(0, 60),
     logos: (Array.isArray(d.logos) ? d.logos : []).filter((m: any) => /^[a-f0-9]{24}$/.test(String(m?.id ?? ''))).map((m: any) => ({ id: String(m.id), name: str(m.name, 80) || 'Logo' })).slice(0, 20),
+    backPrice: (() => { const n = Math.round(Number(String(d.backPrice ?? '').replace(',', '.')) * 100) / 100; return Number.isFinite(n) && n > 0 && n < 1000 ? n : null; })(),
+    rights: (() => { const r = d.rights ?? {}; const docId = /^[a-f0-9]{24}$/.test(String(r.docId ?? '')) ? String(r.docId) : null; const v = { holder: str(r.holder, 120), date: /^\d{4}-\d{2}-\d{2}$/.test(String(r.date ?? '')) ? String(r.date) : null, docId, docName: docId ? str(r.docName, 120) : null, note: str(r.note, 500) }; return v.holder || v.docId || v.note || v.date ? v : null; })(),
     price: (() => { const n = Math.round(Number(String(d.price ?? '').replace(',', '.')) * 100) / 100; return Number.isFinite(n) && n > 0 && n < 10000 ? n : null; })(),
     createdAt: old?.createdAt ?? new Date().toISOString(),
   };

@@ -22,9 +22,14 @@ export type TeamShop = {
   logos?: TeamMotif[];
   /** Festpreis netto je Teil inkl. Veredelung (leer = normale Kalkulation) */
   price?: number | null;
+  /** Rückendruck als Zusatzoption (nur Festpreis-Shops): Aufpreis netto; gedruckt wird das Shop-Logo (logoId) groß auf dem Rücken */
+  backPrice?: number | null;
+  /** Nutzungsrechte an Motiven/Logos (Freigabe des Rechteinhabers) */
+  rights?: { holder?: string; date?: string | null; docId?: string | null; docName?: string | null; note?: string } | null;
   createdAt: string;
 };
-export type TeamMotif = { id: string; name: string };
+/** at = hinzugefügt am (für „Neu“) */
+export type TeamMotif = { id: string; name: string; at?: string };
 /** Festpreis für einen Artikel dieses Shops (nur Artikel des Shops) */
 export const teamFixedPrice = (t: TeamShop | null | undefined, productId: string) => (t && t.price && t.price > 0 && t.items.includes(productId) ? t.price : null);
 export const isMotifShop = (t: TeamShop | null | undefined) => !!t?.motifs?.length;
@@ -42,7 +47,7 @@ function importMotif(dir: string, f: string) {
   const id = randomId(); const ext = f.split('.').pop()!.toLowerCase();
   fs.copyFileSync(path.join(dir, f), path.join(UPLOADS, `${id}.${ext}`));
   writeJSON(path.join(UPLOADS, `${id}.json`), { name: f, ext, size: fs.statSync(path.join(dir, f)).size, date: new Date().toISOString() });
-  return { id, name: motifName(f) };
+  return { id, name: motifName(f), at: new Date().toISOString() };
 }
 function ensurePresets() {
   if (presetsChecked) return;
@@ -121,4 +126,25 @@ export function deleteTeamShop(slug: string) {
     raw[slug] = { ...(typeof m === 'object' && m ? m : { at: new Date().toISOString(), files: [] }), deleted: true };
     writeJSON(PRESET_MARK, raw);
   }
+}
+
+/** Bestellte Stück je Motiv/Logo (Upload-ID) – für Bestseller-Sortierung */
+export function motifCounts(slug: string): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const i of listInquiries()) {
+    if (i.team !== slug || i.status === 'abgelehnt') continue;
+    for (const l of i.lines) {
+      const ids = new Set([...(l.deco?.logos ? Object.values(l.deco.logos).map((x) => x.id) : []), ...(l.deco?.logoId ? [l.deco.logoId] : [])]);
+      for (const id of ids) out[id] = (out[id] ?? 0) + l.qty;
+    }
+  }
+  return out;
+}
+/** Motive nach Beliebtheit (bestellte Stück), sonst Reihenfolge aus dem Admin; Kennzeichen „Beliebt“ (Top 3) und „Neu“ (letzte 21 Tage) */
+export function rankedMotifs(t: TeamShop) {
+  const n = motifCounts(t.slug);
+  const list = (t.motifs ?? []).map((m, k) => ({ ...m, k, sold: n[m.id] ?? 0 }));
+  const top = new Set(list.filter((m) => m.sold > 0).sort((a, b) => b.sold - a.sold).slice(0, 3).map((m) => m.id));
+  const fresh = (m: TeamMotif) => !!m.at && Date.now() - Date.parse(m.at) < 21 * 864e5;
+  return list.sort((a, b) => b.sold - a.sold || a.k - b.k).map((m) => ({ id: m.id, name: m.name, at: m.at, sold: m.sold, badge: top.has(m.id) ? ('Beliebt' as const) : fresh(m) ? ('Neu' as const) : null }));
 }

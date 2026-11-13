@@ -4,7 +4,7 @@ import { esc, sendMail, shopUrl } from '@/lib/mail';
 import { button, h1, infoBox, layout, offerTable, p, quote, signature } from '@/lib/mail-templates';
 import { offerPdf } from '@/lib/pdf';
 import { reviewDays, sendReviewRequest } from '@/lib/review-mail';
-import { CARRIERS, createDhlLabel, deliveryNotePdf, markDelivered, sendShippingMail } from '@/lib/shipping';
+import { CARRIERS, createDhlLabel, deliveryNotePdf, markDelivered, sendProductionMail, sendShippingMail } from '@/lib/shipping';
 import { STATUS, addHistory, getInquiry, offerTotals, randomId, saveInquiry, type Offer, type Status } from '@/lib/store';
 
 const eur = (n: number) => n.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
@@ -39,6 +39,9 @@ export async function POST(req: Request, { params }: { params: { no: string } })
     if (s !== i.status) {
       i.status = s; addHistory(i, `Status: ${STATUS[s]}`);
       // nach Lieferung: Bewertungseinladung geht automatisch nach ein paar Tagen raus (täglicher Lauf)
+      if (s === 'bestellt' && !i.shipment && !i.productionMailAt && body.mail !== false) {
+        try { if (await sendProductionMail(i)) { i.productionMailAt = new Date().toISOString(); addHistory(i, 'Mail „in Produktion“ an Kunde gesendet'); extra = ' · Kunde informiert'; } } catch (e) { console.error('Produktionsmail fehlgeschlagen', e); extra = ' · Mail fehlgeschlagen'; }
+      }
       if (s === 'geliefert' && !i.deliveredAt) { i.deliveredAt = new Date().toISOString(); if (!i.reviewRequestedAt) extra = ` · Bewertungseinladung folgt automatisch in ${reviewDays()} Tagen`; }
       saveInquiry(i);
     }

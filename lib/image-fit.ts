@@ -59,3 +59,15 @@ export function saveAnchor(src: string, pos: string, a: Anchor | null) {
   fs.mkdirSync(path.dirname(ANCHOR_DATA), { recursive: true });
   fs.writeFileSync(ANCHOR_DATA, JSON.stringify(d));
 }
+
+/** Admin: wie verlässlich ist die Motiv-Lage auf den Fotos eines Artikels? (für die Prüfliste)
+ *  ok = automatisch erkannt · korrigiert = Ausreißer per Median ersetzt · skizze = keine Erkennung (Vorschau als Skizze) · anker = Lage von Hand gespeichert */
+export function previewCheck(p: { images: string[]; colors: { name: string; image?: string }[] }, positions: string[]) {
+  const raw = load(); const fixed = fitsFor(p); const anc = anchors();
+  return p.colors.filter((c) => c.image).map((c) => {
+    const src = c.image!;
+    const manual = positions.filter((x) => anc[src]?.[x]);
+    const status = manual.length === positions.length && positions.length ? 'anker' : !raw[src] ? 'skizze' : fixed[src] !== raw[src] ? 'korrigiert' : 'ok';
+    return { color: c.name, src, status: status as 'ok' | 'korrigiert' | 'skizze' | 'anker', manual };
+  });
+}

@@ -77,7 +77,9 @@ export async function POST(req: Request) {
   const perProduct = raw.reduce((m: Record<string, number>, x) => ({ ...m, [x.p.id]: (m[x.p.id] ?? 0) + x.qty }), {});
   const lines: InqLine[] = raw.map(({ p, l, qty }) => {
     const fixed = teamFixedPrice(team, p.id);
-    const price = fixed != null ? Math.round((fixed + (p.sizeUp?.[String(l.size ?? '')] ?? 0)) * 100) / 100 : sizeUnit(p.tiers, perProduct[p.id], p.price, p.sizeUp, String(l.size ?? ''));
+    // Rückendruck-Option: Shop-Logo auf dem Rücken (nicht bereits feste Position) kostet den Aufpreis
+    const back = fixed != null && team?.backPrice && team.logoId && !team.positions.includes('Rücken') && l.deco?.logos?.['Rücken']?.id === team.logoId && Array.isArray(l.deco?.positions) && l.deco.positions.includes('Rücken') ? team.backPrice : 0;
+    const price = fixed != null ? Math.round((fixed + back + (p.sizeUp?.[String(l.size ?? '')] ?? 0)) * 100) / 100 : sizeUnit(p.tiers, perProduct[p.id], p.price, p.sizeUp, String(l.size ?? ''));
     const sample = !!l.sample;
     const ek = adminProduct(p.id).p?.basePrice ?? null;
     return { id: p.id, sku: p.sku, name: p.name, color: String(l.color ?? '').slice(0, 80), size: String(l.size ?? '').slice(0, 40), qty: sample ? 1 : qty, price, sum: Math.round((price ?? 0) * (sample ? 1 : qty) * 100) / 100, deco: cleanDeco(l.deco), ek, ...(sample ? { sample: true } : {}), ...(fixed != null && l.deco ? { incl: true } : {}) };

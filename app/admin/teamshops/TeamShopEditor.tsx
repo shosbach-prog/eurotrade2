@@ -34,7 +34,7 @@ export default function TeamShopEditor({ shops: initial, products, groups, metho
     for (const f of list) {
       const fd = new FormData(); fd.append('file', f);
       const r = await fetch('/api/upload', { method: 'POST', body: fd }); const d = await r.json().catch(() => ({}));
-      if (r.ok) setEdit((e) => ({ ...e!, [key]: [...(e![key] ?? []), { id: d.id, name: f.name.replace(/\.[^.]+$/, '').replace(/^\d+[\s._-]*/, '').replace(/[_-]+/g, ' ').trim().slice(0, 80) || (key === 'logos' ? 'Logo' : 'Motiv') }] }));
+      if (r.ok) setEdit((e) => ({ ...e!, [key]: [...(e![key] ?? []), { id: d.id, name: f.name.replace(/\.[^.]+$/, '').replace(/^\d+[\s._-]*/, '').replace(/[_-]+/g, ' ').trim().slice(0, 80) || (key === 'logos' ? 'Logo' : 'Motiv'), at: new Date().toISOString() }] }));
       else setMsg(`${f.name}: ${d.error ?? 'Upload fehlgeschlagen'}`);
       setUpBusy((n) => n - 1);
     }
@@ -77,8 +77,8 @@ export default function TeamShopEditor({ shops: initial, products, groups, metho
             <div className="ts-head">
               {s.logoId ? <img src={`/api/upload/${s.logoId}`} alt="" /> : <span className="ts-ph">{s.name.slice(0, 2).toUpperCase()}</span>}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <b>{s.name}</b>{!s.active && <span className="muted"> · deaktiviert</span>}
-                <div className="muted" style={{ fontSize: 13 }}>{s.items.length} Artikel{s.motifs?.length ? ` · ${s.motifs.length} Motive` : ''}{s.logos?.length ? ` · ${s.logos.length + 1} Logos` : ''}{s.price ? ` · Festpreis ${s.price.toFixed(2).replace('.', ',')} € netto` : ''} · {s.method} {s.positions.join(', ')}{s.personalize !== 'aus' ? ` · ${s.personalize === 'beides' ? 'Name + Nummer' : s.personalize === 'name' ? 'Name' : 'Nummer'}` : ''}{s.deadline ? ` · Bestellschluss ${new Date(s.deadline).toLocaleDateString('de-DE')}` : ''}</div>
+                <b>{s.name}</b>{!s.active && <span className="muted"> · deaktiviert</span>}{s.motifs?.length ? (s.rights?.docId || s.rights?.date ? <span className="ts-ok" title={`Freigabe: ${s.rights?.holder ?? ''} ${s.rights?.date ?? ''}`}> ✓ Rechte</span> : <span className="ts-warn"> ⚠ Freigabe fehlt</span>) : null}
+                <div className="muted" style={{ fontSize: 13 }}>{s.items.length} Artikel{s.motifs?.length ? ` · ${s.motifs.length} Motive` : ''}{s.logos?.length ? ` · ${s.logos.length + 1} Logos` : ''}{s.price ? ` · Festpreis ${s.price.toFixed(2).replace('.', ',')} € netto` : ''}{s.backPrice ? ` · Rückendruck +${s.backPrice.toFixed(2).replace('.', ',')} €` : ''} · {s.method} {s.positions.join(', ')}{s.personalize !== 'aus' ? ` · ${s.personalize === 'beides' ? 'Name + Nummer' : s.personalize === 'name' ? 'Name' : 'Nummer'}` : ''}{s.deadline ? ` · Bestellschluss ${new Date(s.deadline).toLocaleDateString('de-DE')}` : ''}</div>
                 <div className="ts-link"><code>{url}</code><button className="linkbtn" onClick={() => { navigator.clipboard?.writeText(url); setMsg(`Link kopiert: ${url}`); }}>Link kopieren</button><a className="linkbtn" href={`/team/${s.slug}`} target="_blank">ansehen</a></div>
               </div>
               <div className="ts-stats"><b>{s.orders.inquiries}</b><span>Anfragen</span></div>
@@ -94,7 +94,7 @@ export default function TeamShopEditor({ shops: initial, products, groups, metho
               <h3 style={{ margin: '16px 0 6px', fontSize: 15 }}>Bestellungen der Mitglieder</h3>
               <table className="atable"><thead><tr><th>Anfrage</th><th>Name</th><th>Teile</th><th>Name / Nummer</th><th>Status</th></tr></thead>
                 <tbody>{s.orders.people.map((p) => <tr key={p.no}><td><a className="alink" href={`/admin/anfrage/${p.no}`}>{p.no}</a></td><td>{p.name}<div className="muted" style={{ fontSize: 12 }}>{p.email}</div></td><td>{p.pieces}</td><td>{p.personal.join(', ') || '–'}</td><td>{p.status}</td></tr>)}</tbody></table>
-              <button className="btn alt sm" style={{ marginTop: 10 }} onClick={() => csv(s)}>Als Excel/CSV herunterladen</button>
+              <div className="deco-row" style={{ marginTop: 10 }}><button className="btn alt sm" onClick={() => csv(s)}>Als Excel/CSV herunterladen</button><a className="btn sm" href={`/api/admin/teamshops/druck?slug=${encodeURIComponent(s.slug)}`}>Druckpaket (ZIP) für die Druckerei</a></div>
             </div>}
           </div>
         );
@@ -133,6 +133,21 @@ export default function TeamShopEditor({ shops: initial, products, groups, metho
               <div><label>Ansprechpartner im Verein</label><input value={edit.contact ?? ''} onChange={(e) => setEdit({ ...edit, contact: e.target.value })} placeholder="z. B. Jugendwart Max Meier" /></div>
             </div>
             <label>Hinweis auf der Shop-Seite</label><textarea rows={2} value={edit.note ?? ''} onChange={(e) => setEdit({ ...edit, note: e.target.value })} placeholder="z. B. Abholung beim Training am 12.12." />
+            <fieldset className="ts-rights"><legend>Nutzungsrechte {(edit.motifs?.length || edit.logoId) ? <span className="muted">– Freigabe des Rechteinhabers für Motive/Logos</span> : null}</legend>
+              <div className="two">
+                <div><label>Rechteinhaber</label><input value={edit.rights?.holder ?? ''} onChange={(e) => setEdit({ ...edit, rights: { ...(edit.rights ?? {}), holder: e.target.value } })} placeholder="z. B. Künstler / Verein / Agentur" /></div>
+                <div><label>Freigabe vom</label><input type="date" value={edit.rights?.date ?? ''} onChange={(e) => setEdit({ ...edit, rights: { ...(edit.rights ?? {}), date: e.target.value } })} /></div>
+              </div>
+              <div className="deco-row">
+                {edit.rights?.docId ? <a className="alink" href={`/api/upload/${edit.rights.docId}?download`} target="_blank">📄 {edit.rights.docName ?? 'Freigabe'}</a> : <span className="muted" style={{ fontSize: 13 }}>Noch kein Dokument</span>}
+                <label className="btn alt sm upl">{edit.rights?.docId ? 'Dokument ersetzen' : 'Freigabe hochladen (PDF/Bild)'}<input type="file" hidden accept=".pdf,.png,.jpg,.jpeg" onChange={async (e) => { const f = e.target.files?.[0]; if (!f) return; const fd = new FormData(); fd.append('file', f); const r = await fetch('/api/upload', { method: 'POST', body: fd }); const d = await r.json().catch(() => ({})); if (r.ok) setEdit((x) => ({ ...x!, rights: { ...(x!.rights ?? {}), docId: d.id, docName: d.name } })); else setMsg(d.error ?? 'Upload fehlgeschlagen'); e.target.value = ''; }} /></label>
+              </div>
+              <label>Notiz</label><input value={edit.rights?.note ?? ''} onChange={(e) => setEdit({ ...edit, rights: { ...(edit.rights ?? {}), note: e.target.value } })} placeholder="z. B. Freigabe per WhatsApp, Umsatzbeteiligung 10 %" />
+            </fieldset>
+            <div className="two">
+              <div><label>Rückendruck-Option: Aufpreis netto (optional)</label><input inputMode="decimal" value={edit.backPrice ?? ''} onChange={(e) => setEdit({ ...edit, backPrice: (e.target.value as unknown as number) })} placeholder="z. B. 4,20" /></div>
+              <div><label>&nbsp;</label><small className="muted">Nur mit Festpreis: Kunden können das Shop-Logo (oben) zusätzlich groß auf den Rücken drucken lassen.</small></div>
+            </div>
             <label>Motive zur Auswahl ({edit.motifs?.length ?? 0}) <span className="muted" style={{ fontWeight: 400 }}>– leer = normaler Team-Shop mit festem Logo</span></label>
             <div className="ts-motifs">
               {(edit.motifs ?? []).map((m, i) => (

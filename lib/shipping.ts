@@ -75,6 +75,25 @@ export async function sendShippingMail(i: Inquiry) {
   });
 }
 
+/** Mail beim Status „In Produktion“ – einmalig je Auftrag */
+export async function sendProductionMail(i: Inquiry) {
+  const order = `${shopUrl()}/angebot/${i.token}`;
+  const days = Number(process.env.PRODUCTION_DAYS ?? 7);
+  return sendMail({
+    to: i.customer.email, replyTo: process.env.INQUIRY_TO, subject: `Ihr Auftrag ${i.no} ist in Produktion`,
+    html: layout({
+      preheader: 'Wir veredeln jetzt Ihre Textilien.', title: 'In Produktion',
+      body: h1('Ihr Auftrag ist in Produktion 🧵')
+        + p(`Guten Tag ${esc(i.customer.name)},`)
+        + p(`Ihr Auftrag <strong>${i.no}</strong> ist freigegeben und wird jetzt gefertigt.`)
+        + infoBox([['Auftrag', esc(i.no)], ['Voraussichtlicher Versand', addWorkdays(new Date(), days).toLocaleDateString('de-DE')]])
+        + p('Sobald das Paket unterwegs ist, bekommen Sie eine weitere E-Mail mit der Sendungsnummer.')
+        + button(order, 'Auftragsstatus ansehen')
+        + signature(),
+    }),
+  });
+}
+
 /** Zustellung erkannt (DHL-Tracking) oder nach X Werktagen angenommen → Status „geliefert“, Bewertungseinladung folgt automatisch */
 export function markDelivered(i: Inquiry, how: string) {
   if (!i.shipment) return;

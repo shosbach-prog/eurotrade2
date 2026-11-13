@@ -57,3 +57,27 @@ ssh root@217.154.80.227 "cd /opt/euro-trade-shop && bash deploy.sh"
 ## Vor dem Livegang
 - Datenschutz in `app/datenschutz` eintragen (Impressum ist fertig)
 - SMTP-Zugang in `.env` (sonst nur Speicherung in `data/anfragen/`)
+
+## Automatisches Deployment (Push = live)
+Einmalig auf dem Server einen Schlüssel nur für GitHub erzeugen und erlauben:
+```bash
+ssh root@217.154.80.227
+ssh-keygen -t ed25519 -N "" -f ~/.ssh/github-deploy -C github-actions
+cat ~/.ssh/github-deploy.pub >> ~/.ssh/authorized_keys
+cat ~/.ssh/github-deploy        # privaten Schlüssel komplett kopieren
+```
+GitHub → Repo **eurotrade2** → Settings → Secrets and variables → Actions → *New repository secret*:
+- `DEPLOY_HOST` = `217.154.80.227`
+- `DEPLOY_SSH_KEY` = der kopierte private Schlüssel (inkl. `-----BEGIN …` / `-----END …`)
+
+Ab dann reicht `git push` – GitHub startet `deploy.sh` auf dem Server (Reiter *Actions* zeigt den Verlauf).
+
+## Sicherung außer Haus (z. B. Hetzner Storage Box)
+```bash
+ssh root@217.154.80.227
+ssh-keygen -t ed25519 -N "" -f /root/.ssh/euro-trade-backup
+cat /root/.ssh/euro-trade-backup.pub | ssh -p 23 uXXXXXX@uXXXXXX.your-storagebox.de install-ssh-key
+ssh -p 23 -i /root/.ssh/euro-trade-backup uXXXXXX@uXXXXXX.your-storagebox.de mkdir euro-trade
+```
+In `.env`: `BACKUP_REMOTE=uXXXXXX@uXXXXXX.your-storagebox.de:euro-trade` und `BACKUP_SSH_PORT=23`.
+Die nächtliche Sicherung (02:30) spiegelt dann die letzten 30 Sicherungen dorthin. Test: `bash scripts/backup.sh`.

@@ -6,7 +6,7 @@ import { anchorsFor, fitsFor } from '@/lib/image-fit';
 import { isAdmin } from '@/lib/customer';
 import { gpsrFor } from '@/lib/gpsr';
 import { sizeTableFor } from '@/lib/groessen';
-import { getTeamShop, isOpen, logoChoices, teamFixedPrice } from '@/lib/teamshop';
+import { getTeamShop, isOpen, logoChoices, rankedMotifs, teamFixedPrice } from '@/lib/teamshop';
 import { gross } from '@/lib/pricing';
 import ProductCard from '@/components/ProductCard';
 import { getByCategory, getProduct, matchingFor, pictosOf } from '@/lib/catalog';
@@ -35,13 +35,13 @@ export default async function ProductPage({ params, searchParams }: { params: { 
   const p1 = ts && ts.items.includes(p0.id) && ctx && 'locked' in ctx ? getProduct(decodeURIComponent(params.id), null) ?? p0 : p0;
   const inShop = !!ts && ts.items.includes(p1.id);
   // Motiv-Shop: gewähltes Motiv (?motiv=…) wird als Logo gesetzt, Festpreis inkl. Druck
-  const motifs = inShop && ts!.motifs?.length ? ts!.motifs : null;
+  const motifs = inShop && ts!.motifs?.length ? rankedMotifs(ts!).map((m) => ({ id: m.id, name: m.name })) : null;
   const mot = motifs ? motifs.find((m) => m.id === searchParams?.motiv) ?? motifs[0] : null;
   const fixed = inShop ? teamFixedPrice(ts, p1.id) : null;
   const p = fixed != null && !p1.locked ? { ...p1, price: fixed, priceGross: gross(fixed), tiers: [], was: null, sale: undefined } : p1;
   const logos = inShop && !motifs ? logoChoices(ts) : [];
   const lg = logos.length ? logos.find((l) => l.id === searchParams?.logo) ?? logos[0] : null;
-  const team = inShop ? { slug: ts!.slug, name: ts!.name, logoId: mot?.id ?? lg?.id ?? ts!.logoId, logoName: mot ? `Motiv: ${mot.name}` : lg ? lg.name : ts!.logoName, method: ts!.method, positions: ts!.positions, personalize: ts!.personalize, deadline: ts!.deadline, open: isOpen(ts!), ...(motifs ? { motifs } : {}), ...(logos.length ? { logos } : {}), ...(fixed != null ? { fixed: true } : {}) } : null;
+  const team = inShop ? { slug: ts!.slug, name: ts!.name, logoId: mot?.id ?? lg?.id ?? ts!.logoId, logoName: mot ? `Motiv: ${mot.name}` : lg ? lg.name : ts!.logoName, method: ts!.method, positions: ts!.positions, personalize: ts!.personalize, deadline: ts!.deadline, open: isOpen(ts!), ...(motifs ? { motifs } : {}), ...(logos.length ? { logos } : {}), ...(fixed != null && ts!.backPrice && ts!.logoId ? { back: { price: ts!.backPrice, id: ts!.logoId, name: (ts!.logoName ?? ts!.name).replace(/\.[^.]+$/, '') } } : {}), ...(fixed != null ? { fixed: true } : {}) } : null;
   const match = matchingFor(p.id, ctx);
   const shownIds = new Set([...match.variants, ...match.combos].map((x) => x.id));
   const related = getByCategory(p.categorySlug, ctx).filter((x) => x.id !== p.id && !shownIds.has(x.id)).slice(0, 8);

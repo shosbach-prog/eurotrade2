@@ -99,6 +99,8 @@ export type Inquiry = {
   expiryRemindedAt?: string | null;
   /** Status „geliefert“ gesetzt – Bewertungseinladung folgt automatisch nach ein paar Tagen */
   deliveredAt?: string | null;
+  /** Mail „Ihr Auftrag ist in Produktion“ gesendet */
+  productionMailAt?: string | null;
   reviewRemindedAt?: string | null;
   /** Kunde hat die Motiv-Vorschau mit der Annahme freigegeben */
   previewApprovedAt?: string | null;

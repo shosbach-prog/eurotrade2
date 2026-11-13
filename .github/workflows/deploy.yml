@@ -1,0 +1,21 @@
+# Automatisch live gehen: jeder Push auf main startet deploy.sh auf dem Server.
+# Einmalig einrichten (README → „Automatisches Deployment“): Secrets DEPLOY_HOST, DEPLOY_SSH_KEY (optional DEPLOY_USER, DEPLOY_PATH)
+name: Deploy
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+concurrency: { group: deploy, cancel-in-progress: false }
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Auf dem Server deployen
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER || 'root' }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          command_timeout: 15m
+          script: cd ${{ secrets.DEPLOY_PATH || '/opt/euro-trade-shop' }} && bash deploy.sh

@@ -10,6 +10,7 @@ export async function POST(req: Request) {
   const b = await req.json().catch(() => null);
   const ids: string[] = Array.isArray(b?.ids) ? b.ids.map(String).slice(0, 500) : [];
   const out: Record<string, Kond | null> = {};
-  for (const id of ids) out[id] = konditionen(id);
+  const team = typeof b?.team === 'string' && /^[a-z0-9-]{1,40}$/.test(b.team) ? b.team : null;
+  for (const id of ids) out[id] = konditionen(id, team);
   return NextResponse.json(out, { headers: { 'Cache-Control': 'no-store' } });
 }

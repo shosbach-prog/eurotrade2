@@ -18,13 +18,18 @@ export function AdminKondProvider({ admin, children }: { admin: boolean; childre
   useEffect(() => { try { if (localStorage.getItem(KEY) === 'aus') setShow(false); } catch {} }, []);
   const flush = async () => {
     timer.current = null;
-    const ids = [...queue.current]; queue.current.clear();
-    if (!ids.length) return;
-    try {
-      const r = await fetch('/api/admin/konditionen', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ids }) });
-      const d: Record<string, Kond | null> = r.ok ? await r.json() : {};
-      for (const id of ids) cache.current.set(id, d[id] ?? null);
-    } catch { for (const id of ids) cache.current.set(id, null); }
+    const keys = [...queue.current]; queue.current.clear();
+    if (!keys.length) return;
+    // Schlüssel „id“ oder „id@team“ (Team-/Motiv-Shop mit Festpreis) – je Team ein Abruf
+    const groups = new Map<string, string[]>();
+    for (const k of keys) { const [id, team = ''] = k.split('@'); groups.set(team, [...(groups.get(team) ?? []), id]); }
+    for (const [team, ids] of groups) {
+      try {
+        const r = await fetch('/api/admin/konditionen', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ids, team: team || undefined }) });
+        const d: Record<string, Kond | null> = r.ok ? await r.json() : {};
+        for (const id of ids) cache.current.set(team ? `${id}@${team}` : id, d[id] ?? null);
+      } catch { for (const id of ids) cache.current.set(team ? `${id}@${team}` : id, null); }
+    }
     setVer((v) => v + 1);
   };
   const want = useCallback((id: string) => {
@@ -57,8 +62,9 @@ export function KondSticker({ id }: { id: string }) {
 }
 
 /** Ausführlicher Konditionen-Block auf der Artikelseite */
-export function KondBox({ id }: { id: string }) {
+export function KondBox({ id: pid, team }: { id: string; team?: string | null }) {
   const { admin, show, toggle, get, want } = useContext(Ctx);
+  const id = team ? `${pid}@${team}` : pid;
   useEffect(() => { want(id); }, [id, want]);
   if (!admin) return null;
   if (!show) return <button type="button" className="kond-toggle" onClick={toggle}>EK-Konditionen einblenden</button>;
@@ -84,6 +90,15 @@ export function KondBox({ id }: { id: string }) {
               <tbody>{k.rows.map((r) => <tr key={r.min}><td>{r.min}</td><td>{eur(r.ek)}</td><td>{eur(r.vk)}</td><td>{eur(r.margin)}</td><td className={tone(r.pct)}>{pct(r.pct)}</td></tr>)}</tbody>
             </table>
           )}
+          {k.fixed && <div className="kond-fix">
+            <b>Festpreis {k.fixed.shop}</b>
+            <table className="kond-t"><thead><tr><th></th><th>VK fest</th><th>EK</th><th>Druck ca.</th><th>Marge</th><th>%</th></tr></thead>
+              <tbody>
+                <tr><td>Shirt + Motiv</td><td>{eur(k.fixed.price)}</td><td>{eur(k.fixed.ek)}</td><td>{eur(k.fixed.druck)}</td><td>{eur(k.fixed.margin)}</td><td className={tone(k.fixed.pct)}>{pct(k.fixed.pct)}</td></tr>
+                {k.fixed.back && <tr><td>+ Rückendruck</td><td>{eur(k.fixed.back.price)}</td><td>–</td><td>{eur(k.fixed.back.druck)}</td><td>{eur(k.fixed.back.margin)}</td><td className={tone(k.fixed.back.pct)}>{pct(k.fixed.back.pct)}</td></tr>}
+              </tbody></table>
+            <small className="muted">Druckkosten geschätzt: Veredelungspreis ab 1 Stück × {k.fixed.costPct} % eigene Kosten (Admin → Veredelung){k.fixed.cm ? ` · ${k.fixed.cm}` : ''}</small>
+          </div>}
           {k.sizeExtra && <p className="muted kond-ups">EK-Größenaufpreis: {Object.entries(k.sizeExtra).map(([s, e]) => `${s} +${eur(e)}`).join(' · ')}</p>}
         </>
       )}

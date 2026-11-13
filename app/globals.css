@@ -1855,3 +1855,13 @@ html,body{overflow-x:clip}
 .tshop-logos img{height:56px;max-width:110px;object-fit:contain;background:#fff;border:1px solid var(--line);border-radius:8px;padding:4px}
 .pos-tabs{margin:8px 0 2px}.pos-tabs .size{height:34px;padding:0 12px;font-size:13px}
 .motif-grid .motif.none{justify-content:center;font-size:13px;color:var(--muted);min-height:64px}
+.motif-grid .motif{position:relative}
+.motif-badge{position:absolute;top:6px;left:6px;z-index:1;font-style:normal;font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;background:#ffc21a;color:#111}
+.motif-badge.new{background:#16a34a;color:#fff}
+.back-opt{display:flex;align-items:center;gap:10px;margin-top:10px;padding:10px;border:1.5px dashed var(--brand);border-radius:10px;background:#fff;cursor:pointer;font-size:14px}
+.back-opt img{width:44px;height:44px;object-fit:contain}
+.ts-check{margin:0 0 16px}.ts-check summary{cursor:pointer}
+.kond-fix{margin-top:10px}.kond-fix small{display:block;margin-top:4px;font-size:11.5px}
+.ts-rights{border:1px solid var(--line);border-radius:10px;padding:8px 12px 12px;margin:8px 0}
+.ts-rights legend{font-weight:600;font-size:14px;padding:0 4px}
+.ts-warn{color:#c62828;font-size:13px;font-weight:600}.ts-ok{color:#14833b;font-size:13px;font-weight:600}

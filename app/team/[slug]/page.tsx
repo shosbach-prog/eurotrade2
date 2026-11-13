@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getProduct } from '@/lib/catalog';
-import { getTeamShop, isOpen, logoChoices, teamFixedPrice } from '@/lib/teamshop';
+import { getTeamShop, isOpen, logoChoices, rankedMotifs, teamFixedPrice } from '@/lib/teamshop';
 import ProductImage from '@/components/ProductImage';
 import { eur } from '@/lib/format';
 import { productPath } from '@/lib/format';
@@ -27,7 +27,7 @@ export default function TeamShopPage({ params, searchParams }: { params: { slug:
   if (!t) notFound();
   const items = t.items.map((id) => getProduct(id, null)).filter((p): p is NonNullable<typeof p> => !!p);
   const open = isOpen(t);
-  const motifs = t.motifs ?? [];
+  const motifs = rankedMotifs(t);
   if (motifs.length) {
     const sel = motifs.find((m) => m.id === searchParams?.motiv) ?? null;
     const step2 = sel ? `&motiv=${sel.id}` : '';
@@ -49,6 +49,7 @@ export default function TeamShopPage({ params, searchParams }: { params: { slug:
           {motifs.map((m) => (
             <Link key={m.id} href={`/team/${t.slug}?motiv=${m.id}#shirts`} scroll={false} className={`motif ${sel?.id === m.id ? 'on' : ''}`} aria-current={sel?.id === m.id ? 'true' : undefined}>
               <img src={`/api/upload/${m.id}`} alt={m.name} loading="lazy" />
+              {m.badge && <i className={`motif-badge ${m.badge === 'Neu' ? 'new' : ''}`}>{m.badge}</i>}
               <span>{m.name}</span>
             </Link>
           ))}
