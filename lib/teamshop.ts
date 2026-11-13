@@ -29,7 +29,7 @@ const F = path.join(DATA, 'teamshops.json');
 export const listTeamShops = () => { ensurePresets(); return readJSON<TeamShop[]>(F, []); };
 
 /** Vorbelegte Motiv-Shops (seed/motive/<slug>/*.png) – werden einmalig angelegt; gelöscht bleibt gelöscht */
-const PRESETS: { slug: string; name: string; note?: string }[] = [{ slug: 'politik-insider', name: 'Politik Insider' }];
+const PRESETS: { slug: string; name: string; note?: string }[] = [{ slug: 'politik-insider', name: 'Politik Insider' }, { slug: 'tristement', name: 'Tristement' }];
 const PRESET_MARK = path.join(DATA, 'presets.json');
 let presetsChecked = false;
 function ensurePresets() {
