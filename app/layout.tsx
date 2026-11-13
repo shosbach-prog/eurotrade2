@@ -84,6 +84,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <Link href="/druck-stick">Druck & Stick</Link>
                 <Link href="/ratgeber">Ratgeber</Link>
                 <Link href="/#newsletter">Newsletter & Rabatt</Link>
+                <Link href="/team/politik-insider">Politik Insider Shirts</Link>
               </nav>
               <nav className="ft-col" aria-label="Branchen">
                 <h4>Für</h4>
