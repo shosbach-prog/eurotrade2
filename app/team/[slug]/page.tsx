@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getProduct } from '@/lib/catalog';
-import { getTeamShop, isOpen, teamFixedPrice } from '@/lib/teamshop';
+import { getTeamShop, isOpen, logoChoices, teamFixedPrice } from '@/lib/teamshop';
 import ProductImage from '@/components/ProductImage';
 import { eur } from '@/lib/format';
 import { productPath } from '@/lib/format';
@@ -88,7 +88,8 @@ export default function TeamShopPage({ params, searchParams }: { params: { slug:
         </div>
       </section>
       {t.note && <p className="tshop-note">{t.note}</p>}
-      <ol className="tshop-steps"><li><b>Artikel wählen</b> Farbe und Größe aussuchen</li><li><b>{t.personalize !== 'aus' ? 'Name / Nummer eintragen' : 'Menge festlegen'}</b> das Vereinslogo ist schon gesetzt</li><li><b>Anfrage senden</b> Sie erhalten Ihr Angebot per E-Mail</li></ol>
+      {logoChoices(t).length > 0 && <div className="tshop-logos"><b>{logoChoices(t).length} Logos zur Auswahl:</b>{logoChoices(t).map((l) => <img key={l.id} src={`/api/upload/${l.id}`} alt={l.name} title={l.name} />)}</div>}
+      <ol className="tshop-steps"><li><b>Artikel wählen</b> Farbe und Größe aussuchen</li><li><b>{logoChoices(t).length ? 'Logo wählen' : t.personalize !== 'aus' ? 'Name / Nummer eintragen' : 'Menge festlegen'}</b> {logoChoices(t).length ? 'auf der Artikelseite' : 'das Vereinslogo ist schon gesetzt'}</li><li><b>Anfrage senden</b> Sie erhalten Ihr Angebot per E-Mail</li></ol>
       <div className="grid">
         {items.map((p) => (
           <Link key={p.id} href={`${productPath(p)}?team=${t.slug}`} className="card">

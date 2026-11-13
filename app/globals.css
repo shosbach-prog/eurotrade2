@@ -1849,3 +1849,7 @@ html,body{overflow-x:clip}
 .ts-motif-a{display:flex;gap:6px;justify-content:space-between;font-size:12px}
 .ts-drop{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:12px;border:2px dashed #cbd5e1;border-radius:10px;background:#f8fafc;font-size:13px}
 .ts-drop.on{border-color:var(--brand);background:#eef4ff}
+.motif-grid.logo-grid{grid-template-columns:repeat(auto-fill,minmax(96px,1fr))}
+.motif-grid.logo-grid .motif span{font-size:11.5px;font-weight:600;line-height:1.2}
+.tshop-logos{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:4px 0 18px;font-size:14px}
+.tshop-logos img{height:56px;max-width:110px;object-fit:contain;background:#fff;border:1px solid var(--line);border-radius:8px;padding:4px}

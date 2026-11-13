@@ -24,7 +24,7 @@ export default function TeamShopEditor({ shops: initial, products, groups, metho
   }
   const [upBusy, setUpBusy] = useState(0);
   const [drag, setDrag] = useState(false);
-  async function uploadMotifs(files?: FileList | null) {
+  async function uploadMotifs(files?: FileList | null, key: 'motifs' | 'logos' = 'motifs') {
     const all = [...(files ?? [])];
     const list = all.filter((f) => /\.(png|jpe?g|svg|webp)$/i.test(f.name) || /^image\//.test(f.type));
     if (!list.length) { if (all.length) setMsg('Bitte Bilddateien (PNG, JPG, SVG) wählen – ZIP-Dateien vorher entpacken.'); return; }
@@ -32,7 +32,7 @@ export default function TeamShopEditor({ shops: initial, products, groups, metho
     for (const f of list) {
       const fd = new FormData(); fd.append('file', f);
       const r = await fetch('/api/upload', { method: 'POST', body: fd }); const d = await r.json().catch(() => ({}));
-      if (r.ok) setEdit((e) => ({ ...e!, motifs: [...(e!.motifs ?? []), { id: d.id, name: f.name.replace(/\.[^.]+$/, '').replace(/^\d+[\s._-]*/, '').replace(/[_-]+/g, ' ').trim().slice(0, 80) || 'Motiv' }] }));
+      if (r.ok) setEdit((e) => ({ ...e!, [key]: [...(e![key] ?? []), { id: d.id, name: f.name.replace(/\.[^.]+$/, '').replace(/^\d+[\s._-]*/, '').replace(/[_-]+/g, ' ').trim().slice(0, 80) || (key === 'logos' ? 'Logo' : 'Motiv') }] }));
       else setMsg(`${f.name}: ${d.error ?? 'Upload fehlgeschlagen'}`);
       setUpBusy((n) => n - 1);
     }
@@ -74,7 +74,7 @@ export default function TeamShopEditor({ shops: initial, products, groups, metho
               {s.logoId ? <img src={`/api/upload/${s.logoId}`} alt="" /> : <span className="ts-ph">{s.name.slice(0, 2).toUpperCase()}</span>}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <b>{s.name}</b>{!s.active && <span className="muted"> · deaktiviert</span>}
-                <div className="muted" style={{ fontSize: 13 }}>{s.items.length} Artikel{s.motifs?.length ? ` · ${s.motifs.length} Motive` : ''}{s.price ? ` · Festpreis ${s.price.toFixed(2).replace('.', ',')} € netto` : ''} · {s.method} {s.positions.join(', ')}{s.personalize !== 'aus' ? ` · ${s.personalize === 'beides' ? 'Name + Nummer' : s.personalize === 'name' ? 'Name' : 'Nummer'}` : ''}{s.deadline ? ` · Bestellschluss ${new Date(s.deadline).toLocaleDateString('de-DE')}` : ''}</div>
+                <div className="muted" style={{ fontSize: 13 }}>{s.items.length} Artikel{s.motifs?.length ? ` · ${s.motifs.length} Motive` : ''}{s.logos?.length ? ` · ${s.logos.length + 1} Logos` : ''}{s.price ? ` · Festpreis ${s.price.toFixed(2).replace('.', ',')} € netto` : ''} · {s.method} {s.positions.join(', ')}{s.personalize !== 'aus' ? ` · ${s.personalize === 'beides' ? 'Name + Nummer' : s.personalize === 'name' ? 'Name' : 'Nummer'}` : ''}{s.deadline ? ` · Bestellschluss ${new Date(s.deadline).toLocaleDateString('de-DE')}` : ''}</div>
                 <div className="ts-link"><code>{url}</code><button className="linkbtn" onClick={() => { navigator.clipboard?.writeText(url); setMsg(`Link kopiert: ${url}`); }}>Link kopieren</button><a className="linkbtn" href={`/team/${s.slug}`} target="_blank">ansehen</a></div>
               </div>
               <div className="ts-stats"><b>{s.orders.inquiries}</b><span>Anfragen</span></div>
@@ -85,8 +85,8 @@ export default function TeamShopEditor({ shops: initial, products, groups, metho
               </div>
             </div>
             {open === s.slug && <div className="ts-orders">
-              <table className="atable"><thead><tr>{s.motifs?.length ? <th>Motiv</th> : null}<th>Artikel</th><th>Farbe</th><th>Größen</th><th>Gesamt</th></tr></thead>
-                <tbody>{s.orders.items.map((i) => <tr key={i.sku + i.color + (i.motif ?? '')}>{s.motifs?.length ? <td><b>{i.motif ?? '–'}</b></td> : null}<td><b>{i.sku}</b> {i.name}</td><td>{i.color}</td><td>{Object.entries(i.sizes).map(([z, n]) => `${z}: ${n}`).join(' · ')}</td><td><b>{i.total}</b></td></tr>)}</tbody></table>
+              <table className="atable"><thead><tr>{s.motifs?.length || s.logos?.length ? <th>{s.motifs?.length ? 'Motiv' : 'Logo'}</th> : null}<th>Artikel</th><th>Farbe</th><th>Größen</th><th>Gesamt</th></tr></thead>
+                <tbody>{s.orders.items.map((i) => <tr key={i.sku + i.color + (i.motif ?? '')}>{s.motifs?.length || s.logos?.length ? <td><b>{i.motif ?? '–'}</b></td> : null}<td><b>{i.sku}</b> {i.name}</td><td>{i.color}</td><td>{Object.entries(i.sizes).map(([z, n]) => `${z}: ${n}`).join(' · ')}</td><td><b>{i.total}</b></td></tr>)}</tbody></table>
               <h3 style={{ margin: '16px 0 6px', fontSize: 15 }}>Bestellungen der Mitglieder</h3>
               <table className="atable"><thead><tr><th>Anfrage</th><th>Name</th><th>Teile</th><th>Name / Nummer</th><th>Status</th></tr></thead>
                 <tbody>{s.orders.people.map((p) => <tr key={p.no}><td><a className="alink" href={`/admin/anfrage/${p.no}`}>{p.no}</a></td><td>{p.name}<div className="muted" style={{ fontSize: 12 }}>{p.email}</div></td><td>{p.pieces}</td><td>{p.personal.join(', ') || '–'}</td><td>{p.status}</td></tr>)}</tbody></table>
@@ -104,6 +104,20 @@ export default function TeamShopEditor({ shops: initial, products, groups, metho
             <label>Name des Vereins / der Firma *</label><input value={edit.name ?? ''} onChange={(e) => setEdit({ ...edit, name: e.target.value })} placeholder="z. B. TuS Eving-Lindenhorst" />
             <label>Vereinslogo</label>
             <div className="deco-row">{edit.logoId && <img src={`/api/upload/${edit.logoId}`} alt="" style={{ height: 48, maxWidth: 120, objectFit: 'contain' }} />}<label className="btn alt sm upl">{edit.logoId ? 'Logo ändern' : 'Logo hochladen'}<input type="file" hidden accept=".png,.jpg,.jpeg,.svg,.webp,.pdf,.ai,.eps" onChange={(e) => upload(e.target.files?.[0])} /></label></div>
+            <label>Weitere Logos zur Auswahl ({edit.logos?.length ?? 0}) <span className="muted" style={{ fontWeight: 400 }}>– z. B. Schriftzug, Jugend, Abteilung; Mitglieder wählen eines</span></label>
+            {(edit.logos?.length ?? 0) > 0 && <div className="ts-motifs">
+              {edit.logos!.map((m, i) => (
+                <div key={m.id} className="ts-motif">
+                  <img src={`/api/upload/${m.id}`} alt="" />
+                  <input value={m.name} onChange={(e) => setEdit({ ...edit, logos: edit.logos!.map((x, k) => (k === i ? { ...x, name: e.target.value } : x)) })} aria-label="Name des Logos" />
+                  <div className="ts-motif-a"><span /><button type="button" className="linkbtn err" onClick={() => setEdit({ ...edit, logos: edit.logos!.filter((_, k) => k !== i) })}>entfernen</button></div>
+                </div>
+              ))}
+            </div>}
+            <div className="ts-drop" onDragOver={(e) => e.preventDefault()} onDrop={(e) => { e.preventDefault(); uploadMotifs(e.dataTransfer.files, 'logos'); }}>
+              <label className="btn alt sm upl">+ Weiteres Logo<input type="file" hidden multiple accept="image/png,image/jpeg,image/svg+xml,image/webp,.png,.jpg,.jpeg,.svg,.webp" onChange={(e) => { uploadMotifs(e.target.files, 'logos'); e.target.value = ''; }} /></label>
+              <span className="muted">{edit.logoId ? 'Das Vereinslogo oben ist die Vorauswahl.' : 'Bitte zuerst oben das Haupt-Logo hochladen.'}</span>
+            </div>
             <div className="two">
               <div><label>Veredelung</label><select value={edit.method} onChange={(e) => setEdit({ ...edit, method: e.target.value })}>{methods.filter((m) => m !== 'Beratung gewünscht').map((m) => <option key={m}>{m}</option>)}</select></div>
               <div><label>Name / Nummer</label><select value={edit.personalize} onChange={(e) => setEdit({ ...edit, personalize: e.target.value as TeamShop['personalize'] })}><option value="aus">nicht anbieten</option><option value="name">Name</option><option value="nummer">Nummer</option><option value="beides">Name + Nummer</option></select></div>

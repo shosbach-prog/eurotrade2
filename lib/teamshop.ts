@@ -17,6 +17,8 @@ export type TeamShop = {
   deadline?: string | null; note?: string; contact?: string; color?: string;
   /** Motiv-Shop: Kunden wählen eines dieser Motive (Upload-IDs), das direkt aufs Shirt gedruckt wird */
   motifs?: TeamMotif[];
+  /** weitere Vereinslogos – Mitglieder wählen eines (Hauptlogo = logoId) */
+  logos?: TeamMotif[];
   /** Festpreis netto je Teil inkl. Veredelung (leer = normale Kalkulation) */
   price?: number | null;
   createdAt: string;
@@ -90,7 +92,7 @@ export function teamOrders(slug: string) {
   for (const i of inqs) {
     let pieces = 0; const personal: string[] = [];
     for (const l of i.lines) {
-      const motif = l.deco?.logoName?.startsWith('Motiv: ') ? l.deco.logoName.slice(7) : undefined;
+      const motif = l.deco?.logoName ? l.deco.logoName.replace(/^Motiv: /, '') : undefined;
       const k = `${l.sku}|${l.color}|${motif ?? ''}`;
       const e = sum.get(k) ?? { sku: l.sku, name: l.name, color: l.color, ...(motif ? { motif } : {}), sizes: {}, total: 0 };
       e.sizes[l.size || '–'] = (e.sizes[l.size || '–'] ?? 0) + l.qty; e.total += l.qty; sum.set(k, e);
@@ -100,4 +102,10 @@ export function teamOrders(slug: string) {
     people.push({ no: i.no, name: i.customer.name, email: i.customer.email, date: i.date, pieces, status: i.status ?? 'neu', personal });
   }
   return { inquiries: inqs.length, items: [...sum.values()].sort((a, b) => (a.motif ?? '').localeCompare(b.motif ?? '') || a.sku.localeCompare(b.sku)), people };
+}
+
+/** Logos zur Auswahl (Hauptlogo + weitere) – leer, wenn es nur ein Logo gibt */
+export function logoChoices(t: TeamShop | null | undefined): TeamMotif[] {
+  if (!t?.logos?.length) return [];
+  return [...(t.logoId ? [{ id: t.logoId, name: (t.logoName ?? 'Vereinslogo').replace(/\.[^.]+$/, '') }] : []), ...t.logos];
 }
