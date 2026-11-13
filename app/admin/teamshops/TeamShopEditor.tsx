@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import type { TeamShop } from '@/lib/teamshop';
 import ArticlePicker, { PickedStrip, type PickGroup, type PickItem } from '@/components/ArticlePicker';
 
@@ -9,6 +10,7 @@ type Brief = PickItem;
 const empty = (): Partial<TeamShop> => ({ name: '', active: true, items: [], method: 'Stick', positions: ['Brust links'], personalize: 'aus', deadline: '', note: '', contact: '' });
 
 export default function TeamShopEditor({ shops: initial, products, groups, methods, positions, base }: { shops: Shop[]; products: Brief[]; groups: PickGroup[]; methods: string[]; positions: string[]; base: string }) {
+  const router = useRouter();
   const [shops, setShops] = useState(initial);
   const [edit, setEdit] = useState<Partial<TeamShop> | null>(null);
   const [picker, setPicker] = useState(false);
@@ -51,8 +53,10 @@ export default function TeamShopEditor({ shops: initial, products, groups, metho
   }
   async function del(slug: string) {
     if (!confirm('Team-Shop löschen? Bisherige Anfragen bleiben erhalten.')) return;
-    await fetch(`/api/admin/teamshops?slug=${slug}`, { method: 'DELETE' });
+    const r = await fetch(`/api/admin/teamshops?slug=${encodeURIComponent(slug)}`, { method: 'DELETE' });
+    if (!r.ok) { setMsg('Löschen fehlgeschlagen – bitte neu anmelden und erneut versuchen.'); return; }
     setShops((l) => l.filter((x) => x.slug !== slug));
+    router.refresh();
   }
   function csv(s: Shop) {
     const sizes = [...new Set(s.orders.items.flatMap((i) => Object.keys(i.sizes)))];

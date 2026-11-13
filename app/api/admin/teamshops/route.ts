@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { isAdmin } from '@/lib/customer';
 import { METHODS, POSITIONS } from '@/lib/deco';
-import { listTeamShops, saveTeamShops, teamSlug, type TeamShop } from '@/lib/teamshop';
+import { deleteTeamShop, listTeamShops, saveTeamShops, teamSlug, type TeamShop } from '@/lib/teamshop';
 import { getProduct } from '@/lib/catalog';
 
 const str = (v: unknown, n = 200) => String(v ?? '').trim().slice(0, n);
@@ -44,6 +44,7 @@ export async function PUT(req: Request) {
 export async function DELETE(req: Request) {
   if (!(await isAdmin())) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
   const slug = new URL(req.url).searchParams.get('slug');
-  saveTeamShops(listTeamShops().filter((x) => x.slug !== slug));
+  if (!slug) return NextResponse.json({ error: 'Kein Shop angegeben.' }, { status: 400 });
+  deleteTeamShop(slug);
   return NextResponse.json({ ok: true });
 }

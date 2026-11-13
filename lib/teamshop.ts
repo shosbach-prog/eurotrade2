@@ -34,7 +34,7 @@ export const listTeamShops = () => { ensurePresets(); return readJSON<TeamShop[]
  *  neue Dateien im Ordner kommen bei bestehendem Shop automatisch als weitere Motive dazu (im Admin entfernte nicht wieder) */
 const PRESETS: { slug: string; name: string; note?: string }[] = [{ slug: 'politik-insider', name: 'Politik Insider' }, { slug: 'tristement', name: 'Tristement' }];
 const PRESET_MARK = path.join(DATA, 'presets.json');
-type Mark = { at: string; files: string[] };
+type Mark = { at: string; files: string[]; deleted?: boolean };
 let presetsChecked = false;
 const motifName = (f: string) => f.replace(/\.[^.]+$/, '').replace(/^\d+[\s._-]*/, '').trim() || 'Motiv';
 function importMotif(dir: string, f: string) {
@@ -56,6 +56,7 @@ function ensurePresets() {
       const list = readJSON<TeamShop[]>(F, []);
       const shop = list.find((t) => t.slug === pr.slug);
       let mark = raw[pr.slug];
+      if (typeof mark === 'object' && mark?.deleted) continue; // im Admin gelöscht – nie wieder anlegen oder ergänzen
       // ältere Markierung (nur Datum): bekannt = Dateien, deren Motiv schon im Shop ist
       if (typeof mark === 'string') mark = { at: mark, files: shop ? files.filter((f) => shop.motifs?.some((m) => m.name === motifName(f))) : files };
       fs.mkdirSync(UPLOADS, { recursive: true });
@@ -108,4 +109,15 @@ export function teamOrders(slug: string) {
 export function logoChoices(t: TeamShop | null | undefined): TeamMotif[] {
   if (!t?.logos?.length) return [];
   return [...(t.logoId ? [{ id: t.logoId, name: (t.logoName ?? 'Vereinslogo').replace(/\.[^.]+$/, '') }] : []), ...t.logos];
+}
+
+/** Team-Shop löschen – vorbelegte Motiv-Shops werden dabei dauerhaft als gelöscht markiert */
+export function deleteTeamShop(slug: string) {
+  saveTeamShops(listTeamShops().filter((x) => x.slug !== slug));
+  if (PRESETS.some((p) => p.slug === slug)) {
+    const raw = readJSON<Record<string, unknown>>(PRESET_MARK, {});
+    const m = raw[slug];
+    raw[slug] = { ...(typeof m === 'object' && m ? m : { at: new Date().toISOString(), files: [] }), deleted: true };
+    writeJSON(PRESET_MARK, raw);
+  }
 }
