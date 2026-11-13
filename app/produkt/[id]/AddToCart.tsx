@@ -14,7 +14,7 @@ import { brandSlug, findBrand } from '@/lib/brands';
 import { FONTS, positionsFor, TEXT_COLORS, TEAM_POS, colorHex, fontCss, isImage, parseTeamList, type Deco, type Motif, type TeamRow } from '@/lib/deco';
 import { uploadPreviews } from '@/components/decoRender';
 import DecoStudio, { defaultPlace, type FitT, type Place } from '@/components/DecoStudio';
-import { cmFor, spotsFor } from '@/lib/deco-layout';
+import { cmFor, maxPlace, spotsFor } from '@/lib/deco-layout';
 import { nextTier, unitFor } from '@/lib/tiers';
 import { calcDeco, type DecoPricing } from '@/lib/deco-pricing';
 import SizeAdvisor from '@/components/SizeAdvisor';
@@ -51,6 +51,16 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
     if (!activePos || !positions.includes(activePos)) setActivePos(positions[positions.length - 1] ?? null);
   }, [positions]); // eslint-disable-line react-hooks/exhaustive-deps
   const [logo, setLogo] = useState<Logo | null>(team?.logoId ? { id: team.logoId, name: team.logoName ?? 'Vereinslogo' } : customerLogo ?? null);
+  // Motiv-Shop: Motiv füllt den Druckbereich maximal (je nach Seitenverhältnis des Motivs)
+  const [aspect, setAspect] = useState<number | null>(null);
+  useEffect(() => {
+    if (!team?.motifs || !logo) { setAspect(null); return; }
+    const im = new Image(); let off = false;
+    im.onload = () => { if (off || !im.naturalWidth) return; const ar = im.naturalWidth / im.naturalHeight; setAspect(ar);
+      setPlace((pl) => { const n = { ...pl }; for (const x of positions) { const m = maxPlace(p, x, ar); if (m) n[x] = m; } return n; }); };
+    im.src = `/api/upload/${logo.id}`;
+    return () => { off = true; };
+  }, [logo?.id, positions.join('|')]); // eslint-disable-line react-hooks/exhaustive-deps
   // Teamliste: Namen / Nummern je Teil
   const [teamOn, setTeamOn] = useState(!!team && team.personalize !== 'aus');
   const [teamWhat, setTeamWhat] = useState<'name' | 'nummer' | 'beides'>(team && team.personalize !== 'aus' ? team.personalize : 'beides');
@@ -157,7 +167,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
       <small>{total > 0 ? `bei ${total} Stück, ${est.lines.map((l) => `${l.pos} ca. ${l.cm} cm`).join(', ')} · ${pr.label} · ` : `Menge wählen – ab mehr Stück wird es günstiger · ${pr.label} · `}verbindlich im Angebot</small>
     </div>
   );
-  const studioProps = { product: p, colorHex: color?.hex, photo: color?.image ?? null, fit: color?.image ? (fits?.[color.image] as FitT | undefined) ?? null : null, anchor: color?.image ? anchors?.[color.image] ?? null : null, admin, positions, active: activePos, setActive: setActivePos, place, setPlace, logoSrc: useLogo && logo && (isImage(logo.name) || logo.name.startsWith('Motiv: ')) ? `/api/upload/${logo.id}` : null, text: useText ? text : '', font, textColor: tColor, method };
+  const studioProps = { product: p, colorHex: color?.hex, photo: color?.image ?? null, fit: color?.image ? (fits?.[color.image] as FitT | undefined) ?? null : null, anchor: color?.image ? anchors?.[color.image] ?? null : null, admin, positions, active: activePos, setActive: setActivePos, place, setPlace, logoSrc: useLogo && logo && (isImage(logo.name) || logo.name.startsWith('Motiv: ')) ? `/api/upload/${logo.id}` : null, text: useText ? text : '', font, textColor: tColor, method, aspect };
   // Galerie: Fotos der gewählten Farbe, danach Detailfotos des Artikels
   // Farbbild(er) zuerst, danach alle allgemeinen Ansichten (Rücken, Seite, Detail, Model) – keine Bilder anderer Farben
   const otherColorImgs = new Set(p.colors.filter((c) => c !== color).flatMap((c) => [c.image, ...(c.images ?? [])]).filter(Boolean) as string[]);

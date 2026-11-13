@@ -1,11 +1,13 @@
 'use client';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { cmFor, spotsFor, type View } from '@/lib/deco-layout';
+import { cmFor, maxPlace, spotsFor, type View } from '@/lib/deco-layout';
 import { colorHex, fontCss } from '@/lib/deco';
 
 export type Place = Record<string, { x: number; y: number; w: number }>;
 type Props = {
   product: { category?: string; name?: string };
+  /** Motiv-Shop: Seitenverhältnis des Motivs – „Standard-Position“ füllt dann den Druckbereich maximal */
+  aspect?: number | null;
   colorHex?: string; photo?: string | null;
   positions: string[]; active: string | null; setActive: (p: string) => void;
   place: Place; setPlace: (p: Place) => void;
@@ -195,7 +197,7 @@ export default function DecoStudio(props: Props) {
             <span>Größe <b>{cmFor(kind, place[cur].w)} cm</b> breit</span>
             <input type="range" min={3} max={Math.round(maxW)} step={0.5} value={place[cur].w} onChange={(e) => setWidth(cur, Number(e.target.value))} />
           </label>
-          <button type="button" className="linkbtn" onClick={() => { const d = defaultPlace(product, cur); if (d) setPlace({ ...place, [cur]: d }); }}>Standard-Position</button>
+          <button type="button" className="linkbtn" onClick={() => { const d = (props.aspect ? maxPlace(product, cur, props.aspect) : null) ?? defaultPlace(product, cur); if (d) setPlace({ ...place, [cur]: d }); }}>{props.aspect ? 'Maximale Größe' : 'Standard-Position'}</button>
         </>}
       </div>}
       {props.admin && showPhoto && cur && place[cur] && <div className="ds-admin">

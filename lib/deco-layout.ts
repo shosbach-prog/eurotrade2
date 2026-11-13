@@ -97,3 +97,16 @@ export const SHAPES: Record<Kind, { front: string[]; back?: string[]; detail?: s
 
 export const spotsFor = (p: { category?: string; name?: string }) => { const k = posKind(p); return { kind: k, spots: SPOTS[k], cm: CM_PER_PCT[k], shape: SHAPES[k] }; };
 export const cmFor = (kind: Kind, w: number) => Math.max(1, Math.round(w * CM_PER_PCT[kind]));
+
+/** Größtmögliches Format für Motiv-Shops: füllt den Druckbereich der Position, begrenzt auf das max. Druckformat (Breite × Höhe in cm), oben bündig */
+export const MAX_PRINT_CM = { w: 34, h: 44 };
+export function maxPlace(p: { category?: string; name?: string }, pos: string, aspect: number) {
+  const { spots, cm } = spotsFor(p); const s = spots[pos];
+  if (!s || !(aspect > 0)) return null;
+  const [x0, y0, x1, y1] = s.area;
+  const big = s.w >= 20; // nur große Flächen (Brust mittig, Rücken …) maximal füllen – kleine Logos (Brust links, Ärmel) bleiben klein
+  if (!big) return null;
+  const maxW = Math.min(x1 - x0, MAX_PRINT_CM.w / cm), maxH = Math.min(y1 - y0, MAX_PRINT_CM.h / cm);
+  const w = Math.min(maxW, maxH * aspect), h = w / aspect;
+  return { x: (x0 + x1) / 2, y: Math.round((y0 + h / 2 + 0.5) * 10) / 10, w: Math.round(w * 10) / 10 };
+}

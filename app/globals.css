@@ -1841,7 +1841,7 @@ html,body{overflow-x:clip}
 .motif-pick-h{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;font-size:14px}
 .mshop .card.dim{opacity:.75}
 .mshop .card .img{position:relative}
-.mshop .motif-on{position:absolute;left:50%;top:30%;width:28%;transform:translateX(-50%);object-fit:contain;pointer-events:none}
+.mshop .motif-on{position:absolute;left:50%;top:27%;width:38%;transform:translateX(-50%);object-fit:contain;pointer-events:none}
 .ts-motifs{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:8px}
 .ts-motif{display:flex;flex-direction:column;gap:4px;padding:6px;border:1px solid #e5e7eb;border-radius:8px;background:#fff}
 .ts-motif img{width:100%;aspect-ratio:1;object-fit:contain;background:repeating-conic-gradient(#f3f4f6 0 25%,#fff 0 50%) 0 0/12px 12px;border-radius:6px}
