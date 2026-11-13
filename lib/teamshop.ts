@@ -1,6 +1,8 @@
 import 'server-only';
 import path from 'node:path';
-import { DATA, listInquiries, readJSON, writeJSON } from './store';
+import fs from 'node:fs';
+import { DATA, UPLOADS, listInquiries, randomId, readJSON, writeJSON } from './store';
+import { allProductsBrief } from './catalog';
 
 /** Vereins-/Team-Shop: eigene Seite mit Vereinslogo und ausgewählten Artikeln – Mitglieder bestellen selbst, geliefert wird gesammelt */
 export type TeamShop = {
@@ -24,7 +26,40 @@ export type TeamMotif = { id: string; name: string };
 export const teamFixedPrice = (t: TeamShop | null | undefined, productId: string) => (t && t.price && t.price > 0 && t.items.includes(productId) ? t.price : null);
 export const isMotifShop = (t: TeamShop | null | undefined) => !!t?.motifs?.length;
 const F = path.join(DATA, 'teamshops.json');
-export const listTeamShops = () => readJSON<TeamShop[]>(F, []);
+export const listTeamShops = () => { ensurePresets(); return readJSON<TeamShop[]>(F, []); };
+
+/** Vorbelegte Motiv-Shops (seed/motive/<slug>/*.png) – werden einmalig angelegt; gelöscht bleibt gelöscht */
+const PRESETS: { slug: string; name: string; note?: string }[] = [{ slug: 'politik-insider', name: 'Politik Insider' }];
+const PRESET_MARK = path.join(DATA, 'presets.json');
+let presetsChecked = false;
+function ensurePresets() {
+  if (presetsChecked) return;
+  presetsChecked = true;
+  try {
+    const done = readJSON<Record<string, string>>(PRESET_MARK, {});
+    for (const pr of PRESETS) {
+      if (done[pr.slug]) continue;
+      const dir = path.join(process.cwd(), 'seed', 'motive', pr.slug);
+      if (!fs.existsSync(dir)) continue;
+      const list = readJSON<TeamShop[]>(F, []);
+      if (!list.some((t) => t.slug === pr.slug)) {
+        fs.mkdirSync(UPLOADS, { recursive: true });
+        const motifs = fs.readdirSync(dir).filter((f) => /\.(png|jpe?g|svg|webp)$/i.test(f)).sort().map((f) => {
+          const id = randomId(); const ext = f.split('.').pop()!.toLowerCase();
+          fs.copyFileSync(path.join(dir, f), path.join(UPLOADS, `${id}.${ext}`));
+          writeJSON(path.join(UPLOADS, `${id}.json`), { name: f, ext, size: fs.statSync(path.join(dir, f)).size, date: new Date().toISOString() });
+          return { id, name: f.replace(/\.[^.]+$/, '').replace(/^\d+[\s._-]*/, '').trim() || 'Motiv' };
+        });
+        // Vorauswahl: die ersten T-Shirts aus dem Katalog – im Admin anpassbar
+        const items = allProductsBrief().filter((p) => p.categorySlug === 't-shirts').slice(0, 6).map((p) => p.id);
+        list.push({ slug: pr.slug, name: pr.name, active: true, logoId: null, logoName: null, items, method: 'Druck', positions: ['Brust mittig'], personalize: 'aus', deadline: null, note: pr.note ?? '', contact: '', motifs, price: null, createdAt: new Date().toISOString() });
+        saveTeamShops(list);
+      }
+      done[pr.slug] = new Date().toISOString();
+      writeJSON(PRESET_MARK, done);
+    }
+  } catch (e) { console.error('Motiv-Presets:', e); }
+}
 export const saveTeamShops = (l: TeamShop[]) => writeJSON(F, l);
 export const getTeamShop = (slug: string) => listTeamShops().find((t) => t.slug === slug && t.active) ?? null;
 export const teamSlug = (s: string) => s.toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40);
