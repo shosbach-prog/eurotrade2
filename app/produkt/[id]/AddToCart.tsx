@@ -192,7 +192,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
           </div>
         ) : p.price != null ? <>
           <div className="price">{p.was != null && <span className="price-was">{pr.p(p.was)}</span>}{pr.p(p.price)} <span style={{ fontSize: 15, fontWeight: 500 }} className="muted">/ Stück</span></div>
-          <div className="vat">{pr.mode === 'brutto' ? <>inkl. MwSt. ({eur(p.price)} netto)</> : <>netto zzgl. MwSt. ({eur(p.priceGross)} brutto)</>} · schon ab 1 Stück{decoOn ? ' · Veredelung wird im Angebot kalkuliert' : ''}</div>
+          <div className="vat">{pr.mode === 'brutto' ? <>inkl. MwSt. ({eur(p.price)} netto)</> : <>netto zzgl. MwSt. ({eur(p.priceGross)} brutto)</>} · schon ab 1 Stück{team?.fixed ? ' · Druck inklusive' : decoOn ? ' · Veredelung wird im Angebot kalkuliert' : ''}</div>
           {delivery && <div className="delivery"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M1 4h14v12H1zM15 9h4l3 3v4h-7z" /><circle cx="6" cy="18" r="2" /><circle cx="18" cy="18" r="2" /></svg>{delivery}</div>}
           {p.tiers.length > 0 && (
             <div className="tiers" aria-label="Staffelpreise">

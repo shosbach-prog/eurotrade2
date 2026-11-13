@@ -19,6 +19,13 @@ function load(): Record<string, Fit> {
 export function fitsFor(p: { images: string[]; colors: { image?: string }[] }): Record<string, Fit> {
   const d = load(); const out: Record<string, Fit> = {};
   for (const s of [...p.images, ...p.colors.map((c) => c.image)]) if (s && d[s]) out[s] = d[s];
+  // Ausreißer korrigieren: bei weißen Artikeln auf weißem Grund erkennt die Bildanalyse die Mittelachse oft falsch.
+  // Fotos eines Artikels sind gleich aufgenommen – weicht ein Foto deutlich vom Median ab, gilt der Median.
+  const all = Object.values(out);
+  if (all.length >= 3) {
+    const med = all[0].map((_, i) => { const v = all.map((f) => f[i]).sort((a, b) => a - b); return v[Math.floor(v.length / 2)]; }) as Fit;
+    for (const [k, f] of Object.entries(out)) if (Math.abs(f[4] - med[4]) > 3 || Math.abs(f[1] - med[1]) > 6 || Math.abs(f[3] - med[3]) > 6) out[k] = med;
+  }
   return out;
 }
 
