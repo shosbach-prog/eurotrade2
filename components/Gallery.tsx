@@ -9,13 +9,17 @@ import { mid, webp } from '@/lib/img';
 export const hiRes = (src: string) => src.replace(/\/generated\/product\/(\d+)\/\d+_\d+_\d+\//, '/master/product/$1/');
 const Z = 2.6; // Zoomfaktor
 
-type Props = { p: PublicProduct; hex?: string; overlay?: ReactNode; /** Farbe ohne eigenes Foto: Hinweis mit Farbfeld, Foto bleibt unverändert */ tint?: { hex: string; name: string } };
+type Props = { p: PublicProduct; hex?: string; overlay?: ReactNode; /** gesteuertes Bild (z. B. bei Farbwahl) */ index?: number; /** Bildwechsel durch Blättern */ onIndex?: (i: number) => void; /** Farbe ohne eigenes Foto: Hinweis mit Farbfeld, Foto bleibt unverändert */ tint?: { hex: string; name: string } };
 
 /** Produktgalerie wie bei Amazon: Thumbnails per Hover, Lupe mit Zoomfenster neben dem Bild, Vollbild per Klick */
-export default function Gallery({ p, hex, overlay, tint }: Props) {
+export default function Gallery({ p, hex, overlay, tint, index, onIndex }: Props) {
   const imgs = p.webp ? p.images.map((x) => webp(x, true)!) : p.images;
   const thumbs = p.images.map((x) => mid(x, p.mid, p.webp)!);
-  const [i, setI] = useState(0);
+  const [i, setI] = useState(index ?? 0);
+  useEffect(() => { if (index != null && index >= 0 && index < imgs.length) setI(index); }, [index]); // eslint-disable-line react-hooks/exhaustive-deps
+  const first = useRef(true);
+  const hover = useRef(false);
+  useEffect(() => { if (first.current) { first.current = false; return; } if (hover.current) { hover.current = false; return; } if (i !== index) onIndex?.(i); }, [i]); // eslint-disable-line react-hooks/exhaustive-deps
   const [zoom, setZoom] = useState<{ lx: number; ly: number; lw: number; lh: number; bx: number; by: number; bw: number; bh: number } | null>(null);
   const [full, setFull] = useState(false);
   const box = useRef<HTMLDivElement>(null);
@@ -57,9 +61,9 @@ export default function Gallery({ p, hex, overlay, tint }: Props) {
     <div className="gal">
       <div className="gal-main">
         {imgs.length > 1 && (
-          <div className="gal-thumbs">
+          <div className="gal-thumbs" onMouseLeave={() => { if (index != null && i !== index) { hover.current = true; setI(index); } }}>
             {imgs.map((t, k) => (
-              <button key={t} className={k === i ? 'on' : ''} onMouseEnter={() => setI(k)} onFocus={() => setI(k)} onClick={() => setI(k)} aria-label={`Bild ${k + 1}`}>
+              <button key={t} className={k === i ? 'on' : ''} onMouseEnter={() => { if (k !== i) { hover.current = true; setI(k); } }} onFocus={() => setI(k)} onClick={() => { hover.current = false; if (k === i) onIndex?.(k); else setI(k); }} aria-label={`Bild ${k + 1}`}>
                 <img src={thumbs[k] ?? t} alt="" loading="lazy" decoding="async" />
               </button>
             ))}

@@ -173,7 +173,23 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
   const otherColorImgs = new Set(p.colors.filter((c) => c !== color).flatMap((c) => [c.image, ...(c.images ?? [])]).filter(Boolean) as string[]);
   // Farbe ohne eigenes Foto (einfarbig): Hauptbild als Farbvorschau umfärben
   const tint = color && !color.images?.length && !color.image && p.colors.length > 1 && color.hex && !/[\/+]|melange|heather|camo|stripe|multi/i.test(color.name) ? { hex: color.hex, name: color.name } : undefined;
-  const galP = color?.images?.length ? { ...p, images: [...color.images, ...p.images.filter((x) => !color.images!.includes(x) && !otherColorImgs.has(x))] } : p;
+  // Alle Farben durchblätterbar: Fotos aller Farben in Farbreihenfolge, danach die allgemeinen Ansichten.
+  // Farbwahl springt zum Foto der Farbe, Blättern auf ein Farbfoto wählt die Farbe aus.
+  const colorImgs = (c: (typeof p.colors)[number]) => (c.images?.length ? c.images : c.image ? [c.image] : []);
+  const gal = useMemo(() => {
+    const own = new Map<string, string>();
+    for (const c of p.colors) for (const x of colorImgs(c)) if (!own.has(x)) own.set(x, c.name);
+    if (own.size < 2) return null;
+    const images = [...own.keys(), ...p.images.filter((x) => !own.has(x))];
+    return { images, own };
+  }, [p]); // eslint-disable-line react-hooks/exhaustive-deps
+  const firstOf = (c?: { name: string }) => (gal && c ? Math.max(0, gal.images.findIndex((x) => gal.own.get(x) === c.name)) : 0);
+  const [galIdx, setGalIdx] = useState(() => firstOf(color));
+  useEffect(() => { if (gal && gal.own.get(gal.images[galIdx]) !== color?.name) { const f = gal.images.findIndex((x) => gal.own.get(x) === color?.name); if (f >= 0) setGalIdx(f); } }, [color?.name]); // eslint-disable-line react-hooks/exhaustive-deps
+  const onGal = (i: number) => { setGalIdx(i); const cn = gal?.own.get(gal.images[i]); if (cn && cn !== color?.name) { const c = p.colors.find((x) => x.name === cn); if (c) setColor(c); } };
+  const galP = gal ? { ...p, images: gal.images } : color?.images?.length ? { ...p, images: [...color.images, ...p.images.filter((x) => !color.images!.includes(x) && !otherColorImgs.has(x))] } : p;
+  const galProps = gal ? { index: galIdx, onIndex: onGal } : {};
+  const galKey = gal ? 'all' : cname;
   const textStyle = { fontFamily: fontCss(font), color: colorHex(tColor) };
 
   return (
@@ -184,9 +200,9 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
             <DecoStudio {...studioProps} />
             <button type="button" className="linkbtn ds-photos" onClick={() => setShowPhotos(true)}>Produktfotos ansehen</button>
           </div>
-          <div className="pd-gal-m"><Gallery key={cname} p={galP} hex={color?.hex} tint={tint} /></div>
+          <div className="pd-gal-m"><Gallery key={galKey} p={galP} hex={color?.hex} tint={tint} {...galProps} /></div>
         </> : <>
-          <Gallery key={cname} p={galP} hex={color?.hex} tint={tint} />
+          <Gallery key={galKey} p={galP} hex={color?.hex} tint={tint} {...galProps} />
           {decoOn && <button type="button" className="linkbtn ds-photos" onClick={() => setShowPhotos(false)}>← Zurück zur Live-Vorschau</button>}
         </>}
       </div>
