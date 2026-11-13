@@ -4,6 +4,8 @@ export type Deco = {
   positions: string[]; method: string;
   motif?: Motif;
   logoId?: string | null; logoName?: string | null;
+  /** Team-/Motiv-Shop: eigenes Logo bzw. Motiv je Position (Position -> Logo) */
+  logos?: Record<string, { id: string; name: string }>;
   /** Textveredelung */
   text?: string | null; font?: string | null; textColor?: string | null;
   note?: string;
@@ -80,7 +82,7 @@ export const isImage = (name?: string | null) => /\.(png|jpe?g|webp|svg)$/i.test
 export const decoText = (d?: Deco | null) => (d?.text ? `Text „${d.text.replace(/\n/g, ' / ')}“ (${d.font ?? FONTS[0].id}, ${d.textColor ?? 'Schwarz'})` : '');
 /** „Brust links (ca. 9 cm), Rücken (ca. 28 cm)“ */
 export const posLabel = (d: Deco) => d.positions.map((p) => (d.sizes?.[p] ? `${p} (ca. ${d.sizes[p]} cm)` : p)).join(', ');
-export const decoLabel = (d?: Deco | null) => (d ? [`${d.method}: ${posLabel(d)}`, d.logoName ? (d.logoName.startsWith('Motiv: ') ? d.logoName : `Logo: ${d.logoName}`) : '', decoText(d), d.team?.rows.length ? `${d.team.what === 'nummer' ? 'Nummern' : d.team.what === 'name' ? 'Namen' : 'Namen + Nummern'} (${d.team.pos}): ${d.team.rows.length}×` : ''].filter(Boolean).join(' · ') : '');
+export const decoLabel = (d?: Deco | null) => (d ? [`${d.method}: ${posLabel(d)}`, logoText(d), decoText(d), d.team?.rows.length ? `${d.team.what === 'nummer' ? 'Nummern' : d.team.what === 'name' ? 'Namen' : 'Namen + Nummern'} (${d.team.pos}): ${d.team.rows.length}×` : ''].filter(Boolean).join(' · ') : '');
 
 /** Veredelung auf einen anderen Artikel übertragen: unpassende Positionen (z. B. „Brust links“ auf einer Cap) werden ersetzt */
 export function adaptDeco(d: Deco | null, p: { category?: string; name?: string }): Deco | null {
@@ -110,3 +112,11 @@ export function parseTeamList(raw: string, sizes: string[]): TeamRow[] {
   }).filter((r) => (r.name || r.nr) && !/^(name|nummer|nr|größe|groesse|size)$/i.test(r.name)).slice(0, 300);
 }
 export const teamLabel = (rows?: TeamRow[] | null) => (rows?.length ? rows.map((r) => [r.name, r.nr && `#${r.nr}`, r.size && `(${r.size})`].filter(Boolean).join(' ')).join(', ') : '');
+
+/** Logo-Angabe für Anfrage/Angebot: bei Logo je Position „Brust links: Wappen · Ärmel rechts: Sponsor“ */
+export function logoText(d?: Deco | null) {
+  if (!d) return '';
+  const lg = d.logos && Object.keys(d.logos).length > 1 ? d.logos : null;
+  if (lg) return d.positions.filter((p) => lg[p]).map((p) => `${p}: ${lg[p].name.replace(/^Motiv: /, '')}`).join(' · ');
+  return d.logoName ? (d.logoName.startsWith('Motiv: ') ? d.logoName : `Logo: ${d.logoName}`) : '';
+}

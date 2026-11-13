@@ -5,7 +5,7 @@ import { anchorTf, ident, photoTf, shapeFor, type Anchor, type FitT, type Place,
 
 type Opts = {
   product: { category?: string; name?: string }; colorHex?: string; photo?: string | null; fit?: FitT | null; anchor?: Record<string, Anchor> | null;
-  positions: string[]; place: Place; logoSrc?: string | null; text?: string; font?: string; textColor?: string; method: string;
+  positions: string[]; place: Place; logoSrc?: string | null; logoFor?: Record<string, string> | null; text?: string; font?: string; textColor?: string; method: string;
 };
 const load = (src: string) => new Promise<HTMLImageElement>((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
 
@@ -36,11 +36,13 @@ async function renderView(o: Opts, view: 'front' | 'back', N = 900): Promise<Blo
   const tfOf = (p: string): Tf => (photoOk && o.anchor?.[p] && spots[p] ? anchorTf(spots[p], o.anchor[p]) : tf);
   let t: Tf = tf;
   const X = (x: number) => ((t.ox + (x - 50) * t.s) / 100) * N, Y = (y: number) => ((t.oy + (y - t.rt) * t.s) / 100) * N;
-  const logo = o.logoSrc ? await load(o.logoSrc).catch(() => null) : null;
+  const cache = new Map<string, HTMLImageElement | null>();
+  const getLogo = async (src?: string | null) => { if (!src) return null; if (!cache.has(src)) cache.set(src, await load(src).catch(() => null)); return cache.get(src)!; };
   const lines = (o.text ?? '').split('\n').filter((l) => l.trim());
   const longest = Math.max(1, ...lines.map((l) => l.length));
   for (const p of pos) {
     const pl = o.place[p]; t = tfOf(p);
+    const logo = await getLogo(o.logoFor?.[p] ?? o.logoSrc);
     const w = (pl.w * t.s / 100) * N, cx = X(pl.x), cy = Y(pl.y);
     g.save(); if (t.rot) { g.translate(cx, cy); g.rotate((t.rot * Math.PI) / 180); g.translate(-cx, -cy); }
     const lh = lines.length ? Math.min(0.34, 1.5 / longest) * w : 0;

@@ -51,16 +51,41 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
     if (!activePos || !positions.includes(activePos)) setActivePos(positions[positions.length - 1] ?? null);
   }, [positions]); // eslint-disable-line react-hooks/exhaustive-deps
   const [logo, setLogo] = useState<Logo | null>(team?.logoId ? { id: team.logoId, name: team.logoName ?? 'Vereinslogo' } : customerLogo ?? null);
+  // Team-/Motiv-Shop: Auswahl (Motive oder Vereinslogos); bei mehreren Positionen eigenes Logo je Position
+  const choices = useMemo(() => (team?.motifs ? team.motifs.map((m) => ({ id: m.id, name: `Motiv: ${m.name}`, label: m.name })) : team?.logos ? team.logos.map((m) => ({ id: m.id, name: m.name, label: m.name })) : []), [team]);
+  const multi = choices.length > 0 && positions.length > 1;
+  const [posLogo, setPosLogo] = useState<Record<string, Logo | null>>(() => {
+    const o: Record<string, Logo | null> = {}; const used = new Set<string>();
+    positions.forEach((x, k) => {
+      let c: Logo | null = logo;
+      // weitere Positionen: nächstes noch nicht verwendetes Logo vorschlagen (z. B. Brust = Wappen, Ärmel = Sponsor)
+      if (k > 0) { const f = choices.find((ch) => ch.id !== logo?.id && !used.has(ch.id)); c = f ? { id: f.id, name: f.name } : logo; }
+      if (c) used.add(c.id); o[x] = c;
+    });
+    return o;
+  });
+  const [editPos, setEditPos] = useState(positions[0]);
+  const usedPos = multi ? positions.filter((x) => posLogo[x]) : positions;
+  const firstLogo = multi ? posLogo[usedPos[0]] ?? null : logo;
+  const pickChoice = (m: { id: string; name: string }) => {
+    if (multi) setPosLogo((o) => ({ ...o, [editPos]: { id: m.id, name: m.name } }));
+    else setLogo({ id: m.id, name: m.name });
+    if (!multi || editPos === positions[0]) try { const u = new URL(location.href); u.searchParams.set(team?.motifs ? 'motiv' : 'logo', m.id); history.replaceState(null, '', u); } catch {}
+  };
   // Motiv-Shop: Motiv füllt den Druckbereich maximal (je nach Seitenverhältnis des Motivs)
   const [aspect, setAspect] = useState<number | null>(null);
   useEffect(() => {
-    if (!team?.motifs || !logo) { setAspect(null); return; }
-    const im = new Image(); let off = false;
-    im.onload = () => { if (off || !im.naturalWidth) return; const ar = im.naturalWidth / im.naturalHeight; setAspect(ar);
-      setPlace((pl) => { const n = { ...pl }; for (const x of positions) { const m = maxPlace(p, x, ar); if (m) n[x] = m; } return n; }); };
-    im.src = `/api/upload/${logo.id}`;
+    if (!team?.motifs) { setAspect(null); return; }
+    let off = false;
+    for (const x of positions) {
+      const l = multi ? posLogo[x] : logo; if (!l) continue;
+      const im = new Image();
+      im.onload = () => { if (off || !im.naturalWidth) return; const ar = im.naturalWidth / im.naturalHeight; if (x === (multi ? editPos : positions[0])) setAspect(ar);
+        const m = maxPlace(p, x, ar); if (m) setPlace((pl) => ({ ...pl, [x]: m })); };
+      im.src = `/api/upload/${l.id}`;
+    }
     return () => { off = true; };
-  }, [logo?.id, positions.join('|')]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [logo?.id, JSON.stringify(posLogo), positions.join('|')]); // eslint-disable-line react-hooks/exhaustive-deps
   // Teamliste: Namen / Nummern je Teil
   const [teamOn, setTeamOn] = useState(!!team && team.personalize !== 'aus');
   const [teamWhat, setTeamWhat] = useState<'name' | 'nummer' | 'beides'>(team && team.personalize !== 'aus' ? team.personalize : 'beides');
@@ -123,9 +148,9 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
 
   const onAdd = async () => {
     const kind = spotsFor(p).kind;
-    const pl = Object.fromEntries(positions.filter((x) => place[x]).map((x) => [x, place[x]]));
-    const sizes = Object.fromEntries(positions.filter((x) => place[x]).map((x) => [x, cmFor(kind, place[x].w)]));
-    let deco: Deco | null = decoOn ? { method, positions, place: pl, sizes, motif, logoId: useLogo ? logo?.id ?? null : null, logoName: useLogo ? logo?.name ?? null : null, text: useText ? text.trim() : null, font: useText ? font : null, textColor: useText ? tColor : null, note: [useLogo && !logo ? 'Logo folgt per E-Mail' : '', note.trim()].filter(Boolean).join(' · ') } : null;
+    const pl = Object.fromEntries(usedPos.filter((x) => place[x]).map((x) => [x, place[x]]));
+    const sizes = Object.fromEntries(usedPos.filter((x) => place[x]).map((x) => [x, cmFor(kind, place[x].w)]));
+    let deco: Deco | null = decoOn ? { method, positions: usedPos, place: pl, sizes, motif, ...(multi ? { logos: Object.fromEntries(usedPos.map((x) => [x, posLogo[x]!])) } : {}), logoId: useLogo ? firstLogo?.id ?? null : null, logoName: useLogo ? firstLogo?.name ?? null : null, text: useText ? text.trim() : null, font: useText ? font : null, textColor: useText ? tColor : null, note: [useLogo && !logo ? 'Logo folgt per E-Mail' : '', note.trim()].filter(Boolean).join(' · ') } : null;
     setBusy(true);
     // Live-Vorschau als Bild an die Anfrage hängen (Freigabe im Angebot)
     if (deco && (studioProps.logoSrc || studioProps.text.trim())) {
@@ -167,7 +192,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
       <small>{total > 0 ? `bei ${total} Stück, ${est.lines.map((l) => `${l.pos} ca. ${l.cm} cm`).join(', ')} · ${pr.label} · ` : `Menge wählen – ab mehr Stück wird es günstiger · ${pr.label} · `}verbindlich im Angebot</small>
     </div>
   );
-  const studioProps = { product: p, colorHex: color?.hex, photo: color?.image ?? null, fit: color?.image ? (fits?.[color.image] as FitT | undefined) ?? null : null, anchor: color?.image ? anchors?.[color.image] ?? null : null, admin, positions, active: activePos, setActive: setActivePos, place, setPlace, logoSrc: useLogo && logo && (isImage(logo.name) || logo.name.startsWith('Motiv: ') || !!team?.logos?.some((l) => l.id === logo.id)) ? `/api/upload/${logo.id}` : null, text: useText ? text : '', font, textColor: tColor, method, aspect };
+  const studioProps = { product: p, colorHex: color?.hex, photo: color?.image ?? null, fit: color?.image ? (fits?.[color.image] as FitT | undefined) ?? null : null, anchor: color?.image ? anchors?.[color.image] ?? null : null, admin, positions: usedPos, active: activePos, setActive: setActivePos, place, setPlace, logoSrc: useLogo && firstLogo && (isImage(firstLogo.name) || choices.some((c) => c.id === firstLogo.id)) ? `/api/upload/${firstLogo.id}` : null, logoFor: multi ? Object.fromEntries(usedPos.map((x) => [x, `/api/upload/${posLogo[x]!.id}`])) : null, text: useText ? text : '', font, textColor: tColor, method, aspect };
   // Galerie: Fotos der gewählten Farbe, danach Detailfotos des Artikels
   // Farbbild(er) zuerst, danach alle allgemeinen Ansichten (Rücken, Seite, Detail, Model) – keine Bilder anderer Farben
   const otherColorImgs = new Set(p.colors.filter((c) => c !== color).flatMap((c) => [c.image, ...(c.images ?? [])]).filter(Boolean) as string[]);
@@ -294,26 +319,22 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
 
         {/* Veredelung */}
         {team && !team.motifs && <div className="team-banner">
-          {logo && <img src={`/api/upload/${logo.id}`} alt="" />}
+          {firstLogo && <img src={`/api/upload/${firstLogo.id}`} alt="" />}
           <div><b>Team-Shop {team.name}</b><span>{team.method} mit Vereinslogo · {positions.join(', ')}{team.deadline ? ` · Bestellschluss ${new Date(team.deadline).toLocaleDateString('de-DE')}` : ''}</span></div>
         </div>}
-        {team?.logos && !team.motifs && <div className="motif-pick">
-          <div className="motif-pick-h"><b>Logo wählen</b><span className="muted">{logo?.name} · {team.logos.length} Varianten</span></div>
-          <div className="motif-grid sm logo-grid">{team.logos.map((m) => (
-            <button key={m.id} type="button" className={`motif ${logo?.id === m.id ? 'on' : ''}`} title={m.name} aria-pressed={logo?.id === m.id}
-              onClick={() => { setLogo({ id: m.id, name: m.name }); try { const u = new URL(location.href); u.searchParams.set('logo', m.id); history.replaceState(null, '', u); } catch {} }}>
-              <img src={`/api/upload/${m.id}`} alt={m.name} loading="lazy" /><span>{m.name}</span>
-            </button>))}
+        {team && choices.length > 0 && <div className="motif-pick">
+          <div className="motif-pick-h"><b>{team.motifs ? 'Ihr Motiv' : 'Logo wählen'}</b><span className="muted">{multi ? usedPos.map((x) => `${x}: ${posLogo[x]!.name.replace(/^Motiv: /, '')}`).join(' · ') : (logo?.name ?? '').replace(/^Motiv: /, '')} · {team.method}{multi ? '' : ` ${positions.join(', ')}`}{team.fixed ? ' · Druck im Preis enthalten' : ''}</span></div>
+          {multi && <div className="deco-row pos-tabs" role="tablist" aria-label="Position">{positions.map((x) => (
+            <button key={x} type="button" role="tab" aria-selected={editPos === x} className={`size ${editPos === x ? 'on' : ''}`} onClick={() => { setEditPos(x); setActivePos(x); }}>{x}{posLogo[x] ? '' : ' – ohne'}</button>))}
+          </div>}
+          <div className={`motif-grid sm ${team.motifs ? '' : 'logo-grid'}`}>
+            {multi && (posLogo[editPos] ? usedPos.length > 1 : true) && <button type="button" className={`motif none ${!posLogo[editPos] ? 'on' : ''}`} onClick={() => setPosLogo((o) => ({ ...o, [editPos]: null }))}><span>ohne</span></button>}
+            {choices.map((m) => { const cur = multi ? posLogo[editPos] : logo; return (
+              <button key={m.id} type="button" className={`motif ${cur?.id === m.id ? 'on' : ''}`} title={m.label} aria-pressed={cur?.id === m.id} onClick={() => pickChoice(m)}>
+                <img src={`/api/upload/${m.id}`} alt={m.label} loading="lazy" />{!team.motifs && <span>{m.label}</span>}
+              </button>); })}
           </div>
-        </div>}
-        {team?.motifs && <div className="motif-pick">
-          <div className="motif-pick-h"><b>Ihr Motiv</b><span className="muted">{logo?.name.replace(/^Motiv: /, '')} · {team.method} {positions.join(', ')}{team.fixed ? ' · Druck im Preis enthalten' : ''}</span></div>
-          <div className="motif-grid sm">{team.motifs.map((m) => (
-            <button key={m.id} type="button" className={`motif ${logo?.id === m.id ? 'on' : ''}`} title={m.name} aria-pressed={logo?.id === m.id}
-              onClick={() => { setLogo({ id: m.id, name: `Motiv: ${m.name}` }); try { const u = new URL(location.href); u.searchParams.set('motiv', m.id); history.replaceState(null, '', u); } catch {} }}>
-              <img src={`/api/upload/${m.id}`} alt={m.name} loading="lazy" />
-            </button>))}
-          </div>
+          {multi && <small className="muted">Für jede Position ein eigenes {team.motifs ? 'Motiv' : 'Logo'} wählen – oder „ohne“.</small>}
         </div>}
         {!team && <label className="deco-toggle">
           <input type="checkbox" checked={decoOn} onChange={(e) => setDecoOn(e.target.checked)} />

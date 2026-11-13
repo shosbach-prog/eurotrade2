@@ -3,6 +3,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import { DATA, UPLOADS, listInquiries, randomId, readJSON, writeJSON } from './store';
 import { allProductsBrief } from './catalog';
+import { logoText } from './deco';
 
 /** Vereins-/Team-Shop: eigene Seite mit Vereinslogo und ausgewählten Artikeln – Mitglieder bestellen selbst, geliefert wird gesammelt */
 export type TeamShop = {
@@ -93,7 +94,7 @@ export function teamOrders(slug: string) {
   for (const i of inqs) {
     let pieces = 0; const personal: string[] = [];
     for (const l of i.lines) {
-      const motif = l.deco?.logoName ? l.deco.logoName.replace(/^Motiv: /, '') : undefined;
+      const motif = l.deco?.logos && Object.keys(l.deco.logos).length > 1 ? logoText(l.deco) : l.deco?.logoName ? l.deco.logoName.replace(/^Motiv: /, '') : undefined;
       const k = `${l.sku}|${l.color}|${motif ?? ''}`;
       const e = sum.get(k) ?? { sku: l.sku, name: l.name, color: l.color, ...(motif ? { motif } : {}), sizes: {}, total: 0 };
       e.sizes[l.size || '–'] = (e.sizes[l.size || '–'] ?? 0) + l.qty; e.total += l.qty; sum.set(k, e);

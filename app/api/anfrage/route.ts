@@ -21,6 +21,11 @@ function cleanDeco(d: any): Deco | null {
   return {
     method, positions, motif: ['logo', 'text', 'beides'].includes(d.motif) ? d.motif : 'logo',
     logoId, logoName: logoId ? String(d.logoName ?? '').slice(0, 120) : null,
+    ...(() => {
+      const lg: Record<string, { id: string; name: string }> = {};
+      if (d.logos && typeof d.logos === 'object') for (const p of positions) { const x = d.logos[p]; if (x && /^[a-f0-9]{24}$/.test(String(x.id ?? ''))) lg[p] = { id: String(x.id), name: String(x.name ?? '').slice(0, 120) }; }
+      return Object.keys(lg).length ? { logos: lg } : {};
+    })(),
     text, font: text ? (FONTS.some((f) => f.id === d.font) ? d.font : FONTS[0].id) : null,
     textColor: text ? (TEXT_COLORS.some((c) => c.id === d.textColor) ? d.textColor : 'Schwarz') : null,
     note: String(d.note ?? '').slice(0, 1000),

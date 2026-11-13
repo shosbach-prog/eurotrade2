@@ -11,7 +11,10 @@ type Props = {
   colorHex?: string; photo?: string | null;
   positions: string[]; active: string | null; setActive: (p: string) => void;
   place: Place; setPlace: (p: Place) => void;
-  logoSrc?: string | null; text?: string; font?: string; textColor?: string;
+  logoSrc?: string | null;
+  /** Logo je Position (überschreibt logoSrc) */
+  logoFor?: Record<string, string> | null;
+  text?: string; font?: string; textColor?: string;
   method: string; compact?: boolean;
   /** Bildanalyse des Fotos: [oben, Schulter, Schulter bei Kapuze, unten, Mittelachse] in % der Bühne */
   fit?: FitT | null;
@@ -105,8 +108,9 @@ export default function DecoStudio(props: Props) {
   const lines = text.split('\n').filter((l) => l.trim());
   const longest = Math.max(1, ...lines.map((l) => l.length));
   // Admin auf dem Foto: Platzhalter-Logo, damit die Lage auch ohne hochgeladenes Logo eingestellt werden kann
-  const adminPh = !!props.admin && showPhoto && !logoSrc && lines.length === 0;
-  const hasMotif = !!logoSrc || lines.length > 0 || adminPh;
+  const hasLogo = !!logoSrc || !!(props.logoFor && Object.keys(props.logoFor).length);
+  const adminPh = !!props.admin && showPhoto && !hasLogo && lines.length === 0;
+  const hasMotif = hasLogo || lines.length > 0 || adminPh;
 
   function pt(e: React.PointerEvent) {
     const r = stage.current!.getBoundingClientRect();
@@ -179,7 +183,7 @@ export default function DecoStudio(props: Props) {
           return (
             <div key={pos} className={`ds-motif ${on ? 'on' : ''} ${method === 'Stick' ? 'stitch' : 'print'} ${light ? 'on-light' : 'on-dark'}`}
               style={{ left: `${toX(c.x, t)}%`, top: `${toY(c.y, t)}%`, width: `${c.w * t.s}%`, transform: t.rot ? `translate(-50%,-50%) rotate(${t.rot}deg)` : undefined }} onPointerDown={(e) => down(e, pos)} title={`${pos} – ziehen zum Verschieben`}>
-              {logoSrc && <img src={logoSrc} alt="" draggable={false} />}
+              {(props.logoFor?.[pos] ?? logoSrc) && <img src={(props.logoFor?.[pos] ?? logoSrc)!} alt="" draggable={false} />}
               {adminPh && <div className="ds-ph">LOGO</div>}
               {lines.length > 0 && <div className="ds-text" style={{ fontFamily: fontCss(font), color: colorHex(textColor), fontSize: `${Math.min(34, 150 / longest)}cqw` }}>{lines.map((l, k) => <div key={k}>{l}</div>)}</div>}
               {on && <span className="ds-size">{cmFor(kind, c.w)} cm</span>}
