@@ -23,9 +23,11 @@ export default function TeamShopEditor({ shops: initial, products, groups, metho
     if (r.ok) setEdit((e) => ({ ...e!, logoId: d.id, logoName: d.name })); else setMsg(d.error ?? 'Upload fehlgeschlagen');
   }
   const [upBusy, setUpBusy] = useState(0);
+  const [drag, setDrag] = useState(false);
   async function uploadMotifs(files?: FileList | null) {
-    const list = [...(files ?? [])].filter((f) => /\.(png|jpe?g|svg|webp)$/i.test(f.name));
-    if (!list.length) return;
+    const all = [...(files ?? [])];
+    const list = all.filter((f) => /\.(png|jpe?g|svg|webp)$/i.test(f.name) || /^image\//.test(f.type));
+    if (!list.length) { if (all.length) setMsg('Bitte Bilddateien (PNG, JPG, SVG) wählen – ZIP-Dateien vorher entpacken.'); return; }
     setUpBusy(list.length); setMsg('');
     for (const f of list) {
       const fd = new FormData(); fd.append('file', f);
@@ -123,7 +125,11 @@ export default function TeamShopEditor({ shops: initial, products, groups, metho
                 </div>
               ))}
             </div>
-            <label className="btn alt sm upl" style={{ alignSelf: 'flex-start' }}>{upBusy ? `Lädt hoch … (${upBusy})` : '+ Motive hochladen (PNG/SVG, mehrere möglich)'}<input type="file" hidden multiple accept=".png,.jpg,.jpeg,.svg,.webp" onChange={(e) => { uploadMotifs(e.target.files); e.target.value = ''; }} /></label>
+            <div className={`ts-drop ${drag ? 'on' : ''}`} onDragOver={(e) => { e.preventDefault(); setDrag(true); }} onDragLeave={() => setDrag(false)} onDrop={(e) => { e.preventDefault(); setDrag(false); uploadMotifs(e.dataTransfer.files); }}>
+              <label className="btn alt sm upl">{upBusy ? `Lädt hoch … (noch ${upBusy})` : '+ Motive auswählen'}<input type="file" hidden multiple accept="image/png,image/jpeg,image/svg+xml,image/webp,.png,.jpg,.jpeg,.svg,.webp" onChange={(e) => { uploadMotifs(e.target.files); e.target.value = ''; }} /></label>
+              <span className="muted">oder PNG/JPG/SVG-Dateien hierher ziehen – mehrere auf einmal möglich</span>
+            </div>
+            {msg && <p className="err" style={{ fontSize: 13, margin: '4px 0' }}>{msg}</p>}
             <div className="two">
               <div><label>Festpreis je Teil inkl. Veredelung (netto, optional)</label><input inputMode="decimal" value={edit.price ?? ''} onChange={(e) => setEdit({ ...edit, price: (e.target.value as unknown as number) })} placeholder="z. B. 20,92" /></div>
               <div><label>= brutto inkl. 19 % MwSt.</label><input disabled value={(() => { const n = Number(String(edit.price ?? '').replace(',', '.')); return n > 0 ? `${(Math.round(n * 119) / 100).toFixed(2).replace('.', ',')} €` : '–'; })()} /></div>

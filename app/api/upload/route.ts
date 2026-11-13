@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import fs from 'node:fs';
 import path from 'node:path';
 import { UPLOADS, randomId, writeJSON } from '@/lib/store';
+import { isAdmin } from '@/lib/customer';
 
 const TYPES: Record<string, string> = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', svg: 'image/svg+xml', pdf: 'application/pdf', ai: 'application/postscript', eps: 'application/postscript' };
 const MAX = 15 * 1024 * 1024;
@@ -12,7 +13,7 @@ export async function POST(req: Request) {
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0] ?? 'local';
   const now = Date.now();
   const recent = (hits.get(ip) ?? []).filter((t) => now - t < 600_000);
-  if (recent.length >= 20) return NextResponse.json({ error: 'Zu viele Uploads – bitte später erneut.' }, { status: 429 });
+  if (recent.length >= 20 && !(await isAdmin())) return NextResponse.json({ error: 'Zu viele Uploads – bitte später erneut.' }, { status: 429 });
   hits.set(ip, [...recent, now]);
 
   const form = await req.formData().catch(() => null);
