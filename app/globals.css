@@ -1773,7 +1773,7 @@ html,body{overflow-x:clip}
   .fg .f-group.shut .f-pop{display:none}
   .fg .f-pop::before{display:none}
   .fg .f-check{white-space:normal}
-  .fg-sort{grid-column:2;grid-row:1;justify-self:end;padding:0 0 10px}
+  .fg-sort{grid-column:2;grid-row:1;justify-self:end;padding:0 0 10px;position:relative;z-index:3}
   .fg-info{grid-column:2;grid-row:1;align-self:center;margin:0 0 10px;padding-right:260px}
   .fg>.grid,.fg>.box{grid-column:2;grid-row:2}
   .fg>.more{grid-column:2;grid-row:3}
