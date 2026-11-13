@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const title = n ? `${t.name} – Shirts mit ${n} Motiven` : `Team-Shop ${t.name}`;
   const description = n ? `${n} Motive zur Auswahl: Motiv wählen, Shirt wählen – gedruckt ab 1 Stück. Offizieller Shop von ${t.name} auf euro-trade.com.` : `Offizieller Team-Shop ${t.name}: Artikel mit Logo ${t.method === 'Stick' ? 'bestickt' : 'bedruckt'}, ab 1 Stück – bestellen auf euro-trade.com.`;
   // Versionsnummer im Bild-Link, damit WhatsApp & Co. nach Änderungen das neue Bild laden
-  const v = crypto.createHash('sha1').update(JSON.stringify([t.name, t.price, (t.motifs ?? []).slice(0, 6).map((m) => m.id), t.items.slice(0, 6), t.logoId])).digest('hex').slice(0, 10);
+  const v = crypto.createHash('sha1').update(JSON.stringify(['v2', t.name, t.price, rankedMotifs(t).slice(0, 6).map((m) => m.id), t.items.slice(0, 6), t.logoId])).digest('hex').slice(0, 10);
   const image = { url: `/team/${t.slug}/og.png?v=${v}`, width: 1200, height: 630, alt: title };
   return { title, description, robots: { index: false, follow: false }, alternates: { canonical: `/team/${t.slug}` }, openGraph: { type: 'website', title, description, url: `/team/${t.slug}`, images: [image] }, twitter: { card: 'summary_large_image', title, description, images: [image.url] } };
 }
