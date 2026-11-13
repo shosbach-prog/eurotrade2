@@ -38,7 +38,10 @@ CRON="0 3 * * * cd $(pwd) && docker compose exec -T shop node scripts/sync-lshop
 BACKUP="30 2 * * * cd $(pwd) && bash scripts/backup.sh >> $(pwd)/data/backup.log 2>&1"
 # Täglich 09:15: Angebote nachfassen (Erinnerungs-Mails)
 FOLLOW="15 9 * * * cd $(pwd) && docker compose exec -T shop sh -c 'wget -qO- \"http://127.0.0.1:3000/api/cron?key=\$(cat /app/data/cron-key)\"' >> $(pwd)/data/cron.log 2>&1"
-( crontab -l 2>/dev/null | grep -v 'scripts/sync-lshop.mjs' | grep -v 'scripts/backup.sh' | grep -v '/api/cron' ; echo "$CRON" ; echo "$BACKUP" ; echo "$FOLLOW" ) | crontab -
+# Bestehende eigene Einträge behalten (grep findet evtl. nichts -> darf nicht abbrechen), unsere drei neu setzen
+KEEP=$(crontab -l 2>/dev/null | grep -v 'scripts/sync-lshop.mjs' | grep -v 'scripts/backup.sh' | grep -v '/api/cron' || true)
+printf '%s\n%s\n%s\n%s\n' "$KEEP" "$CRON" "$BACKUP" "$FOLLOW" | sed '/^$/d' | crontab -
+echo ">> Zeitpläne: $(crontab -l | grep -c 'euro-trade\|sync-lshop\|backup.sh\|/api/cron') Einträge aktiv (Sync 03:00, Sicherung 02:30, Nachfassen 09:15)"
 
 echo
 echo ">> Fertig. Status:"
