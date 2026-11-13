@@ -10,8 +10,14 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      HAS_SECRETS: ${{ secrets.DEPLOY_HOST != '' && secrets.DEPLOY_SSH_KEY != '' }}
     steps:
+      - name: Hinweis – Secrets fehlen
+        if: env.HAS_SECRETS != 'true'
+        run: echo "::notice::Auto-Deploy übersprungen – Secrets DEPLOY_HOST und DEPLOY_SSH_KEY fehlen (README → Automatisches Deployment)."
       - name: Auf dem Server deployen
+        if: env.HAS_SECRETS == 'true'
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.DEPLOY_HOST }}
