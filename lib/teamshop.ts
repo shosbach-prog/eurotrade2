@@ -28,36 +28,53 @@ export const isMotifShop = (t: TeamShop | null | undefined) => !!t?.motifs?.leng
 const F = path.join(DATA, 'teamshops.json');
 export const listTeamShops = () => { ensurePresets(); return readJSON<TeamShop[]>(F, []); };
 
-/** Vorbelegte Motiv-Shops (seed/motive/<slug>/*.png) – werden einmalig angelegt; gelöscht bleibt gelöscht */
+/** Vorbelegte Motiv-Shops (seed/motive/<slug>/*) – Shop wird einmalig angelegt (gelöscht bleibt gelöscht);
+ *  neue Dateien im Ordner kommen bei bestehendem Shop automatisch als weitere Motive dazu (im Admin entfernte nicht wieder) */
 const PRESETS: { slug: string; name: string; note?: string }[] = [{ slug: 'politik-insider', name: 'Politik Insider' }, { slug: 'tristement', name: 'Tristement' }];
 const PRESET_MARK = path.join(DATA, 'presets.json');
+type Mark = { at: string; files: string[] };
 let presetsChecked = false;
+const motifName = (f: string) => f.replace(/\.[^.]+$/, '').replace(/^\d+[\s._-]*/, '').trim() || 'Motiv';
+function importMotif(dir: string, f: string) {
+  const id = randomId(); const ext = f.split('.').pop()!.toLowerCase();
+  fs.copyFileSync(path.join(dir, f), path.join(UPLOADS, `${id}.${ext}`));
+  writeJSON(path.join(UPLOADS, `${id}.json`), { name: f, ext, size: fs.statSync(path.join(dir, f)).size, date: new Date().toISOString() });
+  return { id, name: motifName(f) };
+}
 function ensurePresets() {
   if (presetsChecked) return;
   presetsChecked = true;
   try {
-    const done = readJSON<Record<string, string>>(PRESET_MARK, {});
+    const raw = readJSON<Record<string, string | Mark>>(PRESET_MARK, {});
+    let changed = false;
     for (const pr of PRESETS) {
-      if (done[pr.slug]) continue;
       const dir = path.join(process.cwd(), 'seed', 'motive', pr.slug);
       if (!fs.existsSync(dir)) continue;
+      const files = fs.readdirSync(dir).filter((f) => /\.(png|jpe?g|svg|webp)$/i.test(f)).sort();
       const list = readJSON<TeamShop[]>(F, []);
-      if (!list.some((t) => t.slug === pr.slug)) {
-        fs.mkdirSync(UPLOADS, { recursive: true });
-        const motifs = fs.readdirSync(dir).filter((f) => /\.(png|jpe?g|svg|webp)$/i.test(f)).sort().map((f) => {
-          const id = randomId(); const ext = f.split('.').pop()!.toLowerCase();
-          fs.copyFileSync(path.join(dir, f), path.join(UPLOADS, `${id}.${ext}`));
-          writeJSON(path.join(UPLOADS, `${id}.json`), { name: f, ext, size: fs.statSync(path.join(dir, f)).size, date: new Date().toISOString() });
-          return { id, name: f.replace(/\.[^.]+$/, '').replace(/^\d+[\s._-]*/, '').trim() || 'Motiv' };
-        });
-        // Vorauswahl: die ersten T-Shirts aus dem Katalog – im Admin anpassbar
-        const items = allProductsBrief().filter((p) => p.categorySlug === 't-shirts').slice(0, 6).map((p) => p.id);
-        list.push({ slug: pr.slug, name: pr.name, active: true, logoId: null, logoName: null, items, method: 'Druck', positions: ['Brust mittig'], personalize: 'aus', deadline: null, note: pr.note ?? '', contact: '', motifs, price: null, createdAt: new Date().toISOString() });
-        saveTeamShops(list);
+      const shop = list.find((t) => t.slug === pr.slug);
+      let mark = raw[pr.slug];
+      // ältere Markierung (nur Datum): bekannt = Dateien, deren Motiv schon im Shop ist
+      if (typeof mark === 'string') mark = { at: mark, files: shop ? files.filter((f) => shop.motifs?.some((m) => m.name === motifName(f))) : files };
+      fs.mkdirSync(UPLOADS, { recursive: true });
+      if (!mark) {
+        if (!shop) {
+          const items = allProductsBrief().filter((p) => p.categorySlug === 't-shirts').slice(0, 6).map((p) => p.id);
+          list.push({ slug: pr.slug, name: pr.name, active: true, logoId: null, logoName: null, items, method: 'Druck', positions: ['Brust mittig'], personalize: 'aus', deadline: null, note: pr.note ?? '', contact: '', motifs: files.map((f) => importMotif(dir, f)), price: null, createdAt: new Date().toISOString() });
+          saveTeamShops(list);
+        }
+        mark = { at: new Date().toISOString(), files };
+      } else {
+        const fresh = files.filter((f) => !(mark as Mark).files.includes(f));
+        if (fresh.length && shop) {
+          shop.motifs = [...(shop.motifs ?? []), ...fresh.filter((f) => !shop.motifs?.some((m) => m.name === motifName(f))).map((f) => importMotif(dir, f))].slice(0, 60);
+          saveTeamShops(list);
+        }
+        mark = { ...mark, files: [...new Set([...mark.files, ...fresh])] };
       }
-      done[pr.slug] = new Date().toISOString();
-      writeJSON(PRESET_MARK, done);
+      if (JSON.stringify(raw[pr.slug]) !== JSON.stringify(mark)) { raw[pr.slug] = mark; changed = true; }
     }
+    if (changed) writeJSON(PRESET_MARK, raw);
   } catch (e) { console.error('Motiv-Presets:', e); }
 }
 export const saveTeamShops = (l: TeamShop[]) => writeJSON(F, l);
