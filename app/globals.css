@@ -1803,3 +1803,28 @@ html,body{overflow-x:clip}
 .qv .pd>div:first-child{position:static}
 .qv .ptext,.qv .pdetails,.qv .gpsr,.qv .mbar,.qv .gal-hint{display:none}
 .sz-up{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-top:1px}
+
+/* Admin: Einkaufskonditionen (nur für angemeldete Admins sichtbar) */
+.kond-st{position:absolute;left:8px;bottom:8px;z-index:3;display:flex;flex-direction:column;gap:1px;padding:4px 8px;border-radius:8px;font-size:11.5px;line-height:1.25;background:#fff;border:1.5px solid currentColor;box-shadow:0 2px 6px rgba(0,0,0,.12);pointer-events:auto}
+.kond-st b{font-size:12.5px;color:#111}
+.kond-st span{font-weight:600}
+.k-ok{color:#14833b}.k-mid{color:#b26b00}.k-low{color:#c62828}.k-na{color:#6b7280}
+.kond-st.k-na{flex-direction:row}
+.kond-box{margin:14px 0;padding:12px 14px;border:2px dashed #f0b400;border-radius:12px;background:#fffbea;font-size:14px}
+.kond-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;margin-bottom:8px}
+.kond-h strong{color:#7a5a00}
+.kond-h span{font-size:12px}
+.kond-h button,.kond-toggle{margin-left:auto;background:none;border:0;color:#7a5a00;text-decoration:underline;cursor:pointer;font-size:12px;padding:0}
+.kond-toggle{display:block;margin:10px 0 0}
+.kond-kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.kond-kpi>div{background:#fff;border-radius:8px;padding:6px 8px;display:flex;flex-direction:column}
+.kond-kpi small{color:#6b7280;font-size:11px;text-transform:uppercase;letter-spacing:.3px}
+.kond-kpi b{font-size:16px;color:#111}
+.kond-kpi s{font-size:12px;color:#6b7280}
+.kond-kpi span{font-size:12px;font-weight:600}
+.kond-t{width:100%;margin-top:8px;border-collapse:collapse;font-size:13px;background:#fff;border-radius:8px;overflow:hidden}
+.kond-t th,.kond-t td{padding:4px 8px;text-align:right;border-bottom:1px solid #f1f1f1}
+.kond-t th:first-child,.kond-t td:first-child{text-align:left}
+.kond-t td.k-ok,.kond-t td.k-mid,.kond-t td.k-low{font-weight:600}
+.kond-ups{margin:6px 0 0;font-size:12px}
+@media (max-width:560px){.kond-kpi{grid-template-columns:repeat(2,minmax(0,1fr))}}

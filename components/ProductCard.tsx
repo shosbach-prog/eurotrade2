@@ -10,6 +10,7 @@ import BrandLogo from './BrandLogo';
 import { productPath } from '@/lib/format';
 import { Money } from './PriceMode';
 import CardDots, { QuickBtn } from './CardDots';
+import { KondSticker } from './AdminKond';
 
 /** echte Merkmale als Badges – keine erfundenen Labels */
 function badges(p: PublicProduct): { t: string; c: string }[] {
@@ -35,6 +36,7 @@ export default function ProductCard({ p }: { p: PublicProduct }) {
         <ProductImage p={p} />{p.images[1] && <img className="pimg img2" src={mid(p.images[1], p.mid, p.webp)} alt="" loading="lazy" aria-hidden />}
         <div className="badges">{badges(p).map((x) => <span key={x.t} className={`badge-p ${x.c}`}>{x.t}</span>)}</div>
         <WishButton id={p.id} />
+        <KondSticker id={p.id} />
         {!p.locked && <QuickBtn id={p.id} />}
       </div>
       <div className="b">

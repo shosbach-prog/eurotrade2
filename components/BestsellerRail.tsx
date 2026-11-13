@@ -7,6 +7,7 @@ import { webp } from '@/lib/img';
 import { Money } from './PriceMode';
 import Stars from './Stars';
 import { WishButton } from './Wishlist';
+import { KondSticker } from './AdminKond';
 
 /** Bestseller-Leiste: große Bildkacheln randlos nebeneinander, wischbar (Touch, Maus-Ziehen, Trackpad) mit Pfeilen am Desktop */
 export default function BestsellerRail({ items, title = 'Bestseller.', sub = 'Diese Artikel sind besonders beliebt.' }: { items: PublicProduct[]; title?: string; sub?: string }) {
@@ -39,6 +40,7 @@ export default function BestsellerRail({ items, title = 'Bestseller.', sub = 'Di
                   {img && <img src={img} alt={p.name} loading={k < 4 ? 'eager' : 'lazy'} decoding="async" draggable={false} />}
                   {img2 && <img className="bs-img2" src={img2} alt="" loading="lazy" decoding="async" draggable={false} aria-hidden />}
                   <span className="bs-wish" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}><WishButton id={p.id} /></span>
+                  <KondSticker id={p.id} />
                   {p.eol?.all && <span className="bs-badge">Auslaufartikel</span>}
                   {p.sale && <span className="bs-badge sale">{p.sale.pct ? `−${p.sale.pct} %` : 'Angebot'}</span>}
                 </span>

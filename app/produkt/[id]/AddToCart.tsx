@@ -21,6 +21,7 @@ import SizeAdvisor from '@/components/SizeAdvisor';
 import SizeTable from '@/components/SizeTable';
 import { canDistribute, distribute } from '@/lib/sizing';
 import { productPath } from '@/lib/format';
+import { KondBox } from '@/components/AdminKond';
 
 type Logo = { id: string; name: string };
 
@@ -208,6 +209,8 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
           <div className="price" style={{ fontSize: 22, color: 'var(--brand)' }}>Preis auf Anfrage</div>
           <div className="vat">Schon ab 1 Stück · Ihren Preis erhalten Sie umgehend per E-Mail</div>
         </>}
+
+        <KondBox id={p.id} />
 
         {p.eol?.all && <div className="eol-box">⏳ <b>Auslaufartikel</b> – lieferbar solange Vorrat{p.eol.date ? `, voraussichtlich bis ${fmtD(p.eol.date)}` : ''}. Für Nachbestellungen später fragen Sie uns gern nach einem Nachfolger.</div>}
         {!!pictos?.features.length && <ul className="picto-row" aria-label="Eigenschaften">

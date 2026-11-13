@@ -16,6 +16,7 @@ import Consent, { ConsentLink } from '@/components/Consent';
 import { previewMode, shopClosed } from '@/lib/access';
 import { isAdmin, shopAccess } from '@/lib/customer';
 import { PriceModeProvider } from '@/components/PriceMode';
+import { AdminKondProvider } from '@/components/AdminKond';
 import { VAT } from '@/lib/pricing';
 
 const SHOP = process.env.SHOP_NAME ?? 'Euro-Trade';
@@ -60,7 +61,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema()) }} />
         <a href="#inhalt" className="skip">Zum Inhalt springen</a>
-        <PriceModeProvider initial={cookies().get('et_price')?.value === 'brutto' ? 'brutto' : 'netto'} vat={VAT}><CartProvider><WishlistProvider>
+        <PriceModeProvider initial={cookies().get('et_price')?.value === 'brutto' ? 'brutto' : 'netto'} vat={VAT}><AdminKondProvider admin={admin}><CartProvider><WishlistProvider>
           {previewMode() && ok && !path.startsWith('/start') && <div className="preview-bar">Vorschau-Modus – nur für Sie sichtbar. Preise sind Platzhalter. Kunden-Codes sind gesperrt, bis Sie <code>SHOP_PREVIEW=false</code> setzen.</div>}
           <SiteHeader ok={ok} customerName={customer?.name ?? null} admin={admin} menu={menuData(ok ? customer : undefined)} shop={SHOP} domain={process.env.SHOP_DOMAIN ?? 'euro-trade.com'} />
           <main className="wrap" id="inhalt" tabIndex={-1}>{children}</main>
@@ -117,7 +118,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           {!path.startsWith('/admin') && <TrustBadge />}
           {!path.startsWith('/admin') && <QuickView />}
           {!path.startsWith('/admin') && <Contact whatsapp={process.env.CONTACT_WHATSAPP ?? '491732648097'} phone={process.env.BERATUNG_TELEFON ?? '030 40719258'} email={process.env.CONTACT_EMAIL ?? 'info@euro-trade.com'} />}
-        </WishlistProvider></CartProvider></PriceModeProvider>
+        </WishlistProvider></CartProvider></AdminKondProvider></PriceModeProvider>
       </body>
     </html>
   );
