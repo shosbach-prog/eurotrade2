@@ -43,7 +43,7 @@ export default function ProductCard({ p }: { p: PublicProduct }) {
         {p.rating ? <div className="card-rating"><Stars value={p.rating.avg} size={13} count={p.rating.count} /></div> : null}
         <div className="name">{p.name}</div>
         <div className="brand"><BrandLogo name={p.brand} h={16} />{p.sizes.length > 0 && <span>{sizeRange(p.sizes)}</span>}</div>
-        <CardDots colors={p.colors.slice(0, 7).map((c) => { const src = c.images?.[0] ?? c.image; return { name: c.name, bg: swatchBg(c), ...(src && src !== p.images[0] ? { img: mid(src, p.mid, p.webp) } : {}) }; })} more={Math.max(0, p.colors.length - 7)} />
+        <CardDots colors={p.colors.slice(0, 6).map((c) => { const src = c.images?.[0] ?? c.image; return { name: c.name, bg: swatchBg(c), ...(src && src !== p.images[0] ? { img: mid(src, p.mid, p.webp) } : {}) }; })} more={Math.max(0, p.colors.length - 6)} />
         <div className="price">{p.locked ? <small className="lock-p">🔒 Preise nach Anmeldung</small> : min != null ? <>{p.was != null && <span className="price-was"><Money net={p.was} /></span>}<Money net={p.price!} label />{min! < p.price! && <span className="tier-hint">ab {p.tiers[p.tiers.length - 1].min} Stk. <Money net={min!} /></span>}</> : <small style={{ fontSize: 14, color: 'var(--brand)', fontWeight: 600 }}>Preis auf Anfrage</small>}</div>
       </div>
     </Link>

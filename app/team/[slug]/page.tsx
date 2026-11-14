@@ -48,7 +48,7 @@ export default function TeamShopPage({ params, searchParams }: { params: { slug:
         <div className="motif-grid">
           {motifs.map((m) => (
             <Link key={m.id} href={`/team/${t.slug}?motiv=${m.id}#shirts`} scroll={false} className={`motif ${sel?.id === m.id ? 'on' : ''}`} aria-current={sel?.id === m.id ? 'true' : undefined}>
-              <img src={`/api/upload/${m.id}?w=320`} alt={m.name} loading="lazy" />
+              <img src={`/api/upload/${m.id}?w=320`} alt="" loading="lazy" />
               {m.badge && <i className={`motif-badge ${m.badge === 'Neu' ? 'new' : ''}`}>{m.badge}</i>}
               <span>{m.name}</span>
             </Link>

@@ -77,7 +77,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 </div>
               </div>
               <nav className="ft-col" aria-label="Shop">
-                <h4>Shop</h4>
+                <h2>Shop</h2>
                 {ok ? <Link href="/konto">Meine Anfragen</Link> : <><Link href="/zugang">Anmelden</Link><Link href="/registrieren">Registrieren</Link></>}
                 <Link href="/kontakt">Kontakt & Anfrage</Link>
                 <Link href="/marken">Marken</Link>
@@ -87,7 +87,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <Link href="/team/politik-insider">Politik Insider Shirts</Link>
               </nav>
               <nav className="ft-col" aria-label="Branchen">
-                <h4>Für</h4>
+                <h2>Für</h2>
                 <Link href="/fuer/vereine">Vereine</Link>
                 <Link href="/fuer/unternehmen">Unternehmen</Link>
                 <Link href="/fuer/handwerk">Handwerk</Link>
@@ -97,7 +97,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <Link href="/aktion/vereinsausstattung">Vereinsausstattung</Link>
               </nav>
               <nav className="ft-col" aria-label="Service">
-                <h4>Service</h4>
+                <h2>Service</h2>
                 <Link href="/ueber-uns">Über uns</Link>
                 <Link href="/garantie">Zufriedenheitsgarantie</Link>
                 <Link href="/agb">AGB</Link>

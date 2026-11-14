@@ -700,8 +700,10 @@ footer .wrap{padding-left:112px}
 .hs-price{text-align:right;font-weight:800;font-size:15px;white-space:nowrap}
 .hs-price span{display:block;font-size:12px;font-weight:600;opacity:.85;margin-top:3px}
 .hs-dots{display:flex;gap:6px;justify-content:center}
-.hs-dots button{width:8px;height:8px;border-radius:999px;border:0;padding:0;background:rgba(255,255,255,.45);cursor:pointer;transition:width .3s}
-.hs-dots button.on{width:22px;background:var(--accent)}
+.hs-dots{gap:0}
+.hs-dots button{width:24px;height:24px;border:0;padding:0;background:none;cursor:pointer;display:grid;place-items:center}
+.hs-dots button::before{content:'';width:8px;height:8px;border-radius:999px;background:rgba(255,255,255,.45);transition:width .3s}
+.hs-dots button.on{width:30px}.hs-dots button.on::before{width:22px;background:var(--accent)}
 .l-loginbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:16px;border-left:4px solid var(--accent)}
 .l-loginbar .gate-form{flex-direction:row;margin:0;flex:0 1 420px}
 .l-loginbar .gate-form input{height:44px;font-size:16px;flex:1;min-width:0}
@@ -987,7 +989,7 @@ footer.ft .wrap{padding:0 16px;display:block}
 .ft-contact a:hover{color:var(--accent)}
 .ft-contact span span,.ft-contact a span{color:var(--accent);width:16px;text-align:center}
 .ft-col{display:flex;flex-direction:column;gap:10px}
-.ft-col h4{margin:4px 0 6px;color:#fff;font-size:13px;text-transform:uppercase;letter-spacing:1.2px}
+.ft-col h2{margin:4px 0 6px;color:#fff;font-size:13px;text-transform:uppercase;letter-spacing:1.2px}
 .ft-col a{color:#b9c3d6;width:fit-content;transition:color .15s,transform .15s}
 .ft-col a:hover{color:#fff;transform:translateX(2px)}
 .ft-bottom{border-top:1px solid rgba(255,255,255,.08);background:#081127}
@@ -1602,7 +1604,7 @@ a.mm-h:hover{color:var(--brand)}
 .subchips a{padding:7px 13px;border:1px solid var(--line);border-radius:999px;font-size:14px;color:var(--ink);background:#fff}
 .subchips a span{color:var(--muted);font-size:12px;margin-left:3px}
 .subchips a:hover{border-color:var(--brand);color:var(--brand)}
-.subchips a.on{background:var(--brand);border-color:var(--brand);color:#fff}.subchips a.on span{color:#dbe6f6}
+.subchips a.on{background:var(--brand);border-color:var(--brand);color:#fff}.subchips a.on span{color:#fff;opacity:1}
 .h1-g{font-size:.6em;color:var(--muted);font-weight:600}
 .catnav.mm .wrap.mm-bar{gap:0}
 .catnav.mm .mm-panel .wrap{display:block;overflow:visible}
@@ -1785,8 +1787,10 @@ html,body{overflow-x:clip}
   .pd .gal-main{justify-content:center}
 }
 /* Kachel: Farbpunkte mit Foto + Schnellansicht */
-.card .dot.has{cursor:pointer;padding:0;transition:transform .12s,box-shadow .12s}
-.card .dot.has:hover,.card .dot.on{transform:scale(1.18);box-shadow:0 0 0 2px #fff,0 0 0 3px var(--ink)}
+.card .dots{gap:0}.card .dots>.dot{margin:0 5px}.card .dots .dots-more{margin-left:4px}
+.dot-hit{width:24px;height:24px;flex:0 0 24px;padding:0;border:0;background:none;display:grid;place-items:center;cursor:pointer}
+.card .dot.has{transition:transform .12s,box-shadow .12s}
+.card .dot-hit:hover .dot,.card .dot-hit:focus-visible .dot,.card .dot.on{transform:scale(1.18);box-shadow:0 0 0 2px #fff,0 0 0 3px var(--ink)}
 .card.cswap .img .img2{display:none}
 .qv-btn{display:none}
 @media (hover:hover) and (min-width:821px){
@@ -1839,7 +1843,7 @@ html,body{overflow-x:clip}
 .motif-grid.sm .motif{padding:4px;border-radius:8px}
 .motif-pick{margin:14px 0;padding:12px;border:1px solid #e5e7eb;border-radius:12px;background:#fafafa}
 .motif-pick-h{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;font-size:14px}
-.mshop .card.dim{opacity:.75}
+.mshop .card.dim .img{opacity:.7}
 .mshop .card .img{position:relative}
 .mshop .motif-on{position:absolute;left:50%;top:27%;width:38%;transform:translateX(-50%);object-fit:contain;pointer-events:none}
 .ts-motifs{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:8px}

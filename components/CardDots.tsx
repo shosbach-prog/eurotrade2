@@ -24,8 +24,8 @@ export default function CardDots({ colors, more }: { colors: D[]; more: number }
   return (
     <div ref={ref} className="dots" onMouseEnter={preload}>
       {colors.map((d) => d.img
-        ? <button key={d.name} type="button" className={`dot has ${on === d.name ? 'on' : ''}`} title={d.name} aria-label={`Farbe ${d.name} ansehen`} style={{ background: d.bg }}
-            onMouseEnter={() => show(d)} onFocus={() => show(d)} onClick={(e) => { e.preventDefault(); e.stopPropagation(); show(d); }} />
+        ? <button key={d.name} type="button" className="dot-hit" title={d.name} aria-label={`Farbe ${d.name} ansehen`}
+            onMouseEnter={() => show(d)} onFocus={() => show(d)} onClick={(e) => { e.preventDefault(); e.stopPropagation(); show(d); }}><span className={`dot has ${on === d.name ? 'on' : ''}`} style={{ background: d.bg }} /></button>
         : <span key={d.name} className="dot" title={d.name} style={{ background: d.bg }} />)}
       {more > 0 && <span className="dots-more">+{more}</span>}
     </div>

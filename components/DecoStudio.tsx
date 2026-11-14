@@ -199,7 +199,7 @@ export default function DecoStudio(props: Props) {
         {cur && place[cur] && <>
           <label className="ds-range">
             <span>Größe <b>{cmFor(kind, place[cur].w)} cm</b> breit</span>
-            <input type="range" min={3} max={Math.round(maxW)} step={0.5} value={place[cur].w} onChange={(e) => setWidth(cur, Number(e.target.value))} />
+            <input type="range" aria-label="Breite in cm" min={3} max={Math.round(maxW)} step={0.5} value={place[cur].w} onChange={(e) => setWidth(cur, Number(e.target.value))} />
           </label>
           <button type="button" className="linkbtn" onClick={() => { const d = (props.aspect ? maxPlace(product, cur, props.aspect) : null) ?? defaultPlace(product, cur); if (d) setPlace({ ...place, [cur]: d }); }}>{props.aspect ? 'Maximale Größe' : 'Standard-Position'}</button>
         </>}
