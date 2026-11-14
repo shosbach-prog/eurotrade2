@@ -2,11 +2,12 @@ import { previewMode } from '@/lib/access';
 
 export const dynamic = 'force-dynamic';
 
-/** robots.txt – optional mit Content Signals (contentsignals.org) über CONTENT_SIGNAL in der .env,
- *  z. B. CONTENT_SIGNAL=search=yes, ai-input=yes, ai-train=no (Achtung: Lighthouse wertet die Zeile als unbekannt → SEO 92 statt 100) */
+/** robots.txt mit Content Signals (contentsignals.org) – Standard: Suche und KI-Antworten ja, KI-Training nein.
+ *  Anpassen über CONTENT_SIGNAL in der .env, CONTENT_SIGNAL=off entfernt die Zeile (Lighthouse wertet sie als unbekannt → SEO 92 statt 100) */
 export function GET() {
   const base = (process.env.SHOP_URL ?? 'https://euro-trade.com').replace(/\/$/, '');
-  const signal = (process.env.CONTENT_SIGNAL ?? '').trim();
+  const env = (process.env.CONTENT_SIGNAL ?? '').trim();
+  const signal = env === 'off' ? '' : env || 'search=yes, ai-input=yes, ai-train=no';
   const body = previewMode()
     ? 'User-Agent: *\nDisallow: /\n'
     : `# Suche und KI-Antworten erwünscht, KI-Training nicht – siehe https://contentsignals.org/
