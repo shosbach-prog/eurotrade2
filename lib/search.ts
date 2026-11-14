@@ -50,7 +50,7 @@ export function buildSkuMap(products: Product[]) {
 export function buildIndex(products: Product[]) {
   const ms = new MiniSearch<SearchDoc>({
     idField: 'id',
-    fields: ['name', 'brand', 'category', 'sku', 'mpn', 'tags', 'description', 'colorNames', 'material', 'gender'],
+    fields: ['name', 'model', 'brand', 'category', 'sku', 'mpn', 'tags', 'description', 'colorNames', 'material', 'gender'],
     storeFields: ['id'],
     tokenize,
     processTerm: (t) => t || null,
@@ -59,7 +59,7 @@ export function buildIndex(products: Product[]) {
       return Array.isArray(v) ? v.join(' ') : v ?? '';
     },
     searchOptions: {
-      boost: { name: 5, sku: 4, mpn: 4, brand: 3, category: 3, tags: 2, colorNames: 1.2, gender: 1.5, description: 0.4 },
+      boost: { name: 5, model: 5, sku: 4, mpn: 4, brand: 3, category: 3, tags: 2, colorNames: 1.2, gender: 1.5, description: 0.4 },
       prefix: (t) => t.length >= 2,
       fuzzy: (t) => (t.length <= 3 || /\d/.test(t) ? false : t.length <= 5 ? 1 : 2),
       weights: { fuzzy: 0.45, prefix: 0.8 },

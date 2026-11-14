@@ -26,7 +26,7 @@ ${items.map((p) => {
   const sale = p.was != null;
   return `<item>
 <g:id>${esc(p.sku)}</g:id>
-<g:title>${esc(`${p.name.replace(/\s*\([^)]*\)\s*$/, '')} – ${p.brand}`.slice(0, 150))}</g:title>
+<g:title>${esc(`${p.name.replace(/\s*\([^)]*\)\s*$/, '')} – ${p.brand}${p.model ? ` ${p.model}` : ''}`.slice(0, 150))}</g:title>
 <g:description>${esc(desc)}</g:description>
 <g:link>${esc(abs(productPath(p)))}</g:link>
 <g:image_link>${esc(abs(p.images[0]))}</g:image_link>

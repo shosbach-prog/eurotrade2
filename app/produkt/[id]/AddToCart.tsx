@@ -248,6 +248,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
       <div>
         <div className="pd-brand">{findBrand(p.brand) ? <a href={`/marken/${brandSlug(findBrand(p.brand)!)}`} title={`Alle Artikel von ${p.brand}`}><BrandLogo name={p.brand} h={30} /></a> : <span>{p.brand}</span>}<span className="muted">Art.-Nr. {p.sku}</span></div>
         <h1 style={{ margin: '4px 0 0' }}>{p.name}</h1>
+        {p.model && <p className="pd-model">Modell: {p.model}</p>}
         {p.rating && <a href="#bewertungen" className="pd-rating"><Stars value={p.rating.avg} size={16} showValue count={p.rating.count} /></a>}
         {p.locked ? (
           <div className="locked-box">

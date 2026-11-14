@@ -48,7 +48,7 @@ function productMd(p: PublicProduct) {
   return `# ${p.name}
 
 - Marke: ${p.brand}
-- Artikelnummer: ${p.sku}
+${p.model ? `- Modell: ${p.model}\n` : ''}- Artikelnummer: ${p.sku}
 - Kategorie: [${p.category}](${s}${catPath(p.categorySlug)})
 - Preis: ${priceLine(p)}
 ${p.tiers.length ? `- Staffelpreise (netto): ${p.tiers.map((x) => `ab ${x.min} Stk. ${eur(x.price)}`).join(' · ')}\n` : ''}- Farben (${p.colors.length}): ${p.colors.map((c) => c.name).join(', ')}

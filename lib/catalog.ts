@@ -14,6 +14,15 @@ import { applyEol, auslaufMtime } from './auslauf';
 import { kindOf } from './copy';
 
 const LIVE = path.join(process.cwd(), 'data', 'products.json');
+/** Modellnamen aus der L-Shop-Artikelliste (Art.-Nr. → Bezeichnung), z. B. BCPUI10 → „Unisex Polo ID.001“ */
+const MODELS = path.join(process.cwd(), 'seed', 'lshop-models.json');
+let models: Record<string, string> | null = null;
+const modelOf = (p: Product) => {
+  if (!models) { try { models = JSON.parse(fs.readFileSync(MODELS, 'utf8')); } catch { models = {}; } }
+  const m = models![p.sku];
+  // nur wenn der Modellname etwas Neues bringt (nicht schon im Artikelnamen steckt)
+  return m && !p.name.toLowerCase().includes(m.toLowerCase()) ? m : undefined;
+};
 const SEED = path.join(process.cwd(), 'seed', 'products.json');
 const file = () => (fs.existsSync(LIVE) ? LIVE : SEED);
 
@@ -30,7 +39,7 @@ function load(): State {
   const ov = readOverrides();
   const merged: Product[] = raw.map((p) => applyEol(ov[p.id] ? { ...p, ...ov[p.id], id: p.id, custom: false } : p));
   for (const [id, o] of Object.entries(ov)) if (o.custom && !base.has(id)) merged.push({ sku: id, name: 'Neuer Artikel', brand: '', category: 'Sonstiges', description: '', basePrice: null, images: [], colors: [], sizes: [], ...o, id } as Product);
-  for (const p of merged) { p.categorySlug = p.categorySlug && !ov[p.id]?.category ? p.categorySlug : slugify(p.category || 'sonstiges'); }
+  for (const p of merged) { if (!p.model) { const m = modelOf(p); if (m) p.model = m; } p.categorySlug = p.categorySlug && !ov[p.id]?.category ? p.categorySlug : slugify(p.category || 'sonstiges'); }
   const all = merged.map((p, k) => [p, k] as const).sort((a, b) => Number(!!b[0].top) - Number(!!a[0].top) || a[1] - b[1]).map(([p]) => p);
   const products = all.filter((p) => !p.hidden);
   const catMap = new Map<string, Category>();
@@ -210,7 +219,7 @@ export function didYouMean(q: string, ctx?: Ctx): string | null {
   const s = load();
   if (!vocab || vocab.mtime !== s.mtime) {
     const set = new Set<string>();
-    for (const p of s.products) for (const w of `${p.name} ${p.brand} ${p.category} ${(p.tags ?? []).join(' ')} ${p.colors.map((c) => c.name).join(' ')}`.split(/[\s/,·()-]+/)) if (w.length > 2) set.add(w);
+    for (const p of s.products) for (const w of `${p.name} ${p.model ?? ""} ${p.brand} ${p.category} ${(p.tags ?? []).join(' ')} ${p.colors.map((c) => c.name).join(' ')}`.split(/[\s/,·()-]+/)) if (w.length > 2) set.add(w);
     vocab = { mtime: s.mtime, words: [...set] };
   }
   const words = q.trim().split(/\s+/).filter(Boolean);

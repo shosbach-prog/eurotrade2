@@ -21,7 +21,7 @@ import { productPath, catPath } from '@/lib/format';
 
 export async function generateMetadata({ params }: { params: { id: string; cat?: string } }) {
   const p = getProduct(decodeURIComponent(params.id), await viewCtx());
-  return p ? { title: `${p.name} – ${p.brand}`, description: getText(p).text.intro.slice(0, 155), alternates: { canonical: productPath(p) }, openGraph: { title: `${p.name} – ${p.brand}`, images: p.images.slice(0, 1) } } : {};
+  return p ? { title: p.model ? `${p.name} – ${p.brand} ${p.model}` : `${p.name} – ${p.brand}`, description: getText(p).text.intro.slice(0, 155), alternates: { canonical: productPath(p) }, openGraph: { title: `${p.name} – ${p.brand}`, images: p.images.slice(0, 1) } } : {};
 }
 
 export default async function ProductPage({ params, searchParams }: { params: { id: string; cat?: string }; searchParams?: { team?: string; motiv?: string; logo?: string } }) {
@@ -50,7 +50,7 @@ export default async function ProductPage({ params, searchParams }: { params: { 
   const site = (process.env.SHOP_URL ?? 'https://euro-trade.com').replace(/\/$/, '');
   const lowGross = p.price != null ? gross(p.tiers.length ? Math.min(p.price, ...p.tiers.map((x) => x.price)) : p.price) : null;
   const ldExtra = {
-    sku: p.sku, mpn: p.sku, brand: { '@type': 'Brand', name: p.brand }, image: p.images.slice(0, 4).map((u) => (u.startsWith('/') ? `${site}${u}` : u)), description: getText(p).text.intro, color: p.colors.map((c) => c.name).join(', '), material: p.composition || p.material,
+    sku: p.sku, mpn: p.sku, ...(p.model ? { model: p.model, alternateName: `${p.brand} ${p.model}` } : {}), brand: { '@type': 'Brand', name: p.brand }, image: p.images.slice(0, 4).map((u) => (u.startsWith('/') ? `${site}${u}` : u)), description: getText(p).text.intro, color: p.colors.map((c) => c.name).join(', '), material: p.composition || p.material,
     ...(p.price != null && !p.locked ? { offers: { '@type': 'AggregateOffer', priceCurrency: 'EUR', lowPrice: lowGross, highPrice: p.priceGross, offerCount: Math.max(1, p.colors.length), availability: p.eol?.all ? 'https://schema.org/LimitedAvailability' : 'https://schema.org/InStock', url: `${site}${productPath(p)}`, seller: { '@type': 'Organization', name: 'euro-trade.com' } } } : {}),
   };
   return (

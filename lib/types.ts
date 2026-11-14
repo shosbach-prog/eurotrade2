@@ -16,6 +16,8 @@ export type Product = {
   features?: string[];
   composition?: string;
   specs?: Record<string, string>;
+  /** Modellname laut L-Shop/Hersteller (z. B. „Unisex Polo ID.001“) – für Suche, Titel und Feed */
+  model?: string;
   images: string[];
   /** Link zur Größentabelle (PDF des Herstellers) */
   sizeChart?: string;
