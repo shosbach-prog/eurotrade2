@@ -32,6 +32,7 @@ Disallow: /merkliste
 Disallow: /zugang
 
 Sitemap: ${base}/sitemap.xml
+Agentmap: ${base}/.well-known/ai-catalog.json
 `;
   return new Response(body, { headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'public, max-age=3600' } });
 }

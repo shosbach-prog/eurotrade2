@@ -59,6 +59,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   if (!ok && !isPublic && !showcase) redirect('/zugang');
   return (
     <html lang="de">
+      <head><link rel="ai-catalog" href="/.well-known/ai-catalog.json" type="application/json" /></head>
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema()) }} />
         <a href="#inhalt" className="skip">Zum Inhalt springen</a>
