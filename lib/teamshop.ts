@@ -26,6 +26,10 @@ export type TeamShop = {
   backPrice?: number | null;
   /** Nutzungsrechte an Motiven/Logos (Freigabe des Rechteinhabers) */
   rights?: { holder?: string; date?: string | null; docId?: string | null; docName?: string | null; note?: string } | null;
+  /** Einzelversand an jeden Käufer (statt Sammellieferung an Verein) – nur mit Festpreis: sofort bestellen & bezahlen */
+  direct?: boolean;
+  /** Versandpauschale brutto je Bestellung, versandkostenfrei ab Warenwert brutto */
+  shipGross?: number | null; freeFromGross?: number | null;
   createdAt: string;
 };
 /** at = hinzugefügt am (für „Neu“) */
@@ -148,3 +152,8 @@ export function rankedMotifs(t: TeamShop) {
   const fresh = (m: TeamMotif) => !!m.at && Date.now() - Date.parse(m.at) < 21 * 864e5;
   return list.sort((a, b) => b.sold - a.sold || a.k - b.k).map((m) => ({ id: m.id, name: m.name, at: m.at, sold: m.sold, badge: top.has(m.id) ? ('Beliebt' as const) : fresh(m) ? ('Neu' as const) : null }));
 }
+
+/** Einzelversand-Shop: Festpreis + Direktversand → Bestellung mit sofortigem Preis (und PayPal, falls eingerichtet) */
+export const isDirectShop = (t: TeamShop | null | undefined) => !!t && !!t.direct && !!t.price && t.price > 0;
+/** Versand brutto für einen Warenwert brutto */
+export const teamShippingGross = (t: TeamShop, goodsGross: number) => (t.shipGross && t.shipGross > 0 && !(t.freeFromGross && t.freeFromGross > 0 && goodsGross >= t.freeFromGross) ? t.shipGross : 0);

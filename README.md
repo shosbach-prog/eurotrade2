@@ -81,3 +81,12 @@ ssh -p 23 -i /root/.ssh/euro-trade-backup uXXXXXX@uXXXXXX.your-storagebox.de mkd
 ```
 In `.env`: `BACKUP_REMOTE=uXXXXXX@uXXXXXX.your-storagebox.de:euro-trade` und `BACKUP_SSH_PORT=23`.
 Die nächtliche Sicherung (02:30) spiegelt dann die letzten 30 Sicherungen dorthin. Test: `bash scripts/backup.sh`.
+
+## PayPal für Einzelversand-Shops
+1. developer.paypal.com → Login mit dem PayPal-**Geschäftskonto** → *Apps & Credentials* → App anlegen.
+2. Zuerst im Reiter **Sandbox**: Client ID + Secret in `.env` (`PAYPAL_CLIENT_ID`, `PAYPAL_SECRET`, `PAYPAL_MODE=sandbox`), `bash deploy.sh` – mit einem Sandbox-Testkäufer bestellen.
+3. Läuft alles: Werte aus dem Reiter **Live** eintragen, `PAYPAL_MODE=live`, erneut deployen.
+4. Im Admin → Team-Shops → Bearbeiten: „Einzelversand an jeden Käufer“ anhaken, Versandpauschale eintragen, Festpreis setzen.
+
+Ablauf: Warenkorb → „Zahlungspflichtig bestellen – weiter zu PayPal“ → Rückkehr auf die Bestellseite → Status „Angenommen“, Mail an Shop und Kunde.
+Ohne PayPal-Zugang wird bei Einzelversand-Shops sofort ein verbindliches Angebot erstellt, das der Kunde online annimmt.

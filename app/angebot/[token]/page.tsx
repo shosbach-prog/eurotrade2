@@ -9,12 +9,13 @@ import { inquiryByToken, offerTotals } from '@/lib/store';
 import { CARRIERS, trackingUrl } from '@/lib/shipping';
 import ReorderButton from '@/components/ReorderButton';
 import OrderTimeline from './OrderTimeline';
+import { paypalEnabled } from '@/lib/paypal';
 
 export const metadata: Metadata = { title: 'Ihr Auftrag', robots: { index: false, follow: false } };
 export const dynamic = 'force-dynamic';
 const d = (x: Date) => x.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-export default function OfferPage({ params, searchParams }: { params: { token: string }; searchParams?: { neu?: string } }) {
+export default function OfferPage({ params, searchParams }: { params: { token: string }; searchParams?: { neu?: string; bezahlt?: string; zahlung?: string } }) {
   const i = inquiryByToken(params.token);
   if (!i) notFound();
   const o = i.offer?.sentAt ? i.offer : null;
@@ -30,6 +31,14 @@ export default function OfferPage({ params, searchParams }: { params: { token: s
         <b>✓ Vielen Dank – Ihre Anfrage {i.no} ist eingegangen.</b>
         <p>Wir melden uns innerhalb von 24 Stunden mit Ihrem Angebot. Eine Bestätigung mit dem Link zu dieser Seite ist per E-Mail an {i.customer.email} unterwegs – hier sehen Sie jederzeit den aktuellen Stand.</p>
       </div>}
+      {(() => {
+        const paid = i.payment?.status === 'bezahlt';
+        if (paid && (searchParams?.bezahlt || searchParams?.neu)) return <div className="box thanks" role="status"><b>✓ Zahlung erhalten – vielen Dank!</b><p>Ihre Bestellung {i.no} geht jetzt in Produktion. Eine Bestätigung ist per E-Mail an {i.customer.email} unterwegs.</p></div>;
+        if (searchParams?.zahlung === 'abbruch') return <div className="box" role="status"><b>Zahlung abgebrochen.</b> Ihre Bestellung ist gespeichert – Sie können unten jederzeit bezahlen.</div>;
+        if (searchParams?.zahlung === 'fehler') return <div className="box err" role="alert"><b>Die Zahlung konnte nicht abgeschlossen werden.</b> Bitte erneut versuchen oder antworten Sie auf unsere E-Mail.</div>;
+        if (searchParams?.neu && i.direct && !paid) return <div className="box thanks" role="status"><b>✓ Ihre Bestellung {i.no} ist angelegt.</b><p>{paypalEnabled() ? 'Bitte schließen Sie unten die Zahlung ab – danach geht sie in Produktion.' : 'Bitte bestätigen Sie sie unten – danach geht sie in Produktion.'}</p></div>;
+        return null;
+      })()}
       <div className="list-head">
         <div>
           <h1 style={{ marginBottom: 4 }}>{accepted ? 'Ihr Auftrag' : o ? 'Ihr Angebot' : 'Ihre Anfrage'} {i.no}</h1>
@@ -83,7 +92,13 @@ export default function OfferPage({ params, searchParams }: { params: { token: s
         <a className="btn alt" href={`/rechnung/${x.token}`} style={{ display: 'inline-grid', placeItems: 'center' }}>Rechnung ansehen</a>
       </div>)}
       {i.proof?.sentAt && <ProofBox token={params.token} proof={i.proof} name={i.customer.name} />}
-      {o && t && <div className="box" style={{ marginTop: 16 }}>
+      {o && t && i.direct && i.payment?.status !== 'bezahlt' && paypalEnabled() && !accepted && <div className="box pay-box" style={{ marginTop: 16 }}>
+        <b>Gesamt {eur(t.gross)} inkl. MwSt. und Versand</b>
+        <a className="btn paypal" href={`/api/paypal/start?t=${params.token}`}>Jetzt mit PayPal bezahlen</a>
+        <small className="muted">Sie werden zu PayPal weitergeleitet – dort zahlen Sie per PayPal-Konto, Lastschrift oder Karte.</small>
+      </div>}
+      {i.payment?.status === 'bezahlt' && <div className="box" style={{ marginTop: 16 }}><p className="ok" style={{ margin: 0, fontWeight: 600 }}>✓ Bezahlt per PayPal am {d(new Date(i.payment.paidAt!))} – {eur(i.payment.amount)}</p></div>}
+      {o && t && !(i.direct && paypalEnabled()) && <div className="box" style={{ marginTop: 16 }}>
         {accepted ? <p className="ok" style={{ margin: 0, fontWeight: 600 }}>✓ Sie haben dieses Angebot angenommen. Vielen Dank – den Fortschritt sehen Sie oben.</p>
           : expired ? <p className="err" style={{ margin: 0 }}>Dieses Angebot ist abgelaufen. Antworten Sie gern auf unsere E-Mail – wir erstellen Ihnen ein neues.</p>
           : <AcceptForm token={params.token} defaultName={i.customer.name} total={eur(t.gross)} hasPreview={i.lines.some((l) => l.deco?.previews?.length)} addr={{ company: i.customer.company ?? '', street: i.customer.street ?? '', city: i.customer.city ?? '' }} />}

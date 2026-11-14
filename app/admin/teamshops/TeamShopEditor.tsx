@@ -5,7 +5,8 @@ import type { TeamShop } from '@/lib/teamshop';
 import ArticlePicker, { PickedStrip, type PickGroup, type PickItem } from '@/components/ArticlePicker';
 
 type Orders = { inquiries: number; items: { sku: string; name: string; color: string; motif?: string; sizes: Record<string, number>; total: number }[]; people: { no: string; name: string; email: string; date: string; pieces: number; status: string; personal: string[] }[] };
-type Shop = TeamShop & { orders: Orders };
+type Stats = { rows: { week: string; orders: number; pieces: number; revenue: number; margin: number; paid: number }[]; top: { name: string; qty: number }[]; tot: { orders: number; pieces: number; revenue: number; margin: number; paid: number }; missingEk: number };
+type Shop = TeamShop & { orders: Orders; stats: Stats };
 type Brief = PickItem;
 const empty = (): Partial<TeamShop> => ({ name: '', active: true, items: [], method: 'Stick', positions: ['Brust links'], personalize: 'aus', deadline: '', note: '', contact: '' });
 
@@ -17,6 +18,8 @@ export default function TeamShopEditor({ shops: initial, products, groups, metho
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState('');
   const [open, setOpen] = useState<string | null>(null);
+  const [statsOpen, setStatsOpen] = useState<string | null>(null);
+  const money = (n: number) => n.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
 
   async function upload(f?: File | null) {
     if (!f) return;
@@ -78,7 +81,7 @@ export default function TeamShopEditor({ shops: initial, products, groups, metho
               {s.logoId ? <img src={`/api/upload/${s.logoId}`} alt="" /> : <span className="ts-ph">{s.name.slice(0, 2).toUpperCase()}</span>}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <b>{s.name}</b>{!s.active && <span className="muted"> · deaktiviert</span>}{s.motifs?.length ? (s.rights?.docId || s.rights?.date ? <span className="ts-ok" title={`Freigabe: ${s.rights?.holder ?? ''} ${s.rights?.date ?? ''}`}> ✓ Rechte</span> : <span className="ts-warn"> ⚠ Freigabe fehlt</span>) : null}
-                <div className="muted" style={{ fontSize: 13 }}>{s.items.length} Artikel{s.motifs?.length ? ` · ${s.motifs.length} Motive` : ''}{s.logos?.length ? ` · ${s.logos.length + 1} Logos` : ''}{s.price ? ` · Festpreis ${s.price.toFixed(2).replace('.', ',')} € netto` : ''}{s.backPrice ? ` · Rückendruck +${s.backPrice.toFixed(2).replace('.', ',')} €` : ''} · {s.method} {s.positions.join(', ')}{s.personalize !== 'aus' ? ` · ${s.personalize === 'beides' ? 'Name + Nummer' : s.personalize === 'name' ? 'Name' : 'Nummer'}` : ''}{s.deadline ? ` · Bestellschluss ${new Date(s.deadline).toLocaleDateString('de-DE')}` : ''}</div>
+                <div className="muted" style={{ fontSize: 13 }}>{s.items.length} Artikel{s.motifs?.length ? ` · ${s.motifs.length} Motive` : ''}{s.logos?.length ? ` · ${s.logos.length + 1} Logos` : ''}{s.price ? ` · Festpreis ${s.price.toFixed(2).replace('.', ',')} € netto` : ''}{s.backPrice ? ` · Rückendruck +${s.backPrice.toFixed(2).replace('.', ',')} €` : ''}{s.direct ? ` · Einzelversand${s.shipGross ? ` ${s.shipGross.toFixed(2).replace('.', ',')} €` : ''}` : ''} · {s.method} {s.positions.join(', ')}{s.personalize !== 'aus' ? ` · ${s.personalize === 'beides' ? 'Name + Nummer' : s.personalize === 'name' ? 'Name' : 'Nummer'}` : ''}{s.deadline ? ` · Bestellschluss ${new Date(s.deadline).toLocaleDateString('de-DE')}` : ''}</div>
                 <div className="ts-link"><code>{url}</code><button className="linkbtn" onClick={() => { navigator.clipboard?.writeText(url); setMsg(`Link kopiert: ${url}`); }}>Link kopieren</button><a className="linkbtn" href={`/team/${s.slug}`} target="_blank">ansehen</a></div>
               </div>
               <div className="ts-stats"><b>{s.orders.inquiries}</b><span>Anfragen</span></div>
@@ -86,8 +89,24 @@ export default function TeamShopEditor({ shops: initial, products, groups, metho
               <div className="ts-actions">
                 <button className="btn alt sm" onClick={() => { setEdit({ ...s }); }}>Bearbeiten</button>
                 {s.orders.inquiries > 0 && <button className="btn alt sm" onClick={() => setOpen(open === s.slug ? null : s.slug)}>Sammelbestellung</button>}
+                {s.orders.inquiries > 0 && <button className="btn alt sm" onClick={() => setStatsOpen(statsOpen === s.slug ? null : s.slug)}>Auswertung</button>}
+                <a className="btn alt sm" href={`/team/${s.slug}/story.jpg`} download={`${s.slug}-story.jpg`} title="Story-Grafik 9:16 für Instagram/WhatsApp-Status">Story-Bild</a>
+                <a className="btn alt sm" href={`/team/${s.slug}/post.jpg`} download={`${s.slug}-post.jpg`} title="Post-Grafik 1:1 für Instagram/Facebook">Post-Bild</a>
               </div>
             </div>
+            {statsOpen === s.slug && <div className="ts-orders">
+              <div className="ts-kpis">
+                <div><small>Bestellungen</small><b>{s.stats.tot.orders}</b>{s.stats.tot.paid > 0 && <span>{s.stats.tot.paid} per PayPal bezahlt</span>}</div>
+                <div><small>Teile</small><b>{s.stats.tot.pieces}</b></div>
+                <div><small>Umsatz netto</small><b>{money(s.stats.tot.revenue)}</b></div>
+                <div><small>Marge ca.</small><b>{money(s.stats.tot.margin)}</b><span>{s.stats.tot.revenue > 0 ? `${Math.round((s.stats.tot.margin / s.stats.tot.revenue) * 1000) / 10} %` : ''}</span></div>
+              </div>
+              <table className="atable"><thead><tr><th>Woche</th><th>Bestellungen</th><th>Teile</th><th>Umsatz netto</th><th>Marge ca.</th></tr></thead>
+                <tbody>{s.stats.rows.map((r) => <tr key={r.week}><td>{r.week}</td><td>{r.orders}{r.paid ? ` (${r.paid} bezahlt)` : ''}</td><td>{r.pieces}</td><td>{money(r.revenue)}</td><td>{money(r.margin)}</td></tr>)}</tbody></table>
+              {s.stats.top.length > 0 && <><h3 style={{ margin: '16px 0 6px', fontSize: 15 }}>Top-{s.motifs?.length ? 'Motive' : 'Logos'}</h3>
+                <ol className="ts-top">{s.stats.top.map((m) => <li key={m.name}><span>{m.name}</span><b>{m.qty} Stk.</b></li>)}</ol></>}
+              <p className="muted" style={{ fontSize: 12 }}>Marge = Verkaufspreis − EK − geschätzte Druckkosten (Admin → Veredelung); Versand nicht eingerechnet.{s.stats.missingEk ? ` Bei ${s.stats.missingEk} Teilen fehlt der EK.` : ''}</p>
+            </div>}
             {open === s.slug && <div className="ts-orders">
               <table className="atable"><thead><tr>{s.motifs?.length || s.logos?.length ? <th>{s.motifs?.length ? 'Motiv' : 'Logo'}</th> : null}<th>Artikel</th><th>Farbe</th><th>Größen</th><th>Gesamt</th></tr></thead>
                 <tbody>{s.orders.items.map((i) => <tr key={i.sku + i.color + (i.motif ?? '')}>{s.motifs?.length || s.logos?.length ? <td><b>{i.motif ?? '–'}</b></td> : null}<td><b>{i.sku}</b> {i.name}</td><td>{i.color}</td><td>{Object.entries(i.sizes).map(([z, n]) => `${z}: ${n}`).join(' · ')}</td><td><b>{i.total}</b></td></tr>)}</tbody></table>
@@ -143,6 +162,14 @@ export default function TeamShopEditor({ shops: initial, products, groups, metho
                 <label className="btn alt sm upl">{edit.rights?.docId ? 'Dokument ersetzen' : 'Freigabe hochladen (PDF/Bild)'}<input type="file" hidden accept=".pdf,.png,.jpg,.jpeg" onChange={async (e) => { const f = e.target.files?.[0]; if (!f) return; const fd = new FormData(); fd.append('file', f); const r = await fetch('/api/upload', { method: 'POST', body: fd }); const d = await r.json().catch(() => ({})); if (r.ok) setEdit((x) => ({ ...x!, rights: { ...(x!.rights ?? {}), docId: d.id, docName: d.name } })); else setMsg(d.error ?? 'Upload fehlgeschlagen'); e.target.value = ''; }} /></label>
               </div>
               <label>Notiz</label><input value={edit.rights?.note ?? ''} onChange={(e) => setEdit({ ...edit, rights: { ...(edit.rights ?? {}), note: e.target.value } })} placeholder="z. B. Freigabe per WhatsApp, Umsatzbeteiligung 10 %" />
+            </fieldset>
+            <fieldset className="ts-rights"><legend>Bestellung &amp; Versand</legend>
+              <label className="ds-check"><input type="checkbox" checked={!!edit.direct} onChange={(e) => setEdit({ ...edit, direct: e.target.checked })} /> Einzelversand an jeden Käufer – sofort bestellen{' '}<span className="muted">(statt Angebot &amp; Sammellieferung; nur mit Festpreis, Bezahlung per PayPal falls eingerichtet)</span></label>
+              {edit.direct && <div className="two">
+                <div><label>Versandpauschale brutto je Bestellung</label><input inputMode="decimal" value={edit.shipGross ?? ''} onChange={(e) => setEdit({ ...edit, shipGross: (e.target.value as unknown as number) })} placeholder="z. B. 4,90" /></div>
+                <div><label>Versandkostenfrei ab (brutto, optional)</label><input inputMode="decimal" value={edit.freeFromGross ?? ''} onChange={(e) => setEdit({ ...edit, freeFromGross: (e.target.value as unknown as number) })} placeholder="z. B. 80" /></div>
+              </div>}
+              {edit.direct && !edit.price && <p className="err" style={{ fontSize: 13, margin: '6px 0 0' }}>Einzelversand braucht einen Festpreis (unten).</p>}
             </fieldset>
             <div className="two">
               <div><label>Rückendruck-Option: Aufpreis netto (optional)</label><input inputMode="decimal" value={edit.backPrice ?? ''} onChange={(e) => setEdit({ ...edit, backPrice: (e.target.value as unknown as number) })} placeholder="z. B. 4,20" /></div>

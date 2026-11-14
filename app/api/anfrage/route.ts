@@ -2,11 +2,12 @@ import { NextResponse } from 'next/server';
 import { adminProduct, getProduct } from '@/lib/catalog';
 import { getCustomer } from '@/lib/customer';
 import { FONTS, METHODS, POSITIONS, TEAM_POS, TEXT_COLORS, decoLabel, teamLabel, type Deco } from '@/lib/deco';
-import { getTeamShop, teamFixedPrice } from '@/lib/teamshop';
+import { getTeamShop, isDirectShop, teamFixedPrice, teamShippingGross } from '@/lib/teamshop';
+import { paypalEnabled } from '@/lib/paypal';
 import { esc, sendMail, shopUrl } from '@/lib/mail';
 import { button, contactBlock, eur, h1, infoBox, itemsTable, layout, p, quote, signature, type MailLine } from '@/lib/mail-templates';
 import { sizeUnit } from '@/lib/tiers';
-import { discountFor, randomId, saveInquiry, validCode, type InqLine, type Inquiry } from '@/lib/store';
+import { discountFor, draftOffer, offerTotals, randomId, saveInquiry, validCode, type InqLine, type Inquiry } from '@/lib/store';
 import { cartDone } from '@/lib/cart-remind';
 
 const hits = new Map<string, number[]>();
@@ -85,6 +86,9 @@ export async function POST(req: Request) {
     return { id: p.id, sku: p.sku, name: p.name, color: String(l.color ?? '').slice(0, 80), size: String(l.size ?? '').slice(0, 40), qty: sample ? 1 : qty, price, sum: Math.round((price ?? 0) * (sample ? 1 : qty) * 100) / 100, deco: cleanDeco(l.deco), ek, ...(sample ? { sample: true } : {}), ...(fixed != null && l.deco ? { incl: true } : {}) };
   });
   if (!lines.length) return NextResponse.json({ error: 'Warenkorb ist leer.' }, { status: 400 });
+  // Einzelversand-Shop: alle Positionen aus dem Shop zum Festpreis → direkte Bestellung (Lieferadresse nötig)
+  const direct = isDirectShop(team) && lines.every((l) => l.id && teamFixedPrice(team, l.id) != null && !l.sample);
+  if (direct && (!customer.street?.trim() || !customer.city?.trim())) return NextResponse.json({ error: 'Bitte Straße sowie PLZ/Ort für den Versand angeben.' }, { status: 400 });
   const total = lines.reduce((s, l) => s + l.sum, 0);
   const no = `A${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${randomId(3).toUpperCase()}`;
   const via = ctx ? `${ctx.code}${ctx.name && ctx.name !== ctx.code ? ` (${ctx.name})` : ''}` : null;
@@ -92,6 +96,16 @@ export async function POST(req: Request) {
   const sub = body.code ? validCode(String(body.code)) : null;
   const discount = sub && discountFor(total) > 0 ? { code: sub.code!, pct: discountFor(total) } : null;
   const inq: Inquiry = { no, date: new Date().toISOString(), zugangscode: via, customer, lines, total, discount, status: 'neu', token: randomId(16), offer: null, team: team?.slug ?? null, history: [{ date: new Date().toISOString(), text: team ? `Anfrage über Team-Shop „${team.name}“ eingegangen` : 'Anfrage eingegangen' }] };
+  if (direct && team) {
+    // Preis steht fest: Angebot sofort erstellen (inkl. Versandpauschale) – Kunde bezahlt direkt (PayPal) oder bestätigt online
+    const offer = draftOffer(inq);
+    const goodsGross = offerTotals({ ...offer, shipping: 0 }).gross;
+    offer.shipping = Math.round((teamShippingGross(team, goodsGross) / (1 + offer.vat / 100)) * 100) / 100;
+    offer.note = `Direktbestellung über ${team.name} – Druck im Preis enthalten, Versand direkt an Sie.`;
+    offer.sentAt = new Date().toISOString();
+    inq.direct = true; inq.offer = offer; inq.status = 'angebot';
+    inq.history = [...(inq.history ?? []), { date: new Date().toISOString(), text: `Direktbestellung – Gesamt ${eur(offerTotals(offer).gross)} brutto` }];
+  }
   saveInquiry(inq); // immer lokal sichern (auch wenn Mail ausfällt)
   try { cartDone(customer.email); } catch {}
 
@@ -130,11 +144,24 @@ export async function POST(req: Request) {
       + signature(),
   });
 
+  const payNow = direct && paypalEnabled();
+  const directMail = inq.offer && direct ? layout({
+    preheader: `Gesamt ${eur(offerTotals(inq.offer).gross)} inkl. MwSt. und Versand`, title: `Ihre Bestellung ${no}`,
+    body: h1('Vielen Dank für Ihre Bestellung!')
+      + p(`Guten Tag ${esc(customer.name)},`)
+      + p(payNow ? `Ihre Bestellung <strong>${no}</strong> ist angelegt. Falls die Zahlung noch nicht abgeschlossen ist, können Sie sie hier jederzeit nachholen.` : `Ihre Bestellung <strong>${no}</strong> ist angelegt. Bitte bestätigen Sie sie mit einem Klick – danach geht sie in Produktion.`)
+      + infoBox([['Bestell-Nr.', no], ['Stückzahl', String(pieces)], ['Gesamt inkl. MwSt. und Versand', eur(offerTotals(inq.offer).gross)], ['Lieferadresse', esc(`${customer.street}, ${customer.city}`)]])
+      + itemsTable(mlines.map((m) => ({ ...m, price: m.price != null ? Math.round(m.price * (1 + inq.offer!.vat / 100) * 100) / 100 : null, sum: Math.round(m.sum * (1 + inq.offer!.vat / 100) * 100) / 100 })), [['Versand', eur(Math.round(inq.offer.shipping * (1 + inq.offer.vat / 100) * 100) / 100)], ['Gesamt inkl. MwSt.', eur(offerTotals(inq.offer).gross), true]])
+      + button(payNow ? `${base}/api/paypal/start?t=${inq.token}` : `${base}/angebot/${inq.token}`, payNow ? 'Jetzt mit PayPal bezahlen' : 'Bestellung ansehen & bestätigen')
+      + p('Fragen? Antworten Sie einfach auf diese E-Mail.')
+      + signature(),
+  }) : null;
+
   try {
-    await sendMail({ to: process.env.INQUIRY_TO ?? '', replyTo: customer.email, subject: `Neue Anfrage ${no} – ${customer.company || customer.name} – ${eur(total)}`, html: toShop });
-    await sendMail({ to: customer.email, replyTo: process.env.INQUIRY_TO, subject: `Ihre Anfrage ${no} bei ${process.env.SHOP_NAME ?? 'Euro-Trade'}`, html: toCustomer });
+    await sendMail({ to: process.env.INQUIRY_TO ?? '', replyTo: customer.email, subject: `${direct ? 'Neue Bestellung' : 'Neue Anfrage'} ${no} – ${customer.company || customer.name} – ${eur(total)}`, html: toShop });
+    await sendMail({ to: customer.email, replyTo: process.env.INQUIRY_TO, subject: directMail ? `Ihre Bestellung ${no} bei ${process.env.SHOP_NAME ?? 'Euro-Trade'}` : `Ihre Anfrage ${no} bei ${process.env.SHOP_NAME ?? 'Euro-Trade'}`, html: directMail ?? toCustomer });
   } catch (e) {
     console.error('Mailversand fehlgeschlagen', e); // Anfrage ist trotzdem gespeichert
   }
-  return NextResponse.json({ ok: true, no, token: inq.token });
+  return NextResponse.json({ ok: true, no, token: inq.token, ...(direct ? { direct: true } : {}), ...(payNow && body.pay === 'paypal' ? { redirect: `/api/paypal/start?t=${inq.token}` } : {}) });
 }

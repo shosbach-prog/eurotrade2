@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getProduct } from '@/lib/catalog';
-import { getTeamShop, isOpen, logoChoices, rankedMotifs, teamFixedPrice } from '@/lib/teamshop';
+import { getTeamShop, isDirectShop, isOpen, logoChoices, rankedMotifs, teamFixedPrice } from '@/lib/teamshop';
 import ProductImage from '@/components/ProductImage';
 import { eur } from '@/lib/format';
 import { productPath } from '@/lib/format';
@@ -38,12 +38,12 @@ export default function TeamShopPage({ params, searchParams }: { params: { slug:
           <div>
             <span className="tshop-kicker">Offizieller Shop</span>
             <h1>{t.name}</h1>
-            <p>{motifs.length} Motive · {t.method === 'Stick' ? 'gestickt' : 'gedruckt'} auf Shirt Ihrer Wahl · ab 1 Stück{t.price ? ' · Druck im Preis enthalten' : ''}</p>
+            <p>{motifs.length} Motive · {t.method === 'Stick' ? 'gestickt' : 'gedruckt'} auf Shirt Ihrer Wahl · ab 1 Stück{t.price ? ' · Druck im Preis enthalten' : ''}{isDirectShop(t) ? ` · Versand direkt zu Ihnen${t.shipGross ? ` (${t.shipGross.toFixed(2).replace('.', ',')} €${t.freeFromGross ? `, frei ab ${t.freeFromGross.toFixed(0)} €` : ''})` : ''}` : ''}</p>
             {t.deadline && <div className={`tshop-dl ${isOpen(t) ? '' : 'closed'}`}>{isOpen(t) ? <>Bestellschluss <b>{new Date(t.deadline).toLocaleDateString('de-DE')}</b></> : 'Der Bestellzeitraum ist beendet.'}</div>}
           </div>
         </section>
         {t.note && <p className="tshop-note">{t.note}</p>}
-        <ol className="tshop-steps"><li><b>Motiv wählen</b> aus {motifs.length} Designs</li><li><b>Shirt wählen</b> Modell, Farbe und Größe</li><li><b>Anfrage senden</b> Sie erhalten Ihr Angebot per E-Mail</li></ol>
+        <ol className="tshop-steps"><li><b>Motiv wählen</b> aus {motifs.length} Designs</li><li><b>Shirt wählen</b> Modell, Farbe und Größe</li>{isDirectShop(t) ? <li><b>Bestellen &amp; bezahlen</b> wir drucken und schicken es Ihnen</li> : <li><b>Anfrage senden</b> Sie erhalten Ihr Angebot per E-Mail</li>}</ol>
         <h2 id="motive">1. Motiv wählen</h2>
         <div className="motif-grid">
           {motifs.map((m) => (
@@ -84,7 +84,7 @@ export default function TeamShopPage({ params, searchParams }: { params: { slug:
         <div>
           <span className="tshop-kicker">Offizieller Team-Shop</span>
           <h1>{t.name}</h1>
-          <p>{t.method} mit Vereinslogo{t.personalize !== 'aus' ? ` · auf Wunsch mit ${t.personalize === 'name' ? 'Ihrem Namen' : t.personalize === 'nummer' ? 'Ihrer Nummer' : 'Name und Nummer'}` : ''} · ab 1 Stück · Lieferung gesammelt an den Verein</p>
+          <p>{t.method} mit Vereinslogo{t.personalize !== 'aus' ? ` · auf Wunsch mit ${t.personalize === 'name' ? 'Ihrem Namen' : t.personalize === 'nummer' ? 'Ihrer Nummer' : 'Name und Nummer'}` : ''} · ab 1 Stück · {isDirectShop(t) ? 'Versand direkt zu Ihnen' : 'Lieferung gesammelt an den Verein'}</p>
           {t.deadline && <div className={`tshop-dl ${open ? '' : 'closed'}`}>{open ? <>Bestellschluss <b>{new Date(t.deadline).toLocaleDateString('de-DE')}</b>{days != null && days <= 14 && <> · noch {days} {days === 1 ? 'Tag' : 'Tage'}</>}</> : 'Der Bestellzeitraum ist beendet.'}</div>}
         </div>
       </section>

@@ -101,6 +101,10 @@ export type Inquiry = {
   deliveredAt?: string | null;
   /** Mail „Ihr Auftrag ist in Produktion“ gesendet */
   productionMailAt?: string | null;
+  /** Direktbestellung aus einem Einzelversand-Shop (Preis steht fest, Angebot automatisch) */
+  direct?: boolean;
+  /** Online-Zahlung */
+  payment?: { method: 'paypal'; status: 'offen' | 'bezahlt'; amount: number; orderId?: string | null; captureId?: string | null; payer?: string | null; paidAt?: string | null } | null;
   reviewRemindedAt?: string | null;
   /** Kunde hat die Motiv-Vorschau mit der Annahme freigegeben */
   previewApprovedAt?: string | null;
