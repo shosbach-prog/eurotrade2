@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function Widerruf() {
   return (
     <div className="info legal-page">
-      <div className="crumbs"><Link href="/">Start</Link> › Rückgabe & Widerruf</div>
+      <div className="crumbs"><Link href="/">Startseite</Link> › Rückgabe & Widerruf</div>
       <h1>Rückgabe & Widerruf</h1>
       <p className="lead">Wir möchten, dass Sie mit Ihrer Bestellung rundum zufrieden sind. Hier finden Sie alles zu Rückgabe, Umtausch und Reklamation, kurz erklärt und darunter in der gesetzlich vorgeschriebenen Form.</p>
 

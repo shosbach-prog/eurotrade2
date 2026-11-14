@@ -25,7 +25,7 @@ export default async function Marken() {
   return (
     <>
       <JsonLd data={crumbSchema([['Start', '/'], ['Marken', '/marken']])} />
-      <div className="crumbs"><Link href="/">Start</Link> › Marken</div>
+      <div className="crumbs"><Link href="/">Startseite</Link> › Marken</div>
       <h1>Marken & Hersteller</h1>
       <p className="muted" style={{ maxWidth: 760 }}>Wir arbeiten mit über {list.length} Textilmarken. Alle Artikel gibt es schon ab 1 Stück – auf Wunsch mit Ihrem Logo bedruckt oder bestickt.</p>
       {withItems.length > 0 && <><h2>Im Shop</h2><div className="bgrid">{withItems.map(tile)}</div></>}

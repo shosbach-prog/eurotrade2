@@ -55,7 +55,7 @@ export default async function ProductPage({ params, searchParams }: { params: { 
   };
   return (
     <>
-      <div className="crumbs">{team ? <><Link href={`/team/${team.slug}`}>← Team-Shop {team.name}</Link></> : <><Link href="/">Start</Link> › <Link href={catPath(p.categorySlug)}>{p.category}</Link> › {p.name}</>}</div>
+      <div className="crumbs">{team ? <><Link href={`/team/${team.slug}`}>← Team-Shop {team.name}</Link></> : <><Link href="/">Startseite</Link> › <Link href={catPath(p.categorySlug)}>{p.category}</Link> › {p.name}</>}</div>
       <AddToCart key={mot?.id ?? lg?.id ?? 'x'} p={p} team={team} pictos={pictosOf(p.id)} gpsr={gpsrFor(p.brand)} sizeTable={sizeTableFor(p.sku)} fits={fitsFor(p)} anchors={anchorsFor(p)} admin={await isAdmin()} pricing={(() => { const pr = getPricing(); return pr.showEstimate && !p.locked && fixed == null ? pr : null; })()} customerLogo={ctx && 'code' in ctx && ctx.logoId ? { id: ctx.logoId, name: ctx.logoName ?? 'Ihr Logo' } : null} copy={getText(p).text} delivery={process.env.DELIVERY_TEXT ?? 'Lieferung ca. 3–5 Werktage · mit Veredelung ca. 7–14 Werktage nach Freigabe'} />
       <JsonLd data={crumbSchema([['Start', '/'], [p.category, catPath(p.categorySlug)], [p.name, productPath(p)]])} />
       {!p.rating && <JsonLd data={{ '@context': 'https://schema.org', '@type': 'Product', name: p.name, ...ldExtra }} />}

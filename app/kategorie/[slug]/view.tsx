@@ -51,7 +51,7 @@ export default async function CategoryView({ params, searchParams = {} }: { para
     return (
       <>
         <JsonLd data={crumbSchema([['Start', '/'], [title, catPath(params.slug)]])} />
-        <div className="crumbs"><Link href="/">Start</Link> › {title}</div>
+        <div className="crumbs"><Link href="/">Startseite</Link> › {title}</div>
         <section className="cat-hero deal-hero">
           <div className="cat-hero-text">
             <h1>{sale ? 'Sonderangebote' : 'Auslaufartikel & Restposten'}</h1>
@@ -94,7 +94,7 @@ export default async function CategoryView({ params, searchParams = {} }: { para
     <>
       <JsonLd data={crumbSchema([['Start', '/'], [cat.name, catPath(cat.slug)], ...(sub ? [[title, catPath(sub.key)] as [string, string]] : []), ...(g ? [[`${title} ${gLabel(g)}`, catUrl(sub?.key ?? cat.slug, g)] as [string, string]] : [])])} />
       <JsonLd data={faqSchema(txt.faq)} />
-      <div className="crumbs"><Link href="/">Start</Link> › {sub || g ? <Link href={catPath(cat.slug)}>{cat.name}</Link> : cat.name}{sub && <> › {g ? <Link href={catPath(sub.key)}>{title}</Link> : title}</>}{g && <> › {g}</>}</div>
+      <div className="crumbs"><Link href="/">Startseite</Link> › {sub || g ? <Link href={catPath(cat.slug)}>{cat.name}</Link> : cat.name}{sub && <> › {g ? <Link href={catPath(sub.key)}>{title}</Link> : title}</>}{g && <> › {g}</>}</div>
       <section className="cat-hero">
         <div className="cat-hero-text">
           <h1>{title}{g && <> {gLabel(g)}</>}</h1>

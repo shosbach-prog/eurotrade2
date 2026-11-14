@@ -20,7 +20,7 @@ export default function Guide({ params }: { params: { slug: string } }) {
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'Article', headline: g.title, description: g.description, inLanguage: 'de-DE', mainEntityOfPage: `${base}/ratgeber/${g.slug}`, author: { '@type': 'Organization', name: 'euro-trade.com' }, publisher: { '@type': 'Organization', name: 'euro-trade.com', logo: { '@type': 'ImageObject', url: `${base}/icon.svg` } } }} />
       <JsonLd data={faqSchema(g.faq)} />
       <JsonLd data={crumbSchema([['Start', '/'], ['Ratgeber', '/ratgeber'], [g.title, `/ratgeber/${g.slug}`]])} />
-      <div className="crumbs"><Link href="/">Start</Link> › <Link href="/ratgeber">Ratgeber</Link> › {g.title}</div>
+      <div className="crumbs"><Link href="/">Startseite</Link> › <Link href="/ratgeber">Ratgeber</Link> › {g.title}</div>
       <h1>{g.title}</h1>
       <p className="lead">{g.description}</p>
       <p className="rg-meta">{g.minutes} Min. Lesezeit</p>

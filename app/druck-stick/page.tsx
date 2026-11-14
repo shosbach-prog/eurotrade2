@@ -51,7 +51,7 @@ const SIZES = [
 export default function DruckStick() {
   return (
     <div className="info">
-      <div className="crumbs"><Link href="/">Start</Link> › Druck & Stick</div>
+      <div className="crumbs"><Link href="/">Startseite</Link> › Druck & Stick</div>
       <h1>Druck & Stick: welches Verfahren passt zu Ihrem Logo?</h1>
       <p className="lead">Ob Vereinslogo auf der Brust, Namen auf dem Rücken oder ein buntes Motiv auf dem Event-Shirt: Für jedes Projekt gibt es das passende Verfahren. Hier finden Sie die wichtigsten Unterschiede auf einen Blick. Wenn Sie unsicher sind, wählen Sie bei Ihrer Anfrage einfach „Beratung gewünscht“.</p>
 

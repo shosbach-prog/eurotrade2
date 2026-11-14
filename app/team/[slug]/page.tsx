@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   // Versionsnummer im Bild-Link, damit WhatsApp & Co. nach Änderungen das neue Bild laden
   const v = crypto.createHash('sha1').update(JSON.stringify(['v3', t.name, t.price, rankedMotifs(t).slice(0, 6).map((m) => m.id), t.items.slice(0, 6), t.logoId])).digest('hex').slice(0, 10);
   const image = { url: `/team/${t.slug}/og.jpg?v=${v}`, width: 1200, height: 630, alt: title, type: 'image/jpeg' };
-  return { title, description, robots: { index: false, follow: false }, alternates: { canonical: `/team/${t.slug}` }, openGraph: { type: 'website', title, description, url: `/team/${t.slug}`, images: [image] }, twitter: { card: 'summary_large_image', title, description, images: [image.url] } };
+  return { title, description, robots: t.indexed && t.active ? { index: true, follow: true } : { index: false, follow: false }, alternates: { canonical: `/team/${t.slug}` }, openGraph: { type: 'website', title, description, url: `/team/${t.slug}`, images: [image] }, twitter: { card: 'summary_large_image', title, description, images: [image.url] } };
 }
 
 export default function TeamShopPage({ params, searchParams }: { params: { slug: string }; searchParams?: { motiv?: string } }) {

@@ -13,7 +13,7 @@ export default function Ratgeber() {
   return (
     <div className="info">
       <JsonLd data={crumbSchema([['Start', '/'], ['Ratgeber', '/ratgeber']])} />
-      <div className="crumbs"><Link href="/">Start</Link> › Ratgeber</div>
+      <div className="crumbs"><Link href="/">Startseite</Link> › Ratgeber</div>
       <h1>Ratgeber: Textilien mit Logo</h1>
       <p className="lead">Kurz, praktisch und ohne Fachchinesisch: Hier erklären wir, worauf es bei Teamkleidung, Firmenbekleidung und Veredelung ankommt.</p>
       <div className="rg-grid">

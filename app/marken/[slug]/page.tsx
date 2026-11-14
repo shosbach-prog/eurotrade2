@@ -21,7 +21,7 @@ export default async function BrandPage({ params }: { params: { slug: string } }
   return (
     <>
       <JsonLd data={crumbSchema([['Start', '/'], ['Marken', '/marken'], [b.name, `/marken/${b.slug}`]])} />
-      <div className="crumbs"><Link href="/">Start</Link> › <Link href="/marken">Marken</Link> › {b.name}</div>
+      <div className="crumbs"><Link href="/">Startseite</Link> › <Link href="/marken">Marken</Link> › {b.name}</div>
       <section className="brand-hero">
         {b.logo ? <img src={`/brands/${b.logo}`} alt={b.name} /> : null}
         <div>

@@ -12,7 +12,7 @@ export default function UeberUns() {
   return (
     <div className="info">
       <JsonLd data={crumbSchema([['Start', '/'], ['Über uns', '/ueber-uns']])} />
-      <div className="crumbs"><Link href="/">Start</Link> › Über uns</div>
+      <div className="crumbs"><Link href="/">Startseite</Link> › Über uns</div>
       <h1>Über euro-trade.com</h1>
       <p className="lead">Wir bringen Ihr Logo auf hochwertige Markentextilien: für Vereine, Unternehmen, Handwerksbetriebe und Teams. Schon ab einem Stück, mit persönlicher Beratung und einem klaren Angebot, bevor Sie sich entscheiden.</p>
 

@@ -12,7 +12,7 @@ const S = ({ n, t, children }: { n: number; t: string; children: React.ReactNode
 export default function AGB() {
   return (
     <div className="info legal-page legal">
-      <div className="crumbs"><Link href="/">Start</Link> › AGB</div>
+      <div className="crumbs"><Link href="/">Startseite</Link> › AGB</div>
       <h1>Allgemeine Geschäftsbedingungen</h1>
       <p className="lead">Stand: November 2026</p>
 

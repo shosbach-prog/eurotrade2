@@ -163,6 +163,9 @@ export default function TeamShopEditor({ shops: initial, products, groups, metho
               </div>
               <label>Notiz</label><input value={edit.rights?.note ?? ''} onChange={(e) => setEdit({ ...edit, rights: { ...(edit.rights ?? {}), note: e.target.value } })} placeholder="z. B. Freigabe per WhatsApp, Umsatzbeteiligung 10 %" />
             </fieldset>
+            <fieldset className="ts-rights"><legend>Sichtbarkeit</legend>
+              <label className="ds-check"><input type="checkbox" checked={!!edit.indexed} onChange={(e) => setEdit({ ...edit, indexed: e.target.checked })} /> Bei Google auffindbar{' '}<span className="muted">(für öffentliche Shops wie Politik Insider; Vereinsshops besser aus lassen – dann nur per Link erreichbar)</span></label>
+            </fieldset>
             <fieldset className="ts-rights"><legend>Bestellung &amp; Versand</legend>
               <label className="ds-check"><input type="checkbox" checked={!!edit.direct} onChange={(e) => setEdit({ ...edit, direct: e.target.checked })} /> Einzelversand an jeden Käufer – sofort bestellen{' '}<span className="muted">(statt Angebot &amp; Sammellieferung; nur mit Festpreis, Bezahlung per PayPal falls eingerichtet)</span></label>
               {edit.direct && <div className="two">

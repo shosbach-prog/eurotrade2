@@ -21,6 +21,7 @@ function clean(d: any, old?: TeamShop): TeamShop {
     backPrice: (() => { const n = Math.round(Number(String(d.backPrice ?? '').replace(',', '.')) * 100) / 100; return Number.isFinite(n) && n > 0 && n < 1000 ? n : null; })(),
     rights: (() => { const r = d.rights ?? {}; const docId = /^[a-f0-9]{24}$/.test(String(r.docId ?? '')) ? String(r.docId) : null; const v = { holder: str(r.holder, 120), date: /^\d{4}-\d{2}-\d{2}$/.test(String(r.date ?? '')) ? String(r.date) : null, docId, docName: docId ? str(r.docName, 120) : null, note: str(r.note, 500) }; return v.holder || v.docId || v.note || v.date ? v : null; })(),
     direct: d.direct === true,
+    indexed: d.indexed === true,
     shipGross: (() => { const n = Math.round(Number(String(d.shipGross ?? '').replace(',', '.')) * 100) / 100; return Number.isFinite(n) && n > 0 && n < 100 ? n : null; })(),
     freeFromGross: (() => { const n = Math.round(Number(String(d.freeFromGross ?? '').replace(',', '.')) * 100) / 100; return Number.isFinite(n) && n > 0 && n < 100000 ? n : null; })(),
     price: (() => { const n = Math.round(Number(String(d.price ?? '').replace(',', '.')) * 100) / 100; return Number.isFinite(n) && n > 0 && n < 10000 ? n : null; })(),

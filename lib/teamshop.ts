@@ -28,6 +28,8 @@ export type TeamShop = {
   rights?: { holder?: string; date?: string | null; docId?: string | null; docName?: string | null; note?: string } | null;
   /** Einzelversand an jeden Käufer (statt Sammellieferung an Verein) – nur mit Festpreis: sofort bestellen & bezahlen */
   direct?: boolean;
+  /** Öffentlich bei Google auffindbar (Standard: aus – Vereinsshops bleiben privat) */
+  indexed?: boolean;
   /** Versandpauschale brutto je Bestellung, versandkostenfrei ab Warenwert brutto */
   shipGross?: number | null; freeFromGross?: number | null;
   createdAt: string;

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function Garantie() {
   return (
     <div className="info legal-page">
-      <div className="crumbs"><Link href="/">Start</Link> › Zufriedenheitsgarantie</div>
+      <div className="crumbs"><Link href="/">Startseite</Link> › Zufriedenheitsgarantie</div>
       <h1>100 % Zufriedenheitsgarantie</h1>
       <p className="lead">Wir stehen für jede Bestellung gerade. Wenn etwas nicht so ist, wie wir es zugesagt haben, machen wir es richtig, ohne Diskussion. Das garantieren wir Ihnen:</p>
 

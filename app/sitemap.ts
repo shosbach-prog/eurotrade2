@@ -6,6 +6,7 @@ import { ZIELGRUPPEN } from '@/lib/zielgruppen';
 import { AKTIONEN } from '@/lib/aktionen';
 import { GUIDES } from '@/lib/ratgeber';
 import { productPath, catPath } from '@/lib/format';
+import { listTeamShops } from '@/lib/teamshop';
 
 export const dynamic = 'force-dynamic';
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -32,6 +33,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...getCategories().map((c) => ({ url: `${base}${catPath(c.slug)}`, priority: 0.8, changeFrequency: 'weekly' as const, lastModified: now })),
     ...Object.entries(SUBTYPES).flatMap(([cat, list]) => { const ps = visibleProducts().filter((p) => p.categorySlug === cat); return list.filter((x) => { const n = ps.filter((p) => matchSub(x, p.name)).length; return n >= 2 && n < ps.length; }).map((x) => ({ url: `${base}${catPath(x.key)}`, priority: 0.7, changeFrequency: 'weekly' as const, lastModified: now })); }),
     ...getCategories().flatMap((c) => { const ps = visibleProducts().filter((p) => p.categorySlug === c.slug); return ['Damen', 'Herren', 'Kinder'].filter((g) => { const n = ps.filter((p) => p.gender === g || (g !== 'Kinder' && (p.gender ?? 'Unisex') === 'Unisex')).length; return n >= 3 && n < ps.length; }).map((g) => ({ url: `${base}${catPath(`${c.slug}-${g.toLowerCase()}`)}`, priority: 0.6, changeFrequency: 'weekly' as const, lastModified: now })); }),
+    ...listTeamShops().filter((t) => t.active && t.indexed).map((t) => ({ url: `${base}/team/${t.slug}`, priority: 0.7, changeFrequency: 'weekly' as const, lastModified: now })),
     ...allProductsBrief().map((p) => ({ url: `${base}${productPath(p)}`, priority: 0.6, changeFrequency: 'weekly' as const, lastModified: now })),
   ];
 }
