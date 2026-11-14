@@ -34,7 +34,7 @@ export default function TeamShopPage({ params, searchParams }: { params: { slug:
     return (
       <div className="tshop mshop">
         <section className="tshop-hero" style={t.color ? { ['--team' as string]: t.color } : undefined}>
-          {t.logoId && <img src={`/api/upload/${t.logoId}`} alt={t.name} className="tshop-logo" />}
+          {t.logoId && <img src={`/api/upload/${t.logoId}?w=320`} alt={t.name} className="tshop-logo" />}
           <div>
             <span className="tshop-kicker">Offizieller Shop</span>
             <h1>{t.name}</h1>
@@ -48,7 +48,7 @@ export default function TeamShopPage({ params, searchParams }: { params: { slug:
         <div className="motif-grid">
           {motifs.map((m) => (
             <Link key={m.id} href={`/team/${t.slug}?motiv=${m.id}#shirts`} scroll={false} className={`motif ${sel?.id === m.id ? 'on' : ''}`} aria-current={sel?.id === m.id ? 'true' : undefined}>
-              <img src={`/api/upload/${m.id}`} alt={m.name} loading="lazy" />
+              <img src={`/api/upload/${m.id}?w=320`} alt={m.name} loading="lazy" />
               {m.badge && <i className={`motif-badge ${m.badge === 'Neu' ? 'new' : ''}`}>{m.badge}</i>}
               <span>{m.name}</span>
             </Link>
@@ -61,7 +61,7 @@ export default function TeamShopPage({ params, searchParams }: { params: { slug:
             const fp = teamFixedPrice(t, p.id) ?? p.price;
             return (
               <Link key={p.id} href={`${productPath(p)}?team=${t.slug}${step2 || `&motiv=${motifs[0].id}`}`} className={`card ${sel ? '' : 'dim'}`}>
-                <div className="img"><ProductImage p={p} />{sel && <img className="motif-on" src={`/api/upload/${sel.id}`} alt="" aria-hidden />}</div>
+                <div className="img"><ProductImage p={p} />{sel && <img className="motif-on" src={`/api/upload/${sel.id}?w=320`} alt="" aria-hidden loading="lazy" />}</div>
                 <div className="body">
                   <div className="name">{p.name}</div>
                   <div className="muted" style={{ fontSize: 13 }}>{p.colors.length} Farben · {p.sizes.length ? `${p.sizes[0]}–${p.sizes[p.sizes.length - 1]}` : ''}</div>
@@ -80,7 +80,7 @@ export default function TeamShopPage({ params, searchParams }: { params: { slug:
   return (
     <div className="tshop">
       <section className="tshop-hero" style={t.color ? { ['--team' as string]: t.color } : undefined}>
-        {t.logoId && <img src={`/api/upload/${t.logoId}`} alt={t.name} className="tshop-logo" />}
+        {t.logoId && <img src={`/api/upload/${t.logoId}?w=320`} alt={t.name} className="tshop-logo" />}
         <div>
           <span className="tshop-kicker">Offizieller Team-Shop</span>
           <h1>{t.name}</h1>
@@ -89,7 +89,7 @@ export default function TeamShopPage({ params, searchParams }: { params: { slug:
         </div>
       </section>
       {t.note && <p className="tshop-note">{t.note}</p>}
-      {logoChoices(t).length > 0 && <div className="tshop-logos"><b>{logoChoices(t).length} Logos zur Auswahl:</b>{logoChoices(t).map((l) => <img key={l.id} src={`/api/upload/${l.id}`} alt={l.name} title={l.name} />)}</div>}
+      {logoChoices(t).length > 0 && <div className="tshop-logos"><b>{logoChoices(t).length} Logos zur Auswahl:</b>{logoChoices(t).map((l) => <img key={l.id} src={`/api/upload/${l.id}?w=320`} alt={l.name} title={l.name} />)}</div>}
       <ol className="tshop-steps"><li><b>Artikel wählen</b> Farbe und Größe aussuchen</li><li><b>{logoChoices(t).length ? 'Logo wählen' : t.personalize !== 'aus' ? 'Name / Nummer eintragen' : 'Menge festlegen'}</b> {logoChoices(t).length ? 'auf der Artikelseite' : 'das Vereinslogo ist schon gesetzt'}</li><li><b>Anfrage senden</b> Sie erhalten Ihr Angebot per E-Mail</li></ol>
       <div className="grid">
         {items.map((p) => (

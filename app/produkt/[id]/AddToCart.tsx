@@ -78,7 +78,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
     if (!backOn || !canBack) return;
     const im = new Image(); let off = false;
     im.onload = () => { if (off || !im.naturalWidth) return; const m = maxPlace(p, 'Rücken', im.naturalWidth / im.naturalHeight) ?? defaultPlace(p, 'Rücken'); if (m) setPlace((pl) => ({ ...pl, Rücken: m })); };
-    im.src = `/api/upload/${team!.back!.id}`;
+    im.src = `/api/upload/${team!.back!.id}?w=1000`;
     return () => { off = true; };
   }, [backOn]); // eslint-disable-line react-hooks/exhaustive-deps
   const pickChoice = (m: { id: string; name: string }) => {
@@ -96,7 +96,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
       const im = new Image();
       im.onload = () => { if (off || !im.naturalWidth) return; const ar = im.naturalWidth / im.naturalHeight; if (x === (multi ? editPos : positions[0])) setAspect(ar);
         const m = maxPlace(p, x, ar); if (m) setPlace((pl) => ({ ...pl, [x]: m })); };
-      im.src = `/api/upload/${l.id}`;
+      im.src = `/api/upload/${l.id}?w=1000`;
     }
     return () => { off = true; };
   }, [logo?.id, JSON.stringify(posLogo), positions.join('|')]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -206,7 +206,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
       <small>{total > 0 ? `bei ${total} Stück, ${est.lines.map((l) => `${l.pos} ca. ${l.cm} cm`).join(', ')} · ${pr.label} · ` : `Menge wählen – ab mehr Stück wird es günstiger · ${pr.label} · `}verbindlich im Angebot</small>
     </div>
   );
-  const studioProps = { product: p, colorHex: color?.hex, photo: color?.image ?? null, fit: color?.image ? (fits?.[color.image] as FitT | undefined) ?? null : null, anchor: color?.image ? anchors?.[color.image] ?? null : null, admin, positions: usedPos, active: activePos, setActive: setActivePos, place, setPlace, logoSrc: useLogo && firstLogo && (isImage(firstLogo.name) || choices.some((c) => c.id === firstLogo.id)) ? `/api/upload/${firstLogo.id}` : null, logoFor: perLogo ? Object.fromEntries(usedPos.map((x) => [x, `/api/upload/${logoAt(x)!.id}`])) : null, text: useText ? text : '', font, textColor: tColor, method, aspect };
+  const studioProps = { product: p, colorHex: color?.hex, photo: color?.image ?? null, fit: color?.image ? (fits?.[color.image] as FitT | undefined) ?? null : null, anchor: color?.image ? anchors?.[color.image] ?? null : null, admin, positions: usedPos, active: activePos, setActive: setActivePos, place, setPlace, logoSrc: useLogo && firstLogo && (isImage(firstLogo.name) || choices.some((c) => c.id === firstLogo.id)) ? `/api/upload/${firstLogo.id}?w=1000` : null, logoFor: perLogo ? Object.fromEntries(usedPos.map((x) => [x, `/api/upload/${logoAt(x)!.id}?w=1000`])) : null, text: useText ? text : '', font, textColor: tColor, method, aspect };
   // Galerie: Fotos der gewählten Farbe, danach Detailfotos des Artikels
   // Farbbild(er) zuerst, danach alle allgemeinen Ansichten (Rücken, Seite, Detail, Model) – keine Bilder anderer Farben
   const otherColorImgs = new Set(p.colors.filter((c) => c !== color).flatMap((c) => [c.image, ...(c.images ?? [])]).filter(Boolean) as string[]);
@@ -333,7 +333,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
 
         {/* Veredelung */}
         {team && !team.motifs && <div className="team-banner">
-          {firstLogo && <img src={`/api/upload/${firstLogo.id}`} alt="" />}
+          {firstLogo && <img src={`/api/upload/${firstLogo.id}?w=320`} alt="" />}
           <div><b>Team-Shop {team.name}</b><span>{team.method} mit Vereinslogo · {positions.join(', ')}{team.deadline ? ` · Bestellschluss ${new Date(team.deadline).toLocaleDateString('de-DE')}` : ''}</span></div>
         </div>}
         {team && choices.length > 0 && <div className="motif-pick">
@@ -345,12 +345,12 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
             {multi && (posLogo[editPos] ? usedPos.length > 1 : true) && <button type="button" className={`motif none ${!posLogo[editPos] ? 'on' : ''}`} onClick={() => setPosLogo((o) => ({ ...o, [editPos]: null }))}><span>ohne</span></button>}
             {choices.map((m) => { const cur = multi ? posLogo[editPos] : logo; return (
               <button key={m.id} type="button" className={`motif ${cur?.id === m.id ? 'on' : ''}`} title={m.label} aria-pressed={cur?.id === m.id} onClick={() => pickChoice(m)}>
-                <img src={`/api/upload/${m.id}`} alt={m.label} loading="lazy" />{!team.motifs && <span>{m.label}</span>}
+                <img src={`/api/upload/${m.id}?w=320`} alt={m.label} loading="lazy" />{!team.motifs && <span>{m.label}</span>}
               </button>); })}
           </div>
           {multi && <small className="muted">Für jede Position ein eigenes {team.motifs ? 'Motiv' : 'Logo'} wählen – oder „ohne“.</small>}
           {canBack && <label className="back-opt"><input type="checkbox" checked={backOn} onChange={(e) => { setBackOn(e.target.checked); if (e.target.checked) setActivePos('Rücken'); }} />
-            <img src={`/api/upload/${team.back!.id}`} alt="" /><span><b>+ Rückendruck</b> „{team.back!.name}“ groß auf dem Rücken <b>+{pr.p(team.back!.price)}</b></span></label>}
+            <img src={`/api/upload/${team.back!.id}?w=320`} alt="" /><span><b>+ Rückendruck</b> „{team.back!.name}“ groß auf dem Rücken <b>+{pr.p(team.back!.price)}</b></span></label>}
         </div>}
         {!team && <label className="deco-toggle">
           <input type="checkbox" checked={decoOn} onChange={(e) => setDecoOn(e.target.checked)} />
@@ -363,7 +363,7 @@ export default function AddToCart({ p, customerLogo, delivery, copy, pricing, fi
             <div className="dq"><span className="dq-n">1</span><b>Ihr Logo</b></div>
             {logo ? (
               <div className="logo-file">
-                {isImage(logo.name) ? <img src={`/api/upload/${logo.id}`} alt="" /> : <span className="file-ico">{logo.name.split('.').pop()?.toUpperCase()}</span>}
+                {isImage(logo.name) ? <img src={`/api/upload/${logo.id}?w=320`} alt="" /> : <span className="file-ico">{logo.name.split('.').pop()?.toUpperCase()}</span>}
                 <span>{logo.name}{customerLogo && logo.id === customerLogo.id && <span className="muted"> · hinterlegt</span>}</span>
                 <button type="button" className="linkbtn" onClick={() => setLogo(null)}>ändern</button>
               </div>

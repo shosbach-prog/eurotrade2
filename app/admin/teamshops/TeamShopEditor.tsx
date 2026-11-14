@@ -78,7 +78,7 @@ export default function TeamShopEditor({ shops: initial, products, groups, metho
         return (
           <div key={s.slug} className={`box ts-card ${s.active ? '' : 'off'}`}>
             <div className="ts-head">
-              {s.logoId ? <img src={`/api/upload/${s.logoId}`} alt="" /> : <span className="ts-ph">{s.name.slice(0, 2).toUpperCase()}</span>}
+              {s.logoId ? <img src={`/api/upload/${s.logoId}?w=320`} alt="" /> : <span className="ts-ph">{s.name.slice(0, 2).toUpperCase()}</span>}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <b>{s.name}</b>{!s.active && <span className="muted"> · deaktiviert</span>}{s.motifs?.length ? (s.rights?.docId || s.rights?.date ? <span className="ts-ok" title={`Freigabe: ${s.rights?.holder ?? ''} ${s.rights?.date ?? ''}`}> ✓ Rechte</span> : <span className="ts-warn"> ⚠ Freigabe fehlt</span>) : null}
                 <div className="muted" style={{ fontSize: 13 }}>{s.items.length} Artikel{s.motifs?.length ? ` · ${s.motifs.length} Motive` : ''}{s.logos?.length ? ` · ${s.logos.length + 1} Logos` : ''}{s.price ? ` · Festpreis ${s.price.toFixed(2).replace('.', ',')} € netto` : ''}{s.backPrice ? ` · Rückendruck +${s.backPrice.toFixed(2).replace('.', ',')} €` : ''}{s.direct ? ` · Einzelversand${s.shipGross ? ` ${s.shipGross.toFixed(2).replace('.', ',')} €` : ''}` : ''} · {s.method} {s.positions.join(', ')}{s.personalize !== 'aus' ? ` · ${s.personalize === 'beides' ? 'Name + Nummer' : s.personalize === 'name' ? 'Name' : 'Nummer'}` : ''}{s.deadline ? ` · Bestellschluss ${new Date(s.deadline).toLocaleDateString('de-DE')}` : ''}</div>
@@ -126,12 +126,12 @@ export default function TeamShopEditor({ shops: initial, products, groups, metho
           <div className="form cmd-body">
             <label>Name des Vereins / der Firma *</label><input value={edit.name ?? ''} onChange={(e) => setEdit({ ...edit, name: e.target.value })} placeholder="z. B. TuS Eving-Lindenhorst" />
             <label>Vereinslogo</label>
-            <div className="deco-row">{edit.logoId && <img src={`/api/upload/${edit.logoId}`} alt="" style={{ height: 48, maxWidth: 120, objectFit: 'contain' }} />}<label className="btn alt sm upl">{edit.logoId ? 'Logo ändern' : 'Logo hochladen'}<input type="file" hidden accept=".png,.jpg,.jpeg,.svg,.webp,.pdf,.ai,.eps" onChange={(e) => upload(e.target.files?.[0])} /></label></div>
+            <div className="deco-row">{edit.logoId && <img src={`/api/upload/${edit.logoId}?w=320`} alt="" style={{ height: 48, maxWidth: 120, objectFit: 'contain' }} />}<label className="btn alt sm upl">{edit.logoId ? 'Logo ändern' : 'Logo hochladen'}<input type="file" hidden accept=".png,.jpg,.jpeg,.svg,.webp,.pdf,.ai,.eps" onChange={(e) => upload(e.target.files?.[0])} /></label></div>
             <label>Weitere Logos zur Auswahl ({edit.logos?.length ?? 0}) <span className="muted" style={{ fontWeight: 400 }}>– z. B. Schriftzug, Jugend, Abteilung; Mitglieder wählen eines</span></label>
             {(edit.logos?.length ?? 0) > 0 && <div className="ts-motifs">
               {edit.logos!.map((m, i) => (
                 <div key={m.id} className="ts-motif">
-                  <img src={`/api/upload/${m.id}`} alt="" />
+                  <img src={`/api/upload/${m.id}?w=320`} alt="" loading="lazy" />
                   <input value={m.name} onChange={(e) => setEdit({ ...edit, logos: edit.logos!.map((x, k) => (k === i ? { ...x, name: e.target.value } : x)) })} aria-label="Name des Logos" />
                   <div className="ts-motif-a"><span /><button type="button" className="linkbtn err" onClick={() => setEdit({ ...edit, logos: edit.logos!.filter((_, k) => k !== i) })}>entfernen</button></div>
                 </div>
@@ -179,7 +179,7 @@ export default function TeamShopEditor({ shops: initial, products, groups, metho
             <div className="ts-motifs">
               {(edit.motifs ?? []).map((m, i) => (
                 <div key={m.id} className="ts-motif">
-                  <img src={`/api/upload/${m.id}`} alt="" />
+                  <img src={`/api/upload/${m.id}?w=320`} alt="" loading="lazy" />
                   <input value={m.name} onChange={(e) => setMotif(i, { name: e.target.value })} aria-label="Name des Motivs" />
                   <div className="ts-motif-a"><button type="button" className="linkbtn" onClick={() => moveMotif(i, -1)} aria-label="nach vorn">◀</button><button type="button" className="linkbtn" onClick={() => moveMotif(i, 1)} aria-label="nach hinten">▶</button><button type="button" className="linkbtn err" onClick={() => setEdit({ ...edit, motifs: edit.motifs!.filter((_, k) => k !== i) })}>entfernen</button></div>
                 </div>

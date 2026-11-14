@@ -178,7 +178,7 @@ export default function CartClient({ share, contact, remind }: { share: string |
                 </div>
                 {l.deco && <div className="deco-tag">✦ {decoLabel(l.deco)} {!l.team && <button className="linkbtn" onClick={() => update(l.key, { deco: null })}>entfernen</button>}</div>}
                 {l.deco?.team?.rows.length ? <div className="muted" style={{ fontSize: 12.5 }}>{l.deco.team.rows.map((r) => [r.name, r.nr && `#${r.nr}`].filter(Boolean).join(' ')).join(', ')}</div> : null}
-                {l.deco?.previews?.length ? <div className="cl-prev">{l.deco.previews.map((id) => <img key={id} src={`/api/upload/${id}`} alt="Vorschau" />)}</div> : null}
+                {l.deco?.previews?.length ? <div className="cl-prev">{l.deco.previews.map((id) => <img key={id} src={`/api/upload/${id}?w=320`} alt="Vorschau" />)}</div> : null}
               </div>
               {l.sample ? <div className="muted" style={{ width: 112, textAlign: 'center', fontSize: 13 }}>1 Stück</div> : <div className="step" style={{ width: 112 }}>
                 <button type="button" onClick={() => (l.qty > 1 ? setQty(l.key, l.qty - 1) : remove(l.key))} aria-label="weniger">−</button>
