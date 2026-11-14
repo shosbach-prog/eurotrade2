@@ -34,16 +34,23 @@ const SYNONYMS: Record<string, string[]> = {
   rot: ['red'], gruen: ['green'], grau: ['grey', 'gray'],
 };
 
-export type SearchDoc = Product & { colorNames: string };
+export type SearchDoc = Product & { colorNames: string; mpn: string };
+/** Hersteller-Artikelnummer (z. B. B&C „PUI10“ zu BCPUI10) */
+export const mpnOf = (p: Product) => String((p.specs as Record<string, unknown> | undefined)?.['Artikelnummer Hersteller'] ?? '').trim();
 
 export function buildSkuMap(products: Product[]) {
-  return new Map(products.map((p) => [compact(p.sku), p.id]));
+  const m = new Map(products.map((p) => [compact(p.sku), p.id]));
+  // Hersteller-Nr. zusätzlich – nur wenn eindeutig und keine eigene Art.-Nr. überdeckt
+  const seen = new Map<string, number>();
+  for (const p of products) { const k = compact(mpnOf(p)); if (k.length >= 3) seen.set(k, (seen.get(k) ?? 0) + 1); }
+  for (const p of products) { const k = compact(mpnOf(p)); if (k.length >= 3 && seen.get(k) === 1 && !m.has(k)) m.set(k, p.id); }
+  return m;
 }
 
 export function buildIndex(products: Product[]) {
   const ms = new MiniSearch<SearchDoc>({
     idField: 'id',
-    fields: ['name', 'brand', 'category', 'sku', 'tags', 'description', 'colorNames', 'material', 'gender'],
+    fields: ['name', 'brand', 'category', 'sku', 'mpn', 'tags', 'description', 'colorNames', 'material', 'gender'],
     storeFields: ['id'],
     tokenize,
     processTerm: (t) => t || null,
@@ -52,13 +59,13 @@ export function buildIndex(products: Product[]) {
       return Array.isArray(v) ? v.join(' ') : v ?? '';
     },
     searchOptions: {
-      boost: { name: 5, sku: 4, brand: 3, category: 3, tags: 2, colorNames: 1.2, gender: 1.5, description: 0.4 },
+      boost: { name: 5, sku: 4, mpn: 4, brand: 3, category: 3, tags: 2, colorNames: 1.2, gender: 1.5, description: 0.4 },
       prefix: (t) => t.length >= 2,
       fuzzy: (t) => (t.length <= 3 || /\d/.test(t) ? false : t.length <= 5 ? 1 : 2),
       weights: { fuzzy: 0.45, prefix: 0.8 },
     },
   });
-  ms.addAll(products.map((p) => ({ ...p, colorNames: p.colors.map((c) => c.name).join(' ') })));
+  ms.addAll(products.map((p) => ({ ...p, colorNames: p.colors.map((c) => c.name).join(' '), mpn: mpnOf(p) })));
   return ms;
 }
 
