@@ -151,7 +151,7 @@ export default function CustomerEditor({ initial, envCodes, products, defaultMar
 
       {envCodes.length > 0 && <>
         <h2>Codes aus der .env-Datei</h2>
-        <p className="muted" style={{ marginTop: -6 }}>Diese Codes stehen in <code>ACCESS_CODES</code> auf dem Server und gelten mit Standard-Einstellungen. Legen Sie einen Kunden mit demselben Code hier an, um Aufschlag, Kollektion und Logo festzulegen.</p>
+        <p className="muted" style={{ marginTop: -6 }}>Diese Codes stehen in <code>ACCESS_CODES</code> auf dem Server und gelten mit Standard-Einstellungen (der Shop ist auch ohne Code öffentlich). Legen Sie einen Kunden mit demselben Code hier an, um Aufschlag, Kollektion und Logo festzulegen.</p>
         <div className="chips">{envCodes.map((c) => <span key={c.code} className="chip"><code>{c.code}</code> {c.name !== c.code ? `– ${c.name}` : ''}</span>)}</div>
       </>}
     </>

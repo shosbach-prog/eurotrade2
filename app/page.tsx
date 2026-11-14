@@ -17,6 +17,12 @@ import { heroItems } from '@/lib/hero';
 import BrandStrip from '@/components/BrandStrip';
 import { brandList } from '@/lib/brand-catalog';
 
+export const metadata = {
+  title: { absolute: 'Teamwear & Firmenbekleidung mit Logo – ab 1 Stück | Euro-Trade' },
+  description: 'Über 1.500 Markentextilien für Vereine, Unternehmen und Handwerk – mit Preisen online, bedruckt oder bestickt, schon ab 1 Stück. Angebot in 24 Stunden.',
+  alternates: { canonical: '/' },
+};
+
 export default async function Home() {
   const ctx = await getCustomer();
   const cats = getCategories(ctx);

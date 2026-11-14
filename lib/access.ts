@@ -17,8 +17,9 @@ export const normCode = (c: string) => String(c ?? '').trim().toUpperCase();
 /** Vorschau-Modus (Standard!): Shop nur für Admin sichtbar, Kunden-Codes gesperrt – erst SHOP_PREVIEW=false gibt frei */
 export const previewMode = () => process.env.SHOP_PREVIEW !== 'false';
 
-/** Shop geschlossen? – SHOP_CLOSED=true oder Codes in ACCESS_CODES */
-export const shopClosed = () => previewMode() || process.env.SHOP_CLOSED === 'true' || !!(process.env.ACCESS_CODES ?? '').trim();
+/** Shop geschlossen? Standard: offen – Artikel, Preise, Suche und Warenkorb für alle (SEO).
+ *  Nur SHOP_PUBLIC=false (oder Vorschau-Modus) schließt ihn wieder. Zugangscodes bleiben für Kundenkonditionen nutzbar. */
+export const shopClosed = () => previewMode() || process.env.SHOP_PUBLIC === 'false';
 
 /** Cookie-Wert: CODE.signatur */
 export async function signCode(code: string) { const c = normCode(code); return `${encodeURIComponent(c)}.${await hmac('code|' + c)}`; }

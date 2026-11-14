@@ -136,7 +136,7 @@ export default function CustomerManager({ initial, envCodes, products, groups, d
       {envCodes.length > 0 && (
         <details className="cm-env">
           <summary>Codes aus der .env-Datei ({envCodes.length})</summary>
-          <p className="muted">Diese Codes stehen in <code>ACCESS_CODES</code> auf dem Server und gelten mit Standard-Konditionen. Legen Sie einen Kunden mit demselben Code an, um Konditionen festzulegen.</p>
+          <p className="muted">Diese Codes stehen in <code>ACCESS_CODES</code> auf dem Server und gelten mit Standard-Konditionen (der Shop ist auch ohne Code öffentlich – Codes dienen für Kundenkonditionen). Legen Sie einen Kunden mit demselben Code an, um Konditionen festzulegen.</p>
           <div className="chips">{envCodes.map((c) => <span key={c.code} className="chip"><code>{c.code}</code> {c.name !== c.code ? `– ${c.name}` : ''}</span>)}</div>
         </details>
       )}

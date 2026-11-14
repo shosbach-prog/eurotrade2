@@ -4,12 +4,12 @@ import { reviewsFor } from '@/lib/reviews';
 import { contactPerson } from './ContactCard';
 
 /** Bewertungsbereich auf der Produktseite */
-export default function ProductReviews({ productId, name }: { productId: string; name: string }) {
+export default function ProductReviews({ productId, name, extra }: { productId: string; name: string; extra?: Record<string, unknown> }) {
   const list = reviewsFor(productId);
   if (!list.length) return <TrustBlock />;
   const avg = list.reduce((s, r) => s + r.rating, 0) / list.length;
   const dist = [5, 4, 3, 2, 1].map((n) => ({ n, c: list.filter((r) => r.rating === n).length }));
-  const ld = { '@context': 'https://schema.org', '@type': 'Product', name, aggregateRating: { '@type': 'AggregateRating', ratingValue: avg.toFixed(1), reviewCount: list.length }, review: list.slice(0, 5).map((r) => ({ '@type': 'Review', reviewRating: { '@type': 'Rating', ratingValue: r.rating }, author: { '@type': 'Person', name: r.name }, datePublished: r.date.slice(0, 10), reviewBody: r.text })) };
+  const ld = { '@context': 'https://schema.org', '@type': 'Product', name, ...(extra ?? {}), aggregateRating: { '@type': 'AggregateRating', ratingValue: avg.toFixed(1), reviewCount: list.length }, review: list.slice(0, 5).map((r) => ({ '@type': 'Review', reviewRating: { '@type': 'Rating', ratingValue: r.rating }, author: { '@type': 'Person', name: r.name }, datePublished: r.date.slice(0, 10), reviewBody: r.text })) };
   return (
     <section id="bewertungen" className="rev-section">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />

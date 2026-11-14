@@ -46,17 +46,24 @@ export default async function ProductPage({ params, searchParams }: { params: { 
   const shownIds = new Set([...match.variants, ...match.combos].map((x) => x.id));
   const related = getByCategory(p.categorySlug, ctx).filter((x) => x.id !== p.id && !shownIds.has(x.id)).slice(0, 8);
   const refs = team ? [] : refsFor(p);
+  // Strukturierte Daten für Google: Artikel mit Preis (brutto) und Verfügbarkeit
+  const site = (process.env.SHOP_URL ?? 'https://euro-trade.com').replace(/\/$/, '');
+  const lowGross = p.price != null ? gross(p.tiers.length ? Math.min(p.price, ...p.tiers.map((x) => x.price)) : p.price) : null;
+  const ldExtra = {
+    sku: p.sku, mpn: p.sku, brand: { '@type': 'Brand', name: p.brand }, image: p.images.slice(0, 4).map((u) => (u.startsWith('/') ? `${site}${u}` : u)), description: getText(p).text.intro, color: p.colors.map((c) => c.name).join(', '), material: p.composition || p.material,
+    ...(p.price != null && !p.locked ? { offers: { '@type': 'AggregateOffer', priceCurrency: 'EUR', lowPrice: lowGross, highPrice: p.priceGross, offerCount: Math.max(1, p.colors.length), availability: p.eol?.all ? 'https://schema.org/LimitedAvailability' : 'https://schema.org/InStock', url: `${site}${productPath(p)}`, seller: { '@type': 'Organization', name: 'euro-trade.com' } } } : {}),
+  };
   return (
     <>
       <div className="crumbs">{team ? <><Link href={`/team/${team.slug}`}>← Team-Shop {team.name}</Link></> : <><Link href="/">Start</Link> › <Link href={catPath(p.categorySlug)}>{p.category}</Link> › {p.name}</>}</div>
       <AddToCart key={mot?.id ?? lg?.id ?? 'x'} p={p} team={team} pictos={pictosOf(p.id)} gpsr={gpsrFor(p.brand)} sizeTable={sizeTableFor(p.sku)} fits={fitsFor(p)} anchors={anchorsFor(p)} admin={await isAdmin()} pricing={(() => { const pr = getPricing(); return pr.showEstimate && !p.locked && fixed == null ? pr : null; })()} customerLogo={ctx && 'code' in ctx && ctx.logoId ? { id: ctx.logoId, name: ctx.logoName ?? 'Ihr Logo' } : null} copy={getText(p).text} delivery={process.env.DELIVERY_TEXT ?? 'Lieferung ca. 3–5 Werktage · mit Veredelung ca. 7–14 Werktage nach Freigabe'} />
       <JsonLd data={crumbSchema([['Start', '/'], [p.category, catPath(p.categorySlug)], [p.name, productPath(p)]])} />
-      {!p.rating && <JsonLd data={{ '@context': 'https://schema.org', '@type': 'Product', name: p.name, sku: p.sku, brand: { '@type': 'Brand', name: p.brand }, image: p.images.slice(0, 4).map((u) => (u.startsWith('/') ? `${(process.env.SHOP_URL ?? 'https://euro-trade.com').replace(/\/$/, '')}${u}` : u)), description: getText(p).text.intro, color: p.colors.map((c) => c.name).join(', '), material: p.composition || p.material }} />}
+      {!p.rating && <JsonLd data={{ '@context': 'https://schema.org', '@type': 'Product', name: p.name, ...ldExtra }} />}
       {match.variants.length > 0 && <><h2>Gleicher Artikel – anderer Schnitt</h2><p className="muted" style={{ marginTop: -8 }}>Ideal für gemischte Teams: Damen-, Herren- und Kinder-Variante im gleichen Look.</p><div className="grid">{match.variants.map((r) => <ProductCard key={r.id} p={r} />)}</div></>}
       {match.combos.length > 0 && <><h2>Passt dazu</h2><p className="muted" style={{ marginTop: -8 }}>Komplettes Outfit mit gleichem Logo – mehr Teile, bessere Staffelpreise bei der Veredelung.</p><div className="grid">{match.combos.map((r) => <ProductCard key={r.id} p={r} />)}</div></>}
       <RefStrip refs={refs} />
       <RecentTracker id={p.id} />
-      <ProductReviews productId={p.id} name={p.name} />
+      <ProductReviews productId={p.id} name={p.name} extra={ldExtra} />
       {related.length > 0 && <><h2>Ähnliche Artikel</h2><div className="grid">{related.map((r) => <ProductCard key={r.id} p={r} />)}</div></>}
       <RecentlyViewed exclude={p.id} />
     </>
