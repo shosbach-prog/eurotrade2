@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import type { PublicProduct } from '@/lib/types';
 import { productPath } from '@/lib/format';
-import { webp } from '@/lib/img';
+import { mid } from '@/lib/img';
 import { Money } from './PriceMode';
 import Stars from './Stars';
 import { WishButton } from './Wishlist';
@@ -32,12 +32,12 @@ export default function BestsellerRail({ items, title = 'Bestseller.', sub = 'Di
         <div ref={ref} className="bs-track" onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerLeave={up}
           onClickCapture={(e) => { if (drag.current?.moved) { e.preventDefault(); e.stopPropagation(); } }}>
           {items.map((p, k) => {
-            const img = webp(p.images[0], p.webp), img2 = p.images[1] ? webp(p.images[1], p.webp) : null;
+            const img = mid(p.images[0], p.mid, p.webp), img2 = p.images[1] ? mid(p.images[1], p.mid, p.webp) : null;
             const min = p.price != null ? (p.tiers.length ? p.tiers[p.tiers.length - 1].price : p.price) : null;
             return (
               <Link key={p.id} href={productPath(p)} className="bs-tile" draggable={false}>
                 <span className="bs-img">
-                  {img && <img src={img} alt={p.name} loading={k < 4 ? 'eager' : 'lazy'} decoding="async" draggable={false} />}
+                  {img && <img src={img} alt={p.name} loading="lazy" decoding="async" draggable={false} />}
                   {img2 && <img className="bs-img2" src={img2} alt="" loading="lazy" decoding="async" draggable={false} aria-hidden />}
                   <span className="bs-wish" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}><WishButton id={p.id} /></span>
                   <KondSticker id={p.id} />

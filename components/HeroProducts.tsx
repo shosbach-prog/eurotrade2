@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePrice } from './PriceMode';
+import { sized } from '@/lib/img';
 
 export type HeroItem = { id: string; name: string; brand: string; image: string; colors: string[]; colorCount: number; label: string; href: string; price?: number | null };
 
@@ -22,10 +23,10 @@ export default function HeroProducts({ items, interval = 4500 }: { items: HeroIt
   return (
     <div className="hs" onMouseEnter={() => setPause(true)} onMouseLeave={() => setPause(false)} aria-roledescription="Karussell" aria-label="Produkte">
       <div className="hs-stage">
-        {n > 2 && <img className="hs-side hs-l" src={at(-1).image} alt="" aria-hidden />}
-        {n > 1 && <img className="hs-side hs-r" src={at(1).image} alt="" aria-hidden />}
+        {n > 2 && <img className="hs-side hs-l" src={sized(at(-1).image, 480)} alt="" aria-hidden loading="lazy" decoding="async" />}
+        {n > 1 && <img className="hs-side hs-r" src={sized(at(1).image, 480)} alt="" aria-hidden loading="lazy" decoding="async" />}
         <Link href={p.href} className="hs-main" aria-live="polite">
-          {items.map((x, k) => <img key={x.id} src={x.image} alt={k === i ? x.name : ''} className={k === i ? 'on' : ''} loading={k < 2 ? 'eager' : 'lazy'} />)}
+          {items.map((x, k) => <img key={x.id} src={sized(x.image, 720)} alt={k === i ? x.name : ''} className={k === i ? 'on' : ''} decoding="async" {...(k === 0 ? { loading: 'eager' as const, fetchPriority: 'high' as const } : { loading: 'lazy' as const })} />)}
           <span className="hs-badge">{i + 1} / {n}</span>
         </Link>
         {n > 1 && <>
