@@ -3,7 +3,8 @@ import { previewMode } from '@/lib/access';
 export const dynamic = 'force-dynamic';
 
 /** robots.txt mit Content Signals (contentsignals.org) – Standard: Suche und KI-Antworten ja, KI-Training nein.
- *  Anpassen über CONTENT_SIGNAL in der .env, CONTENT_SIGNAL=off entfernt die Zeile (Lighthouse wertet sie als unbekannt → SEO 92 statt 100) */
+ *  Anpassen über CONTENT_SIGNAL in der .env, CONTENT_SIGNAL=off entfernt die Zeile (ältere Lighthouse-Fassungen werten sie als unbekannt).
+ *  Kein „Agentmap:“ – das kennt Lighthouse nicht (SEO 92); das ARD-Manifest wird über /.well-known und <link rel=ai-catalog> gefunden. */
 export function GET() {
   const base = (process.env.SHOP_URL ?? 'https://euro-trade.com').replace(/\/$/, '');
   const env = (process.env.CONTENT_SIGNAL ?? '').trim();
@@ -32,7 +33,6 @@ Disallow: /merkliste
 Disallow: /zugang
 
 Sitemap: ${base}/sitemap.xml
-Agentmap: ${base}/.well-known/ai-catalog.json
 `;
   return new Response(body, { headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'public, max-age=3600' } });
 }
