@@ -3,14 +3,26 @@ import { isCategoryUrl, isProductUrl } from '@/lib/format';
 import { ACCESS_COOKIE, ADMIN_COOKIE, isAdminToken, previewMode, shopClosed, verifyCodeToken } from '@/lib/access';
 
 // Immer erreichbar: Zugang, Pflichtseiten, Angebots-Links aus der E-Mail, Admin-Login
-const PUBLIC = ['/feed', '/api/img', '/api/paypal', '/api/team-info', '/fuer', '/aktion', '/produktsicherheit', '/api/preisanfrage', '/ueber-uns', '/og.png', '/garantie', '/p', '/picto', '/bewerten', '/api/bewerten', '/widerruf', '/newsletter', '/api/newsletter', '/start', '/druck-stick', '/api/zugang-anfrage', '/api/bild', '/api/warenkorb-erinnerung', '/sitemap.xml', '/zugang', '/api/zugang', '/api/login', '/passwort', '/api/passwort', '/registrieren', '/api/registrieren', '/kontakt', '/agb', '/ratgeber', '/api/cron', '/impressum', '/datenschutz', '/angebot', '/api/angebot', '/admin/login', '/api/admin/login', '/icon.svg', '/brands', '/marken', '/team', '/api/angebot', '/rechnung', '/api/rechnung', '/favicon.ico', '/robots.txt'];
+const PUBLIC = ['/feed', '/api/img', '/llms.txt', '/.well-known', '/api/md', '/api/paypal', '/api/team-info', '/fuer', '/aktion', '/produktsicherheit', '/api/preisanfrage', '/ueber-uns', '/og.png', '/garantie', '/p', '/picto', '/bewerten', '/api/bewerten', '/widerruf', '/newsletter', '/api/newsletter', '/start', '/druck-stick', '/api/zugang-anfrage', '/api/bild', '/api/warenkorb-erinnerung', '/sitemap.xml', '/zugang', '/api/zugang', '/api/login', '/passwort', '/api/passwort', '/registrieren', '/api/registrieren', '/kontakt', '/agb', '/ratgeber', '/api/cron', '/impressum', '/datenschutz', '/angebot', '/api/angebot', '/admin/login', '/api/admin/login', '/icon.svg', '/brands', '/marken', '/team', '/api/angebot', '/rechnung', '/api/rechnung', '/favicon.ico', '/robots.txt'];
+// Agenten-Erkennung (RFC 8288): Verweise auf Übersicht, API-Katalog, Skills und Sitemap
+const LINK = ['</llms.txt>; rel="describedby"; type="text/markdown"', '</.well-known/api-catalog>; rel="api-catalog"', '</.well-known/agent-skills/index.json>; rel="https://agentskills.io/rel/index"', '</.well-known/ai-catalog.json>; rel="describedby"; type="application/json"', '</sitemap.xml>; rel="sitemap"'].join(', ');
 const match = (path: string, list: string[]) => list.some((p) => path === p || path.startsWith(p + '/'));
 
 export async function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
   const headers = new Headers(req.headers);
   headers.set('x-path', pathname);
-  const pass = () => NextResponse.next({ request: { headers } });
+  const pass = () => {
+    const r = NextResponse.next({ request: { headers } });
+    if (!pathname.startsWith('/api/') && !pathname.startsWith('/_next/') && !pathname.startsWith('/admin')) { r.headers.set('Link', LINK); r.headers.set('Vary', 'Accept'); }
+    return r;
+  };
+  // Markdown für Agenten: Accept: text/markdown → Markdown-Fassung von Startseite, Kategorie oder Artikel
+  if (!shopClosed() && /text\/markdown/i.test(req.headers.get('accept') ?? '') && (pathname === '/' || isCategoryUrl(pathname) || isProductUrl(pathname))) {
+    const url = req.nextUrl.clone(); url.pathname = '/api/md'; url.search = '';
+    headers.set('x-md-path', pathname);
+    return NextResponse.rewrite(url, { request: { headers } });
+  }
   const deny = (to: string) => {
     if (pathname.startsWith('/api/')) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
     const url = req.nextUrl.clone();

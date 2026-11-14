@@ -18,6 +18,7 @@ import { isAdmin, shopAccess } from '@/lib/customer';
 import { PriceModeProvider } from '@/components/PriceMode';
 import { AdminKondProvider } from '@/components/AdminKond';
 import { VAT } from '@/lib/pricing';
+import AgentTools from '@/components/AgentTools';
 
 const SHOP = process.env.SHOP_NAME ?? 'Euro-Trade';
 export async function generateMetadata(): Promise<Metadata> {
@@ -120,6 +121,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           {!path.startsWith('/admin') && <QuickView />}
           {!path.startsWith('/admin') && <Contact whatsapp={process.env.CONTACT_WHATSAPP ?? '491732648097'} phone={process.env.BERATUNG_TELEFON ?? '030 40719258'} email={process.env.CONTACT_EMAIL ?? 'info@euro-trade.com'} />}
         </WishlistProvider></CartProvider></AdminKondProvider></PriceModeProvider>
+        <AgentTools />
       </body>
     </html>
   );
