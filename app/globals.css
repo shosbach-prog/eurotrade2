@@ -1879,3 +1879,5 @@ html,body{overflow-x:clip}
 .ts-kpis small{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.3px}.ts-kpis b{font-size:18px}.ts-kpis span{font-size:12px;color:var(--muted)}
 .ts-top{margin:0;padding-left:20px;font-size:14px}.ts-top li{display:flex;justify-content:space-between;max-width:420px;padding:2px 0}
 @media (max-width:640px){.ts-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.sm-list{columns:3 240px;column-gap:28px;padding-left:18px;margin:0 0 8px;font-size:14px;line-height:1.7}.sm-list li{break-inside:avoid}

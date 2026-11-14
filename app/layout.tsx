@@ -107,6 +107,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <Link href="/impressum">Impressum</Link>
                 <Link href="/produktsicherheit">Produktsicherheit (GPSR)</Link>
                 <Link href="/datenschutz">Datenschutz</Link>
+                <Link href="/seitenuebersicht">Seitenübersicht</Link>
                 <ConsentLink />
               </nav>
             </div>
