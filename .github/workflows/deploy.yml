@@ -24,4 +24,4 @@ jobs:
           username: ${{ secrets.DEPLOY_USER || 'root' }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           command_timeout: 15m
-          script: cd ${{ secrets.DEPLOY_PATH || '/opt/euro-trade-shop' }} && bash deploy.sh
+          script: cd ${{ secrets.DEPLOY_PATH || '/opt/euro-trade-shop' }} && git pull --ff-only && bash deploy.sh   # erst holen, dann starten – sonst liest bash ein deploy.sh, das sich gerade ändert
