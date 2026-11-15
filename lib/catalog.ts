@@ -4,7 +4,7 @@ import path from 'node:path';
 import type MiniSearch from 'minisearch';
 import type { Category, Product, PublicProduct } from './types';
 import { buildIndex, buildSkuMap, runSearch, type SearchDoc } from './search';
-import { gross, priceTiers, sellPrice } from './pricing';
+import { gross, priceTiers, sellPrice, VAT } from './pricing';
 import { sortColors } from './colors';
 import { ratingFor } from './reviews';
 import { overridesMtime, readOverrides } from './artikel';
@@ -12,6 +12,7 @@ import { productSlug, slugify } from './format';
 import { pictosFor } from './picto';
 import { applyEol, auslaufMtime } from './auslauf';
 import { kindOf } from './copy';
+import { ensureKollektionen } from './kollektionen';
 
 const LIVE = path.join(process.cwd(), 'data', 'products.json');
 /** Modellnamen aus der L-Shop-Artikelliste (Art.-Nr. → Bezeichnung), z. B. BCPUI10 → „Unisex Polo ID.001“ */
@@ -32,6 +33,7 @@ let state: State | null = null;
 /** Lädt data/products.json neu, sobald der Sync die Datei aktualisiert hat – kein Neustart nötig */
 function load(): State {
   const FILE = file();
+  ensureKollektionen(FILE); // einmalig: eigene Kollektionen als ausgeblendete Entwürfe anlegen
   const mtime = `${fs.statSync(FILE).mtimeMs}|${overridesMtime()}|${auslaufMtime()}|${new Date().toISOString().slice(0, 10)}`;
   if (state && state.mtime === mtime) return state;
   const raw: Product[] = JSON.parse(fs.readFileSync(FILE, 'utf8'));
@@ -109,6 +111,11 @@ export const pictosOf = (id: string) => { const p = load().byId.get(id); return 
 
 export function toPublic(p: Product, ctx?: Ctx): PublicProduct {
   const { basePrice, baseTiers, sizeExtra, hidden: _h, custom: _c, ...rest } = p;
+  // Fester Endkundenpreis (z. B. Satire-Kollektion inkl. Druck): brutto genau wie hinterlegt, keine Staffel
+  if (p.fixedGross && p.fixedGross > 0 && !ctx?.locked) {
+    const net = Math.round((p.fixedGross / (1 + VAT / 100)) * 100) / 100;
+    return { ...rest, colors: sortColors(p.colors), price: net, priceGross: p.fixedGross, tiers: [], rating: ratingFor(p.id), props: pictosFor(p).props, ...(hasWebp(p) ? { webp: true } : {}), ...(hasMid(p) ? { mid: true } : {}) };
+  }
   const price = !ctx?.locked && basePrice != null && basePrice > 0 ? sellPrice(basePrice, p.categorySlug, ctx?.markup) : null;
   // Echte Staffel-EK von L-Shop haben Vorrang – sonst Rabattstaffel auf den Verkaufspreis
   const tiers = price == null ? []

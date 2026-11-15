@@ -43,6 +43,18 @@ export type Product = {
   sale?: { pct: number };
   /** Admin: selbst angelegter Artikel */
   custom?: boolean;
+  /** Eigene URL (sonst aus Name + Art.-Nr.) – nur [a-z0-9-] */
+  slug?: string;
+  /** SEO: Seitentitel und Meta-Beschreibung (sonst automatisch) */
+  seo?: { title?: string; description?: string };
+  /** Alternativtext für das Produktbild (sonst Artikelname) */
+  imageAlt?: string;
+  /** Kurzbeschreibung (Einleitung auf der Artikelseite) */
+  short?: string;
+  /** Fester Verkaufspreis brutto (Endkunde, inkl. Druck) – ersetzt die Kalkulation aus dem EK */
+  fixedGross?: number;
+  /** Herkunft, z. B. Kollektion „satire“ (Seed-Import) */
+  collection?: string;
 };
 
 /** Auslaufartikel: ganzer Artikel (all) oder einzelne Farben/Größen (sizes null = alle Größen der Farbe), Datum JJJJ-MM-TT oder null = solange Vorrat */

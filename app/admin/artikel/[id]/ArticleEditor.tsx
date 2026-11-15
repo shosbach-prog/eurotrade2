@@ -128,6 +128,15 @@ export default function ArticleEditor({ p, custom, changed, categories, markup }
         <div><label>Passende Artikel <span className="muted" style={{ fontWeight: 400 }}>(Art.-Nr. mit Komma, z. B. Damenmodell)</span></label><input value={f.pairsText} onChange={(e) => set({ pairsText: e.target.value })} placeholder="JN841, JN1000" /></div>
         <div><label>Zielgruppe</label><input value={f.gender ?? ''} onChange={(e) => set({ gender: e.target.value })} placeholder="Unisex, Herren, Damen, Kinder" /></div>
       </div>
+      <h3>Shop-Seite & SEO</h3>
+      <div className="ae-2">
+        <div><label>URL-Slug <span className="muted" style={{ fontWeight: 400 }}>(leer = automatisch)</span></label><input value={f.slug ?? ''} onChange={(e) => set({ slug: e.target.value.toLowerCase() })} placeholder="mein-artikel-t-shirt" /></div>
+        <div><label>Fester Verkaufspreis brutto <span className="muted" style={{ fontWeight: 400 }}>(leer = Kalkulation aus EK)</span></label><input inputMode="decimal" value={f.fixedGross != null ? String(f.fixedGross).replace('.', ',') : ''} onChange={(e) => { const n = Number(e.target.value.replace(',', '.')); set({ fixedGross: e.target.value.trim() && Number.isFinite(n) ? n : undefined }); }} placeholder="24,90" /></div>
+        <div><label>SEO-Titel <span className="muted" style={{ fontWeight: 400 }}>({(f.seo?.title ?? '').length}/60)</span></label><input value={f.seo?.title ?? ''} onChange={(e) => set({ seo: { ...f.seo, title: e.target.value } })} /></div>
+        <div><label>Meta-Beschreibung <span className="muted" style={{ fontWeight: 400 }}>({(f.seo?.description ?? '').length}/155)</span></label><textarea value={f.seo?.description ?? ''} onChange={(e) => set({ seo: { ...f.seo, description: e.target.value } })} style={{ minHeight: 70 }} /></div>
+        <div><label>Bild-Alttext</label><input value={f.imageAlt ?? ''} onChange={(e) => set({ imageAlt: e.target.value })} /></div>
+        <div><label>Kurzbeschreibung <span className="muted" style={{ fontWeight: 400 }}>(Einleitung auf der Artikelseite)</span></label><textarea value={f.short ?? ''} onChange={(e) => set({ short: e.target.value })} style={{ minHeight: 70 }} /></div>
+      </div>
       <label>Herstellerbeschreibung</label>
       <textarea value={f.description} onChange={(e) => set({ description: e.target.value })} style={{ minHeight: 110 }} />
 

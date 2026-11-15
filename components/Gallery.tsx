@@ -97,7 +97,7 @@ export default function Gallery({ p, hex, overlay, tint, index, onIndex }: Props
           onTouchEnd={(e) => { const s = touch.current; touch.current = null; if (!s || imgs.length < 2) return; const t = e.changedTouches[0]; const dx = t.clientX - s.x; if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(t.clientY - s.y)) { setI((x) => (x + (dx < 0 ? 1 : -1) + imgs.length) % imgs.length); swiped.current = Date.now(); } }}>
           <button className="lb-x" aria-label="Schließen">×</button>
           {imgs.length > 1 && <button className="lb-nav l" aria-label="Vorheriges Bild" onClick={(e) => { e.stopPropagation(); setI((x) => (x - 1 + imgs.length) % imgs.length); }}>‹</button>}
-          <img src={hiRes(src)} alt={p.name} onClick={(e) => e.stopPropagation()} onError={(e) => { (e.target as HTMLImageElement).src = src; }} />
+          <img src={hiRes(src)} alt={p.imageAlt || p.name} onClick={(e) => e.stopPropagation()} onError={(e) => { (e.target as HTMLImageElement).src = src; }} />
           {imgs.length > 1 && <button className="lb-nav r" aria-label="Nächstes Bild" onClick={(e) => { e.stopPropagation(); setI((x) => (x + 1) % imgs.length); }}>›</button>}
           {imgs.length > 1 && <div className="lb-count">{i + 1} / {imgs.length}</div>}
         </div>

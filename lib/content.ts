@@ -29,6 +29,8 @@ export function getText(p: Product | PublicProduct): { text: ProductText; source
   const c = load();
   if (c.edit[p.id]) return { text: c.edit[p.id], source: 'eigen' };
   if (c.seed[p.id]) return { text: c.seed[p.id], source: 'vorlage' };
+  // Eigene Kurzbeschreibung (z. B. Satire-Kollektion) als Einleitung
+  if (p.short) { const g = generateText(p); return { text: { ...g, headline: p.name, intro: p.short }, source: 'vorlage' }; }
   return { text: generateText(p), source: 'automatisch' };
 }
 export function saveText(id: string, t: ProductText | null) {

@@ -31,6 +31,16 @@ function clean(d: Record<string, unknown>): Partial<Product> {
     images: list(d.images, 30).filter(img), colors, specs, sizeChart: str(d.sizeChart, 400) || undefined,
   };
 }
+/** Zusatzfelder (nur wenn mitgeschickt): Slug, SEO, Alttext, Kurztext, Festpreis brutto */
+function cleanExtra(d: Record<string, unknown>): Partial<Product> {
+  const o: Partial<Product> = {};
+  if ('slug' in d) { const s = str(d.slug, 120).toLowerCase(); if (/^[a-z0-9-]+$/.test(s)) o.slug = s; }
+  if (d.seo && typeof d.seo === 'object') { const x = d.seo as Record<string, unknown>; o.seo = { title: str(x.title, 120), description: str(x.description, 320) }; }
+  if ('imageAlt' in d) o.imageAlt = str(d.imageAlt, 300);
+  if ('short' in d) o.short = str(d.short, 1000);
+  if ('fixedGross' in d) { const n = num(d.fixedGross); if (n != null) o.fixedGross = n; }
+  return o;
+}
 const norm = (v: unknown) => (v && typeof v === 'object' && !Array.isArray(v) ? Object.fromEntries(Object.entries(v).filter(([, x]) => x !== '' && x != null)) : v);
 const same = (a: unknown, b: unknown) => JSON.stringify(norm(a) ?? null) === JSON.stringify(norm(b) ?? null) || ((a === '' || (Array.isArray(a) && !a.length) || a === false) && (b == null || b === '' || (Array.isArray(b) && !b.length) || b === false));
 
@@ -46,7 +56,13 @@ export async function PUT(req: Request) {
     const o: Override = {};
     for (const [k, v] of Object.entries(c)) if (!same(v, (original as Record<string, unknown>)[k])) (o as Record<string, unknown>)[k] = v;
     saveOverride(p.id, o);
-  } else saveOverride(p.id, { ...c, custom: true } as Override);
+  } else {
+    // Felder, die der Editor (noch) nicht kennt, beim Speichern behalten – Slug, SEO, Alttext, Kurztext, Festpreis, Kollektion
+    const prev = readOverrides()[p.id] ?? {};
+    const keep = Object.fromEntries((['slug', 'seo', 'imageAlt', 'short', 'fixedGross', 'collection'] as const).filter((k) => prev[k] != null).map((k) => [k, prev[k]]));
+    const extra = cleanExtra(data ?? {});
+    saveOverride(p.id, { ...keep, ...extra, ...c, custom: true } as Override);
+  }
   return NextResponse.json({ ok: true });
 }
 

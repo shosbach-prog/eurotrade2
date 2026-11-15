@@ -21,7 +21,7 @@ import { productPath, catPath } from '@/lib/format';
 
 export async function generateMetadata({ params }: { params: { id: string; cat?: string } }) {
   const p = getProduct(decodeURIComponent(params.id), await viewCtx());
-  return p ? { title: p.model ? `${p.name} – ${p.brand} ${p.model}` : `${p.name} – ${p.brand}`, description: getText(p).text.intro.slice(0, 155), alternates: { canonical: productPath(p) }, openGraph: { title: `${p.name} – ${p.brand}`, images: p.images.slice(0, 1) } } : {};
+  return p ? { title: p.seo?.title || (p.model ? `${p.name} – ${p.brand} ${p.model}` : `${p.name} – ${p.brand}`), description: p.seo?.description || getText(p).text.intro.slice(0, 155), alternates: { canonical: productPath(p) }, openGraph: { title: `${p.name} – ${p.brand}`, images: p.images.slice(0, 1) } } : {};
 }
 
 export default async function ProductPage({ params, searchParams }: { params: { id: string; cat?: string }; searchParams?: { team?: string; motiv?: string; logo?: string } }) {
