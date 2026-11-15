@@ -4,6 +4,10 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
+# Nur ein Deploy gleichzeitig (Auto-Deploy per GitHub Actions + manueller Aufruf würden sich sonst beim Container-Tausch blockieren)
+exec 9>/tmp/euro-trade-deploy.lock
+if ! flock -w 900 9; then echo "!! Ein anderes Deployment läuft seit über 15 Minuten – abgebrochen."; exit 1; fi
+
 # 1) Docker installieren, falls nicht vorhanden
 if ! command -v docker >/dev/null 2>&1; then
   echo ">> Installiere Docker …"
@@ -28,7 +32,13 @@ if [ -d .git ]; then git pull --ff-only; fi
 if ! grep -qE '^LSHOP_API_KEY=.+' .env; then cp seed/products.json data/products.json; fi
 
 # 5) Bauen & starten
-docker compose up -d --build
+# Hängengebliebene Container aus abgebrochenen Läufen entfernen (Namen wie „5fea58eb1359_euro-trade-shop“)
+docker ps -a --format '{{.Names}}' | grep -E '^[0-9a-f]{12}_euro-trade-(shop|caddy)$' | xargs -r docker rm -f || true
+if ! docker compose up -d --build; then
+  echo ">> Container-Konflikt – räume auf und starte erneut …"
+  docker ps -a --format '{{.Names}}' | grep -E '^[0-9a-f]{12}_euro-trade-(shop|caddy)$' | xargs -r docker rm -f || true
+  docker compose up -d
+fi
 # Caddyfile geändert? Dann Caddy neu erstellen (Datei ist einzeln eingebunden – ein Reload sieht die neue Datei nicht)
 if [ "$CADDY_BEFORE" != "$(md5sum Caddyfile | cut -d' ' -f1)" ]; then docker compose up -d --force-recreate caddy; fi
 docker image prune -f >/dev/null
