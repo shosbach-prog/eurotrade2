@@ -9,6 +9,7 @@ import { GUIDES } from './ratgeber';
 import { productPath, catPath } from './format';
 import { listTeamShops } from './teamshop';
 import { brandList } from './brand-catalog';
+import { KOLLEKTIONEN } from './kollektionen';
 
 export type SitemapEntry = { path: string; title: string; group: string; priority: number; changefreq: 'weekly' | 'monthly' | 'yearly'; lastmod?: string; images?: { loc: string; title: string }[] };
 
@@ -52,6 +53,8 @@ export function sitemapEntries(): SitemapEntry[] {
       if (n >= 3 && n < ps.length) out.push({ path: catPath(`${c.slug}-${g.toLowerCase()}`), title: `${c.name} für ${g}`, group: 'Kategorien', priority: 0.6, changefreq: 'weekly', lastmod: d });
     }
   }
+  // Eigene Kollektionen (z. B. /politik-satire) – nur mit sichtbaren Artikeln
+  for (const k of Object.values(KOLLEKTIONEN)) if (all.some((p) => p.collection === k.key)) out.push({ path: `/${k.slug}`, title: k.name, group: 'Kategorien', priority: 0.8, changefreq: 'weekly', lastmod: d });
   for (const b of brandList()) if (b.count > 0) out.push({ path: `/marken/${b.slug}`, title: b.name, group: 'Marken', priority: 0.6, changefreq: 'weekly', lastmod: d });
   for (const t of listTeamShops()) if (t.active && t.indexed) out.push({ path: `/team/${t.slug}`, title: t.name, group: 'Motiv- & Team-Shops', priority: 0.7, changefreq: 'weekly', lastmod: d });
   for (const p of all) out.push({ path: productPath(p), title: p.model ? `${p.name} – ${p.model}` : p.name, group: `Artikel: ${p.category}`, priority: 0.6, changefreq: 'weekly', lastmod: d,
