@@ -13,8 +13,8 @@ export const KOLLEKTIONEN: Record<string, Kollektion> = {
     slug: 'satire',
     name: 'Satire zum Anziehen',
     title: 'Satire-Kollektion – politische Satire auf T-Shirt und Hoodie',
-    description: '50 Satiremotive zu Politik, Bürokratie, Wohnen und Alltag – als T-Shirt und Hoodie, fertig bedruckt zum Festpreis inkl. Druck.',
-    intro: '50 Motive für alle, die Politik und Alltag lieber mit Humor kommentieren – jedes als T-Shirt und als Hoodie, fertig bedruckt zum Festpreis.',
+    description: 'Satiremotive zu Politik, Bürokratie, Wohnen und Alltag – als T-Shirt und Hoodie, fertig bedruckt zum Festpreis inkl. Druck.',
+    intro: 'Satiremotive für alle, die Politik und Alltag lieber mit Humor kommentieren – jedes als T-Shirt und als Hoodie, fertig bedruckt zum Festpreis.',
     filter: 'Thema',
     textil: 'Textilart',
   },
@@ -57,7 +57,10 @@ export function ensureKollektionen(catalogFile: string) {
         if (m.angelegt.includes(sku)) {
           // Seed geändert? Nur nachziehen, wenn der Artikel noch existiert und seit dem Import nicht im Admin bearbeitet wurde
           const cur = ov[id]; const st = m.stand[sku];
-          if (!cur || !st || st.hash === hash || cur.updatedAt !== st.at) continue;
+          if (!cur) continue;
+          // ältere Importe ohne Stand: aktuellen Stand als Ausgangspunkt merken (ab jetzt werden Seed-Änderungen nachgezogen)
+          if (!st) { m.stand[sku] = { hash, at: cur.updatedAt ?? '' }; changed = true; continue; }
+          if (st.hash === hash || cur.updatedAt !== st.at) continue;
           const at = new Date().toISOString();
           ov[id] = { ...(rest as Override), custom: true, hidden: cur.hidden, top: cur.top, sale: cur.sale, collection: name, updatedAt: at } as Override;
           m.stand[sku] = { hash, at }; changed = true;
