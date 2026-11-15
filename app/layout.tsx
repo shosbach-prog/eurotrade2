@@ -104,6 +104,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <h2>Service</h2>
                 <Link href="/ueber-uns">Über uns</Link>
                 <Link href="/garantie">Zufriedenheitsgarantie</Link>
+                <Link href="/versand">Versand & Lieferung</Link>
                 <Link href="/agb">AGB</Link>
                 <Link href="/widerruf">Rückgabe & Widerruf</Link>
                 <Link href="/impressum">Impressum</Link>
@@ -115,7 +116,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </div>
             <div className="ft-bottom">
               <div className="wrap">
-                <span>© {new Date().getFullYear()} {SHOP} · Alle Preise netto zzgl. MwSt. und Versand</span>
+                <span>© {new Date().getFullYear()} {SHOP} · Preise wahlweise netto zzgl. MwSt. oder brutto inkl. MwSt., jeweils zzgl. <Link href="/versand">Versand</Link></span>
                 {gated && customer && <span>Angemeldet als <b>{customer.name}</b> · <LogoutLink /></span>}
               </div>
             </div>

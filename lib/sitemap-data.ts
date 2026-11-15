@@ -33,6 +33,7 @@ export function sitemapEntries(): SitemapEntry[] {
     { path: '/ueber-uns', title: 'Über uns', group: 'Allgemein', priority: 0.5, changefreq: 'yearly' },
     { path: '/garantie', title: 'Zufriedenheitsgarantie', group: 'Rechtliches', priority: 0.4, changefreq: 'yearly' },
     { path: '/widerruf', title: 'Rückgabe & Widerruf', group: 'Rechtliches', priority: 0.3, changefreq: 'yearly' },
+    { path: '/versand', title: 'Versand & Lieferung', group: 'Rechtliches', priority: 0.3, changefreq: 'yearly' },
     { path: '/agb', title: 'AGB', group: 'Rechtliches', priority: 0.2, changefreq: 'yearly' },
     { path: '/impressum', title: 'Impressum', group: 'Rechtliches', priority: 0.1, changefreq: 'yearly' },
     ...ZIELGRUPPEN.map((z) => ({ path: `/fuer/${z.slug}`, title: `Für ${z.dativ}`, group: 'Zielgruppen & Aktionen', priority: 0.8, changefreq: 'monthly' as const })),

@@ -39,7 +39,7 @@ export default function AGB() {
       <S n={4} t="Preise und Versandkosten">
         <p>(1) Auf der Website angezeigte Preise sind Nettopreise zuzüglich der gesetzlichen Umsatzsteuer, sofern nicht anders gekennzeichnet. Im Angebot werden Netto- und Bruttobetrag ausgewiesen. Für Verbraucher ist der Bruttopreis maßgeblich.</p>
         <p>(2) Mengenrabatte (Staffelpreise) beziehen sich auf die Gesamtmenge eines Artikels in einer Bestellung, über alle Farben und Größen.</p>
-        <p>(3) Kosten für Veredelung (z. B. Druck, Stick, Einrichtung, Stickprogramm) und Versand werden im Angebot gesondert ausgewiesen.</p>
+        <p>(3) Der Versand innerhalb Deutschlands kostet pauschal 4,90 € (inkl. MwSt.) je Bestellung. Kosten für Veredelung (z. B. Druck, Stick, Einrichtung, Stickprogramm) und für den Versand ins Ausland werden im Angebot gesondert ausgewiesen.</p>
       </S>
 
       <S n={5} t="Zahlung">
