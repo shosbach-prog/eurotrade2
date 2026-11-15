@@ -9,6 +9,8 @@ import { reviewDays } from '@/lib/review-mail';
 import { listCartReminders } from '@/lib/cart-remind';
 import { getPricing } from '@/lib/deco-pricing-store';
 import CartReminders from './CartReminders';
+import ApiKeys from './ApiKeys';
+import { publicKeys } from '@/lib/api-keys';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'System', robots: { index: false, follow: false } };
@@ -32,6 +34,10 @@ export default function System() {
       <AdminNav active="system" />
       <h1>System</h1>
       <div className="sys-grid">
+        <section className="box" id="api">
+          <h2>Shop-API</h2>
+          <ApiKeys initial={publicKeys()} />
+        </section>
         <section className="box">
           <h2>E-Mail-Versand</h2>
           <dl className="sys-dl">
