@@ -12,8 +12,13 @@ export async function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
   const headers = new Headers(req.headers);
   headers.set('x-path', pathname);
+  // ?preis=brutto|netto → Preisanzeige sofort umstellen (z. B. Links aus dem Google-Feed)
+  const pm = req.nextUrl.searchParams.get('preis');
+  const priceMode = pm === 'brutto' || pm === 'netto' ? pm : null;
+  if (priceMode) headers.set('cookie', [...(headers.get('cookie') ?? '').split(/;\s*/).filter((c) => c && !c.startsWith('et_price=')), `et_price=${priceMode}`].join('; '));
   const pass = () => {
     const r = NextResponse.next({ request: { headers } });
+    if (priceMode) r.cookies.set('et_price', priceMode, { path: '/', maxAge: 31536000, sameSite: 'lax' });
     if (!pathname.startsWith('/api/') && !pathname.startsWith('/_next/') && !pathname.startsWith('/admin')) { r.headers.set('Link', LINK); r.headers.set('Vary', 'Accept'); }
     return r;
   };

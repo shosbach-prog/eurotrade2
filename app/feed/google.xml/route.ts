@@ -7,6 +7,8 @@ export const dynamic = 'force-dynamic';
 
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const money = (n: number) => `${n.toFixed(2)} EUR`;
+/** Versandkosten brutto (Deutschland) */
+const SHIPPING = Number(process.env.SHIPPING_GROSS ?? 4.9);
 
 /** Produkt-Feed für das Google Merchant Center (nur Artikel mit Preis, Preise inkl. MwSt.) */
 export async function GET() {
@@ -20,30 +22,45 @@ export async function GET() {
 <title>euro-trade.com – Markentextilien mit Logo</title>
 <link>${base}</link>
 <description>Textilien, Taschen und Werbemittel – ab 1 Stück, auf Wunsch bedruckt oder bestickt.</description>
-${items.map((p) => {
+${items.flatMap((p) => {
   const t = getText(p).text;
-  const desc = `${t.intro.split('\n\n')[0]} ${t.highlights.join(' · ')}`.slice(0, 4900);
+  const desc = `${(p.short || t.intro.split('\n\n')[0])} ${t.highlights.join(' · ')}`.slice(0, 4900);
   const sale = p.was != null;
-  return `<item>
-<g:id>${esc(p.sku)}</g:id>
-<g:title>${esc(`${p.name.replace(/\s*\([^)]*\)\s*$/, '')} – ${p.brand}${p.model ? ` ${p.model}` : ''}`.slice(0, 150))}</g:title>
+  const ratio = p.priceGross! / p.price!;
+  const gross = (net: number) => Math.round(net * ratio * 100) / 100;
+  // Kleidung: je Größe ein Eintrag (Google verlangt in DE eine einzelne Größe), gruppiert über item_group_id
+  const sizes = p.sizes.filter((s) => s && !/^one ?size$/i.test(s));
+  const variants: (string | null)[] = sizes.length > 1 ? sizes : [sizes[0] ?? null];
+  const apparel = sizes.length > 0;
+  return variants.map((size) => {
+    const up = size && p.sizeUp?.[size] ? p.sizeUp[size] : 0;
+    const price = p.fixedGross ? p.priceGross! : gross(p.price! + up);
+    const was = sale ? gross(p.was! + up) : null;
+    const id = size && variants.length > 1 ? `${p.sku}-${size}`.replace(/[^A-Za-z0-9._-]+/g, '-').slice(0, 50) : p.sku;
+    return `<item>
+<g:id>${esc(id)}</g:id>
+${variants.length > 1 ? `<g:item_group_id>${esc(p.sku)}</g:item_group_id>` : ''}
+<g:title>${esc(`${p.name.replace(/\s*\([^)]*\)\s*$/, '')}${p.collection ? '' : ` – ${p.brand}${p.model ? ` ${p.model}` : ''}`}${size && variants.length > 1 ? ` (Größe ${size})` : ''}`.slice(0, 150))}</g:title>
 <g:description>${esc(desc)}</g:description>
-<g:link>${esc(abs(productPath(p)))}</g:link>
+<g:link>${esc(abs(productPath(p)))}?preis=brutto</g:link>
 <g:image_link>${esc(abs(p.images[0]))}</g:image_link>
 ${p.images.slice(1, 6).map((i) => `<g:additional_image_link>${esc(abs(i))}</g:additional_image_link>`).join('\n')}
 <g:availability>in_stock</g:availability>
 <g:condition>new</g:condition>
-<g:price>${money(sale ? Math.round(p.was! * (p.priceGross! / p.price!) * 100) / 100 : p.priceGross!)}</g:price>
-${sale ? `<g:sale_price>${money(p.priceGross!)}</g:sale_price>` : ''}
+<g:price>${money(was ?? price)}</g:price>
+${was != null ? `<g:sale_price>${money(price)}</g:sale_price>` : ''}
+<g:shipping><g:country>DE</g:country><g:service>Standard</g:service><g:price>${money(SHIPPING)}</g:price></g:shipping>
 <g:brand>${esc(p.brand)}</g:brand>
 <g:mpn>${esc(p.sku)}</g:mpn>
 <g:identifier_exists>no</g:identifier_exists>
 <g:product_type>${esc(p.category)}</g:product_type>
-${p.gender && p.gender !== 'Unisex' ? `<g:gender>${p.gender === 'Herren' ? 'male' : p.gender === 'Damen' ? 'female' : 'unisex'}</g:gender>${p.gender === 'Kinder' ? '<g:age_group>kids</g:age_group>' : '<g:age_group>adult</g:age_group>'}` : ''}
+${apparel ? `<g:gender>${p.gender === 'Herren' ? 'male' : p.gender === 'Damen' ? 'female' : 'unisex'}</g:gender><g:age_group>${p.gender === 'Kinder' ? 'kids' : 'adult'}</g:age_group>` : ''}
 <g:color>${esc(p.colors.slice(0, 3).map((c) => c.name).join('/'))}</g:color>
-${p.sizes.length && p.sizes[0] !== 'One Size' ? `<g:size>${esc(p.sizes.join(', ').slice(0, 100))}</g:size>` : ''}
+${size ? `<g:size>${esc(size.slice(0, 100))}</g:size>` : ''}
 ${p.tiers.length ? `<g:custom_label_0>Staffelpreis ab ${p.tiers[0].min} Stück</g:custom_label_0>` : ''}
+${p.collection ? `<g:custom_label_1>${esc(p.collection)}</g:custom_label_1>` : ''}
 </item>`;
+  });
 }).join('\n')}
 </channel>
 </rss>`;
