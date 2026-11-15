@@ -36,7 +36,7 @@ ${items.flatMap((p) => {
     const up = size && p.sizeUp?.[size] ? p.sizeUp[size] : 0;
     const price = p.fixedGross ? p.priceGross! : gross(p.price! + up);
     const was = sale ? gross(p.was! + up) : null;
-    const id = size && variants.length > 1 ? `${p.sku}-${size}`.replace(/[^A-Za-z0-9._-]+/g, '-').slice(0, 50) : p.sku;
+    const id = size && variants.length > 1 ? `${p.sku}-${size}`.replace(/[^A-Za-z0-9._-]+/g, '-').replace(/-+/g, '-').replace(/-$/, '').slice(0, 50) : p.sku;
     return `<item>
 <g:id>${esc(id)}</g:id>
 ${variants.length > 1 ? `<g:item_group_id>${esc(p.sku)}</g:item_group_id>` : ''}
