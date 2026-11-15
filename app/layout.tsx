@@ -12,6 +12,7 @@ import QuickView from '@/components/QuickView';
 import { WishlistProvider } from '@/components/Wishlist';
 import SiteHeader from '@/components/SiteHeader';
 import { menuData } from '@/lib/menu';
+import { collectionProducts } from '@/lib/catalog';
 import Consent, { ConsentLink } from '@/components/Consent';
 import { previewMode, shopClosed } from '@/lib/access';
 import { isAdmin, shopAccess } from '@/lib/customer';
@@ -86,6 +87,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <Link href="/druck-stick">Druck & Stick</Link>
                 <Link href="/ratgeber">Ratgeber</Link>
                 <Link href="/#newsletter">Newsletter & Rabatt</Link>
+                {collectionProducts('satire').length > 0 && <Link href="/satire">Satire-Kollektion</Link>}
                 <Link href="/team/politik-insider">Politik Insider Shirts</Link>
               </nav>
               <nav className="ft-col" aria-label="Branchen">

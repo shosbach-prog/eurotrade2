@@ -46,6 +46,7 @@ function load(): State {
   const products = all.filter((p) => !p.hidden);
   const catMap = new Map<string, Category>();
   for (const p of products) {
+    if (p.collection) continue; // eigene Kollektionen (z. B. /satire) haben eine eigene Seite – nicht im Katalogmenü
     const c = catMap.get(p.categorySlug) ?? { name: p.category, slug: p.categorySlug, count: 0 };
     c.count++;
     catMap.set(p.categorySlug, c);
@@ -147,6 +148,7 @@ export function getCategories(ctx?: Ctx): Category[] {
   if (!(ctx?.exclusive && ctx.skus?.length)) return load().categories;
   const m = new Map<string, Category>();
   for (const p of products(ctx)) {
+    if (p.collection) continue;
     const c = m.get(p.categorySlug) ?? { name: p.category, slug: p.categorySlug, count: 0 };
     c.count++; m.set(p.categorySlug, c);
   }
@@ -160,7 +162,9 @@ export const getProduct = (id: string, ctx?: Ctx) => {
   return p && visible(ctx)(p) ? toPublic(p, ctx) : null;
 };
 export const getByCategory = (slug: string, ctx?: Ctx) => products(ctx).filter((p) => p.categorySlug === slug).map((p) => toPublic(p, ctx));
-export const getFeatured = (n = 12, ctx?: Ctx) => products(ctx).slice(0, n).map((p) => toPublic(p, ctx));
+export const getFeatured = (n = 12, ctx?: Ctx) => products(ctx).filter((p) => !p.collection).slice(0, n).map((p) => toPublic(p, ctx));
+/** Alle sichtbaren Artikel einer eigenen Kollektion (z. B. „satire“) */
+export const collectionProducts = (name: string, ctx?: Ctx) => products(ctx).filter((p) => p.collection === name).map((p) => toPublic(p, ctx));
 export const productCount = (ctx?: Ctx) => products(ctx).length;
 /** Kundenkollektion in der hinterlegten Reihenfolge */
 export function getCollection(ctx?: Ctx): PublicProduct[] {

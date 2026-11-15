@@ -20,7 +20,7 @@ function rankIds(): string[] {
 export function bestsellers(n = 12, ctx?: Ctx): PublicProduct[] {
   const out: PublicProduct[] = []; const perCat = new Map<string, number>();
   const add = (p: PublicProduct | null | undefined) => {
-    if (!p || out.length >= n || out.some((x) => x.id === p.id) || !p.images.length) return;
+    if (!p || p.collection || out.length >= n || out.some((x) => x.id === p.id) || !p.images.length) return;
     const c = perCat.get(p.categorySlug) ?? 0; if (c >= 2) return;
     perCat.set(p.categorySlug, c + 1); out.push(slimCard(p));
   };

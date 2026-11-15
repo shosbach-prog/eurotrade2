@@ -1,17 +1,35 @@
 import 'server-only';
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import type { Product } from './types';
 import { DATA, readJSON, writeJSON } from './store';
 import { ARTIKEL, readOverrides, type Override } from './artikel';
 
-/** Eigene Kollektionen (seed/kollektionen/<name>.json) – werden einmalig als ausgeblendete Entwürfe angelegt.
+/** Eigene Kollektionen mit eigener Seite (/<slug>) – getrennt von Katalogmenü und Team-Shops */
+export type Kollektion = { slug: string; name: string; title: string; description: string; intro: string; filter: string; textil: string };
+export const KOLLEKTIONEN: Record<string, Kollektion> = {
+  satire: {
+    slug: 'satire',
+    name: 'Satire zum Anziehen',
+    title: 'Satire-Kollektion – politische Satire auf T-Shirt und Hoodie',
+    description: '50 Satiremotive zu Politik, Bürokratie, Wohnen und Alltag – als T-Shirt und Hoodie, fertig bedruckt zum Festpreis inkl. Druck.',
+    intro: '50 Motive für alle, die Politik und Alltag lieber mit Humor kommentieren – jedes als T-Shirt und als Hoodie, fertig bedruckt zum Festpreis.',
+    filter: 'Thema',
+    textil: 'Textilart',
+  },
+};
+export const kollektionBySlug = (slug: string) => Object.values(KOLLEKTIONEN).find((k) => k.slug === slug) ?? null;
+
+/** Seed-Dateien (seed/kollektionen/<name>.json) werden einmalig als ausgeblendete Entwürfe angelegt.
  *  Zuordnung über die Artikelnummer: existiert sie schon (Katalog oder Admin), wird nichts angelegt.
+ *  Ändert sich der Seed, werden angelegte, im Admin noch nicht bearbeitete Artikel nachgezogen (Sichtbarkeit bleibt).
  *  Im Admin gelöschte Artikel kommen nicht wieder (Merkliste data/kollektionen.json). */
 const DIR = path.join(process.cwd(), 'seed', 'kollektionen');
 const MARK = path.join(DATA, 'kollektionen.json');
-type Mark = Record<string, { at: string; angelegt: string[]; vorhanden: string[] }>;
+type Mark = Record<string, { at: string; angelegt: string[]; vorhanden: string[]; stand?: Record<string, { hash: string; at: string }> }>;
 type SeedProduct = Product & { _redaktion?: unknown };
+const hashOf = (x: unknown) => crypto.createHash('sha1').update(JSON.stringify(x)).digest('hex').slice(0, 16);
 let checked = false;
 
 export function ensureKollektionen(catalogFile: string) {
@@ -30,13 +48,25 @@ export function ensureKollektionen(catalogFile: string) {
       const name = f.replace(/\.json$/, '');
       const list = readJSON<SeedProduct[]>(path.join(DIR, f), []);
       const m = mark[name] ?? { at: new Date().toISOString(), angelegt: [], vorhanden: [] };
+      m.stand ??= {};
       for (const { _redaktion: _r, ...p } of list) {
         const sku = String(p.sku ?? '').toUpperCase();
-        if (!sku || !p.id || m.angelegt.includes(sku) || m.vorhanden.includes(sku)) continue;
-        if (skus.has(sku) || ov[p.id]) { m.vorhanden.push(sku); changed = true; continue; }
+        if (!sku || !p.id || m.vorhanden.includes(sku)) continue;
         const { id, ...rest } = p;
-        ov[id] = { ...(rest as Override), custom: true, hidden: true, collection: name, updatedAt: new Date().toISOString() } as Override;
-        skus.add(sku); m.angelegt.push(sku); changed = true;
+        const hash = hashOf(rest);
+        if (m.angelegt.includes(sku)) {
+          // Seed geändert? Nur nachziehen, wenn der Artikel noch existiert und seit dem Import nicht im Admin bearbeitet wurde
+          const cur = ov[id]; const st = m.stand[sku];
+          if (!cur || !st || st.hash === hash || cur.updatedAt !== st.at) continue;
+          const at = new Date().toISOString();
+          ov[id] = { ...(rest as Override), custom: true, hidden: cur.hidden, top: cur.top, sale: cur.sale, collection: name, updatedAt: at } as Override;
+          m.stand[sku] = { hash, at }; changed = true;
+          continue;
+        }
+        if (skus.has(sku) || ov[id]) { m.vorhanden.push(sku); changed = true; continue; }
+        const at = new Date().toISOString();
+        ov[id] = { ...(rest as Override), custom: true, hidden: true, collection: name, updatedAt: at } as Override;
+        skus.add(sku); m.angelegt.push(sku); m.stand[sku] = { hash, at }; changed = true;
       }
       mark[name] = m;
     }
