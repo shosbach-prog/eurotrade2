@@ -79,7 +79,7 @@ export const findCustomer = (code: string) => allCustomers().find((c) => c.code 
 import { posLabel, decoText, logoText, type Deco } from './deco';
 import { DEFAULT_PRICING, calcDeco, cleanPricing, teamUnit } from './deco-pricing';
 export type { Deco };
-export type InqLine = { id?: string; sku: string; name: string; color: string; size: string; qty: number; price: number | null; sum: number; deco?: Deco | null; /** Musterteil – wird bei Folgeauftrag angerechnet */ sample?: boolean; /** Einkaufspreis netto zum Zeitpunkt der Anfrage (für die Marge) */ ek?: number | null; /** Festpreis inkl. Veredelung (Motiv-/Team-Shop) – keine eigene Veredelungsposition */ incl?: boolean };
+export type InqLine = { id?: string; sku: string; name: string; color: string; size: string; qty: number; price: number | null; sum: number; deco?: Deco | null; /** Musterteil – wird bei Folgeauftrag angerechnet */ sample?: boolean; /** Einkaufspreis netto zum Zeitpunkt der Anfrage (für die Marge) */ ek?: number | null; /** Festpreis inkl. Veredelung (Motiv-/Team-Shop) – keine eigene Veredelungsposition */ incl?: boolean; /** Druckdatei (signierter Link) für Motivartikel, z. B. Satire-Kollektion */ print?: string };
 export type OfferLine = { text: string; detail?: string; qty: number; price: number };
 export type Offer = { lines: OfferLine[]; shipping: number; note: string; validDays: number; createdAt: string; sentAt?: string | null; vat: number };
 export type Status = 'neu' | 'angebot' | 'angenommen' | 'bestellt' | 'geliefert' | 'abgelehnt';

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { printUrl } from '@/lib/druck';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import AdminNav from '@/components/AdminNav';
@@ -21,10 +22,12 @@ import { STATUS, draftOffer, getInquiry, offerTotals } from '@/lib/store';
 export const metadata: Metadata = { title: 'Anfrage', robots: { index: false, follow: false } };
 const fmt = (d: string) => new Date(d).toLocaleString('de-DE', { dateStyle: 'medium', timeStyle: 'short' });
 
-export default function InquiryPage({ params }: { params: { no: string } }) {
+export default async function InquiryPage({ params }: { params: { no: string } }) {
   const i = getInquiry(params.no);
   if (!i) notFound();
   const c = i.customer;
+  // Druckdateien auch für ältere Anfragen ohne gespeicherten Link
+  const printLinks = await Promise.all(i.lines.map((l) => (l.print ? Promise.resolve(l.print) : printUrl(l.sku))));
   const logos = [...new Map(i.lines.filter((l) => l.deco?.logoId).map((l) => [l.deco!.logoId!, l.deco!.logoName ?? 'Logo'])).entries()];
   // Einkaufskonditionen (nur Admin): Staffel-EK nach Gesamtmenge je Artikel, sonst EK zum Anfragezeitpunkt / aktueller EK
   const qtyBy = i.lines.reduce<Record<string, number>>((m, l) => ({ ...m, [l.id ?? l.sku]: (m[l.id ?? l.sku] ?? 0) + l.qty }), {});
@@ -90,6 +93,7 @@ export default function InquiryPage({ params }: { params: { no: string } }) {
             <tr key={k}>
               <td>{l.sku}</td>
               <td>{ek[k].eol !== undefined && <span className="sample-tag eol-tag" title="laut L-Shop-Auslaufliste">läuft aus{ek[k].eol ? ` ${new Date(ek[k].eol + 'T12:00:00').toLocaleDateString('de-DE')}` : ''}</span>}{l.sample && <span className="sample-tag">Muster</span>}{l.id ? <Link href={`/produkt/${l.id}`} prefetch={false} className="alink" target="_blank">{l.name}</Link> : l.name}{l.deco && <div className="deco-tag">✦ {decoLabel(l.deco)}{l.deco.note && <> – <i>{l.deco.note}</i></>}</div>}
+                {(l.print ?? printLinks[k]) && <div className="deco-tag">🖨 <a className="alink" href={l.print ?? printLinks[k]!} download>Druckdatei herunterladen</a> <span className="muted" style={{ fontSize: 12 }}>(Link an Drucker weitergeben)</span></div>}
                 {l.deco?.team?.rows.length ? <div className="muted" style={{ fontSize: 12.5 }}>{l.deco.team.pos}: {teamLabel(l.deco.team.rows)}</div> : null}
                 {l.deco?.previews?.length ? <div className="cl-prev">{l.deco.previews.map((id) => <a key={id} href={`/api/upload/${id}`} target="_blank"><img src={`/api/upload/${id}`} alt="Vorschau" /></a>)}</div> : null}</td>
               <td>{l.color}</td><td>{l.size}</td><td>{l.qty}</td>

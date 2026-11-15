@@ -12,7 +12,7 @@ import { productSlug, slugify } from './format';
 import { pictosFor } from './picto';
 import { applyEol, auslaufMtime } from './auslauf';
 import { kindOf } from './copy';
-import { ensureKollektionen } from './kollektionen';
+import { ensureKollektionen, kollektionOf } from './kollektionen';
 
 const LIVE = path.join(process.cwd(), 'data', 'products.json');
 /** Modellnamen aus der L-Shop-Artikelliste (Art.-Nr. → Bezeichnung), z. B. BCPUI10 → „Unisex Polo ID.001“ */
@@ -41,7 +41,7 @@ function load(): State {
   const ov = readOverrides();
   const merged: Product[] = raw.map((p) => applyEol(ov[p.id] ? { ...p, ...ov[p.id], id: p.id, custom: false } : p));
   for (const [id, o] of Object.entries(ov)) if (o.custom && !base.has(id)) merged.push({ sku: id, name: 'Neuer Artikel', brand: '', category: 'Sonstiges', description: '', basePrice: null, images: [], colors: [], sizes: [], ...o, id } as Product);
-  for (const p of merged) { if (!p.model) { const m = modelOf(p); if (m) p.model = m; } p.categorySlug = p.categorySlug && !ov[p.id]?.category ? p.categorySlug : slugify(p.category || 'sonstiges'); }
+  for (const p of merged) { if (!p.model) { const m = modelOf(p); if (m) p.model = m; } p.categorySlug = p.categorySlug && !ov[p.id]?.category ? p.categorySlug : slugify(p.category || 'sonstiges'); const k = kollektionOf(p.collection); if (k) { p.categorySlug = k.slug; p.category = k.name; } }
   const all = merged.map((p, k) => [p, k] as const).sort((a, b) => Number(!!b[0].top) - Number(!!a[0].top) || a[1] - b[1]).map(([p]) => p);
   const products = all.filter((p) => !p.hidden);
   const catMap = new Map<string, Category>();

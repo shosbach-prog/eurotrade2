@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { adminProduct, getProduct } from '@/lib/catalog';
+import { printUrl } from '@/lib/druck';
 import { getCustomer } from '@/lib/customer';
 import { FONTS, METHODS, POSITIONS, TEAM_POS, TEXT_COLORS, decoLabel, teamLabel, type Deco } from '@/lib/deco';
 import { getTeamShop, isDirectShop, teamFixedPrice, teamShippingGross } from '@/lib/teamshop';
@@ -86,6 +87,8 @@ export async function POST(req: Request) {
     return { id: p.id, sku: p.sku, name: p.name, color: String(l.color ?? '').slice(0, 80), size: String(l.size ?? '').slice(0, 40), qty: sample ? 1 : qty, price, sum: Math.round((price ?? 0) * (sample ? 1 : qty) * 100) / 100, deco: cleanDeco(l.deco), ek, ...(sample ? { sample: true } : {}), ...(fixed != null && l.deco ? { incl: true } : {}) };
   });
   if (!lines.length) return NextResponse.json({ error: 'Warenkorb ist leer.' }, { status: 400 });
+  // Druckdatei für Motivartikel (Satire-Kollektion) – nur für Shop/Drucker, nicht in der Kundenmail
+  for (const l of lines) { const u = await printUrl(l.sku); if (u) l.print = u; }
   // Einzelversand-Shop: alle Positionen aus dem Shop zum Festpreis → direkte Bestellung (Lieferadresse nötig)
   const direct = isDirectShop(team) && lines.every((l) => l.id && teamFixedPrice(team, l.id) != null && !l.sample);
   if (direct && (!customer.street?.trim() || !customer.city?.trim())) return NextResponse.json({ error: 'Bitte Straße sowie PLZ/Ort für den Versand angeben.' }, { status: 400 });
@@ -129,6 +132,7 @@ export async function POST(req: Request) {
       + (customer.message ? `<div style="font-size:13px;font-weight:700;margin:0 0 6px">Nachricht</div>${quote(customer.message)}` : '')
       + itemsTable(mlines, totals)
       + (logos.length ? p(`<strong>Logos:</strong> ${logos.map(([id, n]) => `<a href="${base}/api/upload/${id}?download" style="color:#0a5cf0">${esc(n)}</a>`).join(', ')}`) : '')
+      + (lines.some((l) => l.print) ? p(`<strong>Druckdateien für den Drucker:</strong><br>${[...new Map(lines.filter((l) => l.print).map((l) => [l.sku, l])).values()].map((l) => `<a href="${base}${l.print}" style="color:#0a5cf0">${esc(l.sku)} – ${esc(l.name)}</a>`).join('<br>')}`) : '')
       + button(`${base}/admin/anfrage/${no}`, 'Angebot erstellen →'),
   });
   const toCustomer = layout({

@@ -7,10 +7,12 @@ import { DATA, readJSON, writeJSON } from './store';
 import { ARTIKEL, readOverrides, type Override } from './artikel';
 
 /** Eigene Kollektionen mit eigener Seite (/<slug>) – getrennt von Katalogmenü und Team-Shops */
-export type Kollektion = { slug: string; name: string; title: string; description: string; intro: string; filter: string; textil: string };
+export type Kollektion = { /** interner Name (Feld collection der Artikel, Seed-Datei) */ key: string; slug: string; /** frühere Adressen → Weiterleitung */ aliases?: string[]; name: string; title: string; description: string; intro: string; filter: string; textil: string };
 export const KOLLEKTIONEN: Record<string, Kollektion> = {
   satire: {
-    slug: 'satire',
+    key: 'satire',
+    slug: 'politik-satire',
+    aliases: ['satire'],
     name: 'Satire zum Anziehen',
     title: 'Satire-Kollektion – politische Satire auf T-Shirt und Hoodie',
     description: 'Satiremotive zu Politik, Bürokratie, Wohnen und Alltag – als T-Shirt und Hoodie, fertig bedruckt zum Festpreis inkl. Druck.',
@@ -20,6 +22,9 @@ export const KOLLEKTIONEN: Record<string, Kollektion> = {
   },
 };
 export const kollektionBySlug = (slug: string) => Object.values(KOLLEKTIONEN).find((k) => k.slug === slug) ?? null;
+export const kollektionByAlias = (slug: string) => Object.values(KOLLEKTIONEN).find((k) => k.aliases?.includes(slug)) ?? null;
+/** Kollektion eines Artikels (über das Feld collection) */
+export const kollektionOf = (name?: string) => (name ? KOLLEKTIONEN[name] ?? null : null);
 
 /** Seed-Dateien (seed/kollektionen/<name>.json) werden einmalig als ausgeblendete Entwürfe angelegt.
  *  Zuordnung über die Artikelnummer: existiert sie schon (Katalog oder Admin), wird nichts angelegt.
