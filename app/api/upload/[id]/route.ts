@@ -5,7 +5,8 @@ import { thumb, thumbWidth } from '@/lib/thumb';
 
 const TYPES: Record<string, string> = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', svg: 'image/svg+xml', pdf: 'application/pdf', ai: 'application/postscript', eps: 'application/postscript' };
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   if (!/^[a-f0-9]{24}$/.test(params.id)) return new Response('Nicht gefunden', { status: 404 });
   const meta = readJSON<{ name: string; ext: string } | null>(path.join(UPLOADS, `${params.id}.json`), null);
   const file = meta && path.join(UPLOADS, `${params.id}.${meta.ext}`);

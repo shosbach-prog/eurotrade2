@@ -2,7 +2,8 @@ import { invoiceByToken } from '@/lib/invoice';
 import { archivedPdf, archivedXml } from '@/lib/invoice-actions';
 
 /** Kunde lädt seine Rechnung über den geheimen Link (PDF oder ?xml) */
-export function GET(req: Request, { params }: { params: { token: string } }) {
+export async function GET(req: Request, props: { params: Promise<{ token: string }> }) {
+  const params = await props.params;
   const i = invoiceByToken(params.token);
   if (!i) return new Response('Nicht gefunden', { status: 404 });
   const xml = new URL(req.url).searchParams.has('xml');

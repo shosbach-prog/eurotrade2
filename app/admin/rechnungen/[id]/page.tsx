@@ -10,7 +10,8 @@ import { mailEnabled, shopUrl } from '@/lib/mail';
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Rechnung', robots: { index: false, follow: false } };
 
-export default function InvoicePage({ params }: { params: { id: string } }) {
+export default async function InvoicePage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const i = getInvoice(params.id);
   if (!i) notFound();
   return (

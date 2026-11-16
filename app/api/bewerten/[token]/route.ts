@@ -3,7 +3,8 @@ import { esc, sendMail, shopUrl } from '@/lib/mail';
 import { button, h1, layout, p } from '@/lib/mail-templates';
 import { inquiryByToken, listReviews, randomId, saveReviews, type Review } from '@/lib/store';
 
-export async function POST(req: Request, { params }: { params: { token: string } }) {
+export async function POST(req: Request, props: { params: Promise<{ token: string }> }) {
+  const params = await props.params;
   const i = inquiryByToken(params.token);
   if (!i || !['angenommen', 'bestellt', 'geliefert'].includes(i.status ?? '')) return NextResponse.json({ error: 'Link ungültig.' }, { status: 404 });
   const b = await req.json().catch(() => ({}));

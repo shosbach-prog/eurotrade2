@@ -4,7 +4,8 @@ import { button, eur, h1, infoBox, layout, offerTable, p, quote, signature } fro
 import { addHistory, inquiryByToken, listSubscribers, offerTotals, saveInquiry, saveSubscribers } from '@/lib/store';
 
 /** Kunde nimmt das Angebot an */
-export async function POST(req: Request, { params }: { params: { token: string } }) {
+export async function POST(req: Request, props: { params: Promise<{ token: string }> }) {
+  const params = await props.params;
   const i = inquiryByToken(params.token);
   if (!i?.offer?.sentAt) return NextResponse.json({ error: 'Angebot nicht gefunden.' }, { status: 404 });
   if (i.status === 'angenommen' || i.status === 'bestellt' || i.status === 'geliefert') return NextResponse.json({ ok: true, already: true });

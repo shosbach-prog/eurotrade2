@@ -5,11 +5,13 @@ import FilterGrid from '@/components/FilterGrid';
 import { didYouMean, getCategories, search, slimCard } from '@/lib/catalog';
 import { getCustomer } from '@/lib/customer';
 
-export function generateMetadata({ searchParams }: { searchParams: { q?: string } }) {
+export async function generateMetadata(props: { searchParams: Promise<{ q?: string }> }) {
+  const searchParams = await props.searchParams;
   return { title: `Suche: ${searchParams.q ?? ''}`, robots: { index: false } };
 }
 
-export default async function SearchPage({ searchParams }: { searchParams: { q?: string } }) {
+export default async function SearchPage(props: { searchParams: Promise<{ q?: string }> }) {
+  const searchParams = await props.searchParams;
   const ctx = await getCustomer();
   const q = (searchParams.q ?? '').trim();
   const res = q ? search(q, 200, ctx) : [];

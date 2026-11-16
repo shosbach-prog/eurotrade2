@@ -4,7 +4,8 @@ import { getCategories } from '@/lib/catalog';
 
 export const metadata: Metadata = { title: 'Kontakt', description: 'Kontakt zu euro-trade.com – Anfrage für Textilien mit Druck oder Stick, Angebot innerhalb von 24 Stunden.', alternates: { canonical: '/kontakt' } };
 
-export default function Kontakt({ searchParams }: { searchParams?: { artikel?: string; marke?: string } }) {
+export default async function Kontakt(props: { searchParams?: Promise<{ artikel?: string; marke?: string }> }) {
+  const searchParams = await props.searchParams;
   const want = String(searchParams?.artikel ?? searchParams?.marke ?? '').slice(0, 80);
   return (
     <div className="l-section" style={{ marginTop: 24 }}>

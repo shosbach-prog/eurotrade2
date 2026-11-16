@@ -12,7 +12,8 @@ import { productPath } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Artikel bearbeiten', robots: { index: false, follow: false } };
-export default function EditArticle({ params }: { params: { id: string } }) {
+export default async function EditArticle(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const { p, original } = adminProduct(decodeURIComponent(params.id));
   if (!p) notFound();
   const { text, source } = getText(p);

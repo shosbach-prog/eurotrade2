@@ -3,7 +3,10 @@ import AccessForm from './AccessForm';
 
 export const metadata: Metadata = { title: 'Anmelden', description: 'Anmeldung für Kunden von euro-trade.com mit E-Mail und Passwort oder persönlichem Zugangscode.', robots: { index: false, follow: false } };
 
-export default function Zugang({ searchParams }: { searchParams: { weiter?: string; code?: string; abgemeldet?: string } }) {
+export default async function Zugang(
+  props: { searchParams: Promise<{ weiter?: string; code?: string; abgemeldet?: string }> }
+) {
+  const searchParams = await props.searchParams;
   const next = searchParams.weiter?.startsWith('/') && !searchParams.weiter.startsWith('//') ? searchParams.weiter : '/';
   return (
     <div className="gate">

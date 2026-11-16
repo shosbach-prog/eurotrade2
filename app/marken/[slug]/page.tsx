@@ -7,12 +7,14 @@ import { viewCtx } from '@/lib/customer';
 import { brandBySlug, productsOfBrand } from '@/lib/brand-catalog';
 import { brandTeaser, brandText } from '@/lib/brand-texts';
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
+export async function generateMetadata(props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   const b = brandBySlug(params.slug, await viewCtx());
   return b ? { title: `${b.name} bedrucken & besticken`, description: (brandTeaser(b.name) ?? `${b.name} Textilien mit Ihrem Logo – bedruckt oder bestickt ab 1 Stück bei Euro-Trade.`).slice(0, 158), alternates: { canonical: `/marken/${b.slug}` } } : {};
 }
 
-export default async function BrandPage({ params }: { params: { slug: string } }) {
+export default async function BrandPage(props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   const ctx = await viewCtx();
   const b = brandBySlug(params.slug, ctx);
   if (!b) notFound();

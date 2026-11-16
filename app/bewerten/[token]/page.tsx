@@ -6,7 +6,8 @@ import { inquiryByToken, listReviews } from '@/lib/store';
 export const metadata: Metadata = { title: 'Bewertung abgeben', robots: { index: false } };
 export const dynamic = 'force-dynamic';
 
-export default function Bewerten({ params }: { params: { token: string } }) {
+export default async function Bewerten(props: { params: Promise<{ token: string }> }) {
+  const params = await props.params;
   const i = inquiryByToken(params.token);
   if (!i || !['angenommen', 'bestellt', 'geliefert'].includes(i.status ?? '')) notFound();
   const products = [...new Map(i.lines.filter((l) => l.id).map((l) => [l.id!, { id: l.id!, name: l.name, sku: l.sku }])).values()];

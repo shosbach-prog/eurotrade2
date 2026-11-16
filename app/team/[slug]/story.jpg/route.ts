@@ -6,7 +6,8 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 /** Teilen-Kit: Story-Grafik 1080×1920 */
-export async function GET(_req: Request, { params }: { params: { slug: string } }) {
+export async function GET(_req: Request, props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   const t = getTeamShop(params.slug);
   if (!t) return new Response('Nicht gefunden', { status: 404 });
   const buf = await socialImage(t, 'story', shopUrl());

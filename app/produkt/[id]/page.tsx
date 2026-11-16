@@ -25,12 +25,17 @@ const fitTitle = (cands: string[], max = 52) => cands.find((c) => c.length <= ma
 /** Meta-Beschreibung mit Modell und Art.-Nr. vorn – sonst teilen sich Artikel derselben Marke/Kategorie denselben Vorlagentext */
 const metaDesc = (lead: string, intro: string) => { const d = `${lead} – ${intro.replace(/\s+/g, ' ')}`; return d.length <= 155 ? d : `${d.slice(0, 154).replace(/\s+\S*$/, '')}…`; };
 
-export async function generateMetadata({ params }: { params: { id: string; cat?: string } }) {
+export async function generateMetadata(props: { params: Promise<{ id: string; cat?: string }> }) {
+  const params = await props.params;
   const p = getProduct(decodeURIComponent(params.id), await viewCtx());
   return p ? { title: fitTitle(p.seo?.title ? [p.seo.title] : [...(p.model ? [`${p.name} – ${p.brand} ${p.model}`] : []), `${p.name} – ${p.brand}`, p.name, p.name.replace(/\s*\([^)]*\)\s*$/, '')]), description: p.seo?.description || metaDesc(`${p.model || p.name.replace(/\s*\([^)]*\)\s*$/, '')} (${p.sku})`, getText(p).text.intro), alternates: { canonical: productPath(p) }, openGraph: { title: `${p.name} – ${p.brand}`, images: p.images.slice(0, 1) } } : {};
 }
 
-export default async function ProductPage({ params, searchParams }: { params: { id: string; cat?: string }; searchParams?: { team?: string; motiv?: string; logo?: string } }) {
+export default async function ProductPage(
+  props: { params: Promise<{ id: string; cat?: string }>; searchParams?: Promise<{ team?: string; motiv?: string; logo?: string }> }
+) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const ctx = await viewCtx();
   const p0 = getProduct(decodeURIComponent(params.id), ctx);
   if (!p0) notFound();
