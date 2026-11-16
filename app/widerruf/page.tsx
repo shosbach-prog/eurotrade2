@@ -16,9 +16,9 @@ export default function Widerruf() {
 
       <div className="ret-grid">
         <div className="box ret"><div className="ret-ico">14</div><h3>14 Tage Widerrufsrecht</h3><p>Unveredelte Ware können Verbraucher innerhalb von 14 Tagen nach Erhalt ohne Angabe von Gründen zurückgeben.</p></div>
-        <div className="box ret"><div className="ret-ico">✦</div><h3>Veredelte Ware</h3><p>Bedruckte oder bestickte Artikel werden nur für Sie gefertigt und sind daher vom Umtausch und Widerruf ausgeschlossen, außer bei Mängeln.</p></div>
+        <div className="box ret"><div className="ret-ico">✦</div><h3>Individuell veredelte Ware</h3><p>Artikel, die wir nach Ihren Vorgaben bedrucken oder besticken (eigenes Logo, Text, Namen, Nummern), werden nur für Sie gefertigt und sind daher vom Umtausch und Widerruf ausgeschlossen, außer bei Mängeln. Fertige Motivartikel aus unserem Sortiment können Verbraucher wie unveredelte Ware widerrufen.</p></div>
         <div className="box ret"><div className="ret-ico">✓</div><h3>Freigabe vor Produktion</h3><p>Vor jeder Veredelung erhalten Sie eine Vorschau. Erst nach Ihrer Freigabe produzieren wir. So vermeiden wir Fehler von Anfang an.</p></div>
-        <div className="box ret"><div className="ret-ico">!</div><h3>Reklamation</h3><p>Etwas stimmt nicht? Melden Sie sich innerhalb von 7 Tagen mit Fotos. Bei Mängeln oder Fehlern unsererseits ersetzen wir kostenlos.</p></div>
+        <div className="box ret"><div className="ret-ico">!</div><h3>Reklamation</h3><p>Etwas stimmt nicht? Melden Sie sich am besten gleich mit Fotos – so können wir schnell helfen. Bei Mängeln oder Fehlern unsererseits ersetzen wir kostenlos. Ihre gesetzlichen Gewährleistungsrechte gelten unabhängig davon in vollem Umfang.</p></div>
       </div>
 
       <h2>So funktioniert die Rückgabe</h2>
@@ -51,7 +51,7 @@ export default function Widerruf() {
         <p>Sie tragen die unmittelbaren Kosten der Rücksendung der Waren.</p>
         <p>Sie müssen für einen etwaigen Wertverlust der Waren nur aufkommen, wenn dieser Wertverlust auf einen zur Prüfung der Beschaffenheit, Eigenschaften und Funktionsweise der Waren nicht notwendigen Umgang mit ihnen zurückzuführen ist.</p>
         <h3>Ausschluss des Widerrufsrechts</h3>
-        <p>Das Widerrufsrecht besteht nicht bei Verträgen zur Lieferung von Waren, die nicht vorgefertigt sind und für deren Herstellung eine individuelle Auswahl oder Bestimmung durch den Verbraucher maßgeblich ist oder die eindeutig auf die persönlichen Bedürfnisse des Verbrauchers zugeschnitten sind (§ 312g Abs. 2 Nr. 1 BGB). Dies betrifft insbesondere <strong>Textilien, die nach Ihren Vorgaben bedruckt, bestickt oder anderweitig veredelt werden</strong> (z. B. mit Logo, Text, Namen oder Nummern).</p>
+        <p>Das Widerrufsrecht besteht nicht bei Verträgen zur Lieferung von Waren, die nicht vorgefertigt sind und für deren Herstellung eine individuelle Auswahl oder Bestimmung durch den Verbraucher maßgeblich ist oder die eindeutig auf die persönlichen Bedürfnisse des Verbrauchers zugeschnitten sind (§ 312g Abs. 2 Nr. 1 BGB). Dies betrifft insbesondere <strong>Textilien, die nach Ihren Vorgaben bedruckt, bestickt oder anderweitig veredelt werden</strong> (z. B. mit Logo, Text, Namen oder Nummern). Für vorgefertigte Motivartikel aus unserem Sortiment (z. B. die Satire-Kollektion), die Sie ohne eigene Gestaltungsvorgaben bestellen, bleibt das Widerrufsrecht bestehen.</p>
       </div>
 
       <h2 id="formular">Muster-Widerrufsformular</h2>

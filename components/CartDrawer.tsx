@@ -54,7 +54,7 @@ export default function CartDrawer() {
         {lines.length > 0 && (
           <div className="drawer-foot">
             <div className="tot big" style={{ marginTop: 0, borderTop: 0, paddingTop: 0 }}><span>{count} Stück · {pr.label}</span><span>{eur(lines.reduce((s, l) => s + pr.cq(unit(l) ?? 0, l.qty), 0))}</span></div>
-            <a className="btn" href="/warenkorb" style={{ display: 'grid', placeItems: 'center' }}>Zum Warenkorb & Angebot anfordern</a>
+            <a className="btn" href="/warenkorb" style={{ display: 'grid', placeItems: 'center' }}>Zum Warenkorb</a>
             <button className="btn alt" onClick={closeDrawer}>Weiter einkaufen</button>
           </div>
         )}

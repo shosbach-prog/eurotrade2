@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import AcceptForm from './AcceptForm';
 import ProofBox from './ProofBox';
 import { teamLabel } from '@/lib/deco';
-import { invoiceTotals, kindName, listInvoices } from '@/lib/invoice';
+import { invoiceSettings, invoiceTotals, kindName, listInvoices } from '@/lib/invoice';
 import { eur } from '@/lib/format';
 import { inquiryByToken, offerTotals } from '@/lib/store';
 import { CARRIERS, trackingUrl } from '@/lib/shipping';
@@ -36,12 +36,13 @@ export default function OfferPage({ params, searchParams }: { params: { token: s
         if (paid && (searchParams?.bezahlt || searchParams?.neu)) return <div className="box thanks" role="status"><b>✓ Zahlung erhalten – vielen Dank!</b><p>Ihre Bestellung {i.no} geht jetzt in Produktion. Eine Bestätigung ist per E-Mail an {i.customer.email} unterwegs.</p></div>;
         if (searchParams?.zahlung === 'abbruch') return <div className="box" role="status"><b>Zahlung abgebrochen.</b> Ihre Bestellung ist gespeichert – Sie können unten jederzeit bezahlen.</div>;
         if (searchParams?.zahlung === 'fehler') return <div className="box err" role="alert"><b>Die Zahlung konnte nicht abgeschlossen werden.</b> Bitte erneut versuchen oder antworten Sie auf unsere E-Mail.</div>;
+        if (searchParams?.neu && i.direct && i.payBy === 'vorkasse') return <div className="box thanks" role="status"><b>✓ Vielen Dank – Ihre Bestellung {i.no} ist eingegangen.</b><p>Eine Bestellbestätigung ist per E-Mail an {i.customer.email} unterwegs. Die Zahlungsdaten für die Überweisung finden Sie unten.</p></div>;
         if (searchParams?.neu && i.direct && !paid) return <div className="box thanks" role="status"><b>✓ Ihre Bestellung {i.no} ist angelegt.</b><p>{paypalEnabled() ? 'Bitte schließen Sie unten die Zahlung ab – danach geht sie in Produktion.' : 'Bitte bestätigen Sie sie unten – danach geht sie in Produktion.'}</p></div>;
         return null;
       })()}
       <div className="list-head">
         <div>
-          <h1 style={{ marginBottom: 4 }}>{accepted ? 'Ihr Auftrag' : o ? 'Ihr Angebot' : 'Ihre Anfrage'} {i.no}</h1>
+          <h1 style={{ marginBottom: 4 }}>{i.direct ? 'Ihre Bestellung' : accepted ? 'Ihr Auftrag' : o ? 'Ihr Angebot' : 'Ihre Anfrage'} {i.no}</h1>
           <p className="muted" style={{ margin: 0 }}>für {i.customer.company || i.customer.name}{o && !accepted ? ` · gültig bis ${d(valid)}` : ''}</p>
         </div>
         <div className="deco-row">
@@ -97,9 +98,18 @@ export default function OfferPage({ params, searchParams }: { params: { token: s
         <a className="btn paypal" href={`/api/paypal/start?t=${params.token}`}>Jetzt mit PayPal bezahlen</a>
         <small className="muted">Sie werden zu PayPal weitergeleitet – dort zahlen Sie per PayPal-Konto, Lastschrift oder Karte.</small>
       </div>}
+      {o && t && i.payBy === 'vorkasse' && i.payment?.status !== 'bezahlt' && !invs.some((x) => x.status === 'bezahlt') && (() => {
+        const b = invoiceSettings();
+        return <div className="box pay-box" style={{ marginTop: 16 }}>
+          <b>Zahlung per Vorkasse: {eur(t.gross)} inkl. MwSt. und Versand</b>
+          {b.iban ? <p style={{ margin: '6px 0 0' }}>Bitte überweisen Sie den Betrag an <b>{b.company || b.owner}</b><br />IBAN: <b>{b.iban}</b>{b.bic ? <> · BIC: {b.bic}</> : null}{b.bank ? <> · {b.bank}</> : null}<br />Verwendungszweck: <b>{i.no}</b></p>
+            : <p style={{ margin: '6px 0 0' }}>Unsere Bankverbindung erhalten Sie in Kürze mit der Rechnung per E-Mail. Bitte geben Sie bei der Überweisung die Bestell-Nr. <b>{i.no}</b> an.</p>}
+          <small className="muted">Nach Zahlungseingang geht Ihre Bestellung in den Versand bzw. in die Produktion.</small>
+        </div>;
+      })()}
       {i.payment?.status === 'bezahlt' && <div className="box" style={{ marginTop: 16 }}><p className="ok" style={{ margin: 0, fontWeight: 600 }}>✓ Bezahlt per PayPal am {d(new Date(i.payment.paidAt!))} – {eur(i.payment.amount)}</p></div>}
       {o && t && !(i.direct && paypalEnabled()) && <div className="box" style={{ marginTop: 16 }}>
-        {accepted ? <p className="ok" style={{ margin: 0, fontWeight: 600 }}>✓ Sie haben dieses Angebot angenommen. Vielen Dank – den Fortschritt sehen Sie oben.</p>
+        {accepted ? <p className="ok" style={{ margin: 0, fontWeight: 600 }}>{i.direct ? '✓ Ihre Bestellung ist verbindlich eingegangen. Vielen Dank – den Fortschritt sehen Sie oben.' : '✓ Sie haben dieses Angebot angenommen. Vielen Dank – den Fortschritt sehen Sie oben.'}</p>
           : expired ? <p className="err" style={{ margin: 0 }}>Dieses Angebot ist abgelaufen. Antworten Sie gern auf unsere E-Mail – wir erstellen Ihnen ein neues.</p>
           : <AcceptForm token={params.token} defaultName={i.customer.name} total={eur(t.gross)} hasPreview={i.lines.some((l) => l.deco?.previews?.length)} addr={{ company: i.customer.company ?? '', street: i.customer.street ?? '', city: i.customer.city ?? '' }} />}
       </div>}

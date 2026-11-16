@@ -2,9 +2,9 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
 import { eur } from '@/lib/format';
 
-/** Anzeige netto oder brutto (inkl. MwSt.) – Auswahl im Cookie, damit die Seite gleich richtig geladen wird */
+/** Anzeige netto oder brutto (inkl. MwSt.) – Standard brutto (Endkundenpreis, PAngV); Auswahl im Cookie, damit die Seite gleich richtig geladen wird */
 type Mode = 'netto' | 'brutto';
-const Ctx = createContext<{ mode: Mode; vat: number; set: (m: Mode) => void }>({ mode: 'netto', vat: 19, set: () => {} });
+const Ctx = createContext<{ mode: Mode; vat: number; set: (m: Mode) => void }>({ mode: 'brutto', vat: 19, set: () => {} });
 
 export function PriceModeProvider({ initial, vat, children }: { initial: Mode; vat: number; children: ReactNode }) {
   const [mode, setMode] = useState<Mode>(initial);

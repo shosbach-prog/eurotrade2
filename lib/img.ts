@@ -6,3 +6,5 @@ export const sized = (src: string | undefined, w: number) => (src && (EXT.test(s
 export const webp = (src: string | undefined, on?: boolean) => (on && src && src.startsWith('/p/') ? src.replace(/\.jpe?g$/i, '.webp') : src && EXT.test(src) ? sized(src, 1000) : src);
 /** Kleine Fassung (480 px) für Kacheln und Vorschaubilder – nur wenn serverseitig geprüft: p.mid */
 export const mid = (src: string | undefined, on?: boolean, w?: boolean) => (on && src && src.startsWith('/p/') ? src.replace(/\.(jpe?g|webp)$/i, '.m.webp') : src && EXT.test(src) ? sized(src, 480) : webp(src, w));
+/** Absolute Bild-URL auf der eigenen Domain (für Google-Feed und strukturierte Daten): externe L-Shop-Bilder laufen über /api/img */
+export const ownImage = (src: string, site: string) => (src.startsWith('/') ? `${site}${src}` : EXT.test(src) ? `${site}/api/img?u=${encodeURIComponent(src)}&w=1000` : src);

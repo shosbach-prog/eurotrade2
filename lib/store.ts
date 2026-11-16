@@ -103,6 +103,8 @@ export type Inquiry = {
   productionMailAt?: string | null;
   /** Direktbestellung aus einem Einzelversand-Shop (Preis steht fest, Angebot automatisch) */
   direct?: boolean;
+  /** Direktbestellung per Vorkasse (Überweisung) – mit dem Klick verbindlich, Zahlung offen bis Geldeingang */
+  payBy?: 'vorkasse';
   /** Online-Zahlung */
   payment?: { method: 'paypal'; status: 'offen' | 'bezahlt'; amount: number; orderId?: string | null; captureId?: string | null; payer?: string | null; paidAt?: string | null } | null;
   reviewRemindedAt?: string | null;

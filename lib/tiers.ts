@@ -20,7 +20,7 @@ export function unitFor(tiers: PriceTier[] | undefined, qty: number, fallback: n
 /** Stückpreis inkl. Größenaufpreis (z. B. 3XL) */
 export function sizeUnit(tiers: PriceTier[] | undefined, qty: number, fallback: number | null, ups?: Record<string, number>, size?: string | null): number | null {
   const u = unitFor(tiers, qty, fallback);
-  return u == null ? null : Math.round((u + ((size && ups?.[size]) || 0)) * 100) / 100;
+  return u == null ? null : Math.round((u + ((size && ups?.[size]) || 0)) * 10000) / 10000; // 4 Stellen: Festpreis-Artikel (brutto hinterlegt) bleiben centgenau
 }
 /** nächste Staffel, die noch nicht erreicht ist */
 export const nextTier = (tiers: PriceTier[] | undefined, qty: number) => (tiers ?? []).find((t) => t.min > qty) ?? null;

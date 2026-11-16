@@ -11,11 +11,12 @@ import { saveMyInquiry } from '@/lib/mine';
 import { fmtDate, leadCheck } from '@/lib/leadtime';
 import { productPath } from '@/lib/format';
 import { usePrice } from '@/components/PriceMode';
+import { orderTotals } from '@/lib/order-total';
 
 const FORM_KEY = 'et-form-v1';
 const FIELDS = ['name', 'company', 'email', 'phone', 'street', 'city'] as const;
 
-export default function CartClient({ share, contact, remind }: { share: string | null; contact?: ReactNode; remind?: boolean }) {
+export default function CartClient({ share, contact, remind, shop }: { share: string | null; contact?: ReactNode; remind?: boolean; /** Direktbestellung im Shop: Versandpauschale brutto, PayPal eingerichtet?, MwSt.-Satz */ shop?: { ship: number; paypal: boolean; vat: number } }) {
   const { lines, setQty, update, remove, clear, decoToAll, addMany } = useCart();
   const pr = usePrice();
   const router = useRouter();
@@ -106,6 +107,18 @@ export default function CartClient({ share, contact, remind }: { share: string |
   const minDate = new Date(Date.now() + 5 * 86400000).toISOString().slice(0, 10);
   const pct = codeInfo?.ok ? [...codeInfo.tiers].reverse().find((t) => net >= t.min)?.pct ?? 0 : 0;
   const nextT = codeInfo?.ok ? codeInfo.tiers.find((t) => t.min > net) : undefined;
+  // Direktbestellung im Shop: unveredelte Ware und fertige Motivartikel zum angezeigten Preis – verbindlich bestellen statt Angebot anfordern
+  const plain = !!shop && !teamSlug && lines.length > 0 && lines.every((l) => !l.sample && !l.deco && l.price != null);
+  const [quote, setQuote] = useState(false);
+  const shopOrder = plain && !quote;
+  const order = direct || shopOrder;
+  const [payBy, setPayBy] = useState<'paypal' | 'vorkasse'>('vorkasse');
+  useEffect(() => { setPayBy(shop?.paypal ? 'paypal' : 'vorkasse'); }, [shop?.paypal]);
+  // Gesamtbetrag – gleicher Rechenweg wie auf dem Server; weicht der Server ab (z. B. Preisänderung), wird der neue Betrag erst angezeigt und neu bestätigt
+  const ot = shopOrder ? orderTotals(lines.map((l) => ({ qty: l.qty, price: unit(l) ?? 0 })), { pct, shipGross: shop!.ship, vat: shop!.vat }) : null;
+  const [dueNew, setDueNew] = useState<number | null>(null);
+  useEffect(() => { setDueNew(null); }, [lines, pct, shopOrder]);
+  const due = ot ? dueNew ?? ot.gross : 0;
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -114,10 +127,10 @@ export default function CartClient({ share, contact, remind }: { share: string |
     try { localStorage.setItem(FORM_KEY, JSON.stringify(Object.fromEntries(FIELDS.map((k) => [k, f[k] ?? ''])))); } catch {}
     const r = await fetch('/api/anfrage', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ customer: f, code: codeInfo?.ok ? code.trim() : '', team: lines.find((l) => l.team)?.team ?? '', ...(direct && ti?.paypal ? { pay: 'paypal' } : {}), lines: lines.map(({ id, color, size, qty, deco, sample }) => ({ id, color, size, qty, deco, sample })) }),
+      body: JSON.stringify({ customer: f, code: codeInfo?.ok ? code.trim() : '', team: lines.find((l) => l.team)?.team ?? '', ...(direct && ti?.paypal ? { pay: 'paypal' } : {}), ...(shopOrder ? { order: true, expect: due, pay: payBy } : {}), lines: lines.map(({ id, color, size, qty, deco, sample }) => ({ id, color, size, qty, deco, sample })) }),
     });
     const d = await r.json().catch(() => ({}));
-    if (r.ok) { if (d.token) saveMyInquiry(d.no, d.token); setNo(d.no ?? ''); clear(); if (d.redirect) { location.href = d.redirect; return; } if (d.token) { router.push(`/angebot/${d.token}?neu=1`); setState('sending'); } else setState('done'); } else { setState('error'); setErr(d.error ?? 'Senden fehlgeschlagen.'); }
+    if (r.ok) { if (d.token) saveMyInquiry(d.no, d.token); setNo(d.no ?? ''); clear(); if (d.redirect) { location.href = d.redirect; return; } if (d.token) { router.push(`/angebot/${d.token}?neu=1`); setState('sending'); } else setState('done'); } else { if (r.status === 409 && typeof d.total === 'number') setDueNew(d.total); setState('error'); setErr(d.error ?? 'Senden fehlgeschlagen.'); }
   }
 
   const shareBanner = incoming && (
@@ -156,7 +169,7 @@ export default function CartClient({ share, contact, remind }: { share: string |
   return (
     <>
       {shareBanner}
-      <div className="cart-head"><h1>Warenkorb & Anfrage</h1><button type="button" className="btn alt sm" onClick={doShare}>🔗 Warenkorb teilen</button></div>
+      <div className="cart-head"><h1>{order ? 'Warenkorb' : 'Warenkorb & Anfrage'}</h1><button type="button" className="btn alt sm" onClick={doShare}>🔗 Warenkorb teilen</button></div>
       {(shareMsg || shareUrl) && <div className="note share-out">{shareMsg}{shareUrl && <input readOnly value={shareUrl} onFocus={(e) => e.target.select()} aria-label="Link zum Warenkorb" />}</div>}
       <div className="cart">
         <div className="box">
@@ -206,17 +219,23 @@ export default function CartClient({ share, contact, remind }: { share: string |
           {codeInfo?.ok && pct === 0 && nextT && <div className="note muted" style={{ marginTop: 6 }}>Code gültig – ab {eur(nextT.min)} Warenwert erhalten Sie {nextT.pct} % Rabatt.</div>}
           {codeInfo?.ok && pct > 0 && nextT && <div className="note muted" style={{ marginTop: 2 }}>Noch {eur(nextT.min - net)} bis {nextT.pct} % Rabatt.</div>}
           {net > 0 && direct && <div className="tot"><span>Warenwert inkl. MwSt.</span><span>{eur(Math.round(goodsGross * (1 - pct / 100) * 100) / 100)}</span></div>}
-          {net > 0 && !direct && <div className="tot big"><span>Summe {pr.label} (Richtwert){anyOpen ? ' *' : ''}</span><span>{eur(lines.reduce((s, l) => s + pr.cq(unit(l) ?? 0, l.qty), 0) * (1 - pct / 100))}</span></div>}
+          {net > 0 && !order && <div className="tot big"><span>Summe {pr.label} (Richtwert){anyOpen ? ' *' : ''}</span><span>{eur(lines.reduce((s, l) => s + pr.cq(unit(l) ?? 0, l.qty), 0) * (1 - pct / 100))}</span></div>}
           {direct ? <>
             <div className="tot"><span>Versand{ti?.freeFrom ? ` (frei ab ${eur(ti.freeFrom)})` : ''}</span><span>{shipGross ? eur(shipGross) : 'kostenlos'}</span></div>
             <div className="tot big"><span>Gesamt inkl. MwSt.</span><span>{eur(Math.round((goodsGross * (1 - pct / 100) + shipGross) * 100) / 100)}</span></div>
             <p className="muted" style={{ fontSize: 13, margin: '6px 0 0' }}>Druck inklusive · Versand direkt an Sie</p>
+          </> : shopOrder && ot ? <>
+            <div className="tot"><span>Warenwert inkl. MwSt.</span><span>{eur(Math.round((due - ot.shipGross) * 100) / 100)}</span></div>
+            <div className="tot"><span>Versand (Deutschland)</span><span>{ot.shipGross ? eur(ot.shipGross) : 'kostenlos'}</span></div>
+            <div className="tot big"><span>Gesamt inkl. MwSt.</span><span>{eur(due)}</span></div>
+            <p className="muted" style={{ fontSize: 13, margin: '6px 0 0' }}>Enthaltene MwSt. {shop!.vat} %: {eur(Math.round((due - due / (1 + shop!.vat / 100)) * 100) / 100)} · Lieferung innerhalb Deutschlands</p>
           </> : <p className="muted" style={{ fontSize: 13, margin: '6px 0 0' }}>Endpreis inkl. Versand und ggf. Veredelung erhalten Sie mit dem Angebot.</p>}
         </div>
 
         <form className="box form" onSubmit={submit}>
-          <strong style={{ fontSize: 17 }}>{direct ? 'Bestellen' : 'Unverbindliches Angebot anfordern'}</strong>
-          <p className="muted" style={{ margin: '2px 0 0', fontSize: 13.5 }}>{direct ? `Versand direkt an Ihre Adresse${ti?.paypal ? ' · Bezahlung per PayPal' : ''}.` : 'Nur Name und E-Mail nötig – alles Weitere klären wir mit dem Angebot.'}</p>
+          <strong style={{ fontSize: 17 }}>{order ? 'Bestellen' : 'Unverbindliches Angebot anfordern'}</strong>
+          <p className="muted" style={{ margin: '2px 0 0', fontSize: 13.5 }}>{direct ? `Versand direkt an Ihre Adresse${ti?.paypal ? ' · Bezahlung per PayPal' : ''}.` : shopOrder ? `Versand an Ihre Adresse in Deutschland · Zahlung per ${shop!.paypal ? 'PayPal oder ' : ''}Vorkasse (Überweisung).` : 'Nur Name und E-Mail nötig – alles Weitere klären wir mit dem Angebot.'}</p>
+          {plain && <button type="button" className="linkbtn" style={{ justifySelf: 'start', textAlign: 'left' }} onClick={() => setQuote(!quote)}>{quote ? '← Doch direkt zum angezeigten Preis bestellen' : 'Größere Menge oder mit Druck/Stick? Lieber ein unverbindliches Angebot anfordern'}</button>}
           <div className="two">
             <div><label htmlFor="f-name">Name *</label><input id="f-name" name="name" required defaultValue={form.name} key={`n${form.name}`} autoComplete="name" /></div>
             <div><label htmlFor="f-email">E-Mail *</label><input id="f-email" name="email" type="email" required defaultValue={form.email} key={`e${form.email}`} autoComplete="email" onBlur={() => saveKeep()} /></div>
@@ -224,20 +243,20 @@ export default function CartClient({ share, contact, remind }: { share: string |
           {remind && <label className="ds-check keep"><input type="checkbox" checked={keep} onChange={(e) => setKeep(e.target.checked)} /> <span>Warenkorb merken und mich einmalig per E-Mail erinnern, falls ich heute nicht absende <span className="muted">(jederzeit abbestellbar)</span></span></label>}
           <label htmlFor="f-msg">Nachricht <span className="muted" style={{ fontWeight: 400 }}>(optional)</span></label>
           <textarea id="f-msg" name="message" placeholder="Fragen, Namen/Nummern, Wünsche …" />
-          {!direct && <button type="button" className="linkbtn more-toggle" aria-expanded={more} onClick={() => setMore(!more)}>{more ? '− Weniger Angaben' : '+ Firma, Telefon, Adresse, Wunschtermin (optional)'}</button>}
-          <div hidden={!more && !direct}>
+          {!order && <button type="button" className="linkbtn more-toggle" aria-expanded={more} onClick={() => setMore(!more)}>{more ? '− Weniger Angaben' : '+ Firma, Telefon, Adresse, Wunschtermin (optional)'}</button>}
+          <div hidden={!more && !order}>
           <div className="two">
             <div><label htmlFor="f-company">Firma / Verein</label><input id="f-company" name="company" defaultValue={form.company} key={`c${form.company}`} autoComplete="organization" /></div>
             <div><label htmlFor="f-phone">Telefon</label><input id="f-phone" name="phone" type="tel" defaultValue={form.phone} key={`p${form.phone}`} autoComplete="tel" /></div>
           </div>
-          <label htmlFor="f-street">Straße und Nr.{direct ? ' *' : ''} <span className="muted" style={{ fontWeight: 400 }}>(für Lieferung und Rechnung)</span></label>
-          <input id="f-street" name="street" required={direct} defaultValue={form.street} key={`s${form.street}`} autoComplete="street-address" />
+          <label htmlFor="f-street">Straße und Nr.{order ? ' *' : ''} <span className="muted" style={{ fontWeight: 400 }}>(für Lieferung und Rechnung)</span></label>
+          <input id="f-street" name="street" required={order} defaultValue={form.street} key={`s${form.street}`} autoComplete="street-address" />
           <div className="two">
-            <div><label htmlFor="f-city">PLZ / Ort{direct ? ' *' : ''}</label><input id="f-city" name="city" required={direct} defaultValue={form.city} key={`o${form.city}`} autoComplete="address-level2" /></div>
-            {!direct && <div><label htmlFor="f-date">Wunschliefertermin</label><input id="f-date" name="date" type="date" min={minDate} value={wish} onChange={(e) => setWish(e.target.value)} /></div>}
+            <div><label htmlFor="f-city">PLZ / Ort{order ? ' *' : ''}</label><input id="f-city" name="city" required={order} defaultValue={form.city} key={`o${form.city}`} autoComplete="address-level2" /></div>
+            {!order && <div><label htmlFor="f-date">Wunschliefertermin</label><input id="f-date" name="date" type="date" min={minDate} value={wish} onChange={(e) => setWish(e.target.value)} /></div>}
           </div>
           </div>
-          {!direct && (() => {
+          {!order && (() => {
             const hasDeco = lines.some((l) => l.deco);
             const c = leadCheck(wish ? new Date(wish + 'T12:00:00') : null, hasDeco);
             return <div className={`lead lead-${c.state}`}>
@@ -249,8 +268,15 @@ export default function CartClient({ share, contact, remind }: { share: string |
           })()}
           <input className="hp" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
           {direct && <p className="muted" style={{ fontSize: 12.5, margin: 0 }}>Mit der Bestellung gelten unsere <Link href="/agb" style={{ textDecoration: 'underline' }}>AGB</Link>. Hinweis: Individuell bedruckte Ware ist vom <Link href="/widerruf" style={{ textDecoration: 'underline' }}>Widerruf</Link> ausgeschlossen.</p>}
-          <button className={`btn ${direct && ti?.paypal ? 'paypal' : ''}`} disabled={state === 'sending'}>{state === 'sending' ? 'Wird gesendet …' : direct ? (ti?.paypal ? 'Zahlungspflichtig bestellen – weiter zu PayPal' : 'Zahlungspflichtig bestellen') : 'Anfrage senden – kostenlos & unverbindlich'}</button>
-          <p className="muted" style={{ fontSize: 12.5, margin: 0 }}>Wir verwenden Ihre Angaben nur zur Bearbeitung der Anfrage – siehe <Link href="/datenschutz" style={{ textDecoration: 'underline' }}>Datenschutz</Link>.</p>
+          {shopOrder && shop!.paypal && <fieldset style={{ border: 0, padding: 0, margin: 0, display: 'grid', gap: 6 }}>
+            <legend style={{ fontWeight: 600, padding: 0, marginBottom: 4 }}>Zahlungsart</legend>
+            <label className="ds-check"><input type="radio" name="payBy" checked={payBy === 'paypal'} onChange={() => setPayBy('paypal')} /> <span>PayPal <span className="muted">(PayPal-Konto, Lastschrift oder Karte)</span></span></label>
+            <label className="ds-check"><input type="radio" name="payBy" checked={payBy === 'vorkasse'} onChange={() => setPayBy('vorkasse')} /> <span>Vorkasse <span className="muted">(Überweisung – Bankdaten in der Bestellbestätigung)</span></span></label>
+          </fieldset>}
+          {shopOrder && <p className="muted" style={{ fontSize: 12.5, margin: 0 }}>Es gelten unsere <Link href="/agb" style={{ textDecoration: 'underline' }}>AGB</Link>. Verbraucher können die Bestellung 14 Tage lang widerrufen – siehe <Link href="/widerruf" style={{ textDecoration: 'underline' }}>Widerrufsbelehrung</Link>.</p>}
+          {shopOrder && <p style={{ margin: 0, fontWeight: 700 }}>Gesamtbetrag: {eur(due)} <span className="muted" style={{ fontWeight: 400, fontSize: 13 }}>inkl. MwSt. und Versand</span></p>}
+          <button className={`btn ${(direct && ti?.paypal) || (shopOrder && payBy === 'paypal') ? 'paypal' : ''}`} disabled={state === 'sending'}>{state === 'sending' ? 'Wird gesendet …' : direct ? (ti?.paypal ? 'Zahlungspflichtig bestellen – weiter zu PayPal' : 'Zahlungspflichtig bestellen') : shopOrder ? (payBy === 'paypal' ? 'Zahlungspflichtig bestellen – weiter zu PayPal' : 'Zahlungspflichtig bestellen') : 'Anfrage senden – kostenlos & unverbindlich'}</button>
+          <p className="muted" style={{ fontSize: 12.5, margin: 0 }}>Wir verwenden Ihre Angaben nur zur Bearbeitung der {order ? 'Bestellung' : 'Anfrage'} – siehe <Link href="/datenschutz" style={{ textDecoration: 'underline' }}>Datenschutz</Link>.</p>
           {state === 'error' && <div className="note err" role="alert">{err}</div>}
           {contact}
         </form>

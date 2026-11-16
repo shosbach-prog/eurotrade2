@@ -114,7 +114,8 @@ export function toPublic(p: Product, ctx?: Ctx): PublicProduct {
   const { basePrice, baseTiers, sizeExtra, hidden: _h, custom: _c, ...rest } = p;
   // Fester Endkundenpreis (z. B. Satire-Kollektion inkl. Druck): brutto genau wie hinterlegt, keine Staffel
   if (p.fixedGross && p.fixedGross > 0 && !ctx?.locked) {
-    const net = Math.round((p.fixedGross / (1 + VAT / 100)) * 100) / 100;
+    // Netto mit 4 Nachkommastellen, damit netto × MwSt. wieder exakt den hinterlegten Bruttopreis ergibt (24,90 € statt 24,89 €)
+    const net = Math.round((p.fixedGross / (1 + VAT / 100)) * 10000) / 10000;
     return { ...rest, colors: sortColors(p.colors), price: net, priceGross: p.fixedGross, tiers: [], rating: ratingFor(p.id), props: pictosFor(p).props, ...(hasWebp(p) ? { webp: true } : {}), ...(hasMid(p) ? { mid: true } : {}) };
   }
   const price = !ctx?.locked && basePrice != null && basePrice > 0 ? sellPrice(basePrice, p.categorySlug, ctx?.markup) : null;
