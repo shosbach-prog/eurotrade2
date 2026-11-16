@@ -4,7 +4,8 @@ import { notFound } from 'next/navigation';
 import { GUIDES, getGuide } from '@/lib/ratgeber';
 import JsonLd, { crumbSchema, faqSchema } from '@/components/JsonLd';
 
-export const generateStaticParams = () => GUIDES.map((g) => ({ slug: g.slug }));
+// dynamisch rendern: die Content-Security-Policy braucht je Aufruf eine frische Nonce an den Skripten (vorgerenderte Seiten hätten keine)
+export const dynamic = 'force-dynamic';
 export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
   const g = getGuide(params.slug);
   return g ? { title: g.title, description: g.description, alternates: { canonical: `/ratgeber/${g.slug}` }, openGraph: { type: 'article', title: g.title, description: g.description } } : {};
