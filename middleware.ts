@@ -6,12 +6,41 @@ import { ACCESS_COOKIE, ADMIN_COOKIE, isAdminToken, previewMode, shopClosed, ver
 const PUBLIC = ['/feed', '/seitenuebersicht', '/api/img', '/api/druck', '/api/v1', '/llms.txt', '/.well-known', '/api/md', '/api/paypal', '/api/team-info', '/fuer', '/aktion', '/produktsicherheit', '/api/preisanfrage', '/ueber-uns', '/og.png', '/garantie', '/p', '/picto', '/bewerten', '/api/bewerten', '/widerruf', '/versand', '/newsletter', '/api/newsletter', '/start', '/druck-stick', '/api/zugang-anfrage', '/api/bild', '/api/warenkorb-erinnerung', '/sitemap.xml', '/zugang', '/api/zugang', '/api/login', '/passwort', '/api/passwort', '/registrieren', '/api/registrieren', '/kontakt', '/agb', '/ratgeber', '/api/cron', '/impressum', '/datenschutz', '/angebot', '/api/angebot', '/admin/login', '/api/admin/login', '/icon.svg', '/brands', '/marken', '/team', '/api/angebot', '/rechnung', '/api/rechnung', '/favicon.ico', '/robots.txt'];
 // Agenten-Erkennung (RFC 8288): Verweise auf Übersicht, API-Katalog, Skills und Sitemap
 const LINK = ['</llms.txt>; rel="describedby"; type="text/markdown"', '</.well-known/api-catalog>; rel="api-catalog"', '</.well-known/agent-skills/index.json>; rel="https://agentskills.io/rel/index"', '</.well-known/ai-catalog.json>; rel="describedby"; type="application/json"', '</sitemap.xml>; rel="sitemap"'].join(', ');
+
+/** Content-Security-Policy mit Nonce je Seitenaufruf: nur eigene, von Next mit dieser Nonce versehene Skripte laufen
+ *  (plus was diese nachladen – 'strict-dynamic', z. B. Google Tag/Meta-Pixel nach Einwilligung). Eingeschleuste Skripte laufen nicht. */
+function csp(nonce: string) {
+  const dev = process.env.NODE_ENV !== 'production';
+  return [
+    "default-src 'self'",
+    // 'unsafe-inline' und https: gelten nur für alte Browser ohne 'strict-dynamic' – moderne ignorieren sie, sobald eine Nonce da ist
+    `script-src 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline' https:${dev ? " 'unsafe-eval'" : ''}`,
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob: https:",
+    "font-src 'self' data:",
+    `connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.google.com https://*.doubleclick.net https://www.facebook.com https://connect.facebook.net${dev ? ' ws:' : ''}`,
+    "frame-src 'self' https://www.googletagmanager.com https://td.doubleclick.net https://www.facebook.com",
+    "media-src 'self' blob:",
+    "worker-src 'self' blob:",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'self'",
+    ...(dev ? [] : ['upgrade-insecure-requests']),
+  ].join('; ');
+}
+/** Nur HTML-Seiten bekommen die Richtlinie – keine API-Antworten, Dateien oder PDFs */
+const isPage = (p: string) => !p.startsWith('/api/') && !p.startsWith('/_next/') && !/\.[a-z0-9]{2,5}$/i.test(p);
 const match = (path: string, list: string[]) => list.some((p) => path === p || path.startsWith(p + '/'));
 
 export async function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
   const headers = new Headers(req.headers);
   headers.set('x-path', pathname);
+  // Nonce an Next weiterreichen (liest sie aus dem Request-Header und setzt sie an die eigenen Skripte)
+  const policy = isPage(pathname) && process.env.CSP !== 'off' ? csp(btoa(crypto.randomUUID())) : null;
+  if (policy) headers.set('Content-Security-Policy', policy);
+  const secure = <T extends NextResponse>(r: T) => { if (policy) r.headers.set(process.env.CSP === 'report' ? 'Content-Security-Policy-Report-Only' : 'Content-Security-Policy', policy); return r; };
   // ?preis=brutto|netto → Preisanzeige sofort umstellen (z. B. Links aus dem Google-Feed)
   const pm = req.nextUrl.searchParams.get('preis');
   const priceMode = pm === 'brutto' || pm === 'netto' ? pm : null;
@@ -20,7 +49,7 @@ export async function middleware(req: NextRequest) {
     const r = NextResponse.next({ request: { headers } });
     if (priceMode) r.cookies.set('et_price', priceMode, { path: '/', maxAge: 31536000, sameSite: 'lax' });
     if (!pathname.startsWith('/api/') && !pathname.startsWith('/_next/') && !pathname.startsWith('/admin')) { r.headers.set('Link', LINK); r.headers.set('Vary', 'Accept'); }
-    return r;
+    return secure(r);
   };
   // Markdown für Agenten: Accept: text/markdown → Markdown-Fassung von Startseite, Kategorie oder Artikel
   if (!shopClosed() && /text\/markdown/i.test(req.headers.get('accept') ?? '') && (pathname === '/' || isCategoryUrl(pathname) || isProductUrl(pathname))) {
@@ -64,7 +93,7 @@ export async function middleware(req: NextRequest) {
   if (pathname === '/') {
     headers.set('x-path', '/start');
     const url = req.nextUrl.clone(); url.pathname = '/start';
-    return NextResponse.rewrite(url, { request: { headers } });
+    return secure(NextResponse.rewrite(url, { request: { headers } }));
   }
   return deny('/zugang');
 }

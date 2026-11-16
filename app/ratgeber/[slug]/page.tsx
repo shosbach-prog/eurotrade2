@@ -4,7 +4,8 @@ import { notFound } from 'next/navigation';
 import { GUIDES, getGuide } from '@/lib/ratgeber';
 import JsonLd, { crumbSchema, faqSchema } from '@/components/JsonLd';
 
-export const generateStaticParams = () => GUIDES.map((g) => ({ slug: g.slug }));
+// dynamisch rendern: die Content-Security-Policy braucht je Aufruf eine frische Nonce an den Skripten (vorgerenderte Seiten hätten keine)
+export const dynamic = 'force-dynamic';
 export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const params = await props.params;
   const g = getGuide(params.slug);
