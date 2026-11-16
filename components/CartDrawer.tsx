@@ -29,7 +29,7 @@ export default function CartDrawer() {
   return (
     <div className={`drawer-wrap ${drawer ? 'open' : ''}`} aria-hidden={!drawer}>
       <div className="drawer-bg" onClick={closeDrawer} />
-      <aside className="drawer" role="dialog" aria-label="Warenkorb">
+      <div className="drawer" role="dialog" aria-label="Warenkorb">
         <div className="drawer-head">
           <strong>{added.length ? '✓ Zum Warenkorb hinzugefügt' : 'Warenkorb'}</strong>
           <button className="x" onClick={closeDrawer} aria-label="Schließen">×</button>
@@ -58,7 +58,7 @@ export default function CartDrawer() {
             <button className="btn alt" onClick={closeDrawer}>Weiter einkaufen</button>
           </div>
         )}
-      </aside>
+      </div>
     </div>
   );
 }
