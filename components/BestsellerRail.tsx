@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import type { PublicProduct } from '@/lib/types';
 import { productPath } from '@/lib/format';
-import { mid } from '@/lib/img';
+import { mid, srcSet } from '@/lib/img';
 import { Money } from './PriceMode';
 import Stars from './Stars';
 import { WishButton } from './Wishlist';
@@ -37,8 +37,8 @@ export default function BestsellerRail({ items, title = 'Bestseller.', sub = 'Di
             return (
               <Link key={p.id} href={productPath(p)} className="bs-tile" draggable={false}>
                 <span className="bs-img">
-                  {img && <img src={img} alt={p.name} loading="lazy" decoding="async" draggable={false} />}
-                  {img2 && <img className="bs-img2" src={img2} alt="" loading="lazy" decoding="async" draggable={false} aria-hidden />}
+                  {img && <img src={img} srcSet={srcSet(p.images[0], [360, 480, 720])} sizes="(max-width: 700px) 76vw, 22vw" width={480} height={480} alt={p.name} loading="lazy" decoding="async" draggable={false} />}
+                  {img2 && <img className="bs-img2" src={img2} srcSet={srcSet(p.images[1], [360, 480, 720])} sizes="(max-width: 700px) 76vw, 22vw" width={480} height={480} alt="" loading="lazy" decoding="async" draggable={false} aria-hidden />}
                   <span className="bs-wish" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}><WishButton id={p.id} /></span>
                   <KondSticker id={p.id} />
                   {p.eol?.all && <span className="bs-badge">Auslaufartikel</span>}

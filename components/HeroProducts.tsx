@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePrice } from './PriceMode';
-import { sized } from '@/lib/img';
+import { sized, srcSet } from '@/lib/img';
 
 export type HeroItem = { id: string; name: string; brand: string; image: string; colors: string[]; colorCount: number; label: string; href: string; price?: number | null };
 
@@ -21,12 +21,12 @@ export default function HeroProducts({ items, interval = 4500 }: { items: HeroIt
   const at = (d: number) => items[(i + d + n) % n];
   const p = items[i];
   return (
-    <div className="hs" onMouseEnter={() => setPause(true)} onMouseLeave={() => setPause(false)} aria-roledescription="Karussell" aria-label="Produkte">
+    <div className="hs" onMouseEnter={() => setPause(true)} onMouseLeave={() => setPause(false)} role="region" aria-roledescription="Karussell" aria-label="Produkte">
       <div className="hs-stage">
-        {n > 2 && <img className="hs-side hs-l" src={sized(at(-1).image, 480)} alt="" aria-hidden loading="lazy" decoding="async" />}
-        {n > 1 && <img className="hs-side hs-r" src={sized(at(1).image, 480)} alt="" aria-hidden loading="lazy" decoding="async" />}
+        {n > 2 && <img className="hs-side hs-l" src={sized(at(-1).image, 240)} srcSet={srcSet(at(-1).image, [240, 360, 480])} sizes="(max-width: 700px) 24vw, 180px" width={240} height={240} alt="" aria-hidden loading="lazy" decoding="async" />}
+        {n > 1 && <img className="hs-side hs-r" src={sized(at(1).image, 240)} srcSet={srcSet(at(1).image, [240, 360, 480])} sizes="(max-width: 700px) 24vw, 180px" width={240} height={240} alt="" aria-hidden loading="lazy" decoding="async" />}
         <Link href={p.href} className="hs-main" aria-live="polite">
-          {items.map((x, k) => <img key={x.id} src={sized(x.image, 720)} alt={k === i ? x.name : ''} className={k === i ? 'on' : ''} decoding="async" {...(k === 0 ? { loading: 'eager' as const, fetchPriority: 'high' as const } : { loading: 'lazy' as const })} />)}
+          {items.map((x, k) => <img key={x.id} src={sized(x.image, 480)} srcSet={srcSet(x.image, [240, 360, 480, 720])} sizes="(max-width: 700px) 42vw, 360px" width={480} height={480} alt={k === i ? x.name : ''} className={k === i ? 'on' : ''} decoding="async" {...(k === 0 ? { loading: 'eager' as const, fetchPriority: 'high' as const } : { loading: 'lazy' as const })} />)}
           <span className="hs-badge">{i + 1} / {n}</span>
         </Link>
         {n > 1 && <>

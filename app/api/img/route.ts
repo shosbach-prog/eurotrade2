@@ -7,7 +7,9 @@ export const dynamic = 'force-dynamic';
 
 /** Verkleinerte WebP-Fassung von Artikelbildern (L-Shop-Bilder und lokale /p/-Bilder), auf der Platte zwischengespeichert.
  *  Nur feste Breiten und nur erlaubte Quellen – kein offener Proxy. */
-const WIDTHS = [240, 480, 720, 1000];
+const WIDTHS = [240, 360, 480, 720, 1000];
+// Qualität steckt im Cache-Dateinamen – eine Änderung erzeugt neue Dateien statt alte weiterzuverwenden
+const Q = 72;
 const HOSTS = ['shop.l-shop-team.de'];
 const DIR = path.join(DATA, 'imgcache');
 const PUB = path.join(process.cwd(), 'public');
@@ -32,7 +34,7 @@ async function make(u: string, w: number, file: string): Promise<Buffer | null> 
   if (!src) return null;
   try {
     const sharp = (await import('sharp')).default;
-    const out = await sharp(src).rotate().resize({ width: w, withoutEnlargement: true }).webp({ quality: 78, effort: 4 }).toBuffer();
+    const out = await sharp(src).rotate().resize({ width: w, withoutEnlargement: true }).webp({ quality: Q, effort: 5 }).toBuffer();
     fs.mkdirSync(DIR, { recursive: true });
     fs.writeFileSync(file, out);
     return out;
@@ -45,7 +47,7 @@ export async function GET(req: Request) {
   const w = WIDTHS.find((x) => x >= Number(q.get('w') || 480)) ?? 1000;
   if (!u || u.length > 500 || u.includes('..') || !(/^\/(p|brands)\//.test(u) || HOSTS.some((h) => u.startsWith(`https://${h}/`)))) return new Response('Nicht gefunden', { status: 404 });
   const key = crypto.createHash('sha1').update(u).digest('hex');
-  const file = path.join(DIR, `${key}-${w}.webp`);
+  const file = path.join(DIR, `${key}-${w}-q${Q}.webp`);
   let data: Buffer | null = fs.existsSync(file) ? fs.readFileSync(file) : null;
   if (!data) {
     const k = `${key}-${w}`;
