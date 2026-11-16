@@ -15,7 +15,7 @@ export function pickData(): { items: PickItem[]; groups: PickGroup[] } {
     for (const z of ZIELGRUPPEN) if (z.cats.includes(p.categorySlug)) tags.push(`fuer:${z.slug}`);
     if (p.eol) tags.push('eol');
     if (p.sale) tags.push('sale');
-    return { id: p.id, sku: p.sku, name: p.name, brand: p.brand, category: p.category, categorySlug: p.categorySlug, gender: p.gender ?? 'Unisex', image: p.images[0] ?? p.colors.find((c) => c.image)?.image ?? null, colors: p.colors.length, tags };
+    return { id: p.id, sku: p.sku, name: p.name, model: p.model, brand: p.brand, category: p.category, categorySlug: p.categorySlug, gender: p.gender ?? 'Unisex', image: p.images[0] ?? p.colors.find((c) => c.image)?.image ?? null, colors: p.colors.length, tags };
   });
   const count = (t: string) => items.filter((i) => i.tags?.includes(t)).length;
   const subs = Object.entries(SUBTYPES).flatMap(([cat, list]) => list.map((s) => ({ key: `sub:${s.key}`, label: s.title ?? s.label, cat, count: count(`sub:${s.key}`) }))).filter((x) => x.count > 0);

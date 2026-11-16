@@ -1,9 +1,10 @@
 'use client';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
+import { matches, searchKey } from '@/lib/admin-search';
 
 export type Row = {
-  id: string; name: string; sku: string; brand: string; category: string; ek: number | null; vk: number | null;
+  id: string; name: string; sku: string; model?: string; brand: string; category: string; ek: number | null; vk: number | null;
   hidden: boolean; top: boolean; changed: boolean; custom: boolean; text: 'eigen' | 'vorlage' | 'automatisch';
   img: string | null; colors: number; placeholder: boolean; eol?: string | null; sale?: number | null;
 };
@@ -31,8 +32,8 @@ export default function ArticleList({ rows: init, categories }: { rows: Row[]; c
     return s === 'alle' || (s === 'sichtbar' && !r.hidden) || (s === 'aus' && r.hidden) || (s === 'ohne-preis' && r.ek == null) || (s === 'platzhalter' && r.placeholder) || (s === 'geaendert' && (r.changed || r.custom)) || (s === 'auslauf' && !!r.eol) || (s === 'angebot' && r.sale != null);
   }
   const filtered = useMemo(() => {
-    const t = q.trim().toLowerCase();
-    let f = rows.filter((r) => match(r, status) && (!cat || r.category === cat) && (!brand || r.brand === brand) && (!t || `${r.name} ${r.sku} ${r.brand}`.toLowerCase().includes(t)));
+    const t = q.trim();
+    let f = rows.filter((r) => match(r, status) && (!cat || r.category === cat) && (!brand || r.brand === brand) && (!t || matches(searchKey([r.sku, r.name, r.model, r.brand]), t)));
     if (sort === 'name') f = [...f].sort((a, b) => a.name.localeCompare(b.name, 'de'));
     if (sort === 'kategorie') f = [...f].sort((a, b) => a.category.localeCompare(b.category, 'de') || a.name.localeCompare(b.name, 'de'));
     if (sort === 'preis') f = [...f].sort((a, b) => (a.ek ?? 1e9) - (b.ek ?? 1e9));
