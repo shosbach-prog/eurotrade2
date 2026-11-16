@@ -1,7 +1,8 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
+import { matches, searchKey } from '@/lib/admin-search';
 
-export type PickItem = { id: string; sku: string; name: string; brand: string; category: string; categorySlug?: string; gender?: string; image?: string | null; colors?: number; tags?: string[] };
+export type PickItem = { id: string; sku: string; name: string; /** Herstellerbezeichnung, z. B. „T-Shirt #E150“ */ model?: string; brand: string; category: string; categorySlug?: string; gender?: string; image?: string | null; colors?: number; tags?: string[] };
 /** Zusätzliche Filter wie im Mega-Menü; title „_sub“ = Unterkategorien (erscheinen bei der gewählten Kategorie) */
 export type PickGroup = { title: string; entries: { key: string; label: string; count: number; cat?: string }[] };
 
@@ -39,10 +40,10 @@ export default function ArticlePicker({ items, groups = [], value, onChange, tit
   const pickTag = (t: string) => { setTag(t); setTcat(''); setCat(''); setSub(''); setBrand(''); setG(''); setOnlySel(false); };
   const brands = useMemo(() => { const m = new Map<string, number>(); inCat.forEach((p) => m.set(p.brand, (m.get(p.brand) ?? 0) + 1)); return [...m.entries()].sort((a, b) => a[0].localeCompare(b[0], 'de')); }, [inCat]);
   const gens = ['Damen', 'Herren', 'Kinder', 'Unisex'].filter((x) => inCat.some((p) => (p.gender ?? 'Unisex') === x));
-  const words = q.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const keys = useMemo(() => new Map(items.map((p) => [p.id, searchKey([p.sku, p.name, p.model, p.brand])])), [items]);
   const list = useMemo(() => (onlySel ? value.map((id) => byId.get(id)!).filter(Boolean) : inCat.filter((p) =>
     (!g || (p.gender ?? 'Unisex') === g) && (!brand || p.brand === brand) && (!sub || p.tags?.includes(sub)) && (!tcat || p.category === tcat) &&
-    words.every((w) => `${p.sku} ${p.name} ${p.brand}`.toLowerCase().includes(w)))), [onlySel, value, byId, inCat, g, brand, sub, tcat, words.join(' ')]); // eslint-disable-line react-hooks/exhaustive-deps
+    (!q.trim() || matches(keys.get(p.id)!, q)))), [onlySel, value, byId, inCat, g, brand, sub, tcat, q, keys]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggle = (id: string) => onChange(sel.has(id) ? value.filter((x) => x !== id) : [...value, id]);
   const allOn = list.length > 0 && list.every((p) => sel.has(p.id));

@@ -21,7 +21,7 @@ export default function Artikel() {
   const ov = readOverrides();
   const all = adminProducts();
   const rows: Row[] = all.map((p) => ({
-    id: p.id, name: p.name, sku: p.sku, brand: p.brand, category: p.category,
+    id: p.id, name: p.name, sku: p.sku, model: p.model, brand: p.brand, category: p.category,
     ek: p.basePrice ?? null, vk: p.basePrice ? sellPrice(p.basePrice, p.categorySlug) : null,
     hidden: !!p.hidden, top: !!p.top, changed: !!ov[p.id] && !p.custom, custom: !!p.custom,
     text: getText(p).source, img: p.images[0]?.replace(/^\/api\/bild\//, '/api/upload/') ?? null,
