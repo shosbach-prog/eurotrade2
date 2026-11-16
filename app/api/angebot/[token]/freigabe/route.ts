@@ -4,7 +4,8 @@ import { button, h1, infoBox, layout, quote } from '@/lib/mail-templates';
 import { addHistory, inquiryByToken, saveInquiry } from '@/lib/store';
 
 /** Kunde gibt den Korrekturabzug frei oder wünscht eine Änderung */
-export async function POST(req: Request, { params }: { params: { token: string } }) {
+export async function POST(req: Request, props: { params: Promise<{ token: string }> }) {
+  const params = await props.params;
   const i = inquiryByToken(params.token);
   if (!i?.proof?.sentAt) return NextResponse.json({ error: 'Keine Vorschau zur Freigabe.' }, { status: 404 });
   const { action, name, text } = await req.json().catch(() => ({}));

@@ -5,7 +5,8 @@ import { UPLOADS, inquiryByToken, readJSON } from '@/lib/store';
 const TYPES: Record<string, string> = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', pdf: 'application/pdf' };
 
 /** Vorschau- und Freigabebilder zu einem Angebot – nur über den geheimen Angebotslink abrufbar */
-export function GET(_req: Request, { params }: { params: { token: string; id: string } }) {
+export async function GET(_req: Request, props: { params: Promise<{ token: string; id: string }> }) {
+  const params = await props.params;
   const i = inquiryByToken(params.token);
   const ok = i && /^[a-f0-9]{24}$/.test(params.id) && (i.lines.some((l) => l.deco?.previews?.includes(params.id)) || i.proof?.ids.some((x) => x.id === params.id));
   if (!ok) return new Response('Nicht gefunden', { status: 404 });

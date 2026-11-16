@@ -4,15 +4,18 @@ import { RESERVED_TOP } from '@/lib/format';
 import { kollektionByAlias, kollektionBySlug } from '@/lib/kollektionen';
 import CollectionView, { collectionMeta } from '../kollektion/view';
 
-type Props = { params: { cat: string }; searchParams?: Record<string, string> };
+type Props = { params: Promise<{ cat: string }>; searchParams?: Promise<Record<string, string>> };
 
 /** Kategorie-, Unterkategorie- und Zielgruppen-Seiten direkt unter /<slug> */
-export async function generateMetadata({ params }: Props) {
+export async function generateMetadata(props: Props) {
+  const params = await props.params;
   if (RESERVED_TOP.includes(params.cat)) return {};
   if (kollektionBySlug(params.cat)) return collectionMeta(params.cat);
   return meta({ params: { slug: params.cat } });
 }
-export default function Kategorie({ params, searchParams }: Props) {
+export default async function Kategorie(props: Props) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   if (RESERVED_TOP.includes(params.cat) || !/^[a-z0-9-]+$/.test(params.cat)) notFound();
   const alt = kollektionByAlias(params.cat);
   if (alt) permanentRedirect(`/${alt.slug}`);

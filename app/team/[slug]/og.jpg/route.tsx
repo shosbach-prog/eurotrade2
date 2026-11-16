@@ -24,7 +24,8 @@ function dataUri(file: string) {
 const upload = (id: string) => { const m = readJSON<{ ext: string } | null>(path.join(UPLOADS, `${id}.json`), null); return m ? dataUri(path.join(UPLOADS, `${id}.${m.ext}`)) : null; };
 const publicImg = (src?: string) => (src && src.startsWith('/') ? dataUri(path.join(process.cwd(), 'public', src)) : null);
 
-export async function GET(_req: Request, { params }: { params: { slug: string } }) {
+export async function GET(_req: Request, props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   const t = getTeamShop(params.slug);
   if (!t) return new Response('Nicht gefunden', { status: 404 });
   const motifs = rankedMotifs(t);

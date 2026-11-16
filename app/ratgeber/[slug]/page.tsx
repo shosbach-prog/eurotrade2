@@ -5,12 +5,14 @@ import { GUIDES, getGuide } from '@/lib/ratgeber';
 import JsonLd, { crumbSchema, faqSchema } from '@/components/JsonLd';
 
 export const generateStaticParams = () => GUIDES.map((g) => ({ slug: g.slug }));
-export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
+export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const params = await props.params;
   const g = getGuide(params.slug);
   return g ? { title: g.title, description: g.description, alternates: { canonical: `/ratgeber/${g.slug}` }, openGraph: { type: 'article', title: g.title, description: g.description } } : {};
 }
 
-export default function Guide({ params }: { params: { slug: string } }) {
+export default async function Guide(props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   const g = getGuide(params.slug);
   if (!g) notFound();
   const base = (process.env.SHOP_URL ?? 'https://euro-trade.com').replace(/\/$/, '');

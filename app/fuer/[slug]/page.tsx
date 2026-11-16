@@ -9,12 +9,14 @@ import { categoryTiles, getCategories } from '@/lib/catalog';
 import { previewMode } from '@/lib/access';
 
 export const dynamic = 'force-dynamic';
-export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
+export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const params = await props.params;
   const z = zielgruppe(params.slug);
   return z ? { title: z.title, description: z.desc, alternates: { canonical: `/fuer/${z.slug}` } } : {};
 }
 
-export default function Branche({ params }: { params: { slug: string } }) {
+export default async function Branche(props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   const z = zielgruppe(params.slug);
   if (!z) notFound();
   const tiles = categoryTiles(undefined, z.cats).sort((a, b) => z.cats.indexOf(a.slug) - z.cats.indexOf(b.slug));

@@ -4,7 +4,8 @@ import { unsubscribe } from '@/lib/newsletter';
 export const metadata: Metadata = { title: 'Abgemeldet', robots: { index: false } };
 export const dynamic = 'force-dynamic';
 
-export default function Unsubscribe({ params }: { params: { token: string } }) {
+export default async function Unsubscribe(props: { params: Promise<{ token: string }> }) {
+  const params = await props.params;
   const s = unsubscribe(params.token);
   return (
     <div className="gate"><div className="gate-box">

@@ -15,7 +15,11 @@ export const metadata: Metadata = { title: 'Ihr Auftrag', robots: { index: false
 export const dynamic = 'force-dynamic';
 const d = (x: Date) => x.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-export default function OfferPage({ params, searchParams }: { params: { token: string }; searchParams?: { neu?: string; bezahlt?: string; zahlung?: string } }) {
+export default async function OfferPage(
+  props: { params: Promise<{ token: string }>; searchParams?: Promise<{ neu?: string; bezahlt?: string; zahlung?: string }> }
+) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const i = inquiryByToken(params.token);
   if (!i) notFound();
   const o = i.offer?.sentAt ? i.offer : null;

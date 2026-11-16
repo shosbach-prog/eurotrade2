@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import AdminLoginForm from './AdminLoginForm';
 
 export const metadata: Metadata = { title: 'Admin', robots: { index: false, follow: false } };
-export default function AdminLogin({ searchParams }: { searchParams: { weiter?: string } }) {
+export default async function AdminLogin(props: { searchParams: Promise<{ weiter?: string }> }) {
+  const searchParams = await props.searchParams;
   const next = searchParams.weiter?.startsWith('/admin') ? searchParams.weiter : '/admin';
   return (
     <div className="gate"><div className="gate-box">

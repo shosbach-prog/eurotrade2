@@ -6,7 +6,8 @@ import { eur } from '@/lib/format';
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Ihre Rechnung', robots: { index: false, follow: false } };
 
-export default function InvoicePage({ params }: { params: { token: string } }) {
+export default async function InvoicePage(props: { params: Promise<{ token: string }> }) {
+  const params = await props.params;
   const i = invoiceByToken(params.token);
   if (!i) notFound();
   const t = invoiceTotals(i), s = i.seller!;

@@ -22,7 +22,8 @@ import { STATUS, draftOffer, getInquiry, offerTotals } from '@/lib/store';
 export const metadata: Metadata = { title: 'Anfrage', robots: { index: false, follow: false } };
 const fmt = (d: string) => new Date(d).toLocaleString('de-DE', { dateStyle: 'medium', timeStyle: 'short' });
 
-export default async function InquiryPage({ params }: { params: { no: string } }) {
+export default async function InquiryPage(props: { params: Promise<{ no: string }> }) {
+  const params = await props.params;
   const i = getInquiry(params.no);
   if (!i) notFound();
   const c = i.customer;

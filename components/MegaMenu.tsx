@@ -12,7 +12,7 @@ export default function MegaMenu({ menu }: { menu: Menu }) {
   const path = usePathname() ?? '/';
   const [open, setOpen] = useState<string | null>(null);
   const ref = useRef<HTMLElement>(null);
-  const timer = useRef<ReturnType<typeof setTimeout>>();
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const hover = useRef(false);
   useEffect(() => { hover.current = window.matchMedia('(hover: hover) and (pointer: fine)').matches; }, []);
   useEffect(() => { setOpen(null); }, [path]);

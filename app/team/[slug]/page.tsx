@@ -10,7 +10,8 @@ import { productPath } from '@/lib/format';
 import { Money } from '@/components/PriceMode';
 
 export const dynamic = 'force-dynamic';
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const params = await props.params;
   const t = getTeamShop(params.slug);
   if (!t) return { title: 'Team-Shop', robots: { index: false, follow: false } };
   const n = t.motifs?.length ?? 0;
@@ -22,7 +23,11 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   return { title, description, robots: t.indexed && t.active ? { index: true, follow: true } : { index: false, follow: false }, alternates: { canonical: `/team/${t.slug}` }, openGraph: { type: 'website', title, description, url: `/team/${t.slug}`, images: [image] }, twitter: { card: 'summary_large_image', title, description, images: [image.url] } };
 }
 
-export default function TeamShopPage({ params, searchParams }: { params: { slug: string }; searchParams?: { motiv?: string } }) {
+export default async function TeamShopPage(
+  props: { params: Promise<{ slug: string }>; searchParams?: Promise<{ motiv?: string }> }
+) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const t = getTeamShop(params.slug);
   if (!t) notFound();
   const items = t.items.map((id) => getProduct(id, null)).filter((p): p is NonNullable<typeof p> => !!p);

@@ -2,7 +2,8 @@ import { isAdmin } from '@/lib/customer';
 import { offerPdf } from '@/lib/pdf';
 import { getInquiry } from '@/lib/store';
 
-export async function GET(_: Request, { params }: { params: { no: string } }) {
+export async function GET(_: Request, props: { params: Promise<{ no: string }> }) {
+  const params = await props.params;
   if (!(await isAdmin())) return new Response('Nicht angemeldet', { status: 401 });
   const i = getInquiry(params.no);
   if (!i?.offer) return new Response('Noch kein Angebot gespeichert', { status: 404 });

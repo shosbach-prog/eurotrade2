@@ -25,7 +25,8 @@ function cleanOffer(o: any, prev?: Offer | null): Offer {
   };
 }
 
-export async function POST(req: Request, { params }: { params: { no: string } }) {
+export async function POST(req: Request, props: { params: Promise<{ no: string }> }) {
+  const params = await props.params;
   if (!(await isAdmin())) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 });
   const i = getInquiry(params.no);
   if (!i) return NextResponse.json({ error: 'Anfrage nicht gefunden.' }, { status: 404 });
@@ -144,7 +145,8 @@ export async function POST(req: Request, { params }: { params: { no: string } })
 }
 
 /** Lieferschein als PDF */
-export async function GET(_req: Request, { params }: { params: { no: string } }) {
+export async function GET(_req: Request, props: { params: Promise<{ no: string }> }) {
+  const params = await props.params;
   if (!(await isAdmin())) return new Response('Nicht angemeldet', { status: 401 });
   const i = getInquiry(params.no);
   if (!i) return new Response('Nicht gefunden', { status: 404 });

@@ -7,7 +7,8 @@ import { STATUS, listInquiries, offerTotals, type Status } from '@/lib/store';
 export const metadata: Metadata = { title: 'Anfragen', robots: { index: false, follow: false } };
 const fmt = (d: string) => new Date(d).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
 
-export default function AdminHome({ searchParams }: { searchParams: { status?: string } }) {
+export default async function AdminHome(props: { searchParams: Promise<{ status?: string }> }) {
+  const searchParams = await props.searchParams;
   const all = listInquiries();
   const filter = searchParams.status as Status | undefined;
   const items = filter && STATUS[filter] ? all.filter((i) => i.status === filter) : all;

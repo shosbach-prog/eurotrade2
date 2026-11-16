@@ -6,7 +6,8 @@ import { imageInUse } from '@/lib/catalog';
 const TYPES: Record<string, string> = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp' };
 
 /** Öffentliche Bilder – nur Referenzfotos, Ansprechpartner-Foto und Artikelbilder */
-export function GET(_: Request, { params }: { params: { id: string } }) {
+export async function GET(_: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   if (!/^[a-f0-9]{24}$/.test(params.id) || (!listReferences().some((r) => r.imageId === params.id) && getContactPerson()?.photoId !== params.id && !imageInUse(`/api/bild/${params.id}`))) return new Response('Nicht gefunden', { status: 404 });
   const meta = readJSON<{ ext: string } | null>(path.join(UPLOADS, `${params.id}.json`), null);
   const file = meta && path.join(UPLOADS, `${params.id}.${meta.ext}`);

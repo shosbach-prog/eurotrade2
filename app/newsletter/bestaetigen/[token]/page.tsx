@@ -5,7 +5,8 @@ import { confirm, tierText } from '@/lib/newsletter';
 export const metadata: Metadata = { title: 'Anmeldung bestätigt', robots: { index: false } };
 export const dynamic = 'force-dynamic';
 
-export default async function Confirm({ params }: { params: { token: string } }) {
+export default async function Confirm(props: { params: Promise<{ token: string }> }) {
+  const params = await props.params;
   const s = await confirm(params.token);
   return (
     <div className="gate"><div className="gate-box" style={{ maxWidth: 520 }}>

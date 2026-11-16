@@ -31,7 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
     twitter: { card: 'summary_large_image', images: ['/og.png'] },
     // Geschlossener Shop: nur Landingpage und Info-Seite in Suchmaschinen
     // Geschlossener Shop: Landingpage, Infoseiten und Schaufenster (Kategorien/Artikel ohne Preise) indexierbar
-    robots: previewMode() || (shopClosed() && !(['/start', '/druck-stick', '/widerruf', '/garantie', '/impressum', '/ueber-uns'].includes(headers().get('x-path') ?? '') || ((headers().get('x-path') ?? '').startsWith('/fuer/') || (headers().get('x-path') ?? '').startsWith('/aktion/')) || headers().get('x-showcase') === '1')) ? { index: false, follow: false } : undefined,
+    robots: previewMode() || (shopClosed() && !(['/start', '/druck-stick', '/widerruf', '/garantie', '/impressum', '/ueber-uns'].includes((await headers()).get('x-path') ?? '') || (((await headers()).get('x-path') ?? '').startsWith('/fuer/') || ((await headers()).get('x-path') ?? '').startsWith('/aktion/')) || (await headers()).get('x-showcase') === '1')) ? { index: false, follow: false } : undefined,
   };
 }
 export const dynamic = 'force-dynamic';
@@ -51,12 +51,12 @@ function orgSchema() {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const gated = shopClosed();
-  const path = headers().get('x-path') ?? '/';
-  const isPublic = ['/fuer', '/aktion', '/produktsicherheit', '/ueber-uns', '/garantie', '/bewerten', '/widerruf', '/newsletter', '/start', '/druck-stick', '/zugang', '/passwort', '/registrieren', '/kontakt', '/agb', '/ratgeber', '/impressum', '/datenschutz', '/angebot', '/admin', '/marken', '/team', '/rechnung'].some((p) => path === p || path.startsWith(p + '/')) || headers().get('x-public') === '1';
+  const path = (await headers()).get('x-path') ?? '/';
+  const isPublic = ['/fuer', '/aktion', '/produktsicherheit', '/ueber-uns', '/garantie', '/bewerten', '/widerruf', '/newsletter', '/start', '/druck-stick', '/zugang', '/passwort', '/registrieren', '/kontakt', '/agb', '/ratgeber', '/impressum', '/datenschutz', '/angebot', '/admin', '/marken', '/team', '/rechnung'].some((p) => path === p || path.startsWith(p + '/')) || (await headers()).get('x-public') === '1';
   const { ok, customer } = await shopAccess();
   const admin = !customer && (await isAdmin());
   // Code im Admin gesperrt/gelöscht -> zurück zur Anmeldung
-  const showcase = !ok && headers().get('x-showcase') === '1';
+  const showcase = !ok && (await headers()).get('x-showcase') === '1';
   if (!ok && !isPublic && !showcase) redirect('/zugang');
   return (
     <html lang="de">
@@ -64,7 +64,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema()) }} />
         <a href="#inhalt" className="skip">Zum Inhalt springen</a>
-        <PriceModeProvider initial={cookies().get('et_price')?.value === 'netto' ? 'netto' : 'brutto'} vat={VAT}><AdminKondProvider admin={admin}><CartProvider><WishlistProvider>
+        <PriceModeProvider initial={(await cookies()).get('et_price')?.value === 'netto' ? 'netto' : 'brutto'} vat={VAT}><AdminKondProvider admin={admin}><CartProvider><WishlistProvider>
           {previewMode() && ok && !path.startsWith('/start') && <div className="preview-bar">Vorschau-Modus – nur für Sie sichtbar. Preise sind Platzhalter. Kunden-Codes sind gesperrt, bis Sie <code>SHOP_PREVIEW=false</code> setzen.</div>}
           <SiteHeader ok={ok} customerName={customer?.name ?? null} admin={admin} menu={menuData(ok ? customer : undefined)} shop={SHOP} domain={process.env.SHOP_DOMAIN ?? 'euro-trade.com'} />
           <main className="wrap" id="inhalt" tabIndex={-1}>{children}</main>

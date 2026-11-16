@@ -3,7 +3,8 @@ import PasswordForm from './PasswordForm';
 
 export const metadata: Metadata = { title: 'Passwort', robots: { index: false, follow: false } };
 
-export default function Passwort({ searchParams }: { searchParams: { t?: string } }) {
+export default async function Passwort(props: { searchParams: Promise<{ t?: string }> }) {
+  const searchParams = await props.searchParams;
   const token = searchParams.t ?? '';
   return (
     <div className="gate">
