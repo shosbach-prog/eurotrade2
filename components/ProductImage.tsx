@@ -1,11 +1,13 @@
 import type { PublicProduct } from '@/lib/types';
-import { mid } from '@/lib/img';
+import { mid, srcSet } from '@/lib/img';
 
 /** Echtes Bild aus L-Shop – oder neutraler Platzhalter in der ersten Produktfarbe */
 export default function ProductImage({ p, src, hex, priority }: { p: Pick<PublicProduct, 'name' | 'images' | 'colors' | 'category'> & { webp?: boolean; mid?: boolean; imageAlt?: string }; src?: string; hex?: string; priority?: boolean }) {
   // ohne src: Kachel/Vorschau → kleine 480-px-Fassung
   const img = src ?? mid(p.images[0], p.mid, p.webp);
-  if (img) return <img className="pimg" src={img} alt={p.imageAlt || p.name} loading={priority ? 'eager' : 'lazy'} {...(priority ? { fetchPriority: 'high' as const } : {})} decoding="async" />;
+  // Kacheln: zusätzlich 360-px-Fassung anbieten, damit schmale Handy-Kacheln nicht die 480-px-Datei laden
+  const set = !src && img?.startsWith('/p/') ? srcSet(img, [360, 480]) : undefined;
+  if (img) return <img className="pimg" src={img} srcSet={set} sizes={set ? '(max-width: 700px) 46vw, 300px' : undefined} alt={p.imageAlt || p.name} loading={priority ? 'eager' : 'lazy'} {...(priority ? { fetchPriority: 'high' as const } : {})} decoding="async" />;
   const fill = hex ?? p.colors[0]?.hex ?? '#cfd6df';
   const c = p.category.toLowerCase();
   const shape = c.includes('tasche')
