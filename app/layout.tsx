@@ -64,7 +64,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema()) }} />
         <a href="#inhalt" className="skip">Zum Inhalt springen</a>
-        <PriceModeProvider initial={cookies().get('et_price')?.value === 'brutto' ? 'brutto' : 'netto'} vat={VAT}><AdminKondProvider admin={admin}><CartProvider><WishlistProvider>
+        <PriceModeProvider initial={cookies().get('et_price')?.value === 'netto' ? 'netto' : 'brutto'} vat={VAT}><AdminKondProvider admin={admin}><CartProvider><WishlistProvider>
           {previewMode() && ok && !path.startsWith('/start') && <div className="preview-bar">Vorschau-Modus – nur für Sie sichtbar. Preise sind Platzhalter. Kunden-Codes sind gesperrt, bis Sie <code>SHOP_PREVIEW=false</code> setzen.</div>}
           <SiteHeader ok={ok} customerName={customer?.name ?? null} admin={admin} menu={menuData(ok ? customer : undefined)} shop={SHOP} domain={process.env.SHOP_DOMAIN ?? 'euro-trade.com'} />
           <main className="wrap" id="inhalt" tabIndex={-1}>{children}</main>

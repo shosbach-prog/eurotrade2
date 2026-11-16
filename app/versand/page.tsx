@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { paypalEnabled } from '@/lib/paypal';
 
 export const metadata: Metadata = {
   title: 'Versand & Lieferung',
@@ -28,10 +29,10 @@ export default function Versand() {
       </table>
 
       <h2>Lieferzeit</h2>
-      <p>Die voraussichtliche Lieferzeit nennen wir im Angebot bzw. in der Bestellbestätigung. Bedruckte oder bestickte Artikel werden nach Ihrer Freigabe der Vorschau gefertigt – Lieferung meist in 7–14 Werktagen.</p>
+      <p>Unveredelte Lagerware liefern wir in der Regel in 3–5 Werktagen, bei Vorkasse ab Zahlungseingang. Bedruckte oder bestickte Artikel werden nach Ihrer Freigabe der Vorschau gefertigt, Motivartikel aus unserem Sortiment nach Ihrer Bestellung – Lieferung meist in 7–14 Werktagen. Die Lieferzeit steht außerdem am Artikel sowie im Angebot bzw. in der Bestellbestätigung.</p>
 
       <h2>Zahlung</h2>
-      <p>Zahlung per Vorkasse (Überweisung). Unternehmen, Vereine und öffentliche Einrichtungen können nach Vereinbarung auf Rechnung bestellen. Details: <Link href="/agb">AGB</Link>.</p>
+      <p>Zahlung per Vorkasse (Überweisung){paypalEnabled() ? ' oder PayPal' : ''}. Unternehmen, Vereine und öffentliche Einrichtungen können nach Vereinbarung auf Rechnung bestellen. Details: <Link href="/agb">AGB</Link>.</p>
 
       <h2>Rückgabe</h2>
       <p>Unveredelte Ware können Verbraucher innerhalb von 14 Tagen zurückgeben. Alles dazu unter <Link href="/widerruf">Rückgabe & Widerruf</Link>.</p>

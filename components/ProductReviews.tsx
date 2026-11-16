@@ -4,9 +4,9 @@ import { reviewsFor } from '@/lib/reviews';
 import { contactPerson } from './ContactCard';
 
 /** Bewertungsbereich auf der Produktseite */
-export default function ProductReviews({ productId, name, extra }: { productId: string; name: string; extra?: Record<string, unknown> }) {
+export default function ProductReviews({ productId, name, extra, motif }: { productId: string; name: string; extra?: Record<string, unknown>; /** fertiger Motivartikel (Festpreis inkl. Druck) – eigene Hinweise statt Logo-/Angebotstexte */ motif?: boolean }) {
   const list = reviewsFor(productId);
-  if (!list.length) return <TrustBlock />;
+  if (!list.length) return <TrustBlock motif={motif} />;
   const avg = list.reduce((s, r) => s + r.rating, 0) / list.length;
   const dist = [5, 4, 3, 2, 1].map((n) => ({ n, c: list.filter((r) => r.rating === n).length }));
   const ld = { '@context': 'https://schema.org', '@type': 'Product', name, ...(extra ?? {}), aggregateRating: { '@type': 'AggregateRating', ratingValue: avg.toFixed(1), reviewCount: list.length }, review: list.slice(0, 5).map((r) => ({ '@type': 'Review', reviewRating: { '@type': 'Rating', ratingValue: r.rating }, author: { '@type': 'Person', name: r.name }, datePublished: r.date.slice(0, 10), reviewBody: r.text })) };
@@ -29,15 +29,21 @@ export default function ProductReviews({ productId, name, extra }: { productId: 
 }
 
 /** Statt leerer Bewertungen: Darauf können Sie sich verlassen */
-export function TrustBlock() {
+export function TrustBlock({ motif }: { motif?: boolean } = {}) {
   const cp = contactPerson();
   return (
     <section className="rev-section trust">
       <h2>Darauf können Sie sich verlassen</h2>
       <div className="trust-grid">
-        <div className="box"><b>Vorschau vor der Produktion</b><p>Sie sehen Ihr Logo vorab und geben es frei. Erst dann wird gedruckt oder gestickt.</p></div>
-        <div className="box"><b>Markenware ab 1 Stück</b><p>Originale Markentextilien, Staffelpreise ab 10 Stück, auch für Nachbestellungen.</p></div>
-        <div className="box"><b>Angebot statt Überraschung</b><p>Sie erhalten ein verbindliches Angebot mit allen Kosten, bevor Sie sich entscheiden.</p></div>
+        {motif ? <>
+          <div className="box"><b>Druck inklusive</b><p>Der Preis gilt für das fertig bedruckte Teil – ohne Einrichtungskosten, schon ab 1 Stück.</p></div>
+          <div className="box"><b>Markentextil als Basis</b><p>Gedruckt wird auf originale Markenware – Material und Größen finden Sie in den Produktdetails.</p></div>
+          <div className="box"><b>Fester Endpreis</b><p>Preis inkl. MwSt., zzgl. Versand – der Gesamtbetrag steht vor der Bestellung im Warenkorb.</p></div>
+        </> : <>
+          <div className="box"><b>Vorschau vor der Produktion</b><p>Sie sehen Ihr Logo vorab und geben es frei. Erst dann wird gedruckt oder gestickt.</p></div>
+          <div className="box"><b>Markenware ab 1 Stück</b><p>Originale Markentextilien, Staffelpreise ab 10 Stück, auch für Nachbestellungen.</p></div>
+          <div className="box"><b>Fester Preis, klare Kosten</b><p>Unveredelte Ware bestellen Sie direkt zum angezeigten Preis. Für Druck oder Stick erhalten Sie vorab ein verbindliches Angebot mit allen Kosten.</p></div>
+        </>}
         <div className="box contact-card">{cp.photoId ? <img className="avatar" src={`/api/bild/${cp.photoId}`} alt={`Foto ${cp.name}`} width={64} height={64} loading="lazy" decoding="async" style={{ objectFit: 'cover' }} /> : <span className="avatar" aria-hidden>{cp.name.split(/\s+/).map((x) => x[0]).join('').slice(0, 2).toUpperCase()}</span>}<div><b>{cp.role || 'Ihr Ansprechpartner'}</b><p>{cp.name}<br />{cp.phone && <><a className="alink" href={`tel:${cp.phone.replace(/[^\d+]/g, '').replace(/^0/, '+49')}`}>{cp.phone}</a> · </>}<a className="alink" href={`mailto:${cp.email}`}>{cp.email}</a></p></div></div>
       </div>
     </section>

@@ -2,6 +2,7 @@ import { allPublic } from '@/lib/catalog';
 import { getText } from '@/lib/content';
 import { productPath } from '@/lib/format';
 import { previewMode } from '@/lib/access';
+import { ownImage } from '@/lib/img';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +16,8 @@ export async function GET() {
   if (previewMode()) return new Response('Feed erst nach Freischaltung des Shops verfügbar.', { status: 404 });
   const base = (process.env.SHOP_URL ?? 'https://euro-trade.com').replace(/\/$/, '');
   const abs = (u: string) => (u.startsWith('http') ? u : `${base}${u}`);
+  // Bilder immer von der eigenen Domain (externe L-Shop-Bilder über /api/img) – Google ruft sie zuverlässig ab
+  const img = (u: string) => ownImage(u, base);
   const items = allPublic(null).filter((p) => p.price != null && p.priceGross != null && p.images.length);
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
@@ -43,8 +46,8 @@ ${variants.length > 1 ? `<g:item_group_id>${esc(p.sku)}</g:item_group_id>` : ''}
 <g:title>${esc(`${p.name.replace(/\s*\([^)]*\)\s*$/, '')}${p.collection ? '' : ` – ${p.brand}${p.model ? ` ${p.model}` : ''}`}${size && variants.length > 1 ? ` (Größe ${size})` : ''}`.slice(0, 150))}</g:title>
 <g:description>${esc(desc)}</g:description>
 <g:link>${esc(abs(productPath(p)))}?preis=brutto</g:link>
-<g:image_link>${esc(abs(p.images[0]))}</g:image_link>
-${p.images.slice(1, 6).map((i) => `<g:additional_image_link>${esc(abs(i))}</g:additional_image_link>`).join('\n')}
+<g:image_link>${esc(img(p.images[0]))}</g:image_link>
+${p.images.slice(1, 6).map((i) => `<g:additional_image_link>${esc(img(i))}</g:additional_image_link>`).join('\n')}
 <g:availability>in_stock</g:availability>
 <g:condition>new</g:condition>
 <g:price>${money(was ?? price)}</g:price>

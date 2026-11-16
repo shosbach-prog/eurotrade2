@@ -24,33 +24,33 @@ export default function AGB() {
       </S>
 
       <S n={2} t="Kundenkonto und Zugang">
-        <p>(1) Preise und Bestellfunktionen sind nach Anmeldung mit Zugangscode oder E-Mail-Adresse und Passwort sichtbar. Ein Anspruch auf Freischaltung eines Kundenkontos besteht nicht.</p>
+        <p>(1) Der Shop ist ohne Anmeldung nutzbar; Bestellungen und Anfragen sind als Gast möglich. Ein Kundenkonto (Zugangscode oder E-Mail-Adresse und Passwort) ist freiwillig und dient z. B. individuellen Konditionen und der Übersicht über eigene Anfragen. Ein Anspruch auf Freischaltung eines Kundenkontos besteht nicht.</p>
         <p>(2) Der Kunde hält seine Zugangsdaten geheim und informiert uns unverzüglich, wenn ein Missbrauch zu befürchten ist.</p>
       </S>
 
       <S n={3} t="Vertragsschluss">
-        <p>(1) Die Darstellung der Artikel auf der Website ist kein bindendes Angebot, sondern eine Aufforderung zur Abgabe einer Anfrage.</p>
-        <p>(2) Mit dem Absenden einer Anfrage (Warenkorb, Preisanfrage oder Kontaktformular) bittet der Kunde um ein Angebot. Die automatische Eingangsbestätigung ist noch keine Annahme.</p>
-        <p>(3) Wir erstellen ein schriftliches Angebot (per E-Mail bzw. als PDF) mit Artikeln, Mengen, Veredelung, Preisen, Versandkosten und Lieferzeit. Das Angebot ist für die darin genannte Frist gültig.</p>
-        <p>(4) Der Vertrag kommt zustande, wenn der Kunde das Angebot innerhalb der Gültigkeitsfrist annimmt – durch Klick auf „Angebot annehmen“, per E-Mail oder schriftlich. Wir bestätigen die Annahme per E-Mail.</p>
-        <p>(5) Die Vertragssprache ist Deutsch. Den Vertragstext (Angebot und Bestätigung) speichern wir; der Kunde erhält ihn per E-Mail.</p>
+        <p>(1) Die Darstellung der Artikel auf der Website ist kein bindendes Angebot, sondern eine Aufforderung zur Bestellung bzw. zur Abgabe einer Anfrage.</p>
+        <p>(2) <strong>Direktbestellung im Shop:</strong> Unveredelte Ware und fertige Motivartikel aus unserem Sortiment kann der Kunde direkt bestellen. Im Warenkorb werden vor dem Absenden alle Artikel, Mengen, Preise, Versandkosten und der Gesamtbetrag angezeigt; Eingaben lassen sich dort bis zum Absenden prüfen und ändern. Mit Klick auf „Zahlungspflichtig bestellen“ gibt der Kunde ein verbindliches Angebot zum Kauf ab. Der Vertrag kommt zustande, wenn wir die Bestellung per E-Mail bestätigen (Bestellbestätigung mit Zahlungsinformationen) bzw. – bei Zahlung per PayPal – mit Abschluss der Zahlung.</p>
+        <p>(3) <strong>Anfrage und Angebot:</strong> Für veredelte Ware (Druck, Stick), größere Mengen oder Sonderwünsche bittet der Kunde mit dem Absenden einer Anfrage (Warenkorb, Preisanfrage oder Kontaktformular) um ein Angebot. Die automatische Eingangsbestätigung ist noch keine Annahme. Wir erstellen ein schriftliches Angebot (per E-Mail bzw. als PDF) mit Artikeln, Mengen, Veredelung, Preisen, Versandkosten und Lieferzeit. Das Angebot ist für die darin genannte Frist gültig.</p>
+        <p>(4) In diesem Fall kommt der Vertrag zustande, wenn der Kunde das Angebot innerhalb der Gültigkeitsfrist annimmt – durch Klick auf „Angebot annehmen“, per E-Mail oder schriftlich. Wir bestätigen die Annahme per E-Mail.</p>
+        <p>(5) Die Vertragssprache ist Deutsch. Den Vertragstext (Bestellung bzw. Angebot und Bestätigung) speichern wir; der Kunde erhält ihn per E-Mail.</p>
       </S>
 
       <S n={4} t="Preise und Versandkosten">
-        <p>(1) Auf der Website angezeigte Preise sind Nettopreise zuzüglich der gesetzlichen Umsatzsteuer, sofern nicht anders gekennzeichnet. Im Angebot werden Netto- und Bruttobetrag ausgewiesen. Für Verbraucher ist der Bruttopreis maßgeblich.</p>
+        <p>(1) Auf der Website angezeigte Preise sind standardmäßig Endpreise in Euro einschließlich der gesetzlichen Umsatzsteuer, zuzüglich Versandkosten. Über den Umschalter „netto / brutto“ können gewerbliche Kunden auf Nettopreise zuzüglich Umsatzsteuer wechseln; die Anzeige ist jeweils gekennzeichnet. In Bestellübersicht und Angebot werden Netto- und Bruttobetrag ausgewiesen. Für Verbraucher ist der Bruttopreis maßgeblich.</p>
         <p>(2) Mengenrabatte (Staffelpreise) beziehen sich auf die Gesamtmenge eines Artikels in einer Bestellung, über alle Farben und Größen.</p>
         <p>(3) Der Versand innerhalb Deutschlands kostet pauschal 4,90 € (inkl. MwSt.) je Bestellung. Kosten für Veredelung (z. B. Druck, Stick, Einrichtung, Stickprogramm) und für den Versand ins Ausland werden im Angebot gesondert ausgewiesen.</p>
       </S>
 
       <S n={5} t="Zahlung">
-        <p>(1) Die Zahlung erfolgt per Vorkasse (Überweisung), sofern im Angebot keine andere Zahlungsart vereinbart ist. Für Unternehmer, Vereine und öffentliche Einrichtungen kann nach Vereinbarung Zahlung auf Rechnung erfolgen.</p>
+        <p>(1) Die Zahlung erfolgt per Vorkasse (Überweisung) oder – soweit im Bestellvorgang angeboten – per PayPal, sofern im Angebot keine andere Zahlungsart vereinbart ist. Für Unternehmer, Vereine und öffentliche Einrichtungen kann nach Vereinbarung Zahlung auf Rechnung erfolgen.</p>
         <p>(2) Rechnungen sind innerhalb von 14 Tagen nach Rechnungsdatum ohne Abzug fällig, soweit nichts anderes vereinbart ist.</p>
         <p>(3) Rabattcodes sind nicht mit anderen Aktionen kombinierbar, nicht auszahlbar und nur innerhalb ihrer Gültigkeit einlösbar.</p>
       </S>
 
       <S n={6} t="Lieferung">
         <p>(1) Wir liefern an die vom Kunden angegebene Adresse innerhalb Deutschlands; Lieferungen ins Ausland nach Vereinbarung.</p>
-        <p>(2) Die Lieferzeit ergibt sich aus dem Angebot. Bei veredelter Ware beginnt sie mit der Freigabe der Vorschau (§ 7) und – bei Vorkasse – mit Zahlungseingang.</p>
+        <p>(2) Die Lieferzeit ist am Artikel angegeben bzw. ergibt sich aus dem Angebot. Bei Vorkasse beginnt sie mit Zahlungseingang, bei individuell veredelter Ware zusätzlich erst mit der Freigabe der Vorschau (§ 7).</p>
         <p>(3) Ist ein Artikel beim Lieferanten nicht verfügbar, informieren wir den Kunden unverzüglich und bieten eine gleichwertige Alternative an. Bereits geleistete Zahlungen für nicht lieferbare Ware erstatten wir unverzüglich.</p>
         <p>(4) Teillieferungen sind zulässig, soweit sie dem Kunden zumutbar sind.</p>
       </S>
@@ -65,7 +65,7 @@ export default function AGB() {
 
       <S n={8} t="Widerrufsrecht">
         <p>(1) Verbrauchern steht ein gesetzliches Widerrufsrecht zu. Einzelheiten regelt die <Link href="/widerruf" className="alink">Widerrufsbelehrung</Link>.</p>
-        <p>(2) Das Widerrufsrecht besteht nicht bei Waren, die nach Kundenspezifikation angefertigt werden oder eindeutig auf die persönlichen Bedürfnisse zugeschnitten sind (§ 312g Abs. 2 Nr. 1 BGB). Das betrifft insbesondere bedruckte, bestickte oder anderweitig individuell veredelte Textilien.</p>
+        <p>(2) Das Widerrufsrecht besteht nicht bei Waren, die nach Kundenspezifikation angefertigt werden oder eindeutig auf die persönlichen Bedürfnisse zugeschnitten sind (§ 312g Abs. 2 Nr. 1 BGB). Das betrifft Textilien, die nach den Vorgaben des Kunden bedruckt, bestickt oder anderweitig veredelt werden (z. B. mit eigenem Logo, Text, Namen oder Nummern). Für unveredelte Ware und für fertige Motivartikel aus unserem Sortiment bleibt das Widerrufsrecht bestehen.</p>
         <p>(3) Unternehmern steht kein gesetzliches Widerrufsrecht zu. Ein Umtausch unveredelter Ware ist nach vorheriger Absprache möglich.</p>
       </S>
 
