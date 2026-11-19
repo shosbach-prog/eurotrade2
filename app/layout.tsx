@@ -1,4 +1,5 @@
 import './globals.css';
+import './xmas.css';
 import Link from 'next/link';
 import { headers, cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -20,6 +21,8 @@ import { PriceModeProvider } from '@/components/PriceMode';
 import { AdminKondProvider } from '@/components/AdminKond';
 import { VAT } from '@/lib/pricing';
 import AgentTools from '@/components/AgentTools';
+import Snow from '@/components/Snow';
+import { isXmas } from '@/lib/theme';
 
 const SHOP = process.env.SHOP_NAME ?? 'Euro-Trade';
 export async function generateMetadata(): Promise<Metadata> {
@@ -58,8 +61,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // Code im Admin gesperrt/gelöscht -> zurück zur Anmeldung
   const showcase = !ok && (await headers()).get('x-showcase') === '1';
   if (!ok && !isPublic && !showcase) redirect('/zugang');
+  const xmas = isXmas();
   return (
-    <html lang="de">
+    <html lang="de" className={xmas ? 'xmas' : undefined}>
       <head><link rel="ai-catalog" href="/.well-known/ai-catalog.json" type="application/json" /></head>
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema()) }} />
@@ -126,6 +130,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           {!path.startsWith('/admin') && <QuickView />}
           {!path.startsWith('/admin') && <Contact whatsapp={process.env.CONTACT_WHATSAPP ?? '491732648097'} phone={process.env.BERATUNG_TELEFON ?? '030 40719258'} email={process.env.CONTACT_EMAIL ?? 'info@euro-trade.com'} />}
         </WishlistProvider></CartProvider></AdminKondProvider></PriceModeProvider>
+        {xmas && !path.startsWith('/admin') && <Snow />}
         <AgentTools />
       </body>
     </html>
