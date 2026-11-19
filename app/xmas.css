@@ -1,0 +1,99 @@
+/* =====================================================================
+   Weihnachts-Theme – aktiv, wenn <html class="xmas"> gesetzt ist
+   (automatisch 15. Nov. – 6. Jan., steuerbar per SHOP_THEME, siehe lib/theme.ts).
+   Ersetzt das Marken-Blau durch Weihnachtsrot, Tannengrün und Gold.
+   ===================================================================== */
+html.xmas{
+  --bg:#faf6f0; --line:#ebe2d8;
+  --brand:#b4162c; --brand-ink:#fff; --accent:#f4c542;
+  --x-red-d:#7d0f1f; --x-red:#b4162c; --x-red-l:#d8323f;
+  --x-green-d:#0f3d27; --x-green:#17603c;
+  --x-tint:#fbeced; --x-tint2:#fdf4f4; --x-border:#f1c6cb;
+  --x-grad:linear-gradient(100deg,#7d0f1f 0%,#b4162c 55%,#d8323f 100%);
+}
+
+/* Kopfzeile: Rot mit dezentem Schnee-Glitzer + Lichterkette unten */
+.xmas .hdr{background:
+  radial-gradient(circle at 12% 30%,rgba(255,255,255,.18) 0 1.5px,transparent 2px),
+  radial-gradient(circle at 37% 70%,rgba(255,255,255,.14) 0 1.2px,transparent 2px),
+  radial-gradient(circle at 63% 25%,rgba(255,255,255,.16) 0 1.5px,transparent 2px),
+  radial-gradient(circle at 88% 65%,rgba(255,255,255,.14) 0 1.2px,transparent 2px),
+  var(--x-grad);background-size:180px 72px,220px 72px,260px 72px,200px 72px,auto}
+.xmas .hdr::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:6px;pointer-events:none;
+  background:radial-gradient(circle,#f4c542 0 2.5px,transparent 3px) 0 0/48px 6px,
+             radial-gradient(circle,#2fbf71 0 2.5px,transparent 3px) 16px 0/48px 6px,
+             radial-gradient(circle,#ff6b6b 0 2.5px,transparent 3px) 32px 0/48px 6px;
+  animation:x-twinkle 2.4s steps(3) infinite}
+@keyframes x-twinkle{0%{opacity:1}50%{opacity:.55}100%{opacity:1}}
+.xmas .logo-name .logo-tld{color:#ffd9dc}
+.xmas .logo-mark path{stroke:#9b1020}
+.xmas .catnav{border-bottom-color:var(--x-border)}
+.xmas .pub-nav a{color:#ffe1e3}
+
+/* Mütze auf dem Logo */
+.xmas .logo-wrap{position:relative}
+.xmas .hdr .logo-wrap::before{content:"";position:absolute;left:-9px;top:-15px;width:36px;height:27px;z-index:1;pointer-events:none;transform:rotate(-20deg);filter:drop-shadow(0 2px 3px rgba(0,0,0,.35));
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 44'%3E%3Cpath d='M6 34C10 14 26 2 42 6c6 2 10 10 12 20l-6 2C46 18 42 14 36 14 26 14 18 24 18 34z' fill='%23ef4452'/%3E%3Crect x='2' y='30' width='40' height='11' rx='5.5' fill='%23fff'/%3E%3Ccircle cx='51' cy='31' r='6' fill='%23fff'/%3E%3C/svg%3E") no-repeat center/contain}
+
+/* Große Farbflächen */
+.xmas .hero,.xmas .l-hero,.xmas .rg-cta,.xmas .tf-aside{background:var(--x-grad)}
+.xmas .nl{background:linear-gradient(120deg,#0f3d27 0%,#17603c 55%,#1f7a4c 100%);box-shadow:0 18px 40px -18px rgba(15,61,39,.55)}
+.xmas .nl-hot{color:var(--x-green-d)}
+.xmas .nl-tiers li,.xmas .nl-priv,.xmas .nl-hint{color:#e3f3ea}
+.xmas .nl-small{color:#b9e2cb}
+.xmas .team-banner,.xmas .st-top{background:linear-gradient(135deg,var(--x-red),var(--x-red-l))}
+.xmas .mm-promo{background:linear-gradient(135deg,var(--x-red),var(--x-green-d))}
+.xmas .z-bar i{background:linear-gradient(90deg,#f1a7ae,var(--x-red))}
+.xmas .cat-hero{background:linear-gradient(120deg,var(--x-tint2),#fff8dc)}
+.xmas .avatar{color:var(--x-red-d)}
+
+/* Footer: Tannengrün, Streifen in Gold/Rot/Grün */
+.xmas footer.ft{background:#0d2a1d;color:#bcd2c4}
+.xmas footer.ft::before{background:repeating-linear-gradient(90deg,#f4c542 0 40px,#d8323f 40px 80px,#fff 80px 90px,#17603c 90px 130px,#fff 130px 140px)}
+.xmas .ft-bottom{background:#081d14}
+.xmas .ft-brand p{color:#a5bfb0}
+.xmas .ft-col a{color:#bcd2c4}
+.xmas .ft-contact a,.xmas .ft-contact span,.xmas .ft-bottom b,.xmas .ft-bottom a{color:#e2efe7}
+.xmas .ft-bottom .wrap{color:#86a594}
+
+/* Helle Blau-Töne → zartes Rosé */
+.xmas .sugg a.on,.xmas .sugg a:hover,.xmas .size.on,.xmas .gate-lock,.xmas .mx.on span,.xmas .file-ico,
+.xmas .tier.on,.xmas .l-tag,.xmas .sel-sizes span,.xmas .f-fam.on,.xmas .drop.over,.xmas .drop:hover,
+.xmas .step button:hover:not(:disabled),.xmas .st-angebot,.xmas .ap-add.some,.xmas .cr-st.freigegeben{background:var(--x-tint)}
+.xmas .st-angebot{color:var(--brand)}
+.xmas .deco-toggle,.xmas .sz.on,.xmas .sizechart,.xmas .f-group.act .f-btn,.xmas .deco-all,.xmas .contact-menu a:hover,
+.xmas .rev-reply,.xmas .ideal b,.xmas .locked-box,.xmas .deco-est,.xmas .drop,.xmas .mcard.on,.xmas .kalk-test,
+.xmas .al-row.sel,.xmas .ds-tabs button.on,.xmas .ts-drop.on,.xmas .sys-info{background:var(--x-tint2)}
+.xmas .sizechart,.xmas .contact-menu a:hover,.xmas .locked-box,.xmas .deco-est,.xmas .kalk-test,.xmas .sys-info{border-color:var(--x-border)}
+.xmas .drop{border-color:#ecb3ba}
+.xmas .sys-info,.xmas .brand-tags b{color:var(--x-red-d)}
+.xmas .brand-tags b{background:var(--x-tint)}
+.xmas .contact-btn{box-shadow:0 8px 24px rgba(180,22,44,.4)}
+.xmas .gal-thumbs button.on{box-shadow:0 0 0 2px rgba(180,22,44,.2)}
+.xmas .gal-lens{border-color:rgba(180,22,44,.55)}
+.xmas .ap-card.on{box-shadow:0 0 0 2px rgba(180,22,44,.15)}
+.xmas .motif-grid .motif.on{box-shadow:0 0 0 3px rgba(180,22,44,.18)}
+.xmas .ds-area{border-color:rgba(180,22,44,.55);background:rgba(180,22,44,.04)}
+.xmas .ds-motif.on{border-color:rgba(180,22,44,.8);box-shadow:0 0 0 3px rgba(180,22,44,.15)}
+.xmas .ds-size{background:var(--brand)}
+.xmas .ap-cats button.on span,.xmas .ap-subs button.on span,.xmas .ap-cats .ap-row.on .ap-rl span{color:#ffd9dc}
+.xmas .mm-offer.eol{background:var(--x-tint2)}
+
+/* Garantie-Siegel */
+.xmas .tbadge circle[fill="#0646c9"]{fill:var(--x-green-d)}
+.xmas .tbadge text[fill="#0638b8"]{fill:var(--x-red-d)}
+.xmas .tbadge path[stroke="#0638b8"]{stroke:var(--x-red-d)}
+
+/* Saison-Banner etwas festlicher */
+.xmas .season{background:
+  radial-gradient(circle at 8% 20%,rgba(255,255,255,.25) 0 2px,transparent 3px) 0 0/90px 60px,
+  radial-gradient(circle at 60% 70%,rgba(255,255,255,.18) 0 1.5px,transparent 2.5px) 0 0/70px 50px,
+  linear-gradient(110deg,#7d0f1f,#b4162c 55%,#17603c);border:1px solid rgba(244,197,66,.5)}
+
+/* Schneefall (rein dekorativ, klickt durch, aus bei reduzierter Bewegung) */
+.x-snow{position:fixed;inset:0;pointer-events:none;z-index:40;overflow:hidden}
+.x-snow i{position:absolute;top:-12px;width:var(--s,6px);height:var(--s,6px);border-radius:50%;background:#fff;opacity:.85;
+  box-shadow:0 0 4px rgba(150,170,190,.6);animation:x-fall var(--d,12s) linear var(--w,0s) infinite}
+@keyframes x-fall{0%{transform:translate(0,-12px)}50%{transform:translate(var(--x,20px),50vh)}100%{transform:translate(0,105vh)}}
+@media (prefers-reduced-motion:reduce){.x-snow{display:none}.xmas .hdr::after{animation:none}}
+@media print{.x-snow{display:none}}
